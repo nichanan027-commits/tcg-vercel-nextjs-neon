@@ -22,57 +22,62 @@ body.on-driver,body.on-partner{background:#f4f8fb;color:#15263c}
 .backhome i{font-style:normal;font-size:14px;line-height:1}
 
 /* ปุ่มกลับหน้าปกกลาง - ใน top bar */
-.tophome{border:1px solid #d5e3ec;background:#fff;color:#0b7580;border-radius:10px;padding:9px 12px;font-weight:800;font-size:11.5px;cursor:pointer;white-space:nowrap;font-family:inherit}
+.tophome{border:1px solid #d5e3ec;background:#fff;color:#0a5a9c;border-radius:10px;padding:9px 12px;font-weight:800;font-size:11.5px;cursor:pointer;white-space:nowrap;font-family:inherit}
 .tophome:hover{background:#eef9fb}
 
 /* ============================================================
    VIEW 1 : GATEWAY (ปกกลาง)
    ============================================================ */
-#viewGateway{--navy:#071a33;--navy2:#0d3153;--teal:#16b9b1;--cyan:#24c5e5;--mint:#5ce0b7;--bg:#f5f8fb;--ink:#13243a;--muted:#667085;--line:#dfe7ef;--white:#fff;--shadow:0 20px 60px rgba(7,26,51,.12)}
+#viewGateway{--navy:#071a33;--navy2:#0d3153;--teal:#0d5eb8;--cyan:#29b6e8;--mint:#f5b921;--bg:#f5f8fb;--ink:#13243a;--muted:#667085;--line:#dfe7ef;--white:#fff;--shadow:0 20px 60px rgba(7,26,51,.12)}
 #viewGateway .wrap{min-height:100vh;display:flex;flex-direction:column}
 #viewGateway .top{padding:22px 28px;display:flex;justify-content:space-between;align-items:center}
 #viewGateway .brand{font-weight:900;color:var(--navy);letter-spacing:-.02em}
 #viewGateway .brand small{display:block;font-weight:650;color:#58728a;margin-top:4px}
 #viewGateway .demo{font-size:11px;font-weight:800;border:1px solid #c8dae6;padding:7px 10px;border-radius:999px;background:#fff}
 #viewGateway .hero{width:min(1180px,calc(100% - 32px));margin:auto;display:grid;grid-template-columns:1.05fr .95fr;gap:28px;align-items:center;padding:30px 0 70px}
-#viewGateway .kicker{font-size:12px;font-weight:900;letter-spacing:.08em;color:#0a7281;text-transform:uppercase}
+#viewGateway .kicker{font-size:12px;font-weight:900;letter-spacing:.08em;color:#0a5a9c;text-transform:uppercase}
 #viewGateway .hero h1{font-size:clamp(38px,6vw,76px);line-height:.98;margin:14px 0 18px;color:var(--navy);letter-spacing:-.045em}
 #viewGateway .hero h1 span{color:#0b7f86}
 #viewGateway .hero p{font-size:17px;line-height:1.75;color:#4d6276;max-width:680px}
 #viewGateway .chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:18px}
-#viewGateway .chip{font-size:11px;font-weight:800;background:#e9f8f7;color:#096f6a;padding:7px 10px;border-radius:999px}
+#viewGateway .chip{font-size:11px;font-weight:800;background:#e8f3fc;color:#0a5a9c;padding:7px 10px;border-radius:999px}
 #viewGateway .panel{background:rgba(255,255,255,.86);backdrop-filter:blur(10px);border:1px solid rgba(220,232,239,.95);border-radius:28px;box-shadow:var(--shadow);padding:24px}
 #viewGateway .panel h2{margin:0 0 8px;font-size:22px;color:var(--navy)}
 #viewGateway .panel>p{margin:0 0 18px;color:var(--muted);font-size:13px}
 #viewGateway .choice{display:grid;gap:14px}
 #viewGateway .card{display:block;width:100%;text-align:left;font-family:inherit;text-decoration:none;color:inherit;border:1px solid var(--line);border-radius:20px;padding:20px;background:#fff;transition:.18s ease;position:relative;overflow:hidden;cursor:pointer}
 #viewGateway .card:hover{transform:translateY(-3px);box-shadow:0 14px 35px rgba(7,26,51,.1);border-color:#a9dce4}
-#viewGateway .card:focus-visible{outline:3px solid #24c5e5;outline-offset:2px}
+#viewGateway .card:focus-visible{outline:3px solid #29b6e8;outline-offset:2px}
 #viewGateway .icon{width:48px;height:48px;border-radius:15px;display:grid;place-items:center;font-size:24px;background:linear-gradient(135deg,#e9fbfb,#eaf8ff);margin-bottom:13px;overflow:hidden}
 #viewGateway .icon.wide{width:96px;padding:0 6px}
 #viewGateway .icon img{width:100%;height:100%;object-fit:contain}
 #viewGateway .icon svg{width:100%;height:100%;display:block}
 #viewGateway .card h3{margin:0;color:var(--navy);font-size:19px}
 #viewGateway .card p{font-size:12.5px;color:#667085;line-height:1.55;margin:7px 0 12px}
-#viewGateway .go{font-size:12px;font-weight:900;color:#087a83}
+#viewGateway .go{font-size:12px;font-weight:900;color:#0a5a9c}
 #viewGateway .back{margin-top:14px;text-align:center;font-size:12px;color:#667085}
-#viewGateway .back a{color:#0b7580;font-weight:800}
-#viewGateway .strip{background:var(--navy);color:#d8eef7;padding:14px 18px;font-size:12px;text-align:center}
+#viewGateway .back a{color:#0a5a9c;font-weight:800}
+#viewGateway .strip{background:linear-gradient(120deg,var(--navy),#0a3a6e);color:#d8eef7;padding:16px 18px;font-size:12px;text-align:center;display:flex;align-items:center;justify-content:center;gap:9px;flex-wrap:wrap;letter-spacing:.01em}
 #viewGateway .strip b{color:#fff}
+#viewGateway .strip .dot{color:#29b6e8;font-weight:900}
 #viewGateway .mini-flow{margin-top:24px;padding:18px;border-radius:18px;background:linear-gradient(135deg,#071a33,#0d365d);color:#fff}
 #viewGateway .mini-flow .row{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
 #viewGateway .step{padding:10px 8px;border-radius:12px;background:rgba(255,255,255,.08);font-size:11px;text-align:center;border:0;color:inherit;font-family:inherit;cursor:pointer;transition:.15s ease}
 #viewGateway .step:hover,#viewGateway .step:focus-visible{background:rgba(36,197,229,.28);transform:translateY(-1px)}
-#viewGateway .step:focus-visible{outline:2px solid #24c5e5;outline-offset:2px}
+#viewGateway .step:focus-visible{outline:2px solid #29b6e8;outline-offset:2px}
 #viewGateway .step b{display:block;color:#74e6dc;margin-bottom:4px}
 #viewGateway .note{font-size:10.5px;color:#98acbd;margin-top:12px;line-height:1.5}
+#viewGateway .guide{display:flex;align-items:flex-end;gap:12px;margin-top:22px}
+#viewGateway .guide .mascot{flex-shrink:0;filter:drop-shadow(0 6px 10px rgba(10,90,156,.28))}
+#viewGateway .guide .bubble{position:relative;background:#fff;border:1px solid var(--line);border-radius:4px 16px 16px 16px;padding:11px 14px;font-size:12px;font-weight:700;line-height:1.5;color:var(--navy);box-shadow:0 10px 24px rgba(7,26,51,.09)}
+#viewGateway .guide .bubble b{color:#0a5a9c}
 @media(max-width:860px){#viewGateway .hero{grid-template-columns:1fr;padding-top:10px}#viewGateway .hero h1{font-size:48px}#viewGateway .top{padding:16px}#viewGateway .mini-flow .row{grid-template-columns:1fr 1fr}}
-@media(max-width:520px){#viewGateway .hero h1{font-size:40px}#viewGateway .panel{padding:16px;border-radius:22px}#viewGateway .card{padding:16px}#viewGateway .hero{width:min(100% - 20px,1180px)}#viewGateway .top{align-items:flex-start;gap:10px}#viewGateway .demo{white-space:nowrap}#viewGateway .mini-flow .row{grid-template-columns:1fr}}
+@media(max-width:520px){#viewGateway .hero h1{font-size:40px}#viewGateway .panel{padding:16px;border-radius:22px}#viewGateway .card{padding:16px}#viewGateway .hero{width:min(100% - 20px,1180px)}#viewGateway .top{align-items:flex-start;gap:10px}#viewGateway .demo{white-space:nowrap}#viewGateway .mini-flow .row{grid-template-columns:1fr}#viewGateway .guide .mascot{width:60px;height:76px}#viewGateway .strip{flex-direction:column;gap:4px}#viewGateway .strip .dot{display:none}}
 
 /* ============================================================
    VIEW 2 : DRIVER PORTAL (ผู้ที่ผ่านโครงการ / ได้รับอนุมัติแล้ว)
    ============================================================ */
-#viewDriver{--navy:#071a33;--navy2:#0d3153;--teal:#16b9b1;--cyan:#24c5e5;--green:#1ea672;--amber:#e9a72d;--red:#d94f58;--bg:#f4f8fb;--ink:#15263c;--muted:#6a7889;--line:#dde7ef;--white:#fff;--shadow:0 12px 36px rgba(7,26,51,.08);color:var(--ink)}
+#viewDriver{--navy:#071a33;--navy2:#0d3153;--teal:#0d5eb8;--cyan:#29b6e8;--green:#1ea672;--amber:#e9a72d;--red:#d94f58;--bg:#f4f8fb;--ink:#15263c;--muted:#6a7889;--line:#dde7ef;--white:#fff;--shadow:0 12px 36px rgba(7,26,51,.08);color:var(--ink)}
 #viewDriver .app{min-height:100vh;display:grid;grid-template-columns:250px 1fr}
 #viewDriver .side{background:linear-gradient(180deg,var(--navy),#0a2948);color:#fff;padding:20px 15px;position:sticky;top:0;height:100vh;overflow:auto}
 #viewDriver .brand{font-size:20px;font-weight:900}
@@ -98,7 +103,7 @@ body.on-driver,body.on-partner{background:#f4f8fb;color:#15263c}
 #viewDriver .hero-title h2{font-size:26px;margin:0}
 #viewDriver .hero-title p{color:var(--muted);font-size:12px;margin:5px 0 0}
 #viewDriver .btn{border:0;border-radius:10px;padding:10px 13px;font-weight:900;cursor:pointer;font-family:inherit;font-size:12.5px}
-#viewDriver .primary{background:linear-gradient(135deg,#0c6f7f,#0a9190);color:#fff}
+#viewDriver .primary{background:linear-gradient(135deg,#0a4a94,#0d6fc2);color:#fff}
 #viewDriver .ghost{background:#fff;border:1px solid var(--line);color:#405a70}
 #viewDriver .grid{display:grid;grid-template-columns:repeat(12,1fr);gap:13px}
 #viewDriver .card{background:#fff;border:1px solid #e3ebf2;border-radius:16px;box-shadow:var(--shadow);padding:15px}
@@ -124,9 +129,9 @@ body.on-driver,body.on-partner{background:#f4f8fb;color:#15263c}
 #viewDriver .notice{padding:12px 14px;border-radius:12px;background:#ecf9fb;border-left:4px solid var(--cyan);font-size:11.5px;line-height:1.5;margin-bottom:14px}
 #viewDriver .warn{background:#fff7e7;border:1px solid #f3d89b;border-radius:12px;padding:12px;font-size:11.5px}
 #viewDriver .progress{height:13px;border-radius:999px;background:#e9eef3;overflow:hidden}
-#viewDriver .progress span{display:block;height:100%;background:linear-gradient(90deg,#1cc2b2,#24c5e5);width:28%}
+#viewDriver .progress span{display:block;height:100%;background:linear-gradient(90deg,#0d5eb8,#29b6e8);width:28%}
 #viewDriver .bars{height:160px;display:flex;align-items:flex-end;gap:8px;padding-top:16px}
-#viewDriver .bar{flex:1;background:linear-gradient(180deg,#24c5e5,#16b9b1);border-radius:7px 7px 2px 2px;position:relative}
+#viewDriver .bar{flex:1;background:linear-gradient(180deg,#29b6e8,#0d5eb8);border-radius:7px 7px 2px 2px;position:relative}
 #viewDriver .bar i{position:absolute;bottom:-17px;left:50%;transform:translateX(-50%);font-size:9px;color:#7c8996;font-style:normal}
 #viewDriver .ledger{display:grid;gap:8px}
 #viewDriver .ledger .row{display:flex;justify-content:space-between;align-items:center;padding:10px 12px;border:1px solid #e7edf2;border-radius:12px;gap:10px}
@@ -147,7 +152,7 @@ body.on-driver,body.on-partner{background:#f4f8fb;color:#15263c}
 /* ============================================================
    VIEW 3 : PARTNER & CONTROL TOWER
    ============================================================ */
-#viewPartner{--navy:#071a33;--navy2:#0d3153;--cyan:#24c5e5;--teal:#16b9b1;--green:#1ea672;--amber:#e8a72d;--red:#d94f58;--bg:#f4f8fb;--ink:#15263c;--muted:#68788a;--line:#dfe7ee;--white:#fff;--shadow:0 12px 36px rgba(7,26,51,.08);color:var(--ink)}
+#viewPartner{--navy:#071a33;--navy2:#0d3153;--cyan:#29b6e8;--teal:#0d5eb8;--green:#1ea672;--amber:#e8a72d;--red:#d94f58;--bg:#f4f8fb;--ink:#15263c;--muted:#68788a;--line:#dfe7ee;--white:#fff;--shadow:0 12px 36px rgba(7,26,51,.08);color:var(--ink)}
 #viewPartner .app{min-height:100vh;display:grid;grid-template-columns:265px 1fr}
 #viewPartner .side{background:linear-gradient(180deg,var(--navy),#0a2948);color:#fff;padding:20px 15px;position:sticky;top:0;height:100vh;overflow:auto}
 #viewPartner .brand{font-weight:900;font-size:19px}
@@ -197,7 +202,7 @@ body.on-driver,body.on-partner{background:#f4f8fb;color:#15263c}
 #viewPartner .toolbar input,#viewPartner .toolbar select,#viewPartner .toolbar button{padding:8px 9px;border:1px solid var(--line);border-radius:9px;background:#fff;font-family:inherit}
 #viewPartner .toolbar button{font-weight:800;color:#0b7180}
 #viewPartner .progress{height:11px;border-radius:999px;background:#e8edf2;overflow:hidden}
-#viewPartner .progress span{display:block;height:100%;background:linear-gradient(90deg,#17b7aa,#24c5e5)}
+#viewPartner .progress span{display:block;height:100%;background:linear-gradient(90deg,#0d5eb8,#29b6e8)}
 #viewPartner .lane{display:flex;gap:7px;flex-wrap:wrap}
 #viewPartner .node{padding:8px 10px;border:1px solid #dae7ee;border-radius:10px;background:#f7fbfd;font-size:10.5px;font-weight:800}
 #viewPartner .arrow{color:#82909e}
@@ -224,6 +229,22 @@ body.on-driver,body.on-partner{background:#f4f8fb;color:#15263c}
 <h1>ขับ. ผ่อน. <span>คุ้มครอง.</span> เป็นเจ้าของ.</h1>
 <p>หลังสถาบันการเงินอนุมัติสินเชื่อ Route2Own จะเปลี่ยนจากระบบคัดกรองก่อนกู้ เป็นระบบดูแลหลังอนุมัติที่เชื่อมข้อมูลการทำงาน การชำระหนี้ และสัญญาณความเสี่ยง เพื่อช่วยให้ผู้ขับเดินต่อสู่การเป็นเจ้าของ และช่วยพันธมิตรเห็นปัญหาก่อนเกิด NPL</p>
 <div class="chips"><span class="chip">รายได้ &amp; KM/EMU</span><span class="chip">PAYD แบบปรับตามรายได้</span><span class="chip">ระบบควบคุมเงินต้น</span><span class="chip">EWS และ PromptCure</span><span class="chip">การควบคุมเคลม</span></div>
+<div class="guide"><svg class="mascot" viewBox="0 0 120 150" width="86" height="108" aria-hidden="true">
+<ellipse cx="60" cy="100" rx="38" ry="42" fill="#0d5eb8"/>
+<ellipse cx="60" cy="108" rx="22" ry="26" fill="#eef6fc"/>
+<ellipse cx="30" cy="92" rx="12" ry="20" fill="#0a4a94" transform="rotate(-18 30 92)"/>
+<ellipse cx="90" cy="92" rx="12" ry="20" fill="#0a4a94" transform="rotate(18 90 92)"/>
+<circle cx="60" cy="46" r="38" fill="#0d5eb8"/>
+<path d="M30 20 Q34 4 44 16" fill="none" stroke="#29b6e8" stroke-width="5" stroke-linecap="round"/>
+<path d="M90 20 Q86 4 76 16" fill="none" stroke="#29b6e8" stroke-width="5" stroke-linecap="round"/>
+<circle cx="43" cy="45" r="15" fill="#fff"/>
+<circle cx="77" cy="45" r="15" fill="#fff"/>
+<circle cx="45" cy="47" r="6.5" fill="#0a2044"/>
+<circle cx="79" cy="47" r="6.5" fill="#0a2044"/>
+<path d="M56 58 L64 58 L60 68 Z" fill="#f5b921"/>
+<ellipse cx="40" cy="120" rx="8" ry="6" fill="#f5b921"/>
+<ellipse cx="80" cy="120" rx="8" ry="6" fill="#f5b921"/>
+</svg><div class="bubble">สวัสดีครับ ผมผู้ช่วย บสย. 👋 <b>4 ขั้นตอนหลังอนุมัติ</b> ที่ควรรู้อยู่ด้านล่างนี้ กดแต่ละกล่องเพื่อดูรายละเอียดได้เลยครับ</div></div>
 <div class="mini-flow"><div class="row"><button type="button" class="step" onclick="go('partner','pipeline')"><b>01</b>FI อนุมัติแล้ว</button><button type="button" class="step" onclick="go('partner','elg')"><b>02</b>Child E-LG เริ่มใช้งาน</button><button type="button" class="step" onclick="go('driver','home')"><b>03</b>PAYD + การติดตาม</button><button type="button" class="step" onclick="go('driver','ownership')"><b>04</b>คุ้มครอง → เป็นเจ้าของ</button></div><div class="note">สำคัญ: Route2Own ไม่คำนวณ DPD เอง - ยอดค้างชำระ/DPD ตามสัญญาต้องมาจากบัญชีหลักของ FI เท่านั้น · กดกล่องด้านบนเพื่อดูรายละเอียดแต่ละขั้นตอน</div></div>
 </section>
 <section class="panel">
@@ -235,7 +256,7 @@ body.on-driver,body.on-partner{background:#f4f8fb;color:#15263c}
 <div class="back">ยังไม่ได้รับอนุมัติสินเชื่อ? <a href="#" onclick="alert('Front Door เป็นระบบก่อนอนุมัติแยกต่างหาก: ลงทะเบียน → เช็กสิทธิ์ → ความพร้อมด้านเครดิต → FI');return false">กลับไป Route2Own Front Door</a></div>
 </section>
 </main>
-<footer class="strip"><b>Front Door ก่อนก่อหนี้</b> → <b>ระบบป้องกันความเสี่ยงหลังอนุมัติ</b> → <b>การค้ำประกันสำรองเมื่อเกิดความเสียหายสุทธิที่เข้าเงื่อนไข</b></footer>
+<footer class="strip"><b>Front Door ก่อนก่อหนี้</b><span class="dot">→</span><b>ระบบป้องกันความเสี่ยงหลังอนุมัติ</b><span class="dot">→</span><b>การค้ำประกันสำรองเมื่อเกิดความเสียหายสุทธิที่เข้าเงื่อนไข</b></footer>
 </div>
 </div>
 
