@@ -1,0 +1,385 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Route2Own Post-Approval System v2.0</title>
+<style>
+/* ============================================================
+   GLOBAL / ROUTER
+   ============================================================ */
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{font-family:system-ui,-apple-system,"Segoe UI",Tahoma,sans-serif;min-height:100vh;background:#f5f8fb;color:#13243a}
+body.on-gateway{background:radial-gradient(circle at 90% 10%,rgba(36,197,229,.18),transparent 25%),linear-gradient(180deg,#f8fbfd,#eef4f8)}
+body.on-driver,body.on-partner{background:#f4f8fb;color:#15263c}
+.view{display:none}
+.view.active{display:block}
+
+/* ปุ่มกลับหน้าปกกลาง - ใน sidebar */
+.backhome{display:flex;align-items:center;gap:8px;width:100%;border:1px solid rgba(255,255,255,.24);background:rgba(255,255,255,.08);color:#d9edf7;padding:9px 11px;border-radius:10px;margin-top:14px;cursor:pointer;font-weight:800;font-size:11.5px;font-family:inherit;text-align:left}
+.backhome:hover{background:rgba(36,197,229,.22);color:#fff}
+.backhome i{font-style:normal;font-size:14px;line-height:1}
+
+/* ปุ่มกลับหน้าปกกลาง - ใน top bar */
+.tophome{border:1px solid #d5e3ec;background:#fff;color:#0b7580;border-radius:10px;padding:9px 12px;font-weight:800;font-size:11.5px;cursor:pointer;white-space:nowrap;font-family:inherit}
+.tophome:hover{background:#eef9fb}
+
+/* ปุ่มสลับพื้นที่ใช้งานข้ามระบบ */
+.switchbar{display:flex;gap:7px;flex-wrap:wrap;margin-top:10px}
+.switchbar button{flex:1;min-width:0;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.06);color:#cfe6f2;border-radius:10px;padding:8px 6px;font-size:10.5px;font-weight:800;cursor:pointer;font-family:inherit}
+.switchbar button:hover{background:rgba(36,197,229,.2);color:#fff}
+.switchbar button.cur{background:rgba(36,197,229,.28);color:#fff;border-color:rgba(36,197,229,.5)}
+
+/* ============================================================
+   VIEW 1 : GATEWAY (ปกกลาง)
+   ============================================================ */
+#viewGateway{--navy:#071a33;--navy2:#0d3153;--teal:#16b9b1;--cyan:#24c5e5;--mint:#5ce0b7;--bg:#f5f8fb;--ink:#13243a;--muted:#667085;--line:#dfe7ef;--white:#fff;--shadow:0 20px 60px rgba(7,26,51,.12)}
+#viewGateway .wrap{min-height:100vh;display:flex;flex-direction:column}
+#viewGateway .top{padding:22px 28px;display:flex;justify-content:space-between;align-items:center}
+#viewGateway .brand{font-weight:900;color:var(--navy);letter-spacing:-.02em}
+#viewGateway .brand small{display:block;font-weight:650;color:#58728a;margin-top:4px}
+#viewGateway .demo{font-size:11px;font-weight:800;border:1px solid #c8dae6;padding:7px 10px;border-radius:999px;background:#fff}
+#viewGateway .hero{width:min(1180px,calc(100% - 32px));margin:auto;display:grid;grid-template-columns:1.05fr .95fr;gap:28px;align-items:center;padding:30px 0 70px}
+#viewGateway .kicker{font-size:12px;font-weight:900;letter-spacing:.08em;color:#0a7281;text-transform:uppercase}
+#viewGateway .hero h1{font-size:clamp(38px,6vw,76px);line-height:.98;margin:14px 0 18px;color:var(--navy);letter-spacing:-.045em}
+#viewGateway .hero h1 span{color:#0b7f86}
+#viewGateway .hero p{font-size:17px;line-height:1.75;color:#4d6276;max-width:680px}
+#viewGateway .chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:18px}
+#viewGateway .chip{font-size:11px;font-weight:800;background:#e9f8f7;color:#096f6a;padding:7px 10px;border-radius:999px}
+#viewGateway .panel{background:rgba(255,255,255,.86);backdrop-filter:blur(10px);border:1px solid rgba(220,232,239,.95);border-radius:28px;box-shadow:var(--shadow);padding:24px}
+#viewGateway .panel h2{margin:0 0 8px;font-size:22px;color:var(--navy)}
+#viewGateway .panel>p{margin:0 0 18px;color:var(--muted);font-size:13px}
+#viewGateway .choice{display:grid;gap:14px}
+#viewGateway .card{display:block;width:100%;text-align:left;font-family:inherit;text-decoration:none;color:inherit;border:1px solid var(--line);border-radius:20px;padding:20px;background:#fff;transition:.18s ease;position:relative;overflow:hidden;cursor:pointer}
+#viewGateway .card:hover{transform:translateY(-3px);box-shadow:0 14px 35px rgba(7,26,51,.1);border-color:#a9dce4}
+#viewGateway .card:focus-visible{outline:3px solid #24c5e5;outline-offset:2px}
+#viewGateway .icon{width:48px;height:48px;border-radius:15px;display:grid;place-items:center;font-size:24px;background:linear-gradient(135deg,#e9fbfb,#eaf8ff);margin-bottom:13px}
+#viewGateway .card h3{margin:0;color:var(--navy);font-size:19px}
+#viewGateway .card p{font-size:12.5px;color:#667085;line-height:1.55;margin:7px 0 12px}
+#viewGateway .go{font-size:12px;font-weight:900;color:#087a83}
+#viewGateway .back{margin-top:14px;text-align:center;font-size:12px;color:#667085}
+#viewGateway .back a{color:#0b7580;font-weight:800}
+#viewGateway .strip{background:var(--navy);color:#d8eef7;padding:14px 18px;font-size:12px;text-align:center}
+#viewGateway .strip b{color:#fff}
+#viewGateway .mini-flow{margin-top:24px;padding:18px;border-radius:18px;background:linear-gradient(135deg,#071a33,#0d365d);color:#fff}
+#viewGateway .mini-flow .row{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+#viewGateway .step{padding:10px 8px;border-radius:12px;background:rgba(255,255,255,.08);font-size:11px;text-align:center}
+#viewGateway .step b{display:block;color:#74e6dc;margin-bottom:4px}
+#viewGateway .note{font-size:10.5px;color:#98acbd;margin-top:12px;line-height:1.5}
+@media(max-width:860px){#viewGateway .hero{grid-template-columns:1fr;padding-top:10px}#viewGateway .hero h1{font-size:48px}#viewGateway .top{padding:16px}#viewGateway .mini-flow .row{grid-template-columns:1fr 1fr}}
+@media(max-width:520px){#viewGateway .hero h1{font-size:40px}#viewGateway .panel{padding:16px;border-radius:22px}#viewGateway .card{padding:16px}#viewGateway .hero{width:min(100% - 20px,1180px)}#viewGateway .top{align-items:flex-start;gap:10px}#viewGateway .demo{white-space:nowrap}#viewGateway .mini-flow .row{grid-template-columns:1fr}}
+
+/* ============================================================
+   VIEW 2 : DRIVER PORTAL (ผู้ที่ผ่านโครงการ / ได้รับอนุมัติแล้ว)
+   ============================================================ */
+#viewDriver{--navy:#071a33;--navy2:#0d3153;--teal:#16b9b1;--cyan:#24c5e5;--green:#1ea672;--amber:#e9a72d;--red:#d94f58;--bg:#f4f8fb;--ink:#15263c;--muted:#6a7889;--line:#dde7ef;--white:#fff;--shadow:0 12px 36px rgba(7,26,51,.08);color:var(--ink)}
+#viewDriver .app{min-height:100vh;display:grid;grid-template-columns:250px 1fr}
+#viewDriver .side{background:linear-gradient(180deg,var(--navy),#0a2948);color:#fff;padding:20px 15px;position:sticky;top:0;height:100vh;overflow:auto}
+#viewDriver .brand{font-size:20px;font-weight:900}
+#viewDriver .brand small{display:block;color:#9edbe8;font-size:11px;margin-top:5px}
+#viewDriver .badge{display:inline-block;margin-top:11px;font-size:10px;border:1px solid rgba(255,255,255,.22);padding:5px 8px;border-radius:999px}
+#viewDriver .nav{margin-top:20px}
+#viewDriver .nav button{width:100%;border:0;background:transparent;color:#d7e7f3;text-align:left;padding:11px;border-radius:10px;margin:3px 0;cursor:pointer;font-family:inherit;font-size:13px}
+#viewDriver .nav button.active,#viewDriver .nav button:hover{background:rgba(36,197,229,.16);color:#fff}
+#viewDriver .main{min-width:0}
+#viewDriver .top{background:#fff;border-bottom:1px solid var(--line);padding:15px 22px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:5;gap:12px}
+#viewDriver .top h1{font-size:18px;margin:0}
+#viewDriver .top p{font-size:11px;margin:4px 0 0;color:var(--muted)}
+#viewDriver .status{display:flex;gap:7px;flex-wrap:wrap;align-items:center}
+#viewDriver .pill{font-size:10px;font-weight:900;padding:6px 8px;border-radius:999px}
+#viewDriver .green{background:#e8fbf3;color:#0a724f}
+#viewDriver .blue{background:#e8f7fb;color:#08738b}
+#viewDriver .amber{background:#fff4db;color:#8a5d00}
+#viewDriver .red{background:#ffe8ea;color:#9d2830}
+#viewDriver .content{padding:22px}
+#viewDriver .screen{display:none}
+#viewDriver .screen.active{display:block}
+#viewDriver .hero-title{display:flex;justify-content:space-between;align-items:flex-end;gap:14px;margin-bottom:14px}
+#viewDriver .hero-title h2{font-size:26px;margin:0}
+#viewDriver .hero-title p{color:var(--muted);font-size:12px;margin:5px 0 0}
+#viewDriver .btn{border:0;border-radius:10px;padding:10px 13px;font-weight:900;cursor:pointer;font-family:inherit;font-size:12.5px}
+#viewDriver .primary{background:linear-gradient(135deg,#0c6f7f,#0a9190);color:#fff}
+#viewDriver .ghost{background:#fff;border:1px solid var(--line);color:#405a70}
+#viewDriver .grid{display:grid;grid-template-columns:repeat(12,1fr);gap:13px}
+#viewDriver .card{background:#fff;border:1px solid #e3ebf2;border-radius:16px;box-shadow:var(--shadow);padding:15px}
+#viewDriver .kpi{grid-column:span 3;min-height:104px}
+#viewDriver .label{font-size:11px;color:var(--muted)}
+#viewDriver .value{font-size:27px;font-weight:900;margin-top:7px}
+#viewDriver .mini{font-size:10.5px;color:var(--muted);line-height:1.5}
+#viewDriver .s4{grid-column:span 4}
+#viewDriver .s5{grid-column:span 5}
+#viewDriver .s6{grid-column:span 6}
+#viewDriver .s7{grid-column:span 7}
+#viewDriver .s8{grid-column:span 8}
+#viewDriver .s12{grid-column:span 12}
+#viewDriver .tbl{width:100%;border-collapse:collapse;font-size:12px}
+#viewDriver .tbl td,#viewDriver .tbl th{padding:9px;border-bottom:1px solid #edf1f5;text-align:left}
+#viewDriver .tbl th{font-size:10px;color:#5b6c7c;background:#f8fafc}
+#viewDriver .num{text-align:right!important;font-variant-numeric:tabular-nums}
+#viewDriver .notice{padding:12px 14px;border-radius:12px;background:#ecf9fb;border-left:4px solid var(--cyan);font-size:11.5px;line-height:1.5;margin-bottom:14px}
+#viewDriver .warn{background:#fff7e7;border:1px solid #f3d89b;border-radius:12px;padding:12px;font-size:11.5px}
+#viewDriver .progress{height:13px;border-radius:999px;background:#e9eef3;overflow:hidden}
+#viewDriver .progress span{display:block;height:100%;background:linear-gradient(90deg,#1cc2b2,#24c5e5);width:28%}
+#viewDriver .bars{height:160px;display:flex;align-items:flex-end;gap:8px;padding-top:16px}
+#viewDriver .bar{flex:1;background:linear-gradient(180deg,#24c5e5,#16b9b1);border-radius:7px 7px 2px 2px;position:relative}
+#viewDriver .bar i{position:absolute;bottom:-17px;left:50%;transform:translateX(-50%);font-size:9px;color:#7c8996;font-style:normal}
+#viewDriver .ledger{display:grid;gap:8px}
+#viewDriver .ledger .row{display:flex;justify-content:space-between;align-items:center;padding:10px 12px;border:1px solid #e7edf2;border-radius:12px;gap:10px}
+#viewDriver .row b{font-size:13px}
+#viewDriver .row small{display:block;color:var(--muted);font-size:10px}
+#viewDriver .modal{position:fixed;inset:0;background:rgba(7,26,51,.46);display:none;align-items:center;justify-content:center;z-index:30}
+#viewDriver .modal.show{display:flex}
+#viewDriver .modal-card{width:min(580px,92vw);background:#fff;border-radius:18px;padding:20px;box-shadow:0 24px 80px rgba(0,0,0,.25)}
+#viewDriver .modal-card h3{margin:0 0 6px}
+#viewDriver .field{margin:10px 0}
+#viewDriver .field label{display:block;font-size:11px;font-weight:800;margin-bottom:5px}
+#viewDriver .field input,#viewDriver .field select,#viewDriver .field textarea{width:100%;padding:10px;border:1px solid var(--line);border-radius:9px;font-family:inherit}
+#viewDriver .actions{display:flex;justify-content:flex-end;gap:8px}
+#viewDriver .close{float:right;border:0;background:transparent;font-size:22px;cursor:pointer}
+@media(max-width:900px){#viewDriver .app{grid-template-columns:78px 1fr}#viewDriver .brand{font-size:0}#viewDriver .brand:before{content:'R2O';font-size:19px}#viewDriver .brand small,#viewDriver .badge,#viewDriver .nav button{font-size:0}#viewDriver .nav button:before{content:attr(data-icon);font-size:16px}#viewDriver .kpi{grid-column:span 6}#viewDriver .s4,#viewDriver .s5,#viewDriver .s6,#viewDriver .s7,#viewDriver .s8{grid-column:span 12}#viewDriver .backhome b,#viewDriver .switchbar{display:none}}
+@media(max-width:620px){#viewDriver .app{display:block}#viewDriver .side{position:relative;height:auto;padding:12px}#viewDriver .nav{display:flex;overflow:auto;margin-top:10px}#viewDriver .nav button{min-width:46px}#viewDriver .top{position:relative;align-items:flex-start;flex-direction:column;gap:8px}#viewDriver .content{padding:13px}#viewDriver .kpi{grid-column:span 12}#viewDriver .hero-title{align-items:flex-start;flex-direction:column}}
+
+/* ============================================================
+   VIEW 3 : PARTNER & CONTROL TOWER
+   ============================================================ */
+#viewPartner{--navy:#071a33;--navy2:#0d3153;--cyan:#24c5e5;--teal:#16b9b1;--green:#1ea672;--amber:#e8a72d;--red:#d94f58;--bg:#f4f8fb;--ink:#15263c;--muted:#68788a;--line:#dfe7ee;--white:#fff;--shadow:0 12px 36px rgba(7,26,51,.08);color:var(--ink)}
+#viewPartner .app{min-height:100vh;display:grid;grid-template-columns:265px 1fr}
+#viewPartner .side{background:linear-gradient(180deg,var(--navy),#0a2948);color:#fff;padding:20px 15px;position:sticky;top:0;height:100vh;overflow:auto}
+#viewPartner .brand{font-weight:900;font-size:19px}
+#viewPartner .brand small{display:block;color:#9edbe8;font-size:11px;margin-top:5px}
+#viewPartner .demo{display:inline-block;margin-top:11px;font-size:10px;border:1px solid rgba(255,255,255,.22);padding:5px 8px;border-radius:999px}
+#viewPartner .nav{margin-top:20px}
+#viewPartner .nav .group{font-size:9px;text-transform:uppercase;letter-spacing:.08em;color:#7fa5bd;margin:14px 10px 5px}
+#viewPartner .nav button{width:100%;border:0;background:transparent;color:#d7e7f3;text-align:left;padding:10px 11px;border-radius:10px;margin:2px 0;cursor:pointer;font-size:12px;font-family:inherit}
+#viewPartner .nav button.active,#viewPartner .nav button:hover{background:rgba(36,197,229,.15);color:#fff}
+#viewPartner .main{min-width:0}
+#viewPartner .top{background:#fff;border-bottom:1px solid var(--line);padding:14px 22px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:6;gap:12px}
+#viewPartner .top h1{margin:0;font-size:18px}
+#viewPartner .top p{margin:4px 0 0;color:var(--muted);font-size:10.5px}
+#viewPartner .selectors{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+#viewPartner .selectors select{padding:9px;border:1px solid var(--line);border-radius:9px;background:#fff;font-weight:700;color:#253b50;font-family:inherit}
+#viewPartner .content{padding:22px}
+#viewPartner .screen{display:none}
+#viewPartner .screen.active{display:block}
+#viewPartner .title{display:flex;justify-content:space-between;align-items:flex-end;gap:14px;margin-bottom:14px}
+#viewPartner .title h2{font-size:25px;margin:0}
+#viewPartner .title p{font-size:11.5px;color:var(--muted);margin:4px 0 0}
+#viewPartner .pill{display:inline-block;font-size:9.5px;font-weight:900;padding:5px 8px;border-radius:999px}
+#viewPartner .green{background:#e8fbf3;color:#08714e}
+#viewPartner .amber{background:#fff4da;color:#8b5d00}
+#viewPartner .red{background:#ffe9eb;color:#9c2a31}
+#viewPartner .blue{background:#e9f8fc;color:#08768d}
+#viewPartner .gray{background:#eef2f5;color:#526273}
+#viewPartner .notice{padding:12px 14px;border-radius:12px;background:#eef9fb;border-left:4px solid var(--cyan);font-size:11.3px;line-height:1.55;margin-bottom:14px}
+#viewPartner .grid{display:grid;grid-template-columns:repeat(12,1fr);gap:13px}
+#viewPartner .card{background:#fff;border:1px solid #e4ebf1;border-radius:16px;box-shadow:var(--shadow);padding:15px}
+#viewPartner .kpi{grid-column:span 3;min-height:104px}
+#viewPartner .label{font-size:10.5px;color:var(--muted)}
+#viewPartner .value{font-size:27px;font-weight:900;margin-top:7px}
+#viewPartner .mini{font-size:10px;color:var(--muted);line-height:1.5}
+#viewPartner .s4{grid-column:span 4}
+#viewPartner .s5{grid-column:span 5}
+#viewPartner .s6{grid-column:span 6}
+#viewPartner .s7{grid-column:span 7}
+#viewPartner .s8{grid-column:span 8}
+#viewPartner .s12{grid-column:span 12}
+#viewPartner .tblwrap{overflow:auto}
+#viewPartner .tbl{width:100%;border-collapse:collapse;font-size:11.5px}
+#viewPartner .tbl th,#viewPartner .tbl td{padding:9px;border-bottom:1px solid #edf1f4;text-align:left;white-space:nowrap}
+#viewPartner .tbl th{font-size:9.5px;color:#596b7c;background:#f8fafc}
+#viewPartner .num{text-align:right!important;font-variant-numeric:tabular-nums}
+#viewPartner .toolbar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}
+#viewPartner .toolbar input,#viewPartner .toolbar select,#viewPartner .toolbar button{padding:8px 9px;border:1px solid var(--line);border-radius:9px;background:#fff;font-family:inherit}
+#viewPartner .toolbar button{font-weight:800;color:#0b7180}
+#viewPartner .progress{height:11px;border-radius:999px;background:#e8edf2;overflow:hidden}
+#viewPartner .progress span{display:block;height:100%;background:linear-gradient(90deg,#17b7aa,#24c5e5)}
+#viewPartner .lane{display:flex;gap:7px;flex-wrap:wrap}
+#viewPartner .node{padding:8px 10px;border:1px solid #dae7ee;border-radius:10px;background:#f7fbfd;font-size:10.5px;font-weight:800}
+#viewPartner .arrow{color:#82909e}
+#viewPartner .role-gate{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+#viewPartner .rolecard{border:1px solid var(--line);border-radius:15px;padding:14px;background:#fff}
+#viewPartner .rolecard b{display:block;font-size:13px;margin-bottom:5px}
+#viewPartner .tag{font-size:9px;padding:3px 6px;border:1px solid #d8e5ec;border-radius:6px;background:#f9fcfd;color:#53697b}
+#viewPartner .hidden-by-role{display:none!important}
+@media(max-width:1000px){#viewPartner .app{grid-template-columns:80px 1fr}#viewPartner .brand{font-size:0}#viewPartner .brand:before{content:'R2O';font-size:18px}#viewPartner .brand small,#viewPartner .demo,#viewPartner .nav button{font-size:0}#viewPartner .nav button:before{content:attr(data-icon);font-size:15px}#viewPartner .nav .group{display:none}#viewPartner .kpi{grid-column:span 6}#viewPartner .s4,#viewPartner .s5,#viewPartner .s6,#viewPartner .s7,#viewPartner .s8{grid-column:span 12}#viewPartner .role-gate{grid-template-columns:1fr 1fr}#viewPartner .backhome b,#viewPartner .switchbar{display:none}}
+@media(max-width:650px){#viewPartner .app{display:block}#viewPartner .side{position:relative;height:auto;padding:12px}#viewPartner .nav{display:flex;overflow:auto;margin-top:10px}#viewPartner .nav button{min-width:46px}#viewPartner .top{position:relative;align-items:flex-start;flex-direction:column;gap:8px}#viewPartner .selectors{width:100%}#viewPartner .selectors select{flex:1}#viewPartner .content{padding:13px}#viewPartner .kpi{grid-column:span 12}#viewPartner .title{align-items:flex-start;flex-direction:column}#viewPartner .role-gate{grid-template-columns:1fr}}
+</style>
+</head>
+<body class="on-gateway">
+
+<!-- ============================================================
+     VIEW 1 : ปกกลาง / GATEWAY
+     ============================================================ -->
+<div id="viewGateway" class="view active">
+<div class="wrap">
+<header class="top"><div class="brand">Route2Own by บสย.<small>TCG Route2Own EV Taxi Guarantee</small></div><span class="demo">DEMO / POST-APPROVAL SYSTEM</span></header>
+<main class="hero">
+<section>
+<div class="kicker">Post-Approval Risk Guardrail</div>
+<h1>Drive. Pay. <span>Protect.</span> Own.</h1>
+<p>หลังสถาบันการเงินอนุมัติสินเชื่อ Route2Own จะเปลี่ยนจากระบบคัดกรองก่อนกู้ เป็นระบบดูแลหลังอนุมัติที่เชื่อมข้อมูลการทำงาน การชำระหนี้ และสัญญาณความเสี่ยง เพื่อช่วยให้ผู้ขับเดินต่อสู่การเป็นเจ้าของ และช่วย Partner เห็นปัญหาก่อนเกิด NPL</p>
+<div class="chips"><span class="chip">รายได้ &amp; KM/EMU</span><span class="chip">Adaptive PAYD</span><span class="chip">Principal Governor</span><span class="chip">EWS &amp; PromptCure</span><span class="chip">Claim Control</span></div>
+<div class="mini-flow"><div class="row"><div class="step"><b>01</b>FI Approved</div><div class="step"><b>02</b>Child E-LG Active</div><div class="step"><b>03</b>PAYD + Monitoring</div><div class="step"><b>04</b>Protect → Own</div></div><div class="note">สำคัญ: Route2Own ไม่คำนวณ DPD เอง - Contractual arrears/DPD ต้องมาจาก FI authoritative ledger</div></div>
+</section>
+<section class="panel">
+<h2>เลือกพื้นที่ใช้งาน</h2><p>ระบบหลังอนุมัติถูกแยกตามผู้ใช้งานเพื่อไม่ให้ข้อมูลและสิทธิของ Driver ปะปนกับ Partner/Admin</p>
+<div class="choice">
+<a class="card" href="#driver" id="btnGoDriver"><div class="icon">🚕</div><h3>ฉันเป็นผู้ขับที่ได้รับอนุมัติแล้ว</h3><p>ดูรายได้ ระยะทาง PAYD ค่าธรรมเนียม Cure Reserve หนี้คงเหลือ Ownership Progress และแจ้งหยุดวิ่ง/ขอความช่วยเหลือ</p><div class="go">เข้าสู่ My Route2Own →</div></a>
+<a class="card" href="#partner" id="btnGoPartner"><div class="icon">🏢</div><h3>ฉันเป็น Partner / Admin</h3><p>เข้าสู่ระบบตามสังกัด: บสย., FI, สหกรณ์/Fleet, EV/BaaS, GPS/Data, Payment, Insurance/Recovery พร้อมสิทธิข้อมูลตามบทบาท</p><div class="go">เข้าสู่ Partner &amp; Control Tower →</div></a>
+</div>
+<div class="back">ยังไม่ได้รับอนุมัติสินเชื่อ? <a href="#" onclick="alert('Front Door เป็นระบบก่อนอนุมัติแยกต่างหาก: ลงทะเบียน → เช็กสิทธิ์ → Credit Readiness → FI');return false">กลับไป Route2Own Front Door</a></div>
+</section>
+</main>
+<footer class="strip"><b>Front Door ก่อนก่อหนี้</b> → <b>Risk Guardrail หลังอนุมัติ</b> → <b>Guarantee Backstop เมื่อเกิด Eligible Residual Loss</b></footer>
+</div>
+</div>
+
+<!-- ============================================================
+     VIEW 2 : DRIVER PORTAL
+     ============================================================ -->
+<div id="viewDriver" class="view">
+<div class="app"><aside class="side"><div class="brand">My Route2Own<small>Driver Post-Approval Portal</small></div><span class="badge">DEMO DRIVER / SIMULATION</span>
+<button class="backhome" onclick="go('gateway')"><i>←</i><b>กลับหน้าปกกลาง</b></button>
+<div class="switchbar"><button class="cur" onclick="go('driver')">ผู้ขับ</button><button onclick="go('partner')">Partner</button></div>
+<nav class="nav">
+<button class="active" data-screen="home" data-icon="⌂">วันนี้</button><button data-screen="activity" data-icon="↗">รายได้ &amp; การขับ</button><button data-screen="money" data-icon="฿">เงินของฉัน</button><button data-screen="ownership" data-icon="◒">หนี้ &amp; Ownership</button><button data-screen="wallet" data-icon="▤">กระเป๋า Route2Own</button><button data-screen="help" data-icon="+">แจ้งเหตุ / ขอความช่วยเหลือ</button><button data-screen="cure" data-icon="!">PromptCure</button></nav></aside>
+<main class="main"><header class="top"><div><h1>My Route2Own</h1><p>D-000381 · Child E-LG ELG-80381 · FI: KBank · Demo data only</p></div><div class="status"><span class="pill green">ACTIVE</span><span class="pill green">EWS GREEN</span><span class="pill blue">FI DPD 0</span><span class="pill blue">Tier B</span><button class="tophome" onclick="go('gateway')">← หน้าปกกลาง</button></div></header><div class="content">
+<section id="home" class="screen active"><div class="hero-title"><div><h2>วันนี้ของฉัน</h2><p>ข้อมูลหลังธนาคารอนุมัติ: รายได้ การขับ การชำระ และเส้นทางสู่ Ownership</p></div><button class="btn primary" onclick="openIncident()">แจ้งหยุดวิ่ง / ขอความช่วยเหลือ</button></div><div class="notice"><b>หลักการ:</b> Route2Own ใช้ KM/EMU เพื่อจัดจังหวะ PAYD เท่านั้น ไม่ได้สร้างหนี้ตามกิโลเมตร และ DPD/Arrears มาจาก FI เท่านั้น</div><div class="grid">
+<div class="card kpi"><div class="label">รายได้วันนี้</div><div class="value" id="revToday">฿1,850.52</div><div class="mini">Verified ≈ ฿1,757.99</div></div><div class="card kpi"><div class="label">ระยะทางวันนี้</div><div class="value">250 km</div><div class="mini">Service 196 · Reposition 37 · Charging 9</div></div><div class="card kpi"><div class="label">PAYD Target</div><div class="value">฿359.43</div><div class="mini">Actual Sweep ฿359.43</div></div><div class="card kpi"><div class="label">หนี้คงเหลือ</div><div class="value">฿562,420</div><div class="mini">Principal trajectory: on track</div></div>
+<div class="card s7"><h3 style="margin-top:0">Daily Financial X-Ray</h3><table class="tbl"><tr><td>Gross occupational revenue</td><td class="num">+฿1,850.52</td></tr><tr><td>Verified revenue (demo 95%)</td><td class="num">+฿1,757.99</td></tr><tr><td>Eligible OpEx</td><td class="num">-฿477.45</td></tr><tr><td>Protected Cash</td><td class="num">-฿600.00</td></tr><tr><td><b>Available Cash</b></td><td class="num"><b>฿680.54</b></td></tr><tr><td>Debt PAYD Target</td><td class="num">-฿359.43</td></tr><tr><td>RBP Fee - Tier B</td><td class="num">-฿24.66</td></tr><tr><td>Monitoring</td><td class="num">-฿5.00</td></tr><tr><td>Cure Reserve</td><td class="num">-฿20.00</td></tr><tr><td><b>เงินคงเหลือหลังจัดสรร</b></td><td class="num"><b>≈ ฿271.45</b></td></tr></table><div class="mini">Cure Reserve เป็นเงินสำรองผูกกับผู้ขับ ไม่ใช่ค่าธรรมเนียมของโครงการ</div></div>
+<div class="card s5"><h3 style="margin-top:0">Ownership Progress</h3><div class="progress"><span></span></div><div class="value">28%</div><div class="mini">เงินต้นลดลงตามแผน · Projected maturity: CLOSE</div><hr style="border:0;border-top:1px solid #edf1f4;margin:14px 0"><div class="mini">Cure Reserve balance</div><div style="font-size:23px;font-weight:900">฿1,280</div><div class="mini">Next FI due: 28 Aug 2026 · Operating status: ACTIVE</div></div></div></section>
+
+<section id="activity" class="screen"><div class="hero-title"><div><h2>รายได้ &amp; การขับขี่</h2><p>Driver-Day view: รายได้ ระยะทาง EMU และ Downtime</p></div></div><div class="grid"><div class="card kpi"><div class="label">รายได้เดือนนี้</div><div class="value">฿40,711</div><div class="mini">22 operating days equivalent</div></div><div class="card kpi"><div class="label">Total KM</div><div class="value">5,430</div><div class="mini">Month-to-date</div></div><div class="card kpi"><div class="label">EMU</div><div class="value">4,820</div><div class="mini">Illustrative aggregated units</div></div><div class="card kpi"><div class="label">Downtime</div><div class="value">1 day</div><div class="mini">Vehicle service</div></div><div class="card s6"><h3 style="margin-top:0">รายได้ 7 วันล่าสุด</h3><div class="bars"><div class="bar" style="height:72%"><i>จ</i></div><div class="bar" style="height:88%"><i>อ</i></div><div class="bar" style="height:80%"><i>พ</i></div><div class="bar" style="height:94%"><i>พฤ</i></div><div class="bar" style="height:63%"><i>ศ</i></div><div class="bar" style="height:98%"><i>ส</i></div><div class="bar" style="height:83%"><i>อา</i></div></div></div><div class="card s6"><h3 style="margin-top:0">Mobility Breakdown วันนี้</h3><table class="tbl"><tr><td>Total KM</td><td class="num">250</td></tr><tr><td>Service KM</td><td class="num">196</td></tr><tr><td>Reposition KM</td><td class="num">37</td></tr><tr><td>Charging-related KM</td><td class="num">9</td></tr><tr><td>Personal/Other</td><td class="num">8</td></tr></table><div class="mini">Raw GPS KM ≠ EMU. EMU weights are calibration parameters.</div></div></div></section>
+
+<section id="money" class="screen"><div class="hero-title"><div><h2>เงินของฉัน</h2><p>แสดงรายรับ ต้นทุน เงินกันไว้ และการจัดสรรโดยไม่ปะปน Cure Reserve กับ Fee</p></div></div><div class="card"><table class="tbl"><thead><tr><th>รายการ</th><th>วันนี้</th><th>เดือนนี้</th><th>สถานะ</th></tr></thead><tbody><tr><td>Verified Revenue</td><td class="num">฿1,757.99</td><td class="num">฿38,675.89</td><td><span class="pill green">Verified</span></td></tr><tr><td>Eligible OpEx</td><td class="num">฿477.45</td><td class="num">฿10,503.90</td><td>Operating cost</td></tr><tr><td>Protected Cash</td><td class="num">฿600.00</td><td class="num">฿13,200.00</td><td><span class="pill blue">Protected</span></td></tr><tr><td>Available Cash</td><td class="num">฿680.54</td><td class="num">฿14,972.00</td><td>Before financial allocation</td></tr></tbody></table></div></section>
+
+<section id="ownership" class="screen"><div class="hero-title"><div><h2>หนี้ &amp; เส้นทางสู่ Ownership</h2><p>FI contractual data + Principal Governor</p></div></div><div class="grid"><div class="card s5"><div class="label">เงินต้นเริ่มต้น</div><div class="value">฿780,000</div><div class="label" style="margin-top:12px">เงินต้นคงเหลือ</div><div class="value">฿562,420</div><div class="label" style="margin-top:12px">Principal reduction</div><div class="value">฿217,580</div></div><div class="card s7"><h3 style="margin-top:0">Principal Governor</h3><div class="progress"><span></span></div><p class="mini">Outstanding principal อยู่ใต้ Principal Ceiling ใน demo trajectory และ Projected Maturity Balance = CLOSE</p><table class="tbl"><tr><td>Contractual Monthly Due</td><td class="num">฿8,985.84</td></tr><tr><td>Paid this cycle</td><td class="num">฿5,940.12</td></tr><tr><td>Next due date</td><td class="num">28 Aug 2026</td></tr><tr><td>FI Arrears</td><td class="num">฿0</td></tr><tr><td>FI DPD</td><td class="num">0</td></tr></table></div></div></section>
+
+<section id="wallet" class="screen"><div class="hero-title"><div><h2>กระเป๋า Route2Own</h2><p>4 Ledger ที่ต้องแยกฐานะทางเศรษฐศาสตร์และสิทธิของเงิน</p></div></div><div class="ledger"><div class="row"><div><b>Debt Payment</b><small>Debt-service allocation / FI settlement</small></div><strong>฿359.43 วันนี้</strong></div><div class="row"><div><b>RBP Guarantee Fee</b><small>Tier B - Proposed 1.50% p.a. / daily accrual demo</small></div><strong>฿24.66</strong></div><div class="row"><div><b>Monitoring Fee</b><small>5 บาท / Eligible Operating Day</small></div><strong>฿5.00</strong></div><div class="row"><div><b>Cure Reserve</b><small>เงินสำรองของผู้ขับ - customer-attributed</small></div><strong>฿20.00 วันนี้ · Balance ฿1,280</strong></div></div></section>
+
+<section id="help" class="screen"><div class="hero-title"><div><h2>แจ้งหยุดวิ่ง / ขอความช่วยเหลือ</h2><p>3 วันไม่วิ่ง = Review Trigger ไม่ใช่ Credit Downgrade</p></div><button class="btn primary" onclick="openIncident()">เปิดแบบฟอร์มแจ้งเหตุ</button></div><div class="warn"><b>Inactivity Rule:</b> หากระบบไม่พบ productive activity ต่อเนื่องตั้งแต่ 3 operating days ขึ้นไป จะเปิด Inactivity Review Case และติดต่อเพื่อจำแนกสาเหตุ เช่น ป่วย รถเสีย ติดธุระ หรือ data issue ก่อนพิจารณาผลต่อแผนชำระ</div><div class="grid" style="margin-top:13px"><div class="card s4"><h3>ป่วย / อุบัติเหตุ</h3><p class="mini">แจ้งวันเริ่ม-คาดกลับ แนบหลักฐานได้ และขอให้เจ้าหน้าที่ติดต่อ</p></div><div class="card s4"><h3>รถเสีย / Battery</h3><p class="mini">ส่งเคสไป Co-op / EV-BaaS owner และตรวจ downtime SLA</p></div><div class="card s4"><h3>ธุระ / Data Issue</h3><p class="mini">แยก planned leave หรือ missing data ออกจาก credit deterioration</p></div></div></section>
+
+<section id="cure" class="screen"><div class="hero-title"><div><h2>PromptCure</h2><p>ระบบช่วยก่อนเป็น NPL โดยแสดงสาเหตุและทางเลือก ไม่ใช่เพียงสีความเสี่ยง</p></div></div><div class="notice"><b>สถานะปัจจุบัน: GREEN</b> - ไม่มี PromptCure เปิดอยู่ ตัวอย่างด้านล่างเป็น Demo Case</div><div class="card"><h3 style="margin-top:0">ตัวอย่าง Yellow Case</h3><table class="tbl"><tr><td>Cause</td><td>ILLNESS + No activity 4 days</td></tr><tr><td>FI DPD</td><td>0</td></tr><tr><td>Principal</td><td>ON TRACK</td></tr><tr><td>Cure Reserve</td><td>฿1,280</td></tr><tr><td>Recommended action</td><td>Verify illness → evaluate temporary cure → keep FI informed</td></tr></table><div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap"><button class="btn ghost">ใช้ Cure Reserve</button><button class="btn ghost">แจ้งรถเสีย</button><button class="btn ghost">ขอปรับแผน</button><button class="btn primary">ขอเจ้าหน้าที่ติดต่อ</button></div></div></section>
+</div></main></div>
+<div class="modal" id="incidentModal"><div class="modal-card"><button class="close" onclick="closeIncident()">×</button><h3>แจ้งหยุดวิ่ง / แจ้งเหตุจำเป็น</h3><p class="mini">ข้อมูลนี้ใช้เพื่อแยก operational interruption ออกจาก credit deterioration และส่งเคสไปยังเจ้าภาพที่ถูกต้อง</p><div class="field"><label>ประเภทเหตุ</label><select id="reason"><option>ป่วย</option><option>อุบัติเหตุ</option><option>รถเสีย</option><option>Battery / Charging</option><option>ลากิจ / ติดธุระ</option><option>GPS / Data issue</option><option>ปัญหาการหักเงิน</option><option>รายได้ลดผิดปกติ</option><option>อื่น ๆ</option></select></div><div class="field"><label>วันเริ่ม</label><input type="date"></div><div class="field"><label>คาดว่าจะกลับมาวิ่ง</label><input type="date"></div><div class="field"><label>รายละเอียด</label><textarea rows="4" placeholder="อธิบายสาเหตุและสิ่งที่ต้องการให้ช่วย"></textarea></div><div class="actions"><button class="btn ghost" onclick="closeIncident()">ยกเลิก</button><button class="btn primary" onclick="submitIncident()">ส่งแจ้งเหตุ</button></div></div></div>
+</div>
+
+<!-- ============================================================
+     VIEW 3 : PARTNER & CONTROL TOWER
+     ============================================================ -->
+<div id="viewPartner" class="view">
+<div class="app"><aside class="side"><div class="brand">Route2Own Partner &amp; Control Tower<small>Post-Approval Back Office</small></div><span class="demo">DEMO / ROLE-BASED ACCESS</span>
+<button class="backhome" onclick="go('gateway')"><i>←</i><b>กลับหน้าปกกลาง</b></button>
+<div class="switchbar"><button onclick="go('driver')">ผู้ขับ</button><button class="cur" onclick="go('partner')">Partner</button></div>
+<nav class="nav"><div class="group">Control</div><button class="active" data-screen="overview" data-icon="⌂">Overview</button><button data-screen="pipeline" data-icon="⇢">Front-Door Pipeline</button><button data-screen="portfolio" data-icon="▦">Active Portfolio</button><button data-screen="daily" data-icon="◫">Daily Operations</button><button data-screen="incidents" data-icon="!">Inactivity &amp; Incidents</button><button data-screen="ews" data-icon="◉">Risk / EWS</button><button data-screen="cure" data-icon="✚">PromptCure / Pre-TDR</button><button data-screen="elg" data-icon="LG">Child E-LG / Assignment</button><button data-screen="exit" data-icon="↪">Restructure / Exit</button><button data-screen="claim" data-icon="฿">Claim &amp; Recovery</button><button data-screen="finance" data-icon="∑">Program Financial Control</button><button data-screen="partners" data-icon="◎">Partners / Data / Audit</button></nav></aside>
+<main class="main"><header class="top"><div><h1 id="screenTitle">Executive Overview</h1><p>ข้อมูลเป็น Simulation เพื่อสาธิต Operating Model - ไม่ใช่ข้อมูลลูกค้าจริงหรือ Approved Product Terms</p></div><div class="selectors"><select id="roleSelect"><option value="tcg">บสย. / TCG Program Admin</option><option value="risk">บสย. / Risk</option><option value="claim">บสย. / Claim</option><option value="fi">FI Admin</option><option value="coop">Co-op / Fleet Admin</option><option value="oem">EV / BaaS Admin</option><option value="data">GPS / Data Admin</option><option value="payment">Payment Admin</option><option value="recovery">Insurance / Recovery Admin</option></select><select id="orgSelect"></select><button class="tophome" onclick="go('gateway')">← หน้าปกกลาง</button></div></header><div class="content">
+<section id="p-overview" class="screen active"><div class="title"><div><h2>Executive Overview</h2><p>Funnel ก่อนอนุมัติ + พอร์ตหลังอนุมัติ + Pre-NPL + Claim</p></div><span class="pill blue">Demo BusinessDay</span></div><div class="notice"><b>Control principle:</b> 3 วันไม่วิ่ง = Inactivity Review Case ไม่ใช่ Credit Downgrade อัตโนมัติ; Credit Status, Arrears และ DPD ต้องรับจาก FI authoritative ledger.</div><div class="grid"><div class="card kpi"><div class="label">Registrations</div><div class="value">1,248</div><div class="mini">Front Door total</div></div><div class="card kpi"><div class="label">Readiness Certificates</div><div class="value">864</div><div class="mini">Active 602 · Expired 262</div></div><div class="card kpi"><div class="label">FI Approved</div><div class="value">438</div><div class="mini">Approved &amp; activation-ready</div></div><div class="card kpi"><div class="label">Active Child E-LG</div><div class="value">412</div><div class="mini">Active portfolio</div></div><div class="card kpi"><div class="label">Inactive ≥3 days</div><div class="value">26</div><div class="mini">Review trigger</div></div><div class="card kpi"><div class="label">Yellow / Red</div><div class="value">41 / 8</div><div class="mini">Cause-based EWS</div></div><div class="card kpi"><div class="label">PromptCure Open</div><div class="value">33</div><div class="mini">SLA tracked</div></div><div class="card kpi"><div class="label">Claim Pending</div><div class="value">6</div><div class="mini">Recovery-first gate</div></div><div class="card s8"><h3 style="margin-top:0">Lifecycle</h3><div class="lane"><span class="node">Register</span><span class="arrow">→</span><span class="node">Credit Readiness</span><span class="arrow">→</span><span class="node">FI Approved</span><span class="arrow">→</span><span class="node">Child E-LG</span><span class="arrow">→</span><span class="node">PAYD</span><span class="arrow">→</span><span class="node">EWS / Cure</span><span class="arrow">→</span><span class="node">Recovery / Claim</span></div></div><div class="card s4"><h3 style="margin-top:0">Today's Control Priorities</h3><div class="mini">1) Unexplained inactivity &gt;3 days<br>2) Sweep settlement mismatch<br>3) Principal gap watch<br>4) Vehicle downtime SLA<br>5) Claim evidence pending</div></div></div></section>
+
+<section id="p-pipeline" class="screen"><div class="title"><div><h2>Front-Door Pipeline</h2><p>Back Office เห็นแบบ read-only เพื่อเชื่อม Certificate → FI → Activation</p></div></div><div class="card tblwrap"><table class="tbl"><thead><tr><th>Driver</th><th>Co-op</th><th>Readiness</th><th>Certificate</th><th>Expiry</th><th>Tier</th><th>FI</th><th>FI Status</th></tr></thead><tbody><tr><td>D-000381</td><td>Co-op A</td><td>OWN READY</td><td>RC-80381</td><td>30 Aug 2026</td><td>B</td><td>KBank</td><td><span class="pill green">Approved</span></td></tr><tr><td>D-000392</td><td>Co-op B</td><td>OWN READY</td><td>RC-80392</td><td>29 Aug 2026</td><td>A</td><td>Krungsri</td><td><span class="pill amber">Review</span></td></tr><tr><td>D-000405</td><td>Co-op A</td><td>BUILD READINESS</td><td>-</td><td>-</td><td>S</td><td>-</td><td><span class="pill gray">Seasoning</span></td></tr></tbody></table></div></section>
+
+<section id="p-portfolio" class="screen"><div class="title"><div><h2>Active Portfolio</h2><p>หลัง FI Approved + Activation Gate ผ่าน</p></div></div><div class="toolbar"><input id="search" placeholder="ค้น Driver / VIN / FI / Co-op"><select id="filter"><option value="">ทุกสถานะ</option><option>GREEN</option><option>YELLOW</option><option>RED</option><option>ILLNESS</option><option>VEHICLE DOWN</option></select></div><div class="card tblwrap"><table class="tbl" id="portfolioTbl"><thead><tr><th>Driver</th><th>Co-op</th><th>FI</th><th>VIN</th><th>Child E-LG</th><th>Loan Balance</th><th>DPD</th><th>Operating</th><th>EWS</th></tr></thead><tbody><tr><td>D-000381</td><td>Co-op A</td><td>KBank</td><td>VIN...0381</td><td>ELG-80381</td><td class="num">562,420</td><td class="num">0</td><td>ACTIVE</td><td><span class="pill green">GREEN</span></td></tr><tr><td>D-000422</td><td>Co-op B</td><td>SCB</td><td>VIN...0422</td><td>ELG-80422</td><td class="num">468,000</td><td class="num">0</td><td>ILLNESS</td><td><span class="pill amber">YELLOW</span></td></tr><tr><td>D-000437</td><td>Co-op C</td><td>KBank</td><td>VIN...0437</td><td>ELG-80437</td><td class="num">502,000</td><td class="num">12</td><td>ACTIVE</td><td><span class="pill red">RED</span></td></tr></tbody></table></div></section>
+
+<section id="p-daily" class="screen"><div class="title"><div><h2>Daily Operations</h2><p>Aggregate Driver-Day: Revenue / KM / EMU / PAYD / Fee / Cure</p></div></div><div class="grid"><div class="card kpi"><div class="label">Verified Revenue</div><div class="value">฿0.72m</div><div class="mini">Today aggregate</div></div><div class="card kpi"><div class="label">Total KM</div><div class="value">102,840</div><div class="mini">All active drivers</div></div><div class="card kpi"><div class="label">EMU</div><div class="value">91,430</div><div class="mini">Illustrative aggregate</div></div><div class="card kpi"><div class="label">Sweep Success</div><div class="value">97.8%</div><div class="mini">Payment settlement</div></div><div class="card s6"><h3 style="margin-top:0">Financial Flow Today</h3><table class="tbl"><tr><td>PAYD Target</td><td class="num">฿148,200</td></tr><tr><td>Actual Sweep</td><td class="num">฿145,600</td></tr><tr><td>RBP Accrued</td><td class="num">฿9,780</td></tr><tr><td>RBP Collected</td><td class="num">฿9,210</td></tr><tr><td>Monitoring Fee</td><td class="num">฿2,020</td></tr><tr><td>Cure Reserve Contribution</td><td class="num">฿7,860</td></tr></table></div><div class="card s6"><h3 style="margin-top:0">Data Health</h3><table class="tbl"><tr><td>GPS completeness</td><td class="num">98.4%</td></tr><tr><td>Revenue reconciliation</td><td class="num">99.1%</td></tr><tr><td>FI ledger received</td><td class="num">100%</td></tr><tr><td>Unclassified business days</td><td class="num">7</td></tr></table></div></div></section>
+
+<section id="p-incidents" class="screen"><div class="title"><div><h2>Inactivity &amp; Incident Desk</h2><p>สาเหตุเชิงปฏิบัติการต้องถูกแยกออกจาก credit deterioration</p></div></div><div class="grid"><div class="card kpi"><div class="label">หยุด ≥3 วัน</div><div class="value">26</div></div><div class="card kpi"><div class="label">ป่วย</div><div class="value">9</div></div><div class="card kpi"><div class="label">รถเสีย / Battery</div><div class="value">7</div></div><div class="card kpi"><div class="label">Unknown / Data issue</div><div class="value">10</div></div><div class="card s12 tblwrap"><table class="tbl"><thead><tr><th>Driver</th><th>Last Active</th><th>Days Off</th><th>Reason</th><th>FI DPD</th><th>Payment Impact</th><th>Owner</th><th>SLA</th></tr></thead><tbody><tr><td>D-000422</td><td>12 Aug</td><td>4</td><td>ILLNESS</td><td>0</td><td>Watch next cycle</td><td>Co-op B</td><td><span class="pill amber">Contact today</span></td></tr><tr><td>D-000451</td><td>11 Aug</td><td>5</td><td>VEHICLE DOWN</td><td>0</td><td>Low</td><td>OEM-01</td><td><span class="pill blue">SLA 8h</span></td></tr><tr><td>D-000469</td><td>10 Aug</td><td>6</td><td>UNEXPLAINED</td><td>0</td><td>Potential</td><td>TCG Ops</td><td><span class="pill red">Overdue</span></td></tr></tbody></table></div></div></section>
+
+<section id="p-ews" class="screen"><div class="title"><div><h2>Risk / EWS</h2><p>U / Y / P / C / A / D cause-based signals</p></div></div><div class="grid"><div class="card s4"><h3>U - Utilization</h3><div class="value">18</div><div class="mini">Watch cases</div></div><div class="card s4"><h3>Y - Yield</h3><div class="value">14</div><div class="mini">Revenue/EMU deterioration</div></div><div class="card s4"><h3>P - Payment</h3><div class="value">11</div><div class="mini">Settlement/DPD signal</div></div><div class="card s4"><h3>C - Cost/Catch-up</h3><div class="value">9</div></div><div class="card s4"><h3>A - Affordability</h3><div class="value">7</div></div><div class="card s4"><h3>D - Downtime/Asset</h3><div class="value">16</div></div><div class="card s12 tblwrap"><table class="tbl"><thead><tr><th>Driver</th><th>Signal</th><th>Reason Code</th><th>FI DPD</th><th>Principal</th><th>EWS</th><th>Action</th></tr></thead><tbody><tr><td>D-000422</td><td>D</td><td>ILLNESS_4D</td><td>0</td><td>ON TRACK</td><td><span class="pill amber">YELLOW</span></td><td>PromptCure review</td></tr><tr><td>D-000437</td><td>P+A</td><td>DPD12 + PAI_PRESSURE</td><td>12</td><td>GAP WATCH</td><td><span class="pill red">RED</span></td><td>FI Pre-TDR</td></tr></tbody></table></div></div></section>
+
+<section id="p-cure" class="screen"><div class="title"><div><h2>PromptCure / Pre-TDR</h2><p>Case Management ที่มี Owner, Reason, SLA และ Next Action</p></div></div><div class="card tblwrap"><table class="tbl"><thead><tr><th>Case</th><th>Driver</th><th>Cause</th><th>FI DPD</th><th>Cure Reserve</th><th>Stage</th><th>Owner</th><th>Next Action</th></tr></thead><tbody><tr><td>PC-1038</td><td>D-000422</td><td>ILLNESS</td><td>0</td><td>฿1,540</td><td><span class="pill amber">DIAGNOSIS</span></td><td>Co-op B</td><td>Verify return date</td></tr><tr><td>PC-1044</td><td>D-000437</td><td>PAYMENT+A</td><td>12</td><td>฿820</td><td><span class="pill red">FI REVIEW</span></td><td>FI-KBank</td><td>Pre-TDR proposal</td></tr></tbody></table></div></section>
+
+<section id="p-elg" class="screen"><div class="title"><div><h2>Child E-LG / Driver Assignment</h2><p>แยก operator reassignment ออกจาก borrower change</p></div></div><div class="notice"><b>Legal Gate:</b> ถ้าเปลี่ยน operator แต่ borrower/loan เดิม อาจใช้ Driver Assignment mechanism เมื่อ FI/Legal อนุญาต; ถ้า borrower เปลี่ยน ต้อง Re-underwrite / Novation / Revised or New Child ตามสัญญา</div><div class="card tblwrap"><table class="tbl"><thead><tr><th>Request</th><th>Child E-LG</th><th>Type</th><th>Current Driver</th><th>Proposed</th><th>FI</th><th>Stage</th></tr></thead><tbody><tr><td>RA-021</td><td>ELG-80480</td><td>Driver reassignment</td><td>D-000480</td><td>D-001144</td><td>SCB</td><td><span class="pill amber">FI Review</span></td></tr><tr><td>NV-006</td><td>ELG-80491</td><td>Borrower change</td><td>D-000491</td><td>D-001202</td><td>KBank</td><td><span class="pill red">Re-underwrite</span></td></tr></tbody></table></div></section>
+
+<section id="p-exit" class="screen"><div class="title"><div><h2>Restructure / Exit</h2><p>Pre-TDR, Step-back, Reassignment, Voluntary Return, Recovery ต้องแยกสถานะ</p></div></div><div class="grid"><div class="card kpi"><div class="label">Pre-TDR Active</div><div class="value">14</div><div class="mini">Still servicing</div></div><div class="card kpi"><div class="label">Reassignment</div><div class="value">5</div></div><div class="card kpi"><div class="label">Voluntary Return</div><div class="value">3</div></div><div class="card kpi"><div class="label">Recovery</div><div class="value">6</div></div></div></section>
+
+<section id="p-claim" class="screen"><div class="title"><div><h2>Claim &amp; Recovery</h2><p>Recover first → Eligible Net Loss → HMC/Stop-Loss → Payable Claim</p></div></div><div class="card tblwrap"><table class="tbl"><thead><tr><th>Claim</th><th>Driver</th><th>FI</th><th>EAD</th><th>Recoveries</th><th>Eligible Net Loss</th><th>Gate</th><th>Status</th></tr></thead><tbody><tr><td>CL-0011</td><td>D-000422</td><td>SCB</td><td class="num">468,000</td><td class="num">318,500</td><td class="num">149,500</td><td>Evidence</td><td><span class="pill amber">Pending</span></td></tr><tr><td>CL-0012</td><td>D-000437</td><td>KBank</td><td class="num">502,000</td><td class="num">361,000</td><td class="num">141,000</td><td>HMC</td><td><span class="pill blue">Check</span></td></tr></tbody></table></div></section>
+
+<section id="p-finance" class="screen"><div class="title"><div><h2>Program Financial Control</h2><p>วงเงินโครงการ Exposure Fee Claim Funding HMC Stop-Loss</p></div></div><div class="grid"><div class="card kpi"><div class="label">Program Guarantee Limit</div><div class="value">฿300m</div><div class="mini">Demo scenario</div></div><div class="card kpi"><div class="label">Activated Exposure</div><div class="value">฿198m</div><div class="mini">66.0% utilized</div></div><div class="card kpi"><div class="label">Remaining Capacity</div><div class="value">฿102m</div></div><div class="card kpi"><div class="label">Gov Claim Support 28%</div><div class="value">฿84m</div><div class="mini">Proposed capacity</div></div><div class="card s6"><h3 style="margin-top:0">Fee &amp; Customer Reserve</h3><table class="tbl"><tr><td>RBP Fee Accrued</td><td class="num">฿1.92m</td></tr><tr><td>RBP Fee Collected</td><td class="num">฿1.74m</td></tr><tr><td>Monitoring Fee</td><td class="num">฿0.19m</td></tr><tr><td>Cure Reserve Balance</td><td class="num">฿0.82m</td></tr></table><div class="mini">Cure Reserve = customer-attributed liability, not revenue.</div></div><div class="card s6"><h3 style="margin-top:0">Risk Capacity</h3><div class="label">HMC Used</div><div class="progress"><span style="width:18%"></span></div><div class="label" style="margin-top:11px">Stop-Loss Used</div><div class="progress"><span style="width:11%"></span></div><div class="label" style="margin-top:11px">Government Claim Support Used</div><div class="progress"><span style="width:7%"></span></div></div></div></section>
+
+<section id="p-partners" class="screen"><div class="title"><div><h2>Partners / Data / Audit</h2><p>Role-based + Tenant-based access / minimum-necessary data</p></div></div><div class="role-gate"><div class="rolecard"><b>TCG</b><span class="tag">Portfolio / Risk / Claim</span></div><div class="rolecard"><b>FI</b><span class="tag">Loan / DPD / Settlement</span></div><div class="rolecard"><b>Co-op / Fleet</b><span class="tag">Member / Assignment / Cure</span></div><div class="rolecard"><b>EV / BaaS</b><span class="tag">VIN / SoH / SLA</span></div><div class="rolecard"><b>GPS / Data</b><span class="tag">Mobility / QA</span></div><div class="rolecard"><b>Payment / Recovery</b><span class="tag">Sweep / Recovery</span></div></div><div class="card tblwrap" style="margin-top:13px"><table class="tbl"><thead><tr><th>Partner</th><th>Role</th><th>Data SLA</th><th>Integration</th><th>Completeness</th><th>Exceptions</th><th>Status</th></tr></thead><tbody><tr><td>Co-op A</td><td>Eligibility / Assignment</td><td>Daily 06:00</td><td>API</td><td>99.1%</td><td>2</td><td><span class="pill green">Healthy</span></td></tr><tr><td>FI-KBank</td><td>Loan ledger / DPD</td><td>T+1</td><td>Batch</td><td>100%</td><td>0</td><td><span class="pill green">Healthy</span></td></tr><tr><td>GPS-01</td><td>Mobility evidence</td><td>Hourly</td><td>API</td><td>96.8%</td><td>14</td><td><span class="pill amber">Watch</span></td></tr><tr><td>Payment-01</td><td>Sweep / Reversal</td><td>Near real-time</td><td>API</td><td>99.7%</td><td>4</td><td><span class="pill green">Healthy</span></td></tr></tbody></table></div></section>
+</div></main></div>
+</div>
+
+<script>
+/* ============================================================
+   ROUTER : ปกกลาง → Driver / Partner
+   ============================================================ */
+var VIEWS={
+  gateway:{el:'viewGateway',title:'Route2Own Post-Approval Gateway v2.0'},
+  driver:{el:'viewDriver',title:'My Route2Own Driver Portal v2.0'},
+  partner:{el:'viewPartner',title:'Route2Own Partner & Control Tower v2.0'}
+};
+function go(name){
+  if(!VIEWS[name])name='gateway';
+  for(var k in VIEWS){document.getElementById(VIEWS[k].el).classList.toggle('active',k===name)}
+  document.body.className='on-'+name;
+  document.title=VIEWS[name].title;
+  var want=name==='gateway'?'':'#'+name;
+  if(location.hash!==want){
+    if(want){location.hash=name}
+    else if(history.replaceState){history.replaceState(null,'',location.pathname+location.search)}
+    else{location.hash=''}
+  }
+  window.scrollTo(0,0);
+}
+function routeFromHash(){go((location.hash||'').replace(/^#\/?/,''))}
+window.addEventListener('hashchange',routeFromHash);
+routeFromHash();
+
+/* ============================================================
+   DRIVER PORTAL
+   ============================================================ */
+var driverTitles={home:'วันนี้',activity:'รายได้ & การขับขี่',money:'เงินของฉัน',ownership:'หนี้ & Ownership',wallet:'กระเป๋า Route2Own',help:'แจ้งเหตุ / ขอความช่วยเหลือ',cure:'PromptCure'};
+document.querySelectorAll('#viewDriver .nav button[data-screen]').forEach(function(b){
+  b.onclick=function(){
+    document.querySelectorAll('#viewDriver .nav button[data-screen]').forEach(function(x){x.classList.remove('active')});
+    b.classList.add('active');
+    document.querySelectorAll('#viewDriver .screen').forEach(function(x){x.classList.remove('active')});
+    document.getElementById(b.dataset.screen).classList.add('active');
+  };
+});
+function openIncident(){document.getElementById('incidentModal').classList.add('show')}
+function closeIncident(){document.getElementById('incidentModal').classList.remove('show')}
+function submitIncident(){alert('Demo: ส่งแจ้งเหตุแล้ว → Inactivity & Incident Desk. ระบบจะไม่ปรับเครดิตอัตโนมัติ');closeIncident()}
+
+/* ============================================================
+   PARTNER & CONTROL TOWER
+   ============================================================ */
+var partnerTitles={overview:'Executive Overview',pipeline:'Front-Door Pipeline',portfolio:'Active Portfolio',daily:'Daily Operations',incidents:'Inactivity & Incident Desk',ews:'Risk / EWS',cure:'PromptCure / Pre-TDR',elg:'Child E-LG / Assignment',exit:'Restructure / Exit',claim:'Claim & Recovery',finance:'Program Financial Control',partners:'Partners / Data / Audit'};
+document.querySelectorAll('#viewPartner .nav button[data-screen]').forEach(function(b){
+  b.onclick=function(){
+    document.querySelectorAll('#viewPartner .nav button[data-screen]').forEach(function(x){x.classList.remove('active')});
+    b.classList.add('active');
+    document.querySelectorAll('#viewPartner .screen').forEach(function(x){x.classList.remove('active')});
+    document.getElementById('p-'+b.dataset.screen).classList.add('active');
+    document.getElementById('screenTitle').textContent=partnerTitles[b.dataset.screen]||b.textContent;
+  };
+});
+var orgs={tcg:['บสย. / TCG'],risk:['บสย. - Risk'],claim:['บสย. - Claim'],fi:['KBank','Krungsri Auto','SCB Auto Finance','ttb DRIVE','CIMB Thai Auto'],coop:['Co-op A','Co-op B','Co-op C'],oem:['EV Partner 01','BaaS Partner 01'],data:['GPS / Data Partner 01'],payment:['Payment Servicer 01'],recovery:['Insurance / Recovery Partner 01']};
+var role=document.getElementById('roleSelect'),org=document.getElementById('orgSelect');
+function loadOrgs(){org.innerHTML='';(orgs[role.value]||[]).forEach(function(x){var o=document.createElement('option');o.textContent=x;org.appendChild(o)});applyRole()}
+role.onchange=loadOrgs;loadOrgs();
+function applyRole(){
+  var r=role.value,nav=document.querySelectorAll('#viewPartner .nav button[data-screen]');
+  nav.forEach(function(b){b.style.display=''});
+  function hide(list){list.forEach(function(s){var el=document.querySelector('#viewPartner .nav button[data-screen="'+s+'"]');if(el)el.style.display='none'})}
+  function only(list){nav.forEach(function(b){b.style.display=list.indexOf(b.dataset.screen)>=0?'':'none'})}
+  if(r==='fi'){hide(['finance','partners'])}
+  if(r==='coop'){hide(['finance','claim','partners'])}
+  if(r==='oem'){only(['overview','incidents','partners'])}
+  if(r==='data'){only(['overview','daily','partners'])}
+  if(r==='payment'){only(['overview','daily','partners'])}
+  if(r==='recovery'){only(['overview','exit','claim','partners'])}
+}
+var search=document.getElementById('search'),filter=document.getElementById('filter');
+function filterRows(){
+  var q=(search.value||'').toLowerCase(),f=(filter.value||'').toLowerCase();
+  document.querySelectorAll('#portfolioTbl tbody tr').forEach(function(tr){
+    var t=tr.textContent.toLowerCase();
+    tr.style.display=(t.indexOf(q)>=0&&(!f||t.indexOf(f)>=0))?'':'none';
+  });
+}
+search.oninput=filterRows;filter.onchange=filterRows;
+</script>
+</body>
+</html>
