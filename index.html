@@ -67,12 +67,16 @@ body.on-driver,body.on-partner{background:#f4f8fb;color:#15263c}
 #viewGateway .step:focus-visible{outline:2px solid #29b6e8;outline-offset:2px}
 #viewGateway .step b{display:block;color:#74e6dc;margin-bottom:4px}
 #viewGateway .note{font-size:10.5px;color:#98acbd;margin-top:12px;line-height:1.5}
-#viewGateway .guide{display:flex;align-items:flex-end;gap:12px;margin-top:22px}
-#viewGateway .guide .mascot{flex-shrink:0;filter:drop-shadow(0 6px 10px rgba(10,90,156,.28))}
-#viewGateway .guide .bubble{position:relative;background:#fff;border:1px solid var(--line);border-radius:4px 16px 16px 16px;padding:11px 14px;font-size:12px;font-weight:700;line-height:1.5;color:var(--navy);box-shadow:0 10px 24px rgba(7,26,51,.09)}
-#viewGateway .guide .bubble b{color:#0a5a9c}
+/* กล่องข้อความทักทายที่ปรับปรุงโครงสร้างเพื่อเปลี่ยนรูปภาพใหม่ทางด้านซ้าย */
+#viewGateway .assistant-welcome-box{display:flex;align-items:center;gap:20px;background:#ffffff;border:1px solid var(--line);border-radius:16px;padding:16px;margin-top:22px;box-shadow:0 2px 8px rgba(0,0,0,.05)}
+/* กำหนดขนาดของกรอบรูปภาพใหม่ให้สมดุลกับกล่องเนื้อหา */
+#viewGateway .assistant-image-wrapper{width:96px;height:auto;flex-shrink:0}
+#viewGateway .assistant-image-wrapper svg,#viewGateway .assistant-new-img{width:100%;height:auto;display:block;border-radius:12px;filter:drop-shadow(0 4px 10px rgba(0,54,179,.15))}
+#viewGateway .assistant-text-content{font-size:13px;color:#334155;line-height:1.6}
+#viewGateway .assistant-text-content strong{color:#0a5a9c}
+@media(max-width:600px){#viewGateway .assistant-welcome-box{flex-direction:column;text-align:center}#viewGateway .assistant-image-wrapper{width:100%;max-width:130px}}
 @media(max-width:860px){#viewGateway .hero{grid-template-columns:1fr;padding-top:10px}#viewGateway .hero h1{font-size:48px}#viewGateway .top{padding:16px}#viewGateway .mini-flow .row{grid-template-columns:1fr 1fr}}
-@media(max-width:520px){#viewGateway .hero h1{font-size:40px}#viewGateway .panel{padding:16px;border-radius:22px}#viewGateway .card{padding:16px}#viewGateway .hero{width:min(100% - 20px,1180px)}#viewGateway .top{align-items:flex-start;gap:10px}#viewGateway .demo{white-space:nowrap}#viewGateway .mini-flow .row{grid-template-columns:1fr}#viewGateway .guide .mascot{width:60px;height:76px}#viewGateway .strip{flex-direction:column;gap:4px}#viewGateway .strip .dot{display:none}}
+@media(max-width:520px){#viewGateway .hero h1{font-size:40px}#viewGateway .panel{padding:16px;border-radius:22px}#viewGateway .card{padding:16px}#viewGateway .hero{width:min(100% - 20px,1180px)}#viewGateway .top{align-items:flex-start;gap:10px}#viewGateway .demo{white-space:nowrap}#viewGateway .mini-flow .row{grid-template-columns:1fr}#viewGateway .strip{flex-direction:column;gap:4px}#viewGateway .strip .dot{display:none}}
 
 /* ============================================================
    VIEW 2 : DRIVER PORTAL (ผู้ที่ผ่านโครงการ / ได้รับอนุมัติแล้ว)
@@ -229,7 +233,11 @@ body.on-driver,body.on-partner{background:#f4f8fb;color:#15263c}
 <h1>ขับ. ผ่อน. <span>คุ้มครอง.</span> เป็นเจ้าของ.</h1>
 <p>หลังสถาบันการเงินอนุมัติสินเชื่อ Route2Own จะเปลี่ยนจากระบบคัดกรองก่อนกู้ เป็นระบบดูแลหลังอนุมัติที่เชื่อมข้อมูลการทำงาน การชำระหนี้ และสัญญาณความเสี่ยง เพื่อช่วยให้ผู้ขับเดินต่อสู่การเป็นเจ้าของ และช่วยพันธมิตรเห็นปัญหาก่อนเกิด NPL</p>
 <div class="chips"><span class="chip">รายได้ &amp; KM/EMU</span><span class="chip">PAYD แบบปรับตามรายได้</span><span class="chip">ระบบควบคุมเงินต้น</span><span class="chip">EWS และ PromptCure</span><span class="chip">การควบคุมเคลม</span></div>
-<div class="guide"><svg class="mascot" viewBox="0 0 120 150" width="86" height="108" aria-hidden="true">
+<!-- กล่องข้อความทักทายที่ปรับปรุงโครงสร้างเพื่อเปลี่ยนรูปภาพใหม่ทางด้านซ้าย -->
+<div class="assistant-welcome-box">
+  <!-- รูปภาพบริการดิจิทัล บสย. : ยังไม่มีไฟล์ tcg-service.png ในระบบ ใช้ไอคอนนกฮูกที่วาดไว้แทนตำแหน่งนี้ชั่วคราว -->
+  <div class="assistant-image-wrapper">
+    <svg viewBox="0 0 120 150" role="img" aria-label="ผู้ช่วย บสย.">
 <ellipse cx="60" cy="106" rx="34" ry="40" fill="#ffffff" stroke="#dbe6f2" stroke-width="1.5"/>
 <ellipse cx="26" cy="99" rx="11" ry="22" fill="#22337a" transform="rotate(-16 26 99)"/>
 <ellipse cx="94" cy="99" rx="11" ry="22" fill="#22337a" transform="rotate(16 94 99)"/>
@@ -249,7 +257,13 @@ body.on-driver,body.on-partner{background:#f4f8fb;color:#15263c}
 <path d="M53 61 Q60 71 67 61 Q60 66 53 61Z" fill="#f4c430"/>
 <ellipse cx="42" cy="141" rx="8" ry="6" fill="#f4c430"/>
 <ellipse cx="78" cy="141" rx="8" ry="6" fill="#f4c430"/>
-</svg><div class="bubble">สวัสดีครับ ผมผู้ช่วย บสย. 👋 <b>4 ขั้นตอนหลังอนุมัติ</b> ที่ควรรู้อยู่ด้านล่างนี้ กดแต่ละกล่องเพื่อดูรายละเอียดได้เลยครับ</div></div>
+    </svg>
+  </div>
+  <!-- ข้อความทักทาย -->
+  <div class="assistant-text-content">
+    <p>สวัสดีครับ ผมผู้ช่วย บสย. 👇 <strong>4 ขั้นตอนหลังอนุมัติ</strong> ที่ควรรู้อยู่ด้านล่างนี้ กดแต่ละกล่องเพื่อดูรายละเอียดได้เลยครับ</p>
+  </div>
+</div>
 <div class="mini-flow"><div class="row"><button type="button" class="step" onclick="go('partner','pipeline')"><b>01</b>FI อนุมัติแล้ว</button><button type="button" class="step" onclick="go('partner','elg')"><b>02</b>Child E-LG เริ่มใช้งาน</button><button type="button" class="step" onclick="go('driver','home')"><b>03</b>PAYD + การติดตาม</button><button type="button" class="step" onclick="go('driver','ownership')"><b>04</b>คุ้มครอง → เป็นเจ้าของ</button></div><div class="note">สำคัญ: Route2Own ไม่คำนวณ DPD เอง - ยอดค้างชำระ/DPD ตามสัญญาต้องมาจากบัญชีหลักของ FI เท่านั้น · กดกล่องด้านบนเพื่อดูรายละเอียดแต่ละขั้นตอน</div></div>
 </section>
 <section class="panel">
