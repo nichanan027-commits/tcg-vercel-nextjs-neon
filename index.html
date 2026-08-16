@@ -25,12 +25,6 @@ body.on-driver,body.on-partner{background:#f4f8fb;color:#15263c}
 .tophome{border:1px solid #d5e3ec;background:#fff;color:#0b7580;border-radius:10px;padding:9px 12px;font-weight:800;font-size:11.5px;cursor:pointer;white-space:nowrap;font-family:inherit}
 .tophome:hover{background:#eef9fb}
 
-/* ปุ่มสลับพื้นที่ใช้งานข้ามระบบ */
-.switchbar{display:flex;gap:7px;flex-wrap:wrap;margin-top:10px}
-.switchbar button{flex:1;min-width:0;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.06);color:#cfe6f2;border-radius:10px;padding:8px 6px;font-size:10.5px;font-weight:800;cursor:pointer;font-family:inherit}
-.switchbar button:hover{background:rgba(36,197,229,.2);color:#fff}
-.switchbar button.cur{background:rgba(36,197,229,.28);color:#fff;border-color:rgba(36,197,229,.5)}
-
 /* ============================================================
    VIEW 1 : GATEWAY (ปกกลาง)
    ============================================================ */
@@ -67,7 +61,9 @@ body.on-driver,body.on-partner{background:#f4f8fb;color:#15263c}
 #viewGateway .strip b{color:#fff}
 #viewGateway .mini-flow{margin-top:24px;padding:18px;border-radius:18px;background:linear-gradient(135deg,#071a33,#0d365d);color:#fff}
 #viewGateway .mini-flow .row{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
-#viewGateway .step{padding:10px 8px;border-radius:12px;background:rgba(255,255,255,.08);font-size:11px;text-align:center}
+#viewGateway .step{padding:10px 8px;border-radius:12px;background:rgba(255,255,255,.08);font-size:11px;text-align:center;border:0;color:inherit;font-family:inherit;cursor:pointer;transition:.15s ease}
+#viewGateway .step:hover,#viewGateway .step:focus-visible{background:rgba(36,197,229,.28);transform:translateY(-1px)}
+#viewGateway .step:focus-visible{outline:2px solid #24c5e5;outline-offset:2px}
 #viewGateway .step b{display:block;color:#74e6dc;margin-bottom:4px}
 #viewGateway .note{font-size:10.5px;color:#98acbd;margin-top:12px;line-height:1.5}
 @media(max-width:860px){#viewGateway .hero{grid-template-columns:1fr;padding-top:10px}#viewGateway .hero h1{font-size:48px}#viewGateway .top{padding:16px}#viewGateway .mini-flow .row{grid-template-columns:1fr 1fr}}
@@ -145,7 +141,7 @@ body.on-driver,body.on-partner{background:#f4f8fb;color:#15263c}
 #viewDriver .field input,#viewDriver .field select,#viewDriver .field textarea{width:100%;padding:10px;border:1px solid var(--line);border-radius:9px;font-family:inherit}
 #viewDriver .actions{display:flex;justify-content:flex-end;gap:8px}
 #viewDriver .close{float:right;border:0;background:transparent;font-size:22px;cursor:pointer}
-@media(max-width:900px){#viewDriver .app{grid-template-columns:78px 1fr}#viewDriver .brand{font-size:0}#viewDriver .brand:before{content:'R2O';font-size:19px}#viewDriver .brand small,#viewDriver .badge,#viewDriver .nav button{font-size:0}#viewDriver .nav button:before{content:attr(data-icon);font-size:16px}#viewDriver .kpi{grid-column:span 6}#viewDriver .s4,#viewDriver .s5,#viewDriver .s6,#viewDriver .s7,#viewDriver .s8{grid-column:span 12}#viewDriver .backhome b,#viewDriver .switchbar{display:none}}
+@media(max-width:900px){#viewDriver .app{grid-template-columns:78px 1fr}#viewDriver .brand{font-size:0}#viewDriver .brand:before{content:'R2O';font-size:19px}#viewDriver .brand small,#viewDriver .badge,#viewDriver .nav button{font-size:0}#viewDriver .nav button:before{content:attr(data-icon);font-size:16px}#viewDriver .kpi{grid-column:span 6}#viewDriver .s4,#viewDriver .s5,#viewDriver .s6,#viewDriver .s7,#viewDriver .s8{grid-column:span 12}#viewDriver .backhome b{display:none}}
 @media(max-width:620px){#viewDriver .app{display:block}#viewDriver .side{position:relative;height:auto;padding:12px}#viewDriver .nav{display:flex;overflow:auto;margin-top:10px}#viewDriver .nav button{min-width:46px}#viewDriver .top{position:relative;align-items:flex-start;flex-direction:column;gap:8px}#viewDriver .content{padding:13px}#viewDriver .kpi{grid-column:span 12}#viewDriver .hero-title{align-items:flex-start;flex-direction:column}}
 
 /* ============================================================
@@ -210,7 +206,7 @@ body.on-driver,body.on-partner{background:#f4f8fb;color:#15263c}
 #viewPartner .rolecard b{display:block;font-size:13px;margin-bottom:5px}
 #viewPartner .tag{font-size:9px;padding:3px 6px;border:1px solid #d8e5ec;border-radius:6px;background:#f9fcfd;color:#53697b}
 #viewPartner .hidden-by-role{display:none!important}
-@media(max-width:1000px){#viewPartner .app{grid-template-columns:80px 1fr}#viewPartner .brand{font-size:0}#viewPartner .brand:before{content:'R2O';font-size:18px}#viewPartner .brand small,#viewPartner .demo,#viewPartner .nav button{font-size:0}#viewPartner .nav button:before{content:attr(data-icon);font-size:15px}#viewPartner .nav .group{display:none}#viewPartner .kpi{grid-column:span 6}#viewPartner .s4,#viewPartner .s5,#viewPartner .s6,#viewPartner .s7,#viewPartner .s8{grid-column:span 12}#viewPartner .role-gate{grid-template-columns:1fr 1fr}#viewPartner .backhome b,#viewPartner .switchbar{display:none}}
+@media(max-width:1000px){#viewPartner .app{grid-template-columns:80px 1fr}#viewPartner .brand{font-size:0}#viewPartner .brand:before{content:'R2O';font-size:18px}#viewPartner .brand small,#viewPartner .demo,#viewPartner .nav button{font-size:0}#viewPartner .nav button:before{content:attr(data-icon);font-size:15px}#viewPartner .nav .group{display:none}#viewPartner .kpi{grid-column:span 6}#viewPartner .s4,#viewPartner .s5,#viewPartner .s6,#viewPartner .s7,#viewPartner .s8{grid-column:span 12}#viewPartner .role-gate{grid-template-columns:1fr 1fr}#viewPartner .backhome b{display:none}}
 @media(max-width:650px){#viewPartner .app{display:block}#viewPartner .side{position:relative;height:auto;padding:12px}#viewPartner .nav{display:flex;overflow:auto;margin-top:10px}#viewPartner .nav button{min-width:46px}#viewPartner .top{position:relative;align-items:flex-start;flex-direction:column;gap:8px}#viewPartner .selectors{width:100%}#viewPartner .selectors select{flex:1}#viewPartner .content{padding:13px}#viewPartner .kpi{grid-column:span 12}#viewPartner .title{align-items:flex-start;flex-direction:column}#viewPartner .role-gate{grid-template-columns:1fr}}
 </style>
 </head>
@@ -228,7 +224,7 @@ body.on-driver,body.on-partner{background:#f4f8fb;color:#15263c}
 <h1>ขับ. ผ่อน. <span>คุ้มครอง.</span> เป็นเจ้าของ.</h1>
 <p>หลังสถาบันการเงินอนุมัติสินเชื่อ Route2Own จะเปลี่ยนจากระบบคัดกรองก่อนกู้ เป็นระบบดูแลหลังอนุมัติที่เชื่อมข้อมูลการทำงาน การชำระหนี้ และสัญญาณความเสี่ยง เพื่อช่วยให้ผู้ขับเดินต่อสู่การเป็นเจ้าของ และช่วยพันธมิตรเห็นปัญหาก่อนเกิด NPL</p>
 <div class="chips"><span class="chip">รายได้ &amp; KM/EMU</span><span class="chip">PAYD แบบปรับตามรายได้</span><span class="chip">ระบบควบคุมเงินต้น</span><span class="chip">EWS และ PromptCure</span><span class="chip">การควบคุมเคลม</span></div>
-<div class="mini-flow"><div class="row"><div class="step"><b>01</b>FI อนุมัติแล้ว</div><div class="step"><b>02</b>Child E-LG เริ่มใช้งาน</div><div class="step"><b>03</b>PAYD + การติดตาม</div><div class="step"><b>04</b>คุ้มครอง → เป็นเจ้าของ</div></div><div class="note">สำคัญ: Route2Own ไม่คำนวณ DPD เอง - ยอดค้างชำระ/DPD ตามสัญญาต้องมาจากบัญชีหลักของ FI เท่านั้น</div></div>
+<div class="mini-flow"><div class="row"><button type="button" class="step" onclick="go('partner','pipeline')"><b>01</b>FI อนุมัติแล้ว</button><button type="button" class="step" onclick="go('partner','elg')"><b>02</b>Child E-LG เริ่มใช้งาน</button><button type="button" class="step" onclick="go('driver','home')"><b>03</b>PAYD + การติดตาม</button><button type="button" class="step" onclick="go('driver','ownership')"><b>04</b>คุ้มครอง → เป็นเจ้าของ</button></div><div class="note">สำคัญ: Route2Own ไม่คำนวณ DPD เอง - ยอดค้างชำระ/DPD ตามสัญญาต้องมาจากบัญชีหลักของ FI เท่านั้น · กดกล่องด้านบนเพื่อดูรายละเอียดแต่ละขั้นตอน</div></div>
 </section>
 <section class="panel">
 <h2>เลือกพื้นที่ใช้งาน</h2><p>ระบบหลังอนุมัติถูกแยกตามผู้ใช้งานเพื่อไม่ให้ข้อมูลและสิทธิของผู้ขับปะปนกับพันธมิตร/แอดมิน</p>
@@ -249,7 +245,6 @@ body.on-driver,body.on-partner{background:#f4f8fb;color:#15263c}
 <div id="viewDriver" class="view">
 <div class="app"><aside class="side"><div class="brand">My Route2Own<small>ระบบผู้ขับหลังการอนุมัติ</small></div><span class="badge">ระบบสาธิตผู้ขับ / จำลองข้อมูล</span>
 <button class="backhome" onclick="go('gateway')"><i>←</i><b>กลับหน้าปกกลาง</b></button>
-<div class="switchbar"><button class="cur" onclick="go('driver')">ผู้ขับ</button><button onclick="go('partner')">พันธมิตร</button></div>
 <nav class="nav">
 <button class="active" data-screen="home" data-icon="⌂">วันนี้</button><button data-screen="activity" data-icon="↗">รายได้ &amp; การขับขี่</button><button data-screen="money" data-icon="฿">เงินของฉัน</button><button data-screen="ownership" data-icon="◒">หนี้ &amp; ความเป็นเจ้าของ</button><button data-screen="wallet" data-icon="▤">กระเป๋า Route2Own</button><button data-screen="help" data-icon="+">แจ้งเหตุ / ขอความช่วยเหลือ</button><button data-screen="cure" data-icon="!">ปรับโครงสร้างหนี้เร่งด่วน</button></nav></aside>
 <main class="main"><header class="top"><div><h1>My Route2Own</h1><p>D-000381 · Child E-LG ELG-80381 · FI: KBank · ข้อมูลสาธิตเท่านั้น</p></div><div class="status"><span class="pill green">ใช้งานอยู่</span><span class="pill green">EWS เขียว</span><span class="pill blue">FI DPD 0</span><span class="pill blue">ระดับ B</span><button class="tophome" onclick="go('gateway')">← หน้าปกกลาง</button></div></header><div class="content">
@@ -291,7 +286,6 @@ body.on-driver,body.on-partner{background:#f4f8fb;color:#15263c}
 <div id="viewPartner" class="view">
 <div class="app"><aside class="side"><div class="brand">ศูนย์ควบคุมและพันธมิตร Route2Own<small>ระบบหลังบ้านหลังการอนุมัติ</small></div><span class="demo">ระบบสาธิต / การเข้าถึงตามบทบาทหน้าที่</span>
 <button class="backhome" onclick="go('gateway')"><i>←</i><b>กลับหน้าปกกลาง</b></button>
-<div class="switchbar"><button onclick="go('driver')">ผู้ขับ</button><button class="cur" onclick="go('partner')">พันธมิตร</button></div>
 <nav class="nav"><div class="group">การควบคุมและติดตาม</div><button class="active" data-screen="overview" data-icon="⌂">ภาพรวมระบบ</button><button data-screen="pipeline" data-icon="⇢">ขั้นตอนคัดกรองหน้าบ้าน</button><button data-screen="portfolio" data-icon="▦">พอร์ตโฟลิโอที่กำลังดำเนินงาน</button><button data-screen="daily" data-icon="◫">การดำเนินงานรายวัน</button><button data-screen="incidents" data-icon="!">บัญชีที่ไม่มีความเคลื่อนไหว &amp; เคสปัญหา</button><button data-screen="ews" data-icon="◉">ความเสี่ยง / ระบบเตือนภัยล่วงหน้า (EWS)</button><button data-screen="cure" data-icon="✚">ปรับโครงสร้างหนี้เร่งด่วน / ก่อน TDR</button><button data-screen="elg" data-icon="LG">ระบบลูกข่าย E-LG / การมอบหมายงาน</button><button data-screen="exit" data-icon="↪">การปรับโครงสร้างหนี้ / สิ้นสุดสัญญา</button><button data-screen="claim" data-icon="฿">เคลมประกันความเสียหาย &amp; ติดตามทวงหนี้</button><button data-screen="finance" data-icon="∑">การควบคุมทางการเงินของโครงการ</button><button data-screen="partners" data-icon="◎">พันธมิตร / ข้อมูลระบบ / การตรวจสอบ</button></nav></aside>
 <main class="main"><header class="top"><div><h1 id="screenTitle">ภาพรวมระบบ</h1><p>ข้อมูลเป็นการจำลองเพื่อสาธิตรูปแบบการดำเนินงาน - ไม่ใช่ข้อมูลลูกค้าจริงหรือเงื่อนไขผลิตภัณฑ์ที่อนุมัติแล้ว</p></div><div class="selectors"><select id="roleSelect"><option value="tcg">บสย. / TCG Program Admin</option><option value="risk">บสย. / Risk</option><option value="claim">บสย. / Claim</option><option value="fi">ผู้ดูแลระบบ FI</option><option value="coop">ผู้ดูแลระบบสหกรณ์ / กองรถ</option><option value="oem">ผู้ดูแลระบบ EV / BaaS</option><option value="data">ผู้ดูแลระบบ GPS / ข้อมูล</option><option value="payment">ผู้ดูแลระบบการชำระเงิน</option><option value="recovery">ผู้ดูแลระบบประกันภัย / การติดตามหนี้</option></select><select id="orgSelect"></select><button class="tophome" onclick="go('gateway')">← หน้าปกกลาง</button></div></header><div class="content">
 <section id="p-overview" class="screen active"><div class="title"><div><h2>ภาพรวมสำหรับผู้บริหาร</h2><p>ช่องทางก่อนอนุมัติ + พอร์ตหลังอนุมัติ + Pre-NPL + เคลม</p></div><span class="pill blue">วันทำการสาธิต</span></div><div class="notice"><b>หลักการควบคุม:</b> 3 วันไม่วิ่ง = Inactivity Review Case ไม่ใช่ Credit Downgrade อัตโนมัติ; สถานะเครดิต ยอดค้างชำระ และ DPD ต้องรับจากบัญชีหลักของ FI เท่านั้น</div><div class="grid"><div class="card kpi"><div class="label">การลงทะเบียน</div><div class="value">1,248</div><div class="mini">รวมจาก Front Door</div></div><div class="card kpi"><div class="label">ใบรับรองความพร้อม</div><div class="value">864</div><div class="mini">ใช้งานอยู่ 602 · หมดอายุ 262</div></div><div class="card kpi"><div class="label">FI อนุมัติแล้ว</div><div class="value">438</div><div class="mini">อนุมัติแล้วและพร้อมเปิดใช้งาน</div></div><div class="card kpi"><div class="label">Child E-LG ที่ใช้งานอยู่</div><div class="value">412</div><div class="mini">พอร์ตที่ใช้งานอยู่</div></div><div class="card kpi"><div class="label">ไม่เคลื่อนไหว ≥3 วัน</div><div class="value">26</div><div class="mini">จุดเริ่มทบทวน</div></div><div class="card kpi"><div class="label">เหลือง / แดง</div><div class="value">41 / 8</div><div class="mini">EWS ตามสาเหตุ</div></div><div class="card kpi"><div class="label">PromptCure ที่เปิดอยู่</div><div class="value">33</div><div class="mini">ติดตามตาม SLA</div></div><div class="card kpi"><div class="label">เคลมที่รอดำเนินการ</div><div class="value">6</div><div class="mini">ด่านตรวจสอบการติดตามหนี้ก่อน</div></div><div class="card s8"><h3 style="margin-top:0">วงจรชีวิต</h3><div class="lane"><span class="node">ลงทะเบียน</span><span class="arrow">→</span><span class="node">ความพร้อมด้านเครดิต</span><span class="arrow">→</span><span class="node">FI อนุมัติ</span><span class="arrow">→</span><span class="node">Child E-LG</span><span class="arrow">→</span><span class="node">PAYD</span><span class="arrow">→</span><span class="node">EWS / การช่วยเหลือ</span><span class="arrow">→</span><span class="node">การติดตามหนี้ / เคลม</span></div></div><div class="card s4"><h3 style="margin-top:0">ประเด็นควบคุมสำคัญวันนี้</h3><div class="mini">1) หยุดวิ่งโดยไม่ทราบสาเหตุ &gt;3 วัน<br>2) ยอดโอนเงินไม่ตรงกัน<br>3) เฝ้าระวังส่วนต่างเงินต้น<br>4) SLA เวลาหยุดวิ่งของรถ<br>5) รอหลักฐานเคลม</div></div></div></section>
@@ -329,34 +323,43 @@ var VIEWS={
   driver:{el:'viewDriver',title:'My Route2Own Driver Portal v2.0'},
   partner:{el:'viewPartner',title:'Route2Own Partner & Control Tower v2.0'}
 };
-function go(name){
+function go(name,screen){
   if(!VIEWS[name])name='gateway';
   for(var k in VIEWS){document.getElementById(VIEWS[k].el).classList.toggle('active',k===name)}
   document.body.className='on-'+name;
   document.title=VIEWS[name].title;
-  var want=name==='gateway'?'':'#'+name;
+  if(name==='driver'&&screen)showDriverScreen(screen);
+  if(name==='partner'&&screen)showPartnerScreen(screen);
+  var want=name==='gateway'?'':'#'+name+(screen?':'+screen:'');
   if(location.hash!==want){
-    if(want){location.hash=name}
+    if(want){location.hash=name+(screen?':'+screen:'')}
     else if(history.replaceState){history.replaceState(null,'',location.pathname+location.search)}
     else{location.hash=''}
   }
   window.scrollTo(0,0);
 }
-function routeFromHash(){go((location.hash||'').replace(/^#\/?/,''))}
+function routeFromHash(){
+  var h=(location.hash||'').replace(/^#\/?/,'');
+  var parts=h.split(':');
+  go(parts[0],parts[1]);
+}
 window.addEventListener('hashchange',routeFromHash);
-routeFromHash();
 
 /* ============================================================
    DRIVER PORTAL
    ============================================================ */
 var driverTitles={home:'วันนี้',activity:'รายได้ & การขับขี่',money:'เงินของฉัน',ownership:'หนี้ & ความเป็นเจ้าของ',wallet:'กระเป๋า Route2Own',help:'แจ้งเหตุ / ขอความช่วยเหลือ',cure:'ปรับโครงสร้างหนี้เร่งด่วน'};
+function showDriverScreen(id){
+  var btn=document.querySelector('#viewDriver .nav button[data-screen="'+id+'"]');
+  if(!btn)return;
+  document.querySelectorAll('#viewDriver .nav button[data-screen]').forEach(function(x){x.classList.remove('active')});
+  btn.classList.add('active');
+  document.querySelectorAll('#viewDriver .screen').forEach(function(x){x.classList.remove('active')});
+  var scr=document.getElementById(id);
+  if(scr)scr.classList.add('active');
+}
 document.querySelectorAll('#viewDriver .nav button[data-screen]').forEach(function(b){
-  b.onclick=function(){
-    document.querySelectorAll('#viewDriver .nav button[data-screen]').forEach(function(x){x.classList.remove('active')});
-    b.classList.add('active');
-    document.querySelectorAll('#viewDriver .screen').forEach(function(x){x.classList.remove('active')});
-    document.getElementById(b.dataset.screen).classList.add('active');
-  };
+  b.onclick=function(){showDriverScreen(b.dataset.screen)};
 });
 function openIncident(){document.getElementById('incidentModal').classList.add('show')}
 function closeIncident(){document.getElementById('incidentModal').classList.remove('show')}
@@ -397,14 +400,18 @@ calcXray();
    PARTNER & CONTROL TOWER
    ============================================================ */
 var partnerTitles={overview:'ภาพรวมระบบ',pipeline:'ขั้นตอนคัดกรองหน้าบ้าน',portfolio:'พอร์ตโฟลิโอที่กำลังดำเนินงาน',daily:'การดำเนินงานรายวัน',incidents:'บัญชีที่ไม่มีความเคลื่อนไหว & เคสปัญหา',ews:'ความเสี่ยง / ระบบเตือนภัยล่วงหน้า (EWS)',cure:'ปรับโครงสร้างหนี้เร่งด่วน / ก่อน TDR',elg:'ระบบลูกข่าย E-LG / การมอบหมายงาน',exit:'การปรับโครงสร้างหนี้ / สิ้นสุดสัญญา',claim:'เคลมประกันความเสียหาย & ติดตามทวงหนี้',finance:'การควบคุมทางการเงินของโครงการ',partners:'พันธมิตร / ข้อมูลระบบ / การตรวจสอบ'};
+function showPartnerScreen(id){
+  var btn=document.querySelector('#viewPartner .nav button[data-screen="'+id+'"]');
+  if(!btn)return;
+  document.querySelectorAll('#viewPartner .nav button[data-screen]').forEach(function(x){x.classList.remove('active')});
+  btn.classList.add('active');
+  document.querySelectorAll('#viewPartner .screen').forEach(function(x){x.classList.remove('active')});
+  var scr=document.getElementById('p-'+id);
+  if(scr)scr.classList.add('active');
+  document.getElementById('screenTitle').textContent=partnerTitles[id]||btn.textContent;
+}
 document.querySelectorAll('#viewPartner .nav button[data-screen]').forEach(function(b){
-  b.onclick=function(){
-    document.querySelectorAll('#viewPartner .nav button[data-screen]').forEach(function(x){x.classList.remove('active')});
-    b.classList.add('active');
-    document.querySelectorAll('#viewPartner .screen').forEach(function(x){x.classList.remove('active')});
-    document.getElementById('p-'+b.dataset.screen).classList.add('active');
-    document.getElementById('screenTitle').textContent=partnerTitles[b.dataset.screen]||b.textContent;
-  };
+  b.onclick=function(){showPartnerScreen(b.dataset.screen)};
 });
 var orgs={tcg:['บสย. / TCG'],risk:['บสย. - Risk'],claim:['บสย. - Claim'],fi:['KBank','Krungsri Auto','SCB Auto Finance','ttb DRIVE','CIMB Thai Auto'],coop:['Co-op A','Co-op B','Co-op C'],oem:['EV Partner 01','BaaS Partner 01'],data:['GPS / Data Partner 01'],payment:['Payment Servicer 01'],recovery:['Insurance / Recovery Partner 01']};
 var role=document.getElementById('roleSelect'),org=document.getElementById('orgSelect');
@@ -431,6 +438,8 @@ function filterRows(){
   });
 }
 search.oninput=filterRows;filter.onchange=filterRows;
+
+routeFromHash();
 </script>
 </body>
 </html>
