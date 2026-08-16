@@ -36,13 +36,13 @@ body.on-driver,body.on-partner{background:#f4f8fb;color:#15263c}
 #viewGateway .demo{font-size:12.5px;font-weight:800;border:1px solid #c8dae6;padding:7px 10px;border-radius:999px;background:#fff}
 #viewGateway .hero{width:min(1180px,calc(100% - 32px));margin:auto;display:grid;grid-template-columns:1.05fr .95fr;gap:28px;align-items:center;padding:30px 0 70px}
 #viewGateway .kicker{font-size:13.5px;font-weight:900;letter-spacing:.08em;color:#0a5a9c;text-transform:uppercase}
-#viewGateway .hero h1{font-size:clamp(42.5px,6.5vw,85px);line-height:.98;margin:14px 0 18px;color:var(--navy);letter-spacing:-.045em}
-#viewGateway .hero h1 span{color:#0b7f86}
+#viewGateway .hero h1{font-size:clamp(40px,5.6vw,74px);line-height:1.05;margin:14px 0 18px;color:var(--navy);letter-spacing:-.03em;text-wrap:balance}
+#viewGateway .hero h1 span{display:block;color:#0b7f86;margin-top:.08em}
 #viewGateway .hero p{font-size:19px;line-height:1.75;color:#4d6276;max-width:680px}
 #viewGateway .chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:18px}
 #viewGateway .chip{font-size:12.5px;font-weight:800;background:#e8f3fc;color:#0a5a9c;padding:7px 10px;border-radius:999px}
 #viewGateway .panel{background:rgba(255,255,255,.86);backdrop-filter:blur(10px);border:1px solid rgba(220,232,239,.95);border-radius:28px;box-shadow:var(--shadow);padding:24px}
-#viewGateway .panel h2{margin:0 0 8px;font-size:24.5px;color:var(--navy)}
+#viewGateway .panel h2{margin:0 0 8px;font-size:24.5px;color:var(--navy);text-wrap:balance}
 #viewGateway .panel>p{margin:0 0 18px;color:var(--muted);font-size:14.5px}
 #viewGateway .choice{display:grid;gap:14px}
 #viewGateway .card{display:block;width:100%;text-align:left;font-family:inherit;text-decoration:none;color:inherit;border:1px solid var(--line);border-radius:20px;padding:20px;background:#fff;transition:.18s ease;position:relative;overflow:hidden;cursor:pointer}
@@ -52,7 +52,7 @@ body.on-driver,body.on-partner{background:#f4f8fb;color:#15263c}
 #viewGateway .icon.wide{width:96px;padding:0 6px}
 #viewGateway .icon img{width:100%;height:100%;object-fit:contain}
 #viewGateway .icon svg{width:100%;height:100%;display:block}
-#viewGateway .card h3{margin:0;color:var(--navy);font-size:21.5px}
+#viewGateway .card h3{margin:0;color:var(--navy);font-size:21.5px;text-wrap:balance}
 #viewGateway .card p{font-size:14px;color:#667085;line-height:1.55;margin:7px 0 12px}
 #viewGateway .go{font-size:13.5px;font-weight:900;color:#0a5a9c}
 #viewGateway .back{margin-top:14px;text-align:center;font-size:13.5px;color:#667085}
@@ -62,11 +62,12 @@ body.on-driver,body.on-partner{background:#f4f8fb;color:#15263c}
 #viewGateway .strip .dot{color:#29b6e8;font-weight:900}
 #viewGateway .mini-flow{margin-top:24px;padding:18px;border-radius:18px;background:linear-gradient(135deg,#071a33,#0d365d);color:#fff}
 #viewGateway .mini-flow .row{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
-#viewGateway .step{padding:10px 8px;border-radius:12px;background:rgba(255,255,255,.08);font-size:12.5px;text-align:center;border:0;color:inherit;font-family:inherit;cursor:pointer;transition:.15s ease}
+#viewGateway .step{padding:10px 8px;border-radius:12px;background:rgba(255,255,255,.08);font-size:12.5px;text-align:center;border:0;color:inherit;font-family:inherit;cursor:pointer;transition:.15s ease;text-wrap:balance}
 #viewGateway .step:hover,#viewGateway .step:focus-visible{background:rgba(36,197,229,.28);transform:translateY(-1px)}
 #viewGateway .step:focus-visible{outline:2px solid #29b6e8;outline-offset:2px}
 #viewGateway .step b{display:block;color:#74e6dc;margin-bottom:4px}
-#viewGateway .note{font-size:12px;color:#98acbd;margin-top:12px;line-height:1.5}
+#viewGateway .note{font-size:13px;color:#b7c6da;margin-top:14px;line-height:1.6;display:flex;gap:7px;align-items:flex-start}
+#viewGateway .note i{font-style:normal;color:#4fd4e8;flex-shrink:0}
 /* กล่องข้อความทักทายที่ปรับปรุงโครงสร้างเพื่อเปลี่ยนรูปภาพใหม่ทางด้านซ้าย */
 #viewGateway .assistant-welcome-box{display:flex;align-items:center;gap:20px;background:#ffffff;border:1px solid var(--line);border-radius:16px;padding:16px;margin-top:22px;box-shadow:0 2px 8px rgba(0,0,0,.05)}
 /* กำหนดขนาดของกรอบรูปภาพใหม่ให้สมดุลกับกล่องเนื้อหา */
@@ -104,7 +105,7 @@ body.on-driver,body.on-partner{background:#f4f8fb;color:#15263c}
 #viewDriver .screen{display:none}
 #viewDriver .screen.active{display:block}
 #viewDriver .hero-title{display:flex;justify-content:space-between;align-items:flex-end;gap:14px;margin-bottom:14px}
-#viewDriver .hero-title h2{font-size:29px;margin:0}
+#viewDriver .hero-title h2{font-size:29px;margin:0;text-wrap:balance}
 #viewDriver .hero-title p{color:var(--muted);font-size:13.5px;margin:5px 0 0}
 #viewDriver .btn{border:0;border-radius:10px;padding:10px 13px;font-weight:900;cursor:pointer;font-family:inherit;font-size:14px}
 #viewDriver .primary{background:linear-gradient(135deg,#0a4a94,#0d6fc2);color:#fff}
@@ -176,7 +177,7 @@ body.on-driver,body.on-partner{background:#f4f8fb;color:#15263c}
 #viewPartner .screen{display:none}
 #viewPartner .screen.active{display:block}
 #viewPartner .title{display:flex;justify-content:space-between;align-items:flex-end;gap:14px;margin-bottom:14px}
-#viewPartner .title h2{font-size:28px;margin:0}
+#viewPartner .title h2{font-size:28px;margin:0;text-wrap:balance}
 #viewPartner .title p{font-size:13px;color:var(--muted);margin:4px 0 0}
 #viewPartner .pill{display:inline-block;font-size:10.5px;font-weight:900;padding:5px 8px;border-radius:999px}
 #viewPartner .green{background:#e8fbf3;color:#08714e}
@@ -231,7 +232,7 @@ body.on-driver,body.on-partner{background:#f4f8fb;color:#15263c}
 <main class="hero">
 <section>
 <div class="kicker">ระบบป้องกันความเสี่ยงหลังอนุมัติ</div>
-<h1>ขับ. ผ่อน. <span>คุ้มครอง.</span> เป็นเจ้าของ.</h1>
+<h1>ขับ ผ่อน คุ้มครอง<span>เป็นเจ้าของจริง</span></h1>
 <p>หลังสถาบันการเงินอนุมัติสินเชื่อ Route2Own จะเปลี่ยนจากระบบคัดกรองก่อนกู้ เป็นระบบดูแลหลังอนุมัติที่เชื่อมข้อมูลการทำงาน การชำระหนี้ และสัญญาณความเสี่ยง เพื่อช่วยให้ผู้ขับเดินต่อสู่การเป็นเจ้าของ และช่วยพันธมิตรเห็นปัญหาก่อนเกิด NPL</p>
 <div class="chips"><span class="chip">รายได้ &amp; KM/EMU</span><span class="chip">PAYD แบบปรับตามรายได้</span><span class="chip">ระบบควบคุมเงินต้น</span><span class="chip">EWS และ PromptCure</span><span class="chip">การควบคุมเคลม</span></div>
 <!-- กล่องข้อความทักทายที่ปรับปรุงโครงสร้างเพื่อเปลี่ยนรูปภาพใหม่ทางด้านซ้าย -->
@@ -245,7 +246,7 @@ body.on-driver,body.on-partner{background:#f4f8fb;color:#15263c}
     <p>สวัสดีครับ ผมผู้ช่วย บสย. 👇 <strong>4 ขั้นตอนหลังอนุมัติ</strong> ที่ควรรู้อยู่ด้านล่างนี้ กดแต่ละกล่องเพื่อดูรายละเอียดได้เลยครับ</p>
   </div>
 </div>
-<div class="mini-flow"><div class="row"><button type="button" class="step" onclick="go('partner','pipeline')"><b>01</b>FI อนุมัติแล้ว</button><button type="button" class="step" onclick="go('partner','elg')"><b>02</b>Child E-LG เริ่มใช้งาน</button><button type="button" class="step" onclick="go('driver','home')"><b>03</b>PAYD + การติดตาม</button><button type="button" class="step" onclick="go('driver','ownership')"><b>04</b>คุ้มครอง → เป็นเจ้าของ</button></div><div class="note">สำคัญ: Route2Own ไม่คำนวณ DPD เอง - ยอดค้างชำระ/DPD ตามสัญญาต้องมาจากบัญชีหลักของ FI เท่านั้น · กดกล่องด้านบนเพื่อดูรายละเอียดแต่ละขั้นตอน</div></div>
+<div class="mini-flow"><div class="row"><button type="button" class="step" onclick="go('partner','pipeline')"><b>01</b>FI อนุมัติแล้ว</button><button type="button" class="step" onclick="go('partner','elg')"><b>02</b>Child E&#8209;LG เริ่มใช้งาน</button><button type="button" class="step" onclick="go('driver','home')"><b>03</b>PAYD + การติดตาม</button><button type="button" class="step" onclick="go('driver','ownership')"><b>04</b>คุ้มครอง → เป็นเจ้าของ</button></div><div class="note"><i>ⓘ</i><span>Route2Own ไม่คำนวณ DPD เอง — ยอดค้างชำระและ DPD ต้องอ้างอิงจากบัญชีหลักของ FI เท่านั้น</span></div></div>
 </section>
 <section class="panel">
 <h2>เลือกพื้นที่ใช้งาน</h2><p>ระบบหลังอนุมัติถูกแยกตามผู้ใช้งานเพื่อไม่ให้ข้อมูลและสิทธิของผู้ขับปะปนกับพันธมิตร/แอดมิน</p>
