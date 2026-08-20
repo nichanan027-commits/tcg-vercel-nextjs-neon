@@ -5,22 +5,97 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Route2Own | Post-Approval Control System</title>
 <style>
-:root{--navy:#071a33;--navy2:#0d3153;--blue:#0d5eb8;--cyan:#24c5e5;--teal:#16b9b1;--green:#16845d;--amber:#b97806;--red:#ba3642;--bg:#f3f8fb;--ink:#14253a;--muted:#65778a;--line:#dce7ef;--white:#fff;--shadow:0 16px 42px rgba(7,26,51,.12)}*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Tahoma,sans-serif;color:var(--ink);background:var(--bg)}button,input,select{font:inherit}button{cursor:pointer}.hide{display:none!important}
-.top{height:72px;background:rgba(255,255,255,.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 4vw;position:sticky;top:0;z-index:20}.brand{font-weight:900;color:var(--navy);display:flex;align-items:center;gap:10px}.mark{display:grid;place-items:center;width:38px;height:38px;border-radius:12px;background:linear-gradient(135deg,var(--blue),var(--cyan));color:#fff;font-size:11px}.brand small{display:block;color:#5e768b;font-weight:700;margin-top:2px}.topnav{display:flex;gap:8px;align-items:center}.link,.btn{border:0;border-radius:10px;padding:10px 13px;font-weight:850}.link{background:transparent;color:#355972}.btn{background:linear-gradient(135deg,#0a4a94,#0d6fc2);color:#fff;box-shadow:0 7px 18px rgba(13,94,184,.2)}.btn.alt{background:#fff;color:#0a5a9c;border:1px solid #c9dce8;box-shadow:none}.btn.warn{background:#fff4db;color:#805400;border:1px solid #f0d796;box-shadow:none}
-.hero{padding:72px 4vw 55px;background:radial-gradient(circle at 85% 10%,rgba(36,197,229,.23),transparent 26%),linear-gradient(140deg,#f9fcfe,#eaf5fa)}.hero-inner{max-width:1180px;margin:auto;display:grid;grid-template-columns:1.15fr .85fr;gap:28px;align-items:center}.eyebrow{font-size:12px;color:#0a5a9c;letter-spacing:.1em;font-weight:900}.hero h1{font-size:clamp(38px,5vw,68px);line-height:1.06;letter-spacing:-.04em;margin:12px 0 16px;color:var(--navy)}.hero h1 span{display:block;color:#0b7f86}.hero p{font-size:17px;line-height:1.75;color:#536b7e;max-width:650px}.hero-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:22px}.hero-card{padding:24px;border-radius:24px;background:linear-gradient(145deg,#071a33,#0a416f);box-shadow:0 20px 50px rgba(7,26,51,.24);color:#fff}.hero-card h3{font-size:20px;margin:0 0 9px}.hero-card p{font-size:13px;color:#c9e8f3;margin:0 0 16px}.flow{display:grid;gap:9px}.flow div{border-radius:10px;background:rgba(255,255,255,.1);padding:10px;font-size:12px}.flow b{color:#74e6dc;margin-right:7px}
-.wrap{max-width:1180px;margin:auto;padding:44px 4vw}.section-title{display:flex;justify-content:space-between;align-items:end;gap:18px;margin-bottom:18px}.section-title h2{margin:0;font-size:28px}.section-title p{margin:5px 0 0;color:var(--muted)}.grid{display:grid;grid-template-columns:repeat(12,1fr);gap:14px}.card{background:#fff;border:1px solid #e1ebf1;border-radius:18px;padding:18px;box-shadow:var(--shadow)}.s3{grid-column:span 3}.s4{grid-column:span 4}.s5{grid-column:span 5}.s6{grid-column:span 6}.s7{grid-column:span 7}.s8{grid-column:span 8}.s12{grid-column:span 12}
-.case{border:1px solid var(--line);border-radius:17px;padding:17px;background:#fff}.case h3{margin:8px 0 5px;font-size:18px}.case p{font-size:13px;line-height:1.55;color:var(--muted);min-height:42px}.tag{display:inline-block;border-radius:999px;padding:5px 8px;font-size:10px;font-weight:900}.green{background:#e7faf2;color:#08724d}.amber{background:#fff3d9;color:#815700}.red{background:#ffe8eb;color:#992b33}.blue{background:#e7f6fb;color:#08728a}.demo-bar{background:#071a33;color:#d9edf7;padding:12px 4vw;font-size:13px;display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap}.demo-bar b{color:#fff}
-.form-card{padding:22px}.steps{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px}.step{font-size:12px;border-radius:99px;padding:7px 10px;color:#5d7387;background:#eef3f6;font-weight:800}.step.active{background:#dff6fa;color:#08738b}.form-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:13px}.field label{display:block;font-size:12px;font-weight:850;margin-bottom:6px}.field input,.field select{width:100%;padding:10px;border:1px solid var(--line);border-radius:10px;background:#fff}.helper{font-size:11px;color:var(--muted);line-height:1.55}.notice{padding:12px 14px;border-radius:12px;background:#ecf9fb;border-left:4px solid var(--cyan);font-size:12px;line-height:1.55;margin:12px 0}.actions{display:flex;justify-content:flex-end;gap:9px;margin-top:17px;flex-wrap:wrap}
-.result{display:grid;grid-template-columns:.9fr 1.1fr;gap:16px}.score-box{background:linear-gradient(145deg,#071a33,#0a416f);border-radius:18px;padding:23px;color:#fff;text-align:center}.score-ring{width:145px;height:145px;border-radius:50%;margin:10px auto 12px;display:grid;place-items:center;background:conic-gradient(#3ad8e7 0deg,#3ad8e7 var(--deg),rgba(255,255,255,.18) var(--deg),rgba(255,255,255,.18) 360deg);position:relative}.score-ring:before{content:"";position:absolute;inset:11px;border-radius:50%;background:#0b3457}.score-ring div{z-index:1}.score-num{font-size:42px;font-weight:950;line-height:1}.score-unit{font-size:12px;color:#b9e7f1}.score-box p{font-size:12px;line-height:1.5;color:#d5eaf2}.recommend{border:1px solid #e1eaf0;border-radius:13px;padding:12px;margin-bottom:9px}.recommend b{font-size:13px}.recommend span{display:block;color:var(--muted);font-size:12px;margin-top:3px;line-height:1.5}.metric{border:1px solid #e0eaf0;border-radius:13px;padding:13px;margin-bottom:10px}.metric-head{display:flex;justify-content:space-between;gap:10px;font-size:13px;font-weight:850}.progress{height:10px;border-radius:99px;background:#e7eef2;overflow:hidden;margin:9px 0}.progress span{display:block;height:100%;background:linear-gradient(90deg,#0d5eb8,#24c5e5);border-radius:99px}.metric button{font-size:12px;font-weight:850;border:0;background:transparent;color:#0b6d91;padding:0}.tips{display:none;margin-top:10px;padding:10px;border-radius:9px;background:#f5fafc;color:#586f81;font-size:12px;line-height:1.5}.metric.open .tips{display:block}
-.q-head{display:flex;justify-content:space-between;align-items:center;gap:10px}.q-count{font-size:12px;font-weight:850;color:#08738b;background:#e5f7fa;border-radius:99px;padding:5px 8px}.question{display:none}.question.active{display:block}.question h3{font-size:20px;line-height:1.4;margin:16px 0 12px}.answers{display:grid;gap:9px}.answer{padding:12px;border:1px solid var(--line);border-radius:11px;background:#fff;text-align:left;color:#27465e;font-weight:750}.answer:hover,.answer.selected{border-color:#29b6e8;background:#ecfbfd;color:#075f7a}.outcome{background:#eff8fb;border:1px solid #cdeaf0;border-radius:13px;padding:14px;line-height:1.6;font-size:13px;color:#35566e}.support{background:linear-gradient(145deg,#fff,#f2fbfc)}.mini-kpi{padding:14px;border-radius:13px;background:#f7fbfd;border:1px solid #e3edf3}.mini-kpi b{display:block;font-size:24px;margin:4px 0}.mini-kpi span{color:var(--muted);font-size:12px}.footer{padding:26px 4vw;background:#071a33;color:#c3d9e6;font-size:12px;line-height:1.65}.footer b{color:#fff}
+:root{--navy:#071a33;--navy2:#0d3153;--blue:#0d5eb8;--cyan:#24c5e5;--green:#16845d;--amber:#b97806;--red:#ba3642;--bg:#f3f8fb;--ink:#14253a;--muted:#65778a;--line:#dce7ef;--white:#fff;--shadow:0 16px 42px rgba(7,26,51,.12)}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Tahoma,sans-serif;color:var(--ink);background:var(--bg)}
+button,input,select{font:inherit}button{cursor:pointer}.hide{display:none!important}
+.view{display:none}.view.active{display:block}
+.top{height:72px;background:rgba(255,255,255,.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 4vw;position:sticky;top:0;z-index:20}
+.brand{font-weight:900;color:var(--navy);display:flex;align-items:center;gap:10px}
+.mark{display:grid;place-items:center;width:38px;height:38px;border-radius:12px;background:linear-gradient(135deg,var(--blue),var(--cyan));color:#fff;font-size:11px}
+.brand small{display:block;color:#5e768b;font-weight:700;margin-top:2px}
+.topnav{display:flex;gap:8px;align-items:center}
+.link,.btn{border:0;border-radius:10px;padding:10px 13px;font-weight:850}
+.link{background:transparent;color:#355972}
+.btn{background:linear-gradient(135deg,#0a4a94,#0d6fc2);color:#fff;box-shadow:0 7px 18px rgba(13,94,184,.2)}
+.btn.alt{background:#fff;color:#0a5a9c;border:1px solid #c9dce8;box-shadow:none}
+.btn.warn{background:#fff4db;color:#805400;border:1px solid #f0d796;box-shadow:none}
+.hero{padding:72px 4vw 55px;background:radial-gradient(circle at 85% 10%,rgba(36,197,229,.23),transparent 26%),linear-gradient(140deg,#f9fcfe,#eaf5fa)}
+.hero-inner{max-width:1180px;margin:auto;display:grid;grid-template-columns:1.15fr .85fr;gap:28px;align-items:center}
+.eyebrow{font-size:12px;color:#0a5a9c;letter-spacing:.1em;font-weight:900}
+.hero h1{font-size:clamp(38px,5vw,68px);line-height:1.06;letter-spacing:-.04em;margin:12px 0 16px;color:var(--navy)}
+.hero h1 span{display:block;color:#0b7f86}
+.hero p{font-size:17px;line-height:1.75;color:#536b7e;max-width:650px}
+.hero-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:22px}
+.hero-card{padding:24px;border-radius:24px;background:linear-gradient(145deg,#071a33,#0a416f);box-shadow:0 20px 50px rgba(7,26,51,.24);color:#fff}
+.hero-card h3{font-size:20px;margin:0 0 9px}
+.hero-card p{font-size:13px;color:#c9e8f3;margin:0 0 16px}
+.flow{display:grid;gap:9px}
+.flow div{border-radius:10px;background:rgba(255,255,255,.1);padding:10px;font-size:12px}
+.flow b{color:#74e6dc;margin-right:7px}
+.wrap{max-width:1180px;margin:auto;padding:44px 4vw}
+.section-title{display:flex;justify-content:space-between;align-items:end;gap:18px;margin-bottom:18px}
+.section-title h2{margin:0;font-size:28px}
+.section-title p{margin:5px 0 0;color:var(--muted)}
+.grid{display:grid;grid-template-columns:repeat(12,1fr);gap:14px}
+.card{background:#fff;border:1px solid #e1ebf1;border-radius:18px;padding:18px;box-shadow:var(--shadow)}
+.s3{grid-column:span 3}.s4{grid-column:span 4}.s5{grid-column:span 5}.s6{grid-column:span 6}.s7{grid-column:span 7}.s8{grid-column:span 8}.s12{grid-column:span 12}
+.case{border:1px solid var(--line);border-radius:17px;padding:17px;background:#fff}
+.case h3{margin:8px 0 5px;font-size:18px}
+.case p{font-size:13px;line-height:1.55;color:var(--muted);min-height:42px}
+.tag{display:inline-block;border-radius:999px;padding:5px 8px;font-size:10px;font-weight:900}
+.green{background:#e7faf2;color:#08724d}.amber{background:#fff3d9;color:#815700}.red{background:#ffe8eb;color:#992b33}.blue{background:#e7f6fb;color:#08728a}
+.demo-bar{background:#071a33;color:#d9edf7;padding:12px 4vw;font-size:13px;display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap}
+.demo-bar b{color:#fff}
+.form-card{padding:22px}
+.steps{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px}
+.step{font-size:12px;border-radius:99px;padding:7px 10px;color:#5d7387;background:#eef3f6;font-weight:800}
+.step.active{background:#dff6fa;color:#08738b}
+.form-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:13px}
+.field label{display:block;font-size:12px;font-weight:850;margin-bottom:6px}
+.field input,.field select{width:100%;padding:10px;border:1px solid var(--line);border-radius:10px;background:#fff}
+.helper{font-size:11px;color:var(--muted);line-height:1.55}
+.notice{padding:12px 14px;border-radius:12px;background:#ecf9fb;border-left:4px solid var(--cyan);font-size:12px;line-height:1.55;margin:12px 0}
+.actions{display:flex;justify-content:flex-end;gap:9px;margin-top:17px;flex-wrap:wrap}
+.result{display:grid;grid-template-columns:.9fr 1.1fr;gap:16px}
+.score-box{background:linear-gradient(145deg,#071a33,#0a416f);border-radius:18px;padding:23px;color:#fff;text-align:center}
+.score-ring{width:145px;height:145px;border-radius:50%;margin:10px auto 12px;display:grid;place-items:center;background:conic-gradient(#3ad8e7 0deg,#3ad8e7 var(--deg),rgba(255,255,255,.18) var(--deg),rgba(255,255,255,.18) 360deg);position:relative}
+.score-ring:before{content:"";position:absolute;inset:11px;border-radius:50%;background:#0b3457}
+.score-ring div{z-index:1}
+.score-num{font-size:42px;font-weight:950;line-height:1}
+.score-unit{font-size:12px;color:#b9e7f1}
+.score-box p{font-size:12px;line-height:1.5;color:#d5eaf2}
+.recommend{border:1px solid #e1eaf0;border-radius:13px;padding:12px;margin-bottom:9px}
+.recommend b{font-size:13px}
+.recommend span{display:block;color:var(--muted);font-size:12px;margin-top:3px;line-height:1.5}
+.metric{border:1px solid #e0eaf0;border-radius:13px;padding:13px;margin-bottom:10px}
+.metric-head{display:flex;justify-content:space-between;gap:10px;font-size:13px;font-weight:850}
+.progress{height:10px;border-radius:99px;background:#e7eef2;overflow:hidden;margin:9px 0}
+.progress span{display:block;height:100%;background:linear-gradient(90deg,#0d5eb8,#24c5e5);border-radius:99px}
+.metric button{font-size:12px;font-weight:850;border:0;background:transparent;color:#0b6d91;padding:0}
+.tips{display:none;margin-top:10px;padding:10px;border-radius:9px;background:#f5fafc;color:#586f81;font-size:12px;line-height:1.5}
+.metric.open .tips{display:block}
+.q-head{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.q-count{font-size:12px;font-weight:850;color:#08738b;background:#e5f7fa;border-radius:99px;padding:5px 8px}
+.question{display:none}
+.question.active{display:block}
+.question h3{font-size:20px;line-height:1.4;margin:16px 0 12px}
+.answers{display:grid;gap:9px}
+.answer{padding:12px;border:1px solid var(--line);border-radius:11px;background:#fff;text-align:left;color:#27465e;font-weight:750}
+.answer:hover,.answer.selected{border-color:#29b6e8;background:#ecfbfd;color:#075f7a}
+.outcome{background:#eff8fb;border:1px solid #cdeaf0;border-radius:13px;padding:14px;line-height:1.6;font-size:13px;color:#35566e}
+.support{background:linear-gradient(145deg,#fff,#f2fbfc)}
+.mini-kpi{padding:14px;border-radius:13px;background:#f7fbfd;border:1px solid #e3edf3}
+.mini-kpi b{display:block;font-size:24px;margin:4px 0}
+.mini-kpi span{color:var(--muted);font-size:12px}
+.footer{padding:26px 4vw;background:#071a33;color:#c3d9e6;font-size:12px;line-height:1.65}
+.footer b{color:#fff}
 @media(max-width:800px){.hero-inner,.result{grid-template-columns:1fr}.s3,.s4,.s5,.s6,.s7,.s8{grid-column:span 12}.form-grid{grid-template-columns:1fr}.topnav .link{display:none}.hero{padding-top:42px}.wrap{padding-top:30px}.section-title{align-items:flex-start;flex-direction:column}.top{padding:0 16px}.hero,.wrap{padding-left:16px;padding-right:16px}.demo-bar{padding:12px 16px}}
 </style>
 </head>
 <body>
-<header class="top"><div class="brand"><span class="mark">TCG</span><span>TCG EV Taxi Guarantee<small>ระบบลงทะเบียนสนใจและตรวจสอบความพร้อม</small></span></div><nav class="topnav"><button class="link" onclick="showSection('demo')">เคสสาธิต</button><button class="link" onclick="showSection('apply')">ลองตรวจสิทธิ์</button><button class="btn alt" onclick="resetDemo()">รีเซ็ต Demo</button></nav></header>
+<header class="top"><div class="brand"><span class="mark">TCG</span><span>Route2Own<small>Post-Approval Control System</small></span></div><nav class="topnav"><button class="link" onclick="showSection('demo')">เคสสาธิต</button><button class="link" onclick="showSection('apply')">ลองตรวจสิทธิ์</button><button class="btn alt" onclick="resetDemo()">รีเซ็ต Demo</button></nav></header>
 <div class="demo-bar"><span><b>โหมดสาธิตสำหรับกรรมการ</b> — ผลลัพธ์เป็นการประเมินความพร้อม ไม่ใช่การอนุมัติสินเชื่อ</span><span id="statusText">ยังไม่ได้เลือกเคส</span></div>
-<section class="hero"><div class="hero-inner"><div><div class="eyebrow">TCG ROUTE2OWN · FRONT-DOOR DEMO</div><h1>เริ่มจากความพร้อม<span>เดินหน้าสู่การเป็นเจ้าของ EV Taxi</span></h1><p>ระบบสาธิตการลงทะเบียน ตรวจสอบความพร้อม และวางแผนขั้นถัดไป สำหรับผู้ขับและพาร์ทเนอร์ โดยเชื่อมต่อสู่ Route2Own หลังผ่านขั้นตอนอนุมัติและ activation</p><div class="hero-actions"><button class="btn" onclick="showSection('demo')">ดูเคสสาธิต</button><button class="btn alt" onclick="showSection('apply')">ลองตรวจสิทธิ์ด้วยตัวเอง</button></div></div><aside class="hero-card"><h3>เส้นทางตัวอย่าง</h3><p>ระบบหน้าบ้านสาธิตการเตรียมข้อมูลและความพร้อมก่อนส่งต่อพิจารณา</p><div class="flow"><div><b>01</b>ลงทะเบียนสนใจ</div><div><b>02</b>ตรวจข้อมูลและความพร้อม</div><div><b>03</b>Readiness Certificate / แผนเสริม</div><div><b>04</b>ส่งต่อ FI → Activation → Route2Own</div></div></aside></div></section>
-
+<section class="hero"><div class="hero-inner"><div><div class="eyebrow">ROUTE2OWN · POST-APPROVAL SYSTEM</div><h1>ขับ ผ่อน คุ้มครอง<span>เป็นเจ้าของจริง</span></h1><p>ระบบดูแลหลังอนุมัติที่เชื่อมข้อมูลการทำงาน การชำระหนี้ และสัญญาณความเสี่ยง เพื่อช่วยให้ผู้ขับเดินต่อสู่การเป็นเจ้าของ และช่วยพันธมิตรเห็นปัญหาก่อนเกิด NPL</p><div class="hero-actions"><button class="btn" onclick="showSection('demo')">ดูเคสสาธิต</button><button class="btn alt" onclick="showSection('apply')">ลองตรวจสิทธิ์ด้วยตัวเอง</button></div></div><aside class="hero-card"><h3>เส้นทางตัวอย่าง</h3><p>ระบบสาธิตการเตรียมข้อมูลและความพร้อมก่อนส่งต่อพิจารณา</p><div class="flow"><div><b>01</b>ลงทะเบียนสนใจ</div><div><b>02</b>ตรวจข้อมูลและความพร้อม</div><div><b>03</b>Readiness Certificate</div><div><b>04</b>ส่งต่อ FI → Route2Own</div></div></aside></div></section>
 <main>
 <section id="demo" class="wrap"><div class="section-title"><div><h2>เลือกเคสสาธิต</h2><p>กดโหลดเคสเพื่อดูผลตรวจความพร้อมและเส้นทางแนะนำทันที</p></div></div><div class="grid" id="caseGrid"></div></section>
 <section id="apply" class="wrap"><div class="section-title"><div><h2>ลองกรอกข้อมูลด้วยตัวเอง</h2><p>ใช้สำหรับทดลองระบบเท่านั้น ไม่มีการส่งข้อมูลไปยัง FI หรือใช้ตัดสินสินเชื่อ</p></div><span class="tag blue">Interactive Demo</span></div><div class="card form-card"><div class="steps"><span class="step active">1. โปรไฟล์</span><span class="step active">2. รายได้/การทำงาน</span><span class="step active">3. รถและพาร์ทเนอร์</span><span class="step active">4. ผลประเมิน</span></div><div class="form-grid"><div class="field"><label>ชื่อสำหรับการสาธิต</label><input id="name" placeholder="เช่น ผู้ขับสาธิต"></div><div class="field"><label>ประสบการณ์ขับรถรับจ้าง (เดือน)</label><input id="months" type="number" min="0" value="18"></div><div class="field"><label>รายได้เฉลี่ยต่อเดือน (บาท)</label><input id="income" type="number" min="0" value="26000"></div><div class="field"><label>ค่าใช้จ่ายจำเป็นต่อเดือน (บาท)</label><input id="expense" type="number" min="0" value="12000"></div><div class="field"><label>เงินสำรองที่มี (บาท)</label><input id="reserve" type="number" min="0" value="6000"></div><div class="field"><label>มี Co-op/Fleet รองรับหรือไม่</label><select id="partner"><option value="yes">มีพาร์ทเนอร์รองรับ</option><option value="no">ยังไม่มีพาร์ทเนอร์</option></select></div><div class="field"><label>เอกสาร/ใบอนุญาตพร้อมหรือไม่</label><select id="docs"><option value="yes">พร้อมครบสำหรับการสาธิต</option><option value="no">ยังต้องเติมเอกสาร</option></select></div><div class="field"><label>ผ่านกิจกรรมเตรียมความพร้อมหรือไม่</label><select id="learning"><option value="yes">ผ่าน/เข้าร่วมแล้ว</option><option value="no">ยังไม่เข้าร่วม</option></select></div></div><div class="notice"><b>หมายเหตุ:</b> คะแนน Readiness Score เป็นเครื่องมือสาธิตเพื่อแสดงความพร้อมและคำแนะนำ ไม่ใช่ credit score, การรับรองผล หรือการอนุมัติสินเชื่อจาก บสย. หรือสถาบันการเงิน</div><div class="actions"><button class="btn alt" onclick="loadCase('ready')">ใส่ค่าเคสตัวอย่าง</button><button class="btn" onclick="calculate()">คำนวณ Readiness Score</button></div></div></section>
@@ -28,21 +103,10 @@
 <section id="questions" class="wrap hide"><div class="card support"><div class="q-head"><div><h2 style="margin:0">คำถามต่อเนื่อง</h2><p class="helper" style="margin:5px 0 0">ตอบทีละข้อเพื่อให้ระบบสาธิตแผนช่วยเหลือที่เหมาะขึ้น สามารถข้ามได้ทุกข้อ</p></div><span class="q-count" id="qCount">ข้อ 1 จาก 5</span></div><div id="questionHost"></div><div class="actions"><button class="btn alt" id="skipBtn" onclick="answerQuestion('ข้ามตอนนี้')">ข้ามตอนนี้</button></div></div></section>
 <section id="support" class="wrap hide"><div class="section-title"><div><h2>สรุปแผนต่อเนื่อง</h2><p>ผลนี้เป็นตัวอย่างจากคำตอบที่กรอกในเบราว์เซอร์ของคุณ</p></div></div><div class="grid"><div class="card s7"><div class="outcome" id="supportOutcome"></div><div class="actions" style="justify-content:flex-start"><button class="btn" onclick="alert('Demo: สร้างคำขอ F.A. Center แล้ว พร้อมสถานะ New → Triage')">ขอคำปรึกษา F.A. Center</button><button class="btn alt" onclick="showSection('apply')">กลับไปปรับข้อมูล</button></div></div><div class="card s5"><h3 style="margin-top:0">Data Privacy ในระบบจริง</h3><p class="helper">ข้อมูลที่แชร์เพื่อการให้คำปรึกษาหรือส่งต่อพาร์ทเนอร์ต้องอยู่ภายใต้ความยินยอมและขอบเขตการใช้งานที่ระบุชัดเจน</p><div class="mini-kpi"><span>สถานะ case demo</span><b>Ready for Triage</b><span>ไม่ส่งข้อมูลจริงออกจากอุปกรณ์</span></div></div></div></section>
 </main>
-<footer class="footer"><b>TCG EV Taxi Guarantee — Demonstration only.</b><br>Readiness Score ใช้สื่อสารความพร้อมและแผนพัฒนา ไม่ใช่การตัดสินเครดิตหรือคำอนุมัติสินเชื่อ ข้อมูลที่ป้อนจะเก็บใน localStorage ของเบราว์เซอร์นี้เท่านั้นจนกว่าจะกดรีเซ็ต</footer>
+<footer class="footer"><b>Route2Own Post-Approval System — Demonstration only.</b><br>Readiness Score ใช้สื่อสารความพร้อมและแผนพัฒนา ไม่ใช่การตัดสินเครดิตหรือคำอนุมัติสินเชื่อ ข้อมูลที่ป้อนจะเก็บใน localStorage ของเบราว์เซอร์นี้เท่านั้นจนกว่าจะกดรีเซ็ต</footer>
 <script>
-const CASES={
- ready:{title:'เคส A · Ready to Own',tag:'READY TO OWN',cls:'green',desc:'รายได้และการทำงานสม่ำเสมอ มีเอกสารและ Co-op/Fleet รองรับ',data:{name:'คุณอรุณ (สาธิต)',months:30,income:32000,expense:12000,reserve:18000,partner:'yes',docs:'yes',learning:'yes'}},
- build:{title:'เคส B · Build Readiness',tag:'BUILD READINESS',cls:'amber',desc:'มีศักยภาพ แต่ควรเพิ่มเงินสำรองและหลักฐานรายได้ต่อเนื่อง',data:{name:'คุณเบญ (สาธิต)',months:12,income:23000,expense:12500,reserve:3000,partner:'yes',docs:'yes',learning:'no'}},
- support:{title:'เคส C · Need Support',tag:'NEED SUPPORT',cls:'red',desc:'รายได้และเงินสำรองตึง ควรวางแผนกับ F.A. Center ก่อน',data:{name:'คุณชัย (สาธิต)',months:5,income:17000,expense:13000,reserve:500,partner:'no',docs:'no',learning:'no'}},
- partner:{title:'เคส D · Partner Intake',tag:'CO-OP / FLEET',cls:'blue',desc:'ตัวอย่างการส่งต่อผู้ขับจาก Co-op/Fleet เข้าสู่ readiness pipeline',data:{name:'Co-op Referral (สาธิต)',months:20,income:28000,expense:11500,reserve:9000,partner:'yes',docs:'yes',learning:'yes'}}
-};
-const questions=[
- ['รายได้ของคุณใน 30 วันข้างหน้าคาดว่าจะเปลี่ยนอย่างไร?',['เพิ่มขึ้น','ใกล้เคียงเดิม','ลดลง','ยังไม่แน่ใจ']],
- ['คุณมีเงินสำรองสำหรับค่าใช้จ่ายจำเป็นได้กี่วัน?',['ยังไม่มี','1–7 วัน','8–14 วัน','มากกว่า 14 วัน']],
- ['อะไรเป็นอุปสรรคหลักต่อการทำงานต่อเนื่อง?',['รถหรือการชาร์จ','สุขภาพ','ปริมาณผู้โดยสาร','ค่าใช้จ่าย','เอกสาร','อื่น ๆ']],
- ['คุณอยากให้ F.A. Center ช่วยเรื่องใดก่อน?',['วางแผนรายรับรายจ่าย','วางแผนภาระชำระ','รถหยุดวิ่ง','เพิ่มรายได้','ยังไม่ต้องการ']],
- ['คุณต้องการติดตามแผนผ่านช่องทางใด?',['ดูในระบบ','โทรศัพท์','LINE','นัดหมายออนไลน์']]
-];
+const CASES={ready:{title:'เคส A · Ready to Own',tag:'READY TO OWN',cls:'green',desc:'รายได้และการทำงานสม่ำเสมอ มีเอกสารและ Co-op/Fleet รองรับ',data:{name:'คุณอรุณ (สาธิต)',months:30,income:32000,expense:12000,reserve:18000,partner:'yes',docs:'yes',learning:'yes'}},build:{title:'เคส B · Build Readiness',tag:'BUILD READINESS',cls:'amber',desc:'มีศักยภาพ แต่ควรเพิ่มเงินสำรองและหลักฐานรายได้ต่อเนื่อง',data:{name:'คุณเบญ (สาธิต)',months:12,income:23000,expense:12500,reserve:3000,partner:'yes',docs:'yes',learning:'no'}},support:{title:'เคส C · Need Support',tag:'NEED SUPPORT',cls:'red',desc:'รายได้และเงินสำรองตึง ควรวางแผนกับ F.A. Center ก่อน',data:{name:'คุณชัย (สาธิต)',months:5,income:17000,expense:13000,reserve:500,partner:'no',docs:'no',learning:'no'}},partner:{title:'เคส D · Partner Intake',tag:'CO-OP / FLEET',cls:'blue',desc:'ตัวอย่างการส่งต่อผู้ขับจาก Co-op/Fleet เข้าสู่ readiness pipeline',data:{name:'Co-op Referral (สาธิต)',months:20,income:28000,expense:11500,reserve:9000,partner:'yes',docs:'yes',learning:'yes'}}};
+const questions=[['รายได้ของคุณใน 30 วันข้างหน้าคาดว่าจะเปลี่ยนอย่างไร?',['เพิ่มขึ้น','ใกล้เคียงเดิม','ลดลง','ยังไม่แน่ใจ']],['คุณมีเงินสำรองสำหรับค่าใช้จ่ายจำเป็นได้กี่วัน?',['ยังไม่มี','1–7 วัน','8–14 วัน','มากกว่า 14 วัน']],['อะไรเป็นอุปสรรคหลักต่อการทำงานต่อเนื่อง?',['รถหรือการชาร์จ','สุขภาพ','ปริมาณผู้โดยสาร','ค่าใช้จ่าย','เอกสาร','อื่น ๆ']],['คุณอยากให้ F.A. Center ช่วยเรื่องใดก่อน?',['วางแผนรายรับรายจ่าย','วางแผนภาระชำระ','รถหยุดวิ่ง','เพิ่มรายได้','ยังไม่ต้องการ']],['คุณต้องการติดตามแผนผ่านช่องทางใด?',['ดูในระบบ','โทรศัพท์','LINE','นัดหมายออนไลน์']]];
 let qIndex=0,answers=[],lastScore=0;
 function esc(s){return String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));}
 function renderCases(){document.getElementById('caseGrid').innerHTML=Object.entries(CASES).map(([k,c])=>`<article class="case s3"><span class="tag ${c.cls}">${c.tag}</span><h3>${c.title}</h3><p>${c.desc}</p><button class="btn alt" onclick="loadCase('${k}')">โหลดเคสนี้</button></article>`).join('');}
