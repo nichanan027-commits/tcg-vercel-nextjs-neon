@@ -3,353 +3,60 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Route2Own Post-Approval System v2.0</title>
+<title>Route2Own | Post-Approval Control System</title>
 <style>
-*{box-sizing:border-box}
-html,body{margin:0;padding:0}
-body{font-family:system-ui,-apple-system,"Segoe UI",Tahoma,sans-serif;min-height:100vh;background:#f5f8fb;color:#13243a}
-body.on-gateway{background:radial-gradient(circle at 90% 10%,rgba(36,197,229,.18),transparent 25%),linear-gradient(180deg,#f8fbfd,#eef4f8)}
-body.on-driver,body.on-partner{background:#f4f8fb;color:#15263c}
-.view{display:none}
-.view.active{display:block}
-.backhome{display:flex;align-items:center;gap:8px;width:100%;border:1px solid rgba(255,255,255,.24);background:rgba(255,255,255,.08);color:#d9edf7;padding:9px 11px;border-radius:10px;margin-top:14px;cursor:pointer;font-weight:800;font-size:13px;font-family:inherit;text-align:left}
-.backhome:hover{background:rgba(36,197,229,.22);color:#fff}
-.backhome i{font-style:normal;font-size:15.5px;line-height:1}
-.tophome{border:1px solid #d5e3ec;background:#fff;color:#0a5a9c;border-radius:10px;padding:9px 12px;font-weight:800;font-size:13px;cursor:pointer;white-space:nowrap;font-family:inherit}
-.tophome:hover{background:#eef9fb}
-#viewGateway{--navy:#071a33;--navy2:#0d3153;--teal:#0d5eb8;--cyan:#29b6e8;--mint:#f5b921;--bg:#f5f8fb;--ink:#13243a;--muted:#667085;--line:#dfe7ef;--white:#fff;--shadow:0 20px 60px rgba(7,26,51,.12)}
-#viewGateway .wrap{min-height:100vh;display:flex;flex-direction:column}
-#viewGateway .top{padding:22px 28px;display:flex;justify-content:space-between;align-items:center}
-#viewGateway .brand{font-weight:900;color:var(--navy);letter-spacing:-.02em}
-#viewGateway .brand small{display:block;font-weight:650;color:#58728a;margin-top:4px}
-#viewGateway .demo{font-size:12.5px;font-weight:800;border:1px solid #c8dae6;padding:7px 10px;border-radius:999px;background:#fff}
-#viewGateway .hero{width:min(1180px,calc(100% - 32px));margin:auto;display:grid;grid-template-columns:1.05fr .95fr;gap:28px;align-items:center;padding:30px 0 70px}
-#viewGateway .kicker{font-size:13.5px;font-weight:900;letter-spacing:.08em;color:#0a5a9c;text-transform:uppercase}
-#viewGateway .hero h1{font-size:clamp(40px,5.6vw,74px);line-height:1.05;margin:14px 0 18px;color:var(--navy);letter-spacing:-.03em;text-wrap:balance}
-#viewGateway .hero h1 span{display:block;color:#0b7f86;margin-top:.08em}
-#viewGateway .hero p{font-size:19px;line-height:1.75;color:#4d6276;max-width:680px}
-#viewGateway .chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:18px}
-#viewGateway .chip{font-size:12.5px;font-weight:800;background:#e8f3fc;color:#0a5a9c;padding:7px 10px;border-radius:999px}
-#viewGateway .panel{background:rgba(255,255,255,.86);backdrop-filter:blur(10px);border:1px solid rgba(220,232,239,.95);border-radius:28px;box-shadow:var(--shadow);padding:24px}
-#viewGateway .panel h2{margin:0 0 8px;font-size:24.5px;color:var(--navy);text-wrap:balance}
-#viewGateway .panel>p{margin:0 0 18px;color:var(--muted);font-size:14.5px}
-#viewGateway .choice{display:grid;gap:14px}
-#viewGateway .card{display:block;width:100%;text-align:left;font-family:inherit;text-decoration:none;color:inherit;border:1px solid var(--line);border-radius:20px;padding:20px;background:#fff;transition:.18s ease;position:relative;overflow:hidden;cursor:pointer}
-#viewGateway .card:hover{transform:translateY(-3px);box-shadow:0 14px 35px rgba(7,26,51,.1);border-color:#a9dce4}
-#viewGateway .card:focus-visible{outline:3px solid #29b6e8;outline-offset:2px}
-#viewGateway .icon{width:48px;height:48px;border-radius:15px;display:grid;place-items:center;font-size:27px;background:linear-gradient(135deg,#e9fbfb,#eaf8ff);margin-bottom:13px;overflow:hidden}
-#viewGateway .icon.wide{width:96px;padding:0 6px}
-#viewGateway .icon img{width:100%;height:100%;object-fit:contain}
-#viewGateway .icon svg{width:100%;height:100%;display:block}
-#viewGateway .card h3{margin:0;color:var(--navy);font-size:21.5px;text-wrap:balance}
-#viewGateway .card p{font-size:14px;color:#667085;line-height:1.55;margin:7px 0 12px}
-#viewGateway .go{font-size:13.5px;font-weight:900;color:#0a5a9c}
-#viewGateway .back{margin-top:14px;text-align:center;font-size:13.5px;color:#667085}
-#viewGateway .back a{color:#0a5a9c;font-weight:800}
-#viewGateway .strip{background:linear-gradient(120deg,var(--navy),#0a3a6e);color:#d8eef7;padding:16px 18px;font-size:13.5px;text-align:center;display:flex;align-items:center;justify-content:center;gap:9px;flex-wrap:wrap;letter-spacing:.01em}
-#viewGateway .strip b{color:#fff}
-#viewGateway .strip .dot{color:#29b6e8;font-weight:900}
-#viewGateway .mini-flow{margin-top:24px;padding:18px;border-radius:18px;background:linear-gradient(135deg,#071a33,#0d365d);color:#fff}
-#viewGateway .mini-flow .row{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
-#viewGateway .step{padding:10px 8px;border-radius:12px;background:rgba(255,255,255,.08);font-size:12.5px;text-align:center;border:0;color:inherit;font-family:inherit;cursor:pointer;transition:.15s ease;text-wrap:balance}
-#viewGateway .step:hover,#viewGateway .step:focus-visible{background:rgba(36,197,229,.28);transform:translateY(-1px)}
-#viewGateway .step:focus-visible{outline:2px solid #29b6e8;outline-offset:2px}
-#viewGateway .step b{display:block;color:#74e6dc;margin-bottom:4px}
-#viewGateway .note{font-size:13px;color:#b7c6da;margin-top:14px;line-height:1.6;display:flex;gap:7px;align-items:flex-start}
-#viewGateway .note i{font-style:normal;color:#4fd4e8;flex-shrink:0}
-#viewGateway .assistant-welcome-box{display:flex;align-items:center;gap:20px;background:#ffffff;border:1px solid var(--line);border-radius:16px;padding:16px;margin-top:22px;box-shadow:0 2px 8px rgba(0,0,0,.05)}
-#viewGateway .assistant-image-wrapper{width:96px;height:auto;flex-shrink:0}
-#viewGateway .assistant-image-wrapper svg,#viewGateway .assistant-new-img{width:100%;height:auto;display:block;border-radius:12px;filter:drop-shadow(0 4px 10px rgba(0,54,179,.15))}
-#viewGateway .assistant-text-content{font-size:14.5px;color:#334155;line-height:1.6}
-#viewGateway .assistant-text-content strong{color:#0a5a9c}
-@media(max-width:600px){#viewGateway .assistant-welcome-box{flex-direction:column;text-align:center}#viewGateway .assistant-image-wrapper{width:100%;max-width:130px}}
-@media(max-width:860px){#viewGateway .hero{grid-template-columns:1fr;padding-top:10px}#viewGateway .hero h1{font-size:54px}#viewGateway .top{padding:16px}#viewGateway .mini-flow .row{grid-template-columns:1fr 1fr}}
-@media(max-width:520px){#viewGateway .hero h1{font-size:45px}#viewGateway .panel{padding:16px;border-radius:22px}#viewGateway .card{padding:16px}#viewGateway .hero{width:min(100% - 20px,1180px)}#viewGateway .top{align-items:flex-start;gap:10px}#viewGateway .demo{white-space:nowrap}#viewGateway .mini-flow .row{grid-template-columns:1fr}#viewGateway .strip{flex-direction:column;gap:4px}#viewGateway .strip .dot{display:none}}
-.demo-bar{background:#071a33;color:#d9edf7;padding:12px 4vw;font-size:13px;display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap}.demo-bar b{color:#fff}
-.demo-cases{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin:18px 0}.case-card{border:1px solid var(--line);border-radius:17px;padding:17px;background:#fff;transition:.18s ease}.case-card:hover{transform:translateY(-3px);box-shadow:0 14px 35px rgba(7,26,51,.1)}.case-card h3{margin:8px 0 5px;font-size:18px}.case-card p{font-size:13px;line-height:1.55;color:var(--muted);min-height:42px}
-.form-card{padding:22px}.steps{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px}.step{font-size:12px;border-radius:99px;padding:7px 10px;color:#5d7387;background:#eef3f6;font-weight:800}.step.active{background:#dff6fa;color:#08738b}.form-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:13px}.field label{display:block;font-size:12px;font-weight:850;margin-bottom:6px}.field input,.field select{width:100%;padding:10px;border:1px solid var(--line);border-radius:10px;background:#fff}.helper{font-size:11px;color:var(--muted);line-height:1.55}
-.result{display:grid;grid-template-columns:.9fr 1.1fr;gap:16px}.score-box{background:linear-gradient(145deg,#071a33,#0a416f);border-radius:18px;padding:23px;color:#fff;text-align:center}.score-ring{width:145px;height:145px;border-radius:50%;margin:10px auto 12px;display:grid;place-items:center;background:conic-gradient(#3ad8e7 0deg,#3ad8e7 var(--deg),rgba(255,255,255,.18) var(--deg),rgba(255,255,255,.18) 360deg);position:relative}.score-ring:before{content:"";position:absolute;inset:11px;border-radius:50%;background:#0b3457}.score-ring div{z-index:1}.score-num{font-size:42px;font-weight:950;line-height:1}.score-unit{font-size:12px;color:#b9e7f1}.score-box p{font-size:12px;line-height:1.5;color:#d5eaf2}
-.recommend{border:1px solid #e1eaf0;border-radius:13px;padding:12px;margin-bottom:9px}.recommend b{font-size:13px}.recommend span{display:block;color:var(--muted);font-size:12px;margin-top:3px;line-height:1.5}.metric{border:1px solid #e0eaf0;border-radius:13px;padding:13px;margin-bottom:10px}.metric-head{display:flex;justify-content:space-between;gap:10px;font-size:13px;font-weight:850}.progress{height:10px;border-radius:99px;background:#e7eef2;overflow:hidden;margin:9px 0}.progress span{display:block;height:100%;background:linear-gradient(90deg,#0d5eb8,#24c5e5);border-radius:99px}.metric button{font-size:12px;font-weight:850;border:0;background:transparent;color:#0b6d91;padding:0}.tips{display:none;margin-top:10px;padding:10px;border-radius:9px;background:#f5fafc;color:#586f81;font-size:12px;line-height:1.5}.metric.open .tips{display:block}
-.q-head{display:flex;justify-content:space-between;align-items:center;gap:10px}.q-count{font-size:12px;font-weight:850;color:#08738b;background:#e5f7fa;border-radius:99px;padding:5px 8px}.question{display:none}.question.active{display:block}.question h3{font-size:20px;line-height:1.4;margin:16px 0 12px}.answers{display:grid;gap:9px}.answer{padding:12px;border:1px solid var(--line);border-radius:11px;background:#fff;text-align:left;color:#27465e;font-weight:750}.answer:hover,.answer.selected{border-color:#29b6e8;background:#ecfbfd;color:#075f7a}.outcome{background:#eff8fb;border:1px solid #cdeaf0;border-radius:13px;padding:14px;line-height:1.6;font-size:13px;color:#35566e}.support{background:linear-gradient(145deg,#fff,#f2fbfc)}.mini-kpi{padding:14px;border-radius:13px;background:#f7fbfd;border:1px solid #e3edf3}.mini-kpi b{display:block;font-size:24px;margin:4px 0}.mini-kpi span{color:var(--muted);font-size:12px}
-@media(max-width:800px){.demo-cases{grid-template-columns:1fr}.s3,.s4,.s5,.s6,.s7,.s8{grid-column:span 12}.form-grid{grid-template-columns:1fr}.result{grid-template-columns:1fr}}
-#viewDriver{--navy:#071a33;--navy2:#0d3153;--teal:#0d5eb8;--cyan:#29b6e8;--green:#1ea672;--amber:#e9a72d;--red:#d94f58;--bg:#f4f8fb;--ink:#15263c;--muted:#6a7889;--line:#dde7ef;--white:#fff;--shadow:0 12px 36px rgba(7,26,51,.08);color:var(--ink)}
-#viewDriver .app{min-height:100vh;display:grid;grid-template-columns:250px 1fr}
-#viewDriver .side{background:linear-gradient(180deg,var(--navy),#0a2948);color:#fff;padding:20px 15px;position:sticky;top:0;height:100vh;overflow:auto}
-#viewDriver .brand{font-size:22.5px;font-weight:900}
-#viewDriver .brand small{display:block;color:#9edbe8;font-size:12.5px;margin-top:5px}
-#viewDriver .badge{display:inline-block;margin-top:11px;font-size:11px;border:1px solid rgba(255,255,255,.22);padding:5px 8px;border-radius:999px}
-#viewDriver .nav{margin-top:20px}
-#viewDriver .nav button{width:100%;border:0;background:transparent;color:#d7e7f3;text-align:left;padding:11px;border-radius:10px;margin:3px 0;cursor:pointer;font-family:inherit;font-size:14.5px}
-#viewDriver .nav button.active,#viewDriver .nav button:hover{background:rgba(36,197,229,.16);color:#fff}
-#viewDriver .main{min-width:0}
-#viewDriver .top{background:#fff;border-bottom:1px solid var(--line);padding:15px 22px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:5;gap:12px}
-#viewDriver .top h1{font-size:20px;margin:0}
-#viewDriver .top p{font-size:12.5px;margin:4px 0 0;color:var(--muted)}
-#viewDriver .status{display:flex;gap:7px;flex-wrap:wrap;align-items:center}
-#viewDriver .pill{font-size:11px;font-weight:900;padding:6px 8px;border-radius:999px}
-#viewDriver .green{background:#e8fbf3;color:#0a724f}
-#viewDriver .blue{background:#e8f7fb;color:#08738b}
-#viewDriver .amber{background:#fff4db;color:#8a5d00}
-#viewDriver .red{background:#ffe8ea;color:#9d2830}
-#viewDriver .content{padding:22px}
-#viewDriver .screen{display:none}
-#viewDriver .screen.active{display:block}
-#viewDriver .hero-title{display:flex;justify-content:space-between;align-items:flex-end;gap:14px;margin-bottom:14px}
-#viewDriver .hero-title h2{font-size:29px;margin:0;text-wrap:balance}
-#viewDriver .hero-title p{color:var(--muted);font-size:13.5px;margin:5px 0 0}
-#viewDriver .btn{border:0;border-radius:10px;padding:10px 13px;font-weight:900;cursor:pointer;font-family:inherit;font-size:14px}
-#viewDriver .primary{background:linear-gradient(135deg,#0a4a94,#0d6fc2);color:#fff}
-#viewDriver .ghost{background:#fff;border:1px solid var(--line);color:#405a70}
-#viewDriver .grid{display:grid;grid-template-columns:repeat(12,1fr);gap:13px}
-#viewDriver .card{background:#fff;border:1px solid #e3ebf2;border-radius:16px;box-shadow:var(--shadow);padding:15px}
-#viewDriver .kpi{grid-column:span 3;min-height:104px}
-#viewDriver .label{font-size:12.5px;color:var(--muted)}
-#viewDriver .value{font-size:30px;font-weight:900;margin-top:7px}
-#viewDriver .mini{font-size:12px;color:var(--muted);line-height:1.5}
-#viewDriver .s4{grid-column:span 4}
-#viewDriver .s5{grid-column:span 5}
-#viewDriver .s6{grid-column:span 6}
-#viewDriver .s7{grid-column:span 7}
-#viewDriver .s8{grid-column:span 8}
-#viewDriver .s12{grid-column:span 12}
-#viewDriver .tbl{width:100%;border-collapse:collapse;font-size:13.5px}
-#viewDriver .tbl td,#viewDriver .tbl th{padding:9px;border-bottom:1px solid #edf1f5;text-align:left}
-#viewDriver .tbl th{font-size:11px;color:#5b6c7c;background:#f8fafc}
-#viewDriver .num{text-align:right!important;font-variant-numeric:tabular-nums}
-#viewDriver .tbl input[type=number]{width:88px;padding:5px 7px;border:1px solid var(--line);border-radius:7px;font:inherit;font-variant-numeric:tabular-nums;text-align:right;background:#fbfdfe;color:var(--ink)}
-#viewDriver .tbl input[type=number].pct{width:56px}
-#viewDriver .tbl input[type=number]:focus{outline:2px solid var(--cyan);outline-offset:1px;border-color:var(--cyan)}
-#viewDriver .xray-actions{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:10px;flex-wrap:wrap}
-#viewDriver .xray-actions .mini{flex:1;min-width:200px}
-#viewDriver .notice{padding:12px 14px;border-radius:12px;background:#ecf9fb;border-left:4px solid var(--cyan);font-size:13px;line-height:1.5;margin-bottom:14px}
-#viewDriver .warn{background:#fff7e7;border:1px solid #f3d89b;border-radius:12px;padding:12px;font-size:13px}
-#viewDriver .progress{height:13px;border-radius:999px;background:#e9eef3;overflow:hidden}
-#viewDriver .progress span{display:block;height:100%;background:linear-gradient(90deg,#0d5eb8,#29b6e8);width:28%}
-#viewDriver .bars{height:160px;display:flex;align-items:flex-end;gap:8px;padding-top:16px}
-#viewDriver .bar{flex:1;background:linear-gradient(180deg,#29b6e8,#0d5eb8);border-radius:7px 7px 2px 2px;position:relative}
-#viewDriver .bar i{position:absolute;bottom:-17px;left:50%;transform:translateX(-50%);font-size:10px;color:#7c8996;font-style:normal}
-#viewDriver .ledger{display:grid;gap:8px}
-#viewDriver .ledger .row{display:flex;justify-content:space-between;align-items:center;padding:10px 12px;border:1px solid #e7edf2;border-radius:12px;gap:10px}
-#viewDriver .row b{font-size:14.5px}
-#viewDriver .row small{display:block;color:var(--muted);font-size:11px}
-#viewDriver .modal{position:fixed;inset:0;background:rgba(7,26,51,.46);display:none;align-items:center;justify-content:center;z-index:30}
-#viewDriver .modal.show{display:flex}
-#viewDriver .modal-card{width:min(580px,92vw);background:#fff;border-radius:18px;padding:20px;box-shadow:0 24px 80px rgba(0,0,0,.25)}
-#viewDriver .modal-card h3{margin:0 0 6px}
-#viewDriver .field{margin:10px 0}
-#viewDriver .field label{display:block;font-size:12.5px;font-weight:800;margin-bottom:5px}
-#viewDriver .field input,#viewDriver .field select,#viewDriver .field textarea{width:100%;padding:10px;border:1px solid var(--line);border-radius:9px;font-family:inherit}
-#viewDriver .actions{display:flex;justify-content:flex-end;gap:8px}
-#viewDriver .close{float:right;border:0;background:transparent;font-size:24.5px;cursor:pointer}
-@media(max-width:900px){#viewDriver .app{grid-template-columns:78px 1fr}#viewDriver .brand{font-size:0}#viewDriver .brand:before{content:'R2O';font-size:21.5px}#viewDriver .brand small,#viewDriver .badge,#viewDriver .nav button{font-size:0}#viewDriver .nav button:before{content:attr(data-icon);font-size:18px}#viewDriver .kpi{grid-column:span 6}#viewDriver .s4,#viewDriver .s5,#viewDriver .s6,#viewDriver .s7,#viewDriver .s8{grid-column:span 12}#viewDriver .backhome b{display:none}}
-@media(max-width:620px){#viewDriver .app{display:block}#viewDriver .side{position:relative;height:auto;padding:12px}#viewDriver .nav{display:flex;overflow:auto;margin-top:10px}#viewDriver .nav button{min-width:46px}#viewDriver .top{position:relative;align-items:flex-start;flex-direction:column;gap:8px}#viewDriver .content{padding:13px}#viewDriver .kpi{grid-column:span 12}#viewDriver .hero-title{align-items:flex-start;flex-direction:column}}
-#viewPartner{--navy:#071a33;--navy2:#0d3153;--cyan:#29b6e8;--teal:#0d5eb8;--green:#1ea672;--amber:#e8a72d;--red:#d94f58;--bg:#f4f8fb;--ink:#15263c;--muted:#68788a;--line:#dfe7ee;--white:#fff;--shadow:0 12px 36px rgba(7,26,51,.08);color:var(--ink)}
-#viewPartner .app{min-height:100vh;display:grid;grid-template-columns:265px 1fr}
-#viewPartner .side{background:linear-gradient(180deg,var(--navy),#0a2948);color:#fff;padding:20px 15px;position:sticky;top:0;height:100vh;overflow:auto}
-#viewPartner .brand{font-weight:900;font-size:21.5px}
-#viewPartner .brand small{display:block;color:#9edbe8;font-size:12.5px;margin-top:5px}
-#viewPartner .demo{display:inline-block;margin-top:11px;font-size:11px;border:1px solid rgba(255,255,255,.22);padding:5px 8px;border-radius:999px}
-#viewPartner .nav{margin-top:20px}
-#viewPartner .nav .group{font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:#7fa5bd;margin:14px 10px 5px}
-#viewPartner .nav button{width:100%;border:0;background:transparent;color:#d7e7f3;text-align:left;padding:10px 11px;border-radius:10px;margin:2px 0;cursor:pointer;font-size:13.5px;font-family:inherit}
-#viewPartner .nav button.active,#viewPartner .nav button:hover{background:rgba(36,197,229,.15);color:#fff}
-#viewPartner .main{min-width:0}
-#viewPartner .top{background:#fff;border-bottom:1px solid var(--line);padding:14px 22px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:6;gap:12px}
-#viewPartner .top h1{margin:0;font-size:20px}
-#viewPartner .top p{margin:4px 0 0;color:var(--muted);font-size:12px}
-#viewPartner .selectors{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-#viewPartner .selectors select{padding:9px;border:1px solid var(--line);border-radius:9px;background:#fff;font-weight:700;color:#253b50;font-family:inherit}
-#viewPartner .content{padding:22px}
-#viewPartner .screen{display:none}
-#viewPartner .screen.active{display:block}
-#viewPartner .title{display:flex;justify-content:space-between;align-items:flex-end;gap:14px;margin-bottom:14px}
-#viewPartner .title h2{font-size:28px;margin:0;text-wrap:balance}
-#viewPartner .title p{font-size:13px;color:var(--muted);margin:4px 0 0}
-#viewPartner .pill{display:inline-block;font-size:10.5px;font-weight:900;padding:5px 8px;border-radius:999px}
-#viewPartner .green{background:#e8fbf3;color:#08714e}
-#viewPartner .amber{background:#fff4da;color:#8b5d00}
-#viewPartner .red{background:#ffe9eb;color:#9c2a31}
-#viewPartner .blue{background:#e9f8fc;color:#08768d}
-#viewPartner .gray{background:#eef2f5;color:#526273}
-#viewPartner .notice{padding:12px 14px;border-radius:12px;background:#eef9fb;border-left:4px solid var(--cyan);font-size:12.5px;line-height:1.55;margin-bottom:14px}
-#viewPartner .grid{display:grid;grid-template-columns:repeat(12,1fr);gap:13px}
-#viewPartner .card{background:#fff;border:1px solid #e4ebf1;border-radius:16px;box-shadow:var(--shadow);padding:15px}
-#viewPartner .kpi{grid-column:span 3;min-height:104px}
-#viewPartner .label{font-size:12px;color:var(--muted)}
-#viewPartner .value{font-size:30px;font-weight:900;margin-top:7px}
-#viewPartner .mini{font-size:11px;color:var(--muted);line-height:1.5}
-#viewPartner .s4{grid-column:span 4}
-#viewPartner .s5{grid-column:span 5}
-#viewPartner .s6{grid-column:span 6}
-#viewPartner .s7{grid-column:span 7}
-#viewPartner .s8{grid-column:span 8}
-#viewPartner .s12{grid-column:span 12}
-#viewPartner .tblwrap{overflow:auto}
-#viewPartner .tbl{width:100%;border-collapse:collapse;font-size:13px}
-#viewPartner .tbl th,#viewPartner .tbl td{padding:9px;border-bottom:1px solid #edf1f4;text-align:left;white-space:nowrap}
-#viewPartner .tbl th{font-size:10.5px;color:#596b7c;background:#f8fafc}
-#viewPartner .num{text-align:right!important;font-variant-numeric:tabular-nums}
-#viewPartner .toolbar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}
-#viewPartner .toolbar input,#viewPartner .toolbar select,#viewPartner .toolbar button{padding:8px 9px;border:1px solid var(--line);border-radius:9px;background:#fff;font-family:inherit}
-#viewPartner .toolbar input{min-width:240px;flex:1}
-#viewPartner .toolbar button{font-weight:800;color:#0b7180}
-#viewPartner .progress{height:11px;border-radius:999px;background:#e8edf2;overflow:hidden}
-#viewPartner .progress span{display:block;height:100%;background:linear-gradient(90deg,#0d5eb8,#29b6e8)}
-#viewPartner .lane{display:flex;gap:7px;flex-wrap:wrap}
-#viewPartner .node{padding:8px 10px;border:1px solid #dae7ee;border-radius:10px;background:#f7fbfd;font-size:12px;font-weight:800}
-#viewPartner .arrow{color:#82909e}
-#viewPartner .role-gate{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
-#viewPartner .rolecard{border:1px solid var(--line);border-radius:15px;padding:14px;background:#fff}
-#viewPartner .rolecard b{display:block;font-size:14.5px;margin-bottom:5px}
-#viewPartner .tag{font-size:10px;padding:3px 6px;border:1px solid #d8e5ec;border-radius:6px;background:#f9fcfd;color:#53697b}
-#viewPartner .hidden-by-role{display:none!important}
-@media(max-width:1000px){#viewPartner .app{grid-template-columns:80px 1fr}#viewPartner .brand{font-size:0}#viewPartner .brand:before{content:'R2O';font-size:20px}#viewPartner .brand small,#viewPartner .demo,#viewPartner .nav button{font-size:0}#viewPartner .nav button:before{content:attr(data-icon);font-size:17px}#viewPartner .nav .group{display:none}#viewPartner .kpi{grid-column:span 6}#viewPartner .s4,#viewPartner .s5,#viewPartner .s6,#viewPartner .s7,#viewPartner .s8{grid-column:span 12}#viewPartner .role-gate{grid-template-columns:1fr 1fr}#viewPartner .backhome b{display:none}}
-@media(max-width:650px){#viewPartner .app{display:block}#viewPartner .side{position:relative;height:auto;padding:12px}#viewPartner .nav{display:flex;overflow:auto;margin-top:10px}#viewPartner .nav button{min-width:46px}#viewPartner .top{position:relative;align-items:flex-start;flex-direction:column;gap:8px}#viewPartner .selectors{width:100%}#viewPartner .selectors select{flex:1}#viewPartner .content{padding:13px}#viewPartner .kpi{grid-column:span 12}#viewPartner .title{align-items:flex-start;flex-direction:column}#viewPartner .role-gate{grid-template-columns:1fr}}
+:root{--navy:#071a33;--navy2:#0d3153;--blue:#0d5eb8;--cyan:#24c5e5;--teal:#16b9b1;--green:#16845d;--amber:#b97806;--red:#ba3642;--bg:#f3f8fb;--ink:#14253a;--muted:#65778a;--line:#dce7ef;--white:#fff;--shadow:0 16px 42px rgba(7,26,51,.12)}*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Tahoma,sans-serif;color:var(--ink);background:var(--bg)}button,input,select{font:inherit}button{cursor:pointer}.hide{display:none!important}
+.top{height:72px;background:rgba(255,255,255,.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 4vw;position:sticky;top:0;z-index:20}.brand{font-weight:900;color:var(--navy);display:flex;align-items:center;gap:10px}.mark{display:grid;place-items:center;width:38px;height:38px;border-radius:12px;background:linear-gradient(135deg,var(--blue),var(--cyan));color:#fff;font-size:11px}.brand small{display:block;color:#5e768b;font-weight:700;margin-top:2px}.topnav{display:flex;gap:8px;align-items:center}.link,.btn{border:0;border-radius:10px;padding:10px 13px;font-weight:850}.link{background:transparent;color:#355972}.btn{background:linear-gradient(135deg,#0a4a94,#0d6fc2);color:#fff;box-shadow:0 7px 18px rgba(13,94,184,.2)}.btn.alt{background:#fff;color:#0a5a9c;border:1px solid #c9dce8;box-shadow:none}.btn.warn{background:#fff4db;color:#805400;border:1px solid #f0d796;box-shadow:none}
+.hero{padding:72px 4vw 55px;background:radial-gradient(circle at 85% 10%,rgba(36,197,229,.23),transparent 26%),linear-gradient(140deg,#f9fcfe,#eaf5fa)}.hero-inner{max-width:1180px;margin:auto;display:grid;grid-template-columns:1.15fr .85fr;gap:28px;align-items:center}.eyebrow{font-size:12px;color:#0a5a9c;letter-spacing:.1em;font-weight:900}.hero h1{font-size:clamp(38px,5vw,68px);line-height:1.06;letter-spacing:-.04em;margin:12px 0 16px;color:var(--navy)}.hero h1 span{display:block;color:#0b7f86}.hero p{font-size:17px;line-height:1.75;color:#536b7e;max-width:650px}.hero-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:22px}.hero-card{padding:24px;border-radius:24px;background:linear-gradient(145deg,#071a33,#0a416f);box-shadow:0 20px 50px rgba(7,26,51,.24);color:#fff}.hero-card h3{font-size:20px;margin:0 0 9px}.hero-card p{font-size:13px;color:#c9e8f3;margin:0 0 16px}.flow{display:grid;gap:9px}.flow div{border-radius:10px;background:rgba(255,255,255,.1);padding:10px;font-size:12px}.flow b{color:#74e6dc;margin-right:7px}
+.wrap{max-width:1180px;margin:auto;padding:44px 4vw}.section-title{display:flex;justify-content:space-between;align-items:end;gap:18px;margin-bottom:18px}.section-title h2{margin:0;font-size:28px}.section-title p{margin:5px 0 0;color:var(--muted)}.grid{display:grid;grid-template-columns:repeat(12,1fr);gap:14px}.card{background:#fff;border:1px solid #e1ebf1;border-radius:18px;padding:18px;box-shadow:var(--shadow)}.s3{grid-column:span 3}.s4{grid-column:span 4}.s5{grid-column:span 5}.s6{grid-column:span 6}.s7{grid-column:span 7}.s8{grid-column:span 8}.s12{grid-column:span 12}
+.case{border:1px solid var(--line);border-radius:17px;padding:17px;background:#fff}.case h3{margin:8px 0 5px;font-size:18px}.case p{font-size:13px;line-height:1.55;color:var(--muted);min-height:42px}.tag{display:inline-block;border-radius:999px;padding:5px 8px;font-size:10px;font-weight:900}.green{background:#e7faf2;color:#08724d}.amber{background:#fff3d9;color:#815700}.red{background:#ffe8eb;color:#992b33}.blue{background:#e7f6fb;color:#08728a}.demo-bar{background:#071a33;color:#d9edf7;padding:12px 4vw;font-size:13px;display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap}.demo-bar b{color:#fff}
+.form-card{padding:22px}.steps{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px}.step{font-size:12px;border-radius:99px;padding:7px 10px;color:#5d7387;background:#eef3f6;font-weight:800}.step.active{background:#dff6fa;color:#08738b}.form-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:13px}.field label{display:block;font-size:12px;font-weight:850;margin-bottom:6px}.field input,.field select{width:100%;padding:10px;border:1px solid var(--line);border-radius:10px;background:#fff}.helper{font-size:11px;color:var(--muted);line-height:1.55}.notice{padding:12px 14px;border-radius:12px;background:#ecf9fb;border-left:4px solid var(--cyan);font-size:12px;line-height:1.55;margin:12px 0}.actions{display:flex;justify-content:flex-end;gap:9px;margin-top:17px;flex-wrap:wrap}
+.result{display:grid;grid-template-columns:.9fr 1.1fr;gap:16px}.score-box{background:linear-gradient(145deg,#071a33,#0a416f);border-radius:18px;padding:23px;color:#fff;text-align:center}.score-ring{width:145px;height:145px;border-radius:50%;margin:10px auto 12px;display:grid;place-items:center;background:conic-gradient(#3ad8e7 0deg,#3ad8e7 var(--deg),rgba(255,255,255,.18) var(--deg),rgba(255,255,255,.18) 360deg);position:relative}.score-ring:before{content:"";position:absolute;inset:11px;border-radius:50%;background:#0b3457}.score-ring div{z-index:1}.score-num{font-size:42px;font-weight:950;line-height:1}.score-unit{font-size:12px;color:#b9e7f1}.score-box p{font-size:12px;line-height:1.5;color:#d5eaf2}.recommend{border:1px solid #e1eaf0;border-radius:13px;padding:12px;margin-bottom:9px}.recommend b{font-size:13px}.recommend span{display:block;color:var(--muted);font-size:12px;margin-top:3px;line-height:1.5}.metric{border:1px solid #e0eaf0;border-radius:13px;padding:13px;margin-bottom:10px}.metric-head{display:flex;justify-content:space-between;gap:10px;font-size:13px;font-weight:850}.progress{height:10px;border-radius:99px;background:#e7eef2;overflow:hidden;margin:9px 0}.progress span{display:block;height:100%;background:linear-gradient(90deg,#0d5eb8,#24c5e5);border-radius:99px}.metric button{font-size:12px;font-weight:850;border:0;background:transparent;color:#0b6d91;padding:0}.tips{display:none;margin-top:10px;padding:10px;border-radius:9px;background:#f5fafc;color:#586f81;font-size:12px;line-height:1.5}.metric.open .tips{display:block}
+.q-head{display:flex;justify-content:space-between;align-items:center;gap:10px}.q-count{font-size:12px;font-weight:850;color:#08738b;background:#e5f7fa;border-radius:99px;padding:5px 8px}.question{display:none}.question.active{display:block}.question h3{font-size:20px;line-height:1.4;margin:16px 0 12px}.answers{display:grid;gap:9px}.answer{padding:12px;border:1px solid var(--line);border-radius:11px;background:#fff;text-align:left;color:#27465e;font-weight:750}.answer:hover,.answer.selected{border-color:#29b6e8;background:#ecfbfd;color:#075f7a}.outcome{background:#eff8fb;border:1px solid #cdeaf0;border-radius:13px;padding:14px;line-height:1.6;font-size:13px;color:#35566e}.support{background:linear-gradient(145deg,#fff,#f2fbfc)}.mini-kpi{padding:14px;border-radius:13px;background:#f7fbfd;border:1px solid #e3edf3}.mini-kpi b{display:block;font-size:24px;margin:4px 0}.mini-kpi span{color:var(--muted);font-size:12px}.footer{padding:26px 4vw;background:#071a33;color:#c3d9e6;font-size:12px;line-height:1.65}.footer b{color:#fff}
+@media(max-width:800px){.hero-inner,.result{grid-template-columns:1fr}.s3,.s4,.s5,.s6,.s7,.s8{grid-column:span 12}.form-grid{grid-template-columns:1fr}.topnav .link{display:none}.hero{padding-top:42px}.wrap{padding-top:30px}.section-title{align-items:flex-start;flex-direction:column}.top{padding:0 16px}.hero,.wrap{padding-left:16px;padding-right:16px}.demo-bar{padding:12px 16px}}
 </style>
 </head>
-<body class="on-gateway">
-<div id="viewGateway" class="view active">
-<div class="wrap">
-<header class="top"><div class="brand">Route2Own by บสย.<small>TCG Route2Own EV Taxi Guarantee</small></div><span class="demo">ระบบสาธิต / ระบบหลังอนุมัติ</span></header>
-<main class="hero">
-<section>
-<div class="kicker">ระบบป้องกันความเสี่ยงหลังอนุมัติ</div>
-<h1>ขับ ผ่อน คุ้มครอง<span>เป็นเจ้าของจริง</span></h1>
-<p>หลังสถาบันการเงินอนุมัติสินเชื่อ Route2Own จะเปลี่ยนจากระบบคัดกรองก่อนกู้ เป็นระบบดูแลหลังอนุมัติที่เชื่อมข้อมูลการทำงาน การชำระหนี้ และสัญญาณความเสี่ยง เพื่อช่วยให้ผู้ขับเดินต่อสู่การเป็นเจ้าของ และช่วยพันธมิตรเห็นปัญหาก่อนเกิด NPL</p>
-<div class="chips"><span class="chip">รายได้ &amp; KM/EMU</span><span class="chip">PAYD แบบปรับตามรายได้</span><span class="chip">ระบบควบคุมเงินต้น</span><span class="chip">EWS และ PromptCure</span><span class="chip">การควบคุมเคลม</span></div>
-<div class="assistant-welcome-box">
-  <div class="assistant-image-wrapper">
-    <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#29b6e8"/><stop offset="100%" stop-color="#0d5eb8"/></linearGradient></defs><circle cx="50" cy="50" r="48" fill="url(#g)"/><path d="M35 42c0-4 3-7 7-7s7 3 7 7-3 7-7 7-7-3-7-7zm23 0c0-4 3-7 7-7s7 3 7 7-3 7-7 7-7-3-7-7zM30 65c5-8 12-12 20-12s15 4 20 12" stroke="#fff" stroke-width="4" fill="none" stroke-linecap="round"/></svg>
-  </div>
-  <div class="assistant-text-content">
-    <strong>ต้องการคำแนะนำด้านธุรกิจหรือการเงิน?</strong><br>
-    บสย. F.A. Center พร้อมช่วยผู้ขับและผู้เกี่ยวข้องวางแผนการเงิน สร้างความต่อเนื่องในการทำงาน และเดินหน้าสู่การเป็นเจ้าของ EV Taxi อย่างมั่นคง
-  </div>
-</div>
-</section>
-<aside class="panel">
-<h2>เลือกมุมมองการใช้งาน</h2>
-<p>ข้อมูลตัวอย่างสำหรับการติดตามโครงการหลังการอนุมัติสินเชื่อ</p>
-<div class="choice">
-<button class="card" onclick="go('driver','home')"><div class="icon">🚖</div><h3>ผู้ขับขี่</h3><p>ดูสถานะสัญญา แผนการชำระ เงินต้น และคำแนะนำเฉพาะบุคคล</p><span class="go">เข้าสู่ Driver Portal →</span></button>
-<button class="card" onclick="go('partner','overview')"><div class="icon">🤝</div><h3>พาร์ทเนอร์</h3><p>ติดตามกลุ่มผู้ขับ การดำเนินงาน และสัญญาณเตือนในพอร์ต</p><span class="go">เข้าสู่ Partner Console →</span></button>
-<button class="card" onclick="go('tower','monitor')"><div class="icon">◉</div><h3>Control Tower</h3><p>ภาพรวมความเสี่ยง Monitoring Dashboard และการควบคุมเคลมระดับโครงการ</p><span class="go">เข้าสู่ Control Tower →</span></button>
-</div>
-<div class="strip"><b>ข้อมูลเป็น Simulation</b> เพื่อสาธิต Operating Model <span class="dot">•</span> ไม่ใช่ข้อมูลลูกค้าจริงหรือ Approved Product Terms</div>
-<div class="mini-flow"><div class="row"><button class="step"><b>01</b>ลงทะเบียน</button><button class="step"><b>02</b>ตรวจสอบสิทธิ์</button><button class="step"><b>03</b>FI อนุมัติ</button><button class="step"><b>04</b>Route2Own</button></div><p class="note"><i>ℹ</i> ข้อมูลนี้ใช้เพื่อสาธิตการทำงานเท่านั้น</p></div>
-</aside>
-</main>
-</div>
-</div>
-<div id="viewDriver" class="view">
-<div class="app">
-<aside class="side">
-<div class="brand">My Route2Own<small>Driver Post-Approval Portal</small></div>
-<span class="badge">DEMO DRIVER / SIMULATION</span>
-<nav class="nav">
-<button class="active" data-screen="home" data-icon="⌂">วันนี้</button>
-<button data-screen="activity" data-icon="↗">รายได้ & การขับ</button>
-<button data-screen="money" data-icon="฿">เงินของฉัน</button>
-<button data-screen="ownership" data-icon="◒">หนี้ & Ownership</button>
-<button data-screen="wallet" data-icon="▤">กระเป๋า Route2Own</button>
-<button data-screen="help" data-icon="+">แจ้งเหตุ / ขอความช่วยเหลือ</button>
-<button data-screen="cure" data-icon="!">PromptCure</button>
-</nav>
-<button class="backhome" onclick="go('gateway')"><i>←</i> <b>กลับหน้าปกกลาง</b></button>
-</aside>
-<main class="main">
-<header class="top"><div><h1>My Route2Own</h1><p>D-000381 · Child E-LG ELG-80381 · FI: KBank · Demo data only</p></div><div><span class="pill green">ACTIVE</span> <span class="pill green">EWS GREEN</span> <span class="pill blue">FI DPD 0</span> <span class="pill blue">Tier B</span></div></header>
-<div class="content">
-<section id="home" class="screen active"><div class="hero-title"><div><h2>วันนี้ของฉัน</h2><p>ข้อมูลหลังธนาคารอนุมัติ: รายได้ การขับ การชำระ และเส้นทางสู่ Ownership</p></div><button class="btn primary" onclick="openIncident()">แจ้งหยุดวิ่ง / ขอความช่วยเหลือ</button></div><div class="notice"><b>หลักการ:</b> Route2Own ใช้ KM/EMU เพื่อจัดจังหวะ PAYD เท่านั้น ไม่ได้สร้างหนี้ตามกิโลเมตร และ DPD/Arrears มาจาก FI เท่านั้น</div></section>
-<section id="activity" class="screen"><div class="hero-title"><div><h2>รายได้ & การขับขี่</h2><p>Driver-Day view: รายได้ ระยะทาง EMU และ Downtime</p></div></div></section>
-<section id="money" class="screen"><div class="hero-title"><div><h2>เงินของฉัน</h2><p>แสดงรายรับ ต้นทุน เงินกันไว้ และการจัดสรรโดยไม่ปะปน Cure Reserve กับ Fee</p></div></div></section>
-<section id="ownership" class="screen"><div class="hero-title"><div><h2>หนี้ & เส้นทางสู่ Ownership</h2><p>FI contractual data + Principal Governor</p></div></div></section>
-<section id="wallet" class="screen"><div class="hero-title"><div><h2>กระเป๋า Route2Own</h2><p>4 Ledger ที่ต้องแยกฐานะทางเศรษฐศาสตร์และสิทธิของเงิน</p></div></div></section>
-<section id="help" class="screen"><div class="hero-title"><div><h2>แจ้งหยุดวิ่ง / ขอความช่วยเหลือ</h2><p>3 วันไม่วิ่ง = Review Trigger ไม่ใช่ Credit Downgrade</p></div><button class="btn primary" onclick="openIncident()">เปิดแบบฟอร์มแจ้งเหตุ</button></div></section>
-<section id="cure" class="screen"><div class="hero-title"><div><h2>PromptCure</h2><p>ระบบช่วยก่อนเป็น NPL โดยแสดงสาเหตุและทางเลือก ไม่ใช่เพียงสีความเสี่ยง</p></div></div></section>
-</div>
-</main>
-</div>
-</div>
-<div id="viewPartner" class="view">
-<div class="app">
-<aside class="side">
-<div class="brand">Route2Own<small>Partner &amp; Control Tower</small></div>
-<span class="demo" id="roleBadge">Partner Console</span>
-<nav class="nav">
-<div class="group">Partner</div>
-<button class="active" data-screen="overview" data-icon="⌂">Executive Overview</button>
-<button data-screen="pipeline" data-icon="⇢">Front-Door Pipeline</button>
-<button data-screen="portfolio" data-icon="▦">Active Portfolio</button>
-<button data-screen="daily" data-icon="◫">Daily Operations</button>
-<button data-screen="incidents" data-icon="!">Inactivity & Incidents</button>
-<button data-screen="ews" data-icon="◉">Risk / EWS</button>
-<button data-screen="cure" data-icon="✚">PromptCure / Pre-TDR</button>
-<button data-screen="elg" data-icon="LG">Child E-LG / Assignment</button>
-<button data-screen="exit" data-icon="↪">Restructure / Exit</button>
-<button data-screen="claim" data-icon="฿">Claim & Recovery</button>
-<button data-screen="finance" data-icon="∑">Program Financial Control</button>
-<button data-screen="partners" data-icon="◎">Partners / Data / Audit</button>
-</nav>
-<button class="backhome" onclick="go('gateway')"><i>←</i> <b>กลับหน้าปกกลาง</b></button>
-</aside>
-<main class="main">
-<header class="top"><div><h1 id="partnerTopTitle">Executive Overview</h1><p>ข้อมูลเป็น Simulation เพื่อสาธิต Operating Model - ไม่ใช่ข้อมูลลูกค้าจริงหรือ Approved Product Terms</p></div><div class="selectors"><select id="roleSelect"><option value="tcg">บสย. / TCG Program Admin</option><option value="risk">บสย. / Risk</option><option value="claim">บสย. / Claim</option><option value="fi">FI Admin</option><option value="coop">Co-op / Fleet Admin</option><option value="oem">EV / BaaS Admin</option><option value="data">GPS / Data Admin</option><option value="payment">Payment Admin</option><option value="recovery">Insurance / Recovery Admin</option></select><select id="orgSelect"></select></div></header>
-<div class="content">
-<section id="overview" class="screen active"><div class="title"><div><h2>Executive Overview</h2><p>Funnel ก่อนอนุมัติ + พอร์ตหลังอนุมัติ + Pre-NPL + Claim</p></div><span class="pill blue">Demo BusinessDay</span></div></section>
-<section id="pipeline" class="screen"><div class="title"><div><h2>Front-Door Pipeline</h2><p>Back Office เห็นแบบ read-only เพื่อเชื่อม Certificate → FI → Activation</p></div></div></section>
-<section id="portfolio" class="screen"><div class="title"><div><h2>Active Portfolio</h2><p>หลัง FI Approved + Activation Gate ผ่าน</p></div></div></section>
-<section id="daily" class="screen"><div class="title"><div><h2>Daily Operations</h2><p>Aggregate Driver-Day: Revenue / KM / EMU / PAYD / Fee / Cure</p></div></div></section>
-<section id="incidents" class="screen"><div class="title"><div><h2>Inactivity & Incident Desk</h2><p>สาเหตุเชิงปฏิบัติการต้องถูกแยกออกจาก credit deterioration</p></div></div></section>
-<section id="ews" class="screen"><div class="title"><div><h2>Risk / EWS</h2><p>U / Y / P / C / A / D cause-based signals</p></div></div></section>
-<section id="cure" class="screen"><div class="title"><div><h2>PromptCure / Pre-TDR</h2><p>Case Management ที่มี Owner, Reason, SLA และ Next Action</p></div></div></section>
-<section id="elg" class="screen"><div class="title"><div><h2>Child E-LG / Driver Assignment</h2><p>แยก operator reassignment ออกจาก borrower change</p></div></div></section>
-<section id="exit" class="screen"><div class="title"><div><h2>Restructure / Exit</h2><p>Pre-TDR, Step-back, Reassignment, Voluntary Return, Recovery ต้องแยกสถานะ</p></div></div></section>
-<section id="claim" class="screen"><div class="title"><div><h2>Claim & Recovery</h2><p>Recover first → Eligible Net Loss → HMC/Stop-Loss → Payable Claim</p></div></div></section>
-<section id="finance" class="screen"><div class="title"><div><h2>Program Financial Control</h2><p>วงเงินโครงการ Exposure Fee Claim Funding HMC Stop-Loss</p></div></div></section>
-<section id="partners" class="screen"><div class="title"><div><h2>Partners / Data / Audit</h2><p>Role-based + Tenant-based access / minimum-necessary data</p></div></div></section>
-</div>
-</main>
-</div>
-</div>
+<body>
+<header class="top"><div class="brand"><span class="mark">TCG</span><span>TCG EV Taxi Guarantee<small>ระบบลงทะเบียนสนใจและตรวจสอบความพร้อม</small></span></div><nav class="topnav"><button class="link" onclick="showSection('demo')">เคสสาธิต</button><button class="link" onclick="showSection('apply')">ลองตรวจสิทธิ์</button><button class="btn alt" onclick="resetDemo()">รีเซ็ต Demo</button></nav></header>
 <div class="demo-bar"><span><b>โหมดสาธิตสำหรับกรรมการ</b> — ผลลัพธ์เป็นการประเมินความพร้อม ไม่ใช่การอนุมัติสินเชื่อ</span><span id="statusText">ยังไม่ได้เลือกเคส</span></div>
-<section id="readinessDemo" class="wrap" style="display:none"><div class="section-title"><div><h2>เคสสาธิต</h2><p>กดโหลดเคสเพื่อดูผลตรวจความพร้อมและเส้นทางแนะนำทันที</p></div></div><div class="demo-cases" id="caseGrid"></div></section>
-<section id="readinessApply" class="wrap" style="display:none"><div class="section-title"><div><h2>ลองตรวจสิทธิ์ด้วยตัวเอง</h2><p>ใช้สำหรับทดลองระบบเท่านั้น ไม่มีการส่งข้อมูลไปยัง FI หรือใช้ตัดสินสินเชื่อ</p></div><span class="tag blue">Interactive Demo</span></div><div class="card form-card"><div class="steps"><span class="step active">1. โปรไฟล์</span><span class="step active">2. รายได้/การทำงาน</span><span class="step active">3. รถและพาร์ทเนอร์</span><span class="step active">4. ผลประเมิน</span></div><div class="form-grid"><div class="field"><label>ชื่อสำหรับการสาธิต</label><input id="name" placeholder="เช่น ผู้ขับสาธิต"></div><div class="field"><label>ประสบการณ์ขับรถรับจ้าง (เดือน)</label><input id="months" type="number" min="0" value="18"></div><div class="field"><label>รายได้เฉลี่ยต่อเดือน (บาท)</label><input id="income" type="number" min="0" value="26000"></div><div class="field"><label>ค่าใช้จ่ายจำเป็นต่อเดือน (บาท)</label><input id="expense" type="number" min="0" value="12000"></div><div class="field"><label>เงินสำรองที่มี (บาท)</label><input id="reserve" type="number" min="0" value="6000"></div><div class="field"><label>มี Co-op/Fleet รองรับหรือไม่</label><select id="partner"><option value="yes">มีพาร์ทเนอร์รองรับ</option><option value="no">ยังไม่มีพาร์ทเนอร์</option></select></div><div class="field"><label>เอกสาร/ใบอนุญาตพร้อมหรือไม่</label><select id="docs"><option value="yes">พร้อมครบสำหรับการสาธิต</option><option value="no">ยังต้องเติมเอกสาร</option></select></div><div class="field"><label>ผ่านกิจกรรมเตรียมความพร้อมหรือไม่</label><select id="learning"><option value="yes">ผ่าน/เข้าร่วมแล้ว</option><option value="no">ยังไม่เข้าร่วม</option></select></div></div><div class="notice"><b>หมายเหตุ:</b> คะแนน Readiness Score เป็นเครื่องมือสาธิตเพื่อแสดงความพร้อมและคำแนะนำ ไม่ใช่ credit score, การรับรองผล หรือการอนุมัติสินเชื่อจาก บสย. หรือสถาบันการเงิน</div><div class="actions"><button class="btn alt" onclick="loadCase('ready')">ใส่ค่าเคสตัวอย่าง</button><button class="btn" onclick="calculate()">คำนวณ Readiness Score</button></div></div></section>
-<section id="readinessResult" class="wrap" style="display:none"><div class="section-title"><div><h2>ผลการประเมินความพร้อม</h2><p>แสดงคะแนนรวม 3 คำแนะนำหลัก และรายละเอียดแต่ละหมวดเมื่อเลือกดู</p></div><button class="btn alt" onclick="showSection('readinessApply')">ลองปรับข้อมูล</button></div><div class="card"><div class="result"><div class="score-box"><div class="tag" id="tierTag">BUILD READINESS</div><div class="score-ring" id="ring"><div><div class="score-num" id="scoreNum">74</div><div class="score-unit">/ 100</div></div></div><b id="tierLabel">Build Readiness</b><p id="scoreText">มีศักยภาพ และมีแผนเสริมความพร้อมก่อนส่งต่อ FI</p></div><div><h3 style="margin-top:0">3 คำแนะนำหลัก</h3><div id="recommendations"></div><div class="actions" style="justify-content:flex-start"><button class="btn" onclick="showSection('questions')">ตอบคำถามต่อเนื่อง 5 ข้อ</button><button class="btn alt" onclick="alert('Demo: จะเชื่อมไปยัง #driver:home หลัง FI approval และ activation ในระบบจริง')">ดูตัวอย่าง Route2Own หลังอนุมัติ</button></div></div></div></div><div class="grid" style="margin-top:14px"><div class="card s12"><h3 style="margin-top:0">คะแนนตามหมวด</h3><div id="metrics"></div></div></div></section>
-<section id="questions" class="wrap" style="display:none"><div class="card support"><div class="q-head"><div><h2 style="margin:0">คำถามต่อเนื่อง</h2><p class="helper" style="margin:5px 0 0">ตอบทีละข้อเพื่อให้ระบบสาธิตแผนช่วยเหลือที่เหมาะขึ้น สามารถข้ามได้ทุกข้อ</p></div><span class="q-count" id="qCount">ข้อ 1 จาก 5</span></div><div id="questionHost"></div><div class="actions"><button class="btn alt" id="skipBtn" onclick="answerQuestion('ข้ามตอนนี้')">ข้ามตอนนี้</button></div></div></section>
-<section id="support" class="wrap" style="display:none"><div class="section-title"><div><h2>สรุปแผนต่อเนื่อง</h2><p>ผลนี้เป็นตัวอย่างจากคำตอบที่กรอกในเบราว์เซอร์ของคุณ</p></div></div><div class="grid"><div class="card s7"><div class="outcome" id="supportOutcome"></div><div class="actions" style="justify-content:flex-start"><button class="btn" onclick="alert('Demo: สร้างคำขอ F.A. Center แล้ว พร้อมสถานะ New → Triage')">ขอคำปรึกษา F.A. Center</button><button class="btn alt" onclick="showSection('readinessApply')">กลับไปปรับข้อมูล</button></div></div><div class="card s5"><h3 style="margin-top:0">Data Privacy ในระบบจริง</h3><p class="helper">ข้อมูลที่แชร์เพื่อการให้คำปรึกษาหรือส่งต่อพาร์ทเนอร์ต้องอยู่ภายใต้ความยินยอมและขอบเขตการใช้งานที่ระบุชัดเจน</p><div class="mini-kpi"><span>สถานะ case demo</span><b>Ready for Triage</b><span>ไม่ส่งข้อมูลจริงออกจากอุปกรณ์</span></div></div></div></section>
+<section class="hero"><div class="hero-inner"><div><div class="eyebrow">TCG ROUTE2OWN · FRONT-DOOR DEMO</div><h1>เริ่มจากความพร้อม<span>เดินหน้าสู่การเป็นเจ้าของ EV Taxi</span></h1><p>ระบบสาธิตการลงทะเบียน ตรวจสอบความพร้อม และวางแผนขั้นถัดไป สำหรับผู้ขับและพาร์ทเนอร์ โดยเชื่อมต่อสู่ Route2Own หลังผ่านขั้นตอนอนุมัติและ activation</p><div class="hero-actions"><button class="btn" onclick="showSection('demo')">ดูเคสสาธิต</button><button class="btn alt" onclick="showSection('apply')">ลองตรวจสิทธิ์ด้วยตัวเอง</button></div></div><aside class="hero-card"><h3>เส้นทางตัวอย่าง</h3><p>ระบบหน้าบ้านสาธิตการเตรียมข้อมูลและความพร้อมก่อนส่งต่อพิจารณา</p><div class="flow"><div><b>01</b>ลงทะเบียนสนใจ</div><div><b>02</b>ตรวจข้อมูลและความพร้อม</div><div><b>03</b>Readiness Certificate / แผนเสริม</div><div><b>04</b>ส่งต่อ FI → Activation → Route2Own</div></div></aside></div></section>
+
+<main>
+<section id="demo" class="wrap"><div class="section-title"><div><h2>เลือกเคสสาธิต</h2><p>กดโหลดเคสเพื่อดูผลตรวจความพร้อมและเส้นทางแนะนำทันที</p></div></div><div class="grid" id="caseGrid"></div></section>
+<section id="apply" class="wrap"><div class="section-title"><div><h2>ลองกรอกข้อมูลด้วยตัวเอง</h2><p>ใช้สำหรับทดลองระบบเท่านั้น ไม่มีการส่งข้อมูลไปยัง FI หรือใช้ตัดสินสินเชื่อ</p></div><span class="tag blue">Interactive Demo</span></div><div class="card form-card"><div class="steps"><span class="step active">1. โปรไฟล์</span><span class="step active">2. รายได้/การทำงาน</span><span class="step active">3. รถและพาร์ทเนอร์</span><span class="step active">4. ผลประเมิน</span></div><div class="form-grid"><div class="field"><label>ชื่อสำหรับการสาธิต</label><input id="name" placeholder="เช่น ผู้ขับสาธิต"></div><div class="field"><label>ประสบการณ์ขับรถรับจ้าง (เดือน)</label><input id="months" type="number" min="0" value="18"></div><div class="field"><label>รายได้เฉลี่ยต่อเดือน (บาท)</label><input id="income" type="number" min="0" value="26000"></div><div class="field"><label>ค่าใช้จ่ายจำเป็นต่อเดือน (บาท)</label><input id="expense" type="number" min="0" value="12000"></div><div class="field"><label>เงินสำรองที่มี (บาท)</label><input id="reserve" type="number" min="0" value="6000"></div><div class="field"><label>มี Co-op/Fleet รองรับหรือไม่</label><select id="partner"><option value="yes">มีพาร์ทเนอร์รองรับ</option><option value="no">ยังไม่มีพาร์ทเนอร์</option></select></div><div class="field"><label>เอกสาร/ใบอนุญาตพร้อมหรือไม่</label><select id="docs"><option value="yes">พร้อมครบสำหรับการสาธิต</option><option value="no">ยังต้องเติมเอกสาร</option></select></div><div class="field"><label>ผ่านกิจกรรมเตรียมความพร้อมหรือไม่</label><select id="learning"><option value="yes">ผ่าน/เข้าร่วมแล้ว</option><option value="no">ยังไม่เข้าร่วม</option></select></div></div><div class="notice"><b>หมายเหตุ:</b> คะแนน Readiness Score เป็นเครื่องมือสาธิตเพื่อแสดงความพร้อมและคำแนะนำ ไม่ใช่ credit score, การรับรองผล หรือการอนุมัติสินเชื่อจาก บสย. หรือสถาบันการเงิน</div><div class="actions"><button class="btn alt" onclick="loadCase('ready')">ใส่ค่าเคสตัวอย่าง</button><button class="btn" onclick="calculate()">คำนวณ Readiness Score</button></div></div></section>
+<section id="result" class="wrap hide"><div class="section-title"><div><h2>ผลการประเมินความพร้อม</h2><p>แสดงคะแนนรวม 3 คำแนะนำหลัก และรายละเอียดแต่ละหมวดเมื่อเลือกดู</p></div><button class="btn alt" onclick="showSection('apply')">ลองปรับข้อมูล</button></div><div class="card"><div class="result"><div class="score-box"><div class="tag" id="tierTag">BUILD READINESS</div><div class="score-ring" id="ring"><div><div class="score-num" id="scoreNum">74</div><div class="score-unit">/ 100</div></div></div><b id="tierLabel">Build Readiness</b><p id="scoreText">มีศักยภาพ และมีแผนเสริมความพร้อมก่อนส่งต่อ FI</p></div><div><h3 style="margin-top:0">3 คำแนะนำหลัก</h3><div id="recommendations"></div><div class="actions" style="justify-content:flex-start"><button class="btn" onclick="showSection('questions')">ตอบคำถามต่อเนื่อง 5 ข้อ</button><button class="btn alt" onclick="alert('Demo: จะเชื่อมไปยัง #driver:home หลัง FI approval และ activation ในระบบจริง')">ดูตัวอย่าง Route2Own หลังอนุมัติ</button></div></div></div></div><div class="grid" style="margin-top:14px"><div class="card s12"><h3 style="margin-top:0">คะแนนตามหมวด</h3><div id="metrics"></div></div></div></section>
+<section id="questions" class="wrap hide"><div class="card support"><div class="q-head"><div><h2 style="margin:0">คำถามต่อเนื่อง</h2><p class="helper" style="margin:5px 0 0">ตอบทีละข้อเพื่อให้ระบบสาธิตแผนช่วยเหลือที่เหมาะขึ้น สามารถข้ามได้ทุกข้อ</p></div><span class="q-count" id="qCount">ข้อ 1 จาก 5</span></div><div id="questionHost"></div><div class="actions"><button class="btn alt" id="skipBtn" onclick="answerQuestion('ข้ามตอนนี้')">ข้ามตอนนี้</button></div></div></section>
+<section id="support" class="wrap hide"><div class="section-title"><div><h2>สรุปแผนต่อเนื่อง</h2><p>ผลนี้เป็นตัวอย่างจากคำตอบที่กรอกในเบราว์เซอร์ของคุณ</p></div></div><div class="grid"><div class="card s7"><div class="outcome" id="supportOutcome"></div><div class="actions" style="justify-content:flex-start"><button class="btn" onclick="alert('Demo: สร้างคำขอ F.A. Center แล้ว พร้อมสถานะ New → Triage')">ขอคำปรึกษา F.A. Center</button><button class="btn alt" onclick="showSection('apply')">กลับไปปรับข้อมูล</button></div></div><div class="card s5"><h3 style="margin-top:0">Data Privacy ในระบบจริง</h3><p class="helper">ข้อมูลที่แชร์เพื่อการให้คำปรึกษาหรือส่งต่อพาร์ทเนอร์ต้องอยู่ภายใต้ความยินยอมและขอบเขตการใช้งานที่ระบุชัดเจน</p><div class="mini-kpi"><span>สถานะ case demo</span><b>Ready for Triage</b><span>ไม่ส่งข้อมูลจริงออกจากอุปกรณ์</span></div></div></div></section>
+</main>
+<footer class="footer"><b>TCG EV Taxi Guarantee — Demonstration only.</b><br>Readiness Score ใช้สื่อสารความพร้อมและแผนพัฒนา ไม่ใช่การตัดสินเครดิตหรือคำอนุมัติสินเชื่อ ข้อมูลที่ป้อนจะเก็บใน localStorage ของเบราว์เซอร์นี้เท่านั้นจนกว่าจะกดรีเซ็ต</footer>
 <script>
-var VIEWS={gateway:{el:'viewGateway'},driver:{el:'viewDriver'},partner:{el:'viewPartner'},tower:{el:'viewPartner'}};
-function go(name,screen){if(!VIEWS[name])name='gateway';for(var k in VIEWS){document.getElementById(VIEWS[k].el).classList.toggle('active',k===name);}if(name==='driver'&&screen)showDriver(screen);if((name==='partner'||name==='tower')&&screen)showPartner(screen);window.scrollTo({top:0,behavior:'smooth'});}
-function showDriver(id){document.querySelectorAll('#viewDriver .nav button').forEach(function(b){b.classList.toggle('active',b.dataset.screen===id)});document.querySelectorAll('#viewDriver .screen').forEach(function(s){s.classList.toggle('active',s.id===id)});}
-document.querySelectorAll('#viewDriver .nav button').forEach(function(b){b.onclick=function(){showDriver(b.dataset.screen)};});
-var partnerTitles={overview:'Executive Overview',pipeline:'Front-Door Pipeline',portfolio:'Active Portfolio',daily:'Daily Operations',incidents:'Inactivity & Incident Desk',ews:'Risk / EWS',cure:'PromptCure / Pre-TDR',elg:'Child E-LG / Assignment',exit:'Restructure / Exit',claim:'Claim & Recovery',finance:'Program Financial Control',partners:'Partners / Data / Audit'};
-function showPartner(id){document.querySelectorAll('#viewPartner .nav button').forEach(function(b){b.classList.toggle('active',b.dataset.screen===id)});document.querySelectorAll('#viewPartner .screen').forEach(function(s){s.classList.toggle('active',s.id===id)});document.getElementById('partnerTopTitle').textContent=partnerTitles[id]||'Partner & Control Tower';}
-document.querySelectorAll('#viewPartner .nav button').forEach(function(b){b.onclick=function(){showPartner(b.dataset.screen)};});
-var orgs={tcg:['บสย. / TCG'],risk:['บสย. - Risk'],claim:['บสย. - Claim'],fi:['KBank','Krungsri Auto','SCB Auto Finance','ttb DRIVE','CIMB Thai Auto'],coop:['Co-op A','Co-op B','Co-op C'],oem:['EV Partner 01','BaaS Partner 01'],data:['GPS / Data Partner 01'],payment:['Payment Servicer 01'],recovery:['Insurance / Recovery Partner 01']};
-var role=document.getElementById('roleSelect'),org=document.getElementById('orgSelect');
-function loadOrgs(){org.innerHTML='';(orgs[role.value]||[]).forEach(function(x){var o=document.createElement('option');o.textContent=x;org.appendChild(o)});applyRole();}
-role.onchange=loadOrgs;loadOrgs();
-function applyRole(){var r=role.value;var nav=document.querySelectorAll('#viewPartner .nav button');nav.forEach(function(b){b.style.display='';});function hide(list){list.forEach(function(s){var el=document.querySelector('#viewPartner .nav button[data-screen="'+s+'"]');if(el)el.style.display='none';});}function only(list){nav.forEach(function(b){b.style.display=list.indexOf(b.dataset.screen)>=0?'':'none';});}if(r==='fi'){hide(['finance','partners']);}if(r==='coop'){hide(['finance','claim','partners']);}if(r==='oem'){only(['overview','incidents','partners']);}if(r==='data'){only(['overview','daily','partners']);}if(r==='payment'){only(['overview','daily','partners']);}if(r==='recovery'){only(['overview','exit','claim','partners']);}}
-function openIncident(){document.getElementById('incidentModal').classList.add('show');}
-function closeIncident(){document.getElementById('incidentModal').classList.remove('show');}
-function submitIncident(){alert('Demo: ส่งแจ้งเหตุแล้ว → Inactivity & Incident Desk. ระบบจะไม่ปรับเครดิตอัตโนมัติ');closeIncident();}
-const CASES={ready:{title:'เคส A · Ready to Own',tag:'READY TO OWN',cls:'green',desc:'รายได้และการทำงานสม่ำเสมอ มีเอกสารและ Co-op/Fleet รองรับ',data:{name:'คุณอรุณ (สาธิต)',months:30,income:32000,expense:12000,reserve:18000,partner:'yes',docs:'yes',learning:'yes'}},build:{title:'เคส B · Build Readiness',tag:'BUILD READINESS',cls:'amber',desc:'มีศักยภาพ แต่ควรเพิ่มเงินสำรองและหลักฐานรายได้ต่อเนื่อง',data:{name:'คุณเบญ (สาธิต)',months:12,income:23000,expense:12500,reserve:3000,partner:'yes',docs:'yes',learning:'no'}},support:{title:'เคส C · Need Support',tag:'NEED SUPPORT',cls:'red',desc:'รายได้และเงินสำรองตึง ควรวางแผนกับ F.A. Center ก่อน',data:{name:'คุณชัย (สาธิต)',months:5,income:17000,expense:13000,reserve:500,partner:'no',docs:'no',learning:'no'}},partner:{title:'เคส D · Partner Intake',tag:'CO-OP / FLEET',cls:'blue',desc:'ตัวอย่างการส่งต่อผู้ขับจาก Co-op/Fleet เข้าสู่ readiness pipeline',data:{name:'Co-op Referral (สาธิต)',months:20,income:28000,expense:11500,reserve:9000,partner:'yes',docs:'yes',learning:'yes'}}};
-const questions=[['รายได้ของคุณใน 30 วันข้างหน้าคาดว่าจะเปลี่ยนอย่างไร?',['เพิ่มขึ้น','ใกล้เคียงเดิม','ลดลง','ยังไม่แน่ใจ']],['คุณมีเงินสำรองสำหรับค่าใช้จ่ายจำเป็นได้กี่วัน?',['ยังไม่มี','1–7 วัน','8–14 วัน','มากกว่า 14 วัน']],['อะไรเป็นอุปสรรคหลักต่อการทำงานต่อเนื่อง?',['รถหรือการชาร์จ','สุขภาพ','ปริมาณผู้โดยสาร','ค่าใช้จ่าย','เอกสาร','อื่น ๆ']],['คุณอยากให้ F.A. Center ช่วยเรื่องใดก่อน?',['วางแผนรายรับรายจ่าย','วางแผนภาระชำระ','รถหยุดวิ่ง','เพิ่มรายได้','ยังไม่ต้องการ']],['คุณต้องการติดตามแผนผ่านช่องทางใด?',['ดูในระบบ','โทรศัพท์','LINE','นัดหมายออนไลน์']]];
+const CASES={
+ ready:{title:'เคส A · Ready to Own',tag:'READY TO OWN',cls:'green',desc:'รายได้และการทำงานสม่ำเสมอ มีเอกสารและ Co-op/Fleet รองรับ',data:{name:'คุณอรุณ (สาธิต)',months:30,income:32000,expense:12000,reserve:18000,partner:'yes',docs:'yes',learning:'yes'}},
+ build:{title:'เคส B · Build Readiness',tag:'BUILD READINESS',cls:'amber',desc:'มีศักยภาพ แต่ควรเพิ่มเงินสำรองและหลักฐานรายได้ต่อเนื่อง',data:{name:'คุณเบญ (สาธิต)',months:12,income:23000,expense:12500,reserve:3000,partner:'yes',docs:'yes',learning:'no'}},
+ support:{title:'เคส C · Need Support',tag:'NEED SUPPORT',cls:'red',desc:'รายได้และเงินสำรองตึง ควรวางแผนกับ F.A. Center ก่อน',data:{name:'คุณชัย (สาธิต)',months:5,income:17000,expense:13000,reserve:500,partner:'no',docs:'no',learning:'no'}},
+ partner:{title:'เคส D · Partner Intake',tag:'CO-OP / FLEET',cls:'blue',desc:'ตัวอย่างการส่งต่อผู้ขับจาก Co-op/Fleet เข้าสู่ readiness pipeline',data:{name:'Co-op Referral (สาธิต)',months:20,income:28000,expense:11500,reserve:9000,partner:'yes',docs:'yes',learning:'yes'}}
+};
+const questions=[
+ ['รายได้ของคุณใน 30 วันข้างหน้าคาดว่าจะเปลี่ยนอย่างไร?',['เพิ่มขึ้น','ใกล้เคียงเดิม','ลดลง','ยังไม่แน่ใจ']],
+ ['คุณมีเงินสำรองสำหรับค่าใช้จ่ายจำเป็นได้กี่วัน?',['ยังไม่มี','1–7 วัน','8–14 วัน','มากกว่า 14 วัน']],
+ ['อะไรเป็นอุปสรรคหลักต่อการทำงานต่อเนื่อง?',['รถหรือการชาร์จ','สุขภาพ','ปริมาณผู้โดยสาร','ค่าใช้จ่าย','เอกสาร','อื่น ๆ']],
+ ['คุณอยากให้ F.A. Center ช่วยเรื่องใดก่อน?',['วางแผนรายรับรายจ่าย','วางแผนภาระชำระ','รถหยุดวิ่ง','เพิ่มรายได้','ยังไม่ต้องการ']],
+ ['คุณต้องการติดตามแผนผ่านช่องทางใด?',['ดูในระบบ','โทรศัพท์','LINE','นัดหมายออนไลน์']]
+];
 let qIndex=0,answers=[],lastScore=0;
 function esc(s){return String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));}
-function renderCases(){document.getElementById('caseGrid').innerHTML=Object.entries(CASES).map(([k,c])=>'<article class="case-card"><span class="tag '+c.cls+'">'+c.tag+'</span><h3>'+c.title+'</h3><p>'+c.desc+'</p><button class="btn alt" onclick="loadCase(\''+k+'\')">โหลดเคสนี้</button></article>').join('');}
+function renderCases(){document.getElementById('caseGrid').innerHTML=Object.entries(CASES).map(([k,c])=>`<article class="case s3"><span class="tag ${c.cls}">${c.tag}</span><h3>${c.title}</h3><p>${c.desc}</p><button class="btn alt" onclick="loadCase('${k}')">โหลดเคสนี้</button></article>`).join('');}
 function showSection(id){document.getElementById(id).scrollIntoView({behavior:'smooth',block:'start'});}
 function loadCase(key){let c=CASES[key];Object.entries(c.data).forEach(([id,v])=>document.getElementById(id).value=v);document.getElementById('statusText').textContent='กำลังใช้ '+c.title;saveForm();calculate();}
 function n(id){return Math.max(0,Number(document.getElementById(id).value)||0)}
-function calculate(){let months=n('months'),income=n('income'),expense=n('expense'),reserve=n('reserve'),partner=document.getElementById('partner').value,docs=document.getElementById('docs').value,learning=document.getElementById('learning').value;let work=Math.min(25,Math.round(months/24*25));let incomeScore=income>=30000?25:income>=24000?21:income>=18000?16:10;let surplus=Math.max(0,income-expense),cash=Math.min(25,Math.round((surplus/10000)*13+(reserve/12000)*12));let docsScore=(partner==='yes'?8:2)+(docs==='yes'?7:2);let learn=learning==='yes'?10:3;let score=Math.min(100,work+incomeScore+cash+docsScore+learn);lastScore=score;let tier=score>=80?'Ready to Own':score>=60?'Build Readiness':score>=40?'Need Support':'Start with Foundation';let tierClass=score>=80?'green':score>=60?'amber':'red';let txt=score>=80?'พร้อมส่งต่อเพื่อพิจารณากับ FI ตามขั้นตอนของโครงการ':score>=60?'มีศักยภาพ และมีแผนเสริมความพร้อมก่อนส่งต่อ FI':'ควรเริ่มจากแผนสร้างความพร้อมและรับคำปรึกษาเพิ่มเติม';document.getElementById('tierTag').textContent=tier.toUpperCase();document.getElementById('tierTag').className='tag '+tierClass;document.getElementById('tierLabel').textContent=tier;document.getElementById('scoreNum').textContent=score;document.getElementById('scoreText').textContent=txt;document.getElementById('ring').style.setProperty('--deg',(score*3.6)+'deg');let metrics=[['ความต่อเนื่องของงาน',work,25,'เพิ่มหลักฐานการทำงาน/การให้บริการอย่างต่อเนื่อง และกลับมาอัปเดตข้อมูลเมื่อมีประสบการณ์เพิ่มขึ้น'],['คุณภาพและเสถียรภาพรายได้',incomeScore,25,'เก็บหลักฐานรายได้สม่ำเสมอ และติดตามแนวโน้มรายรับเพื่อเห็นความต่อเนื่อง'],['กระแสเงินสดและความสามารถรับภาระ',cash,25,'ทำงบรายรับ-รายจ่าย ลดค่าใช้จ่ายที่ไม่จำเป็น และตั้งเป้าเงินสำรองรายสัปดาห์'],['ความพร้อมเอกสาร/พันธมิตร',docsScore,15,'ตรวจเอกสารที่เกี่ยวข้อง และประสาน Co-op/Fleet เพื่อให้ข้อมูลพร้อมก่อนส่งต่อ'],['ความพร้อมต่อเนื่องและการเรียนรู้',learn,10,'เข้าร่วมกิจกรรมเตรียมความพร้อมและทบทวนแผนการเงินก่อนยื่นเรื่อง']];document.getElementById('metrics').innerHTML=metrics.map((m,i)=>'<div class="metric"><div class="metric-head"><span>'+m[0]+'</span><span>'+m[1]+' / '+m[2]+'</span></div><div class="progress"><span style="width:'+(m[1]/m[2]*100)+'%"></span></div><button onclick="this.parentElement.classList.toggle(\'open\')">ดูวิธีเพิ่มคะแนน</button><div class="tips">'+m[3]+'</div></div>').join('');let rec=[];if(cash<18)rec.push(['สร้างเงินสำรองให้ถึงเป้าหมาย','วางเป้าหมายเงินสำรองรายสัปดาห์จากรายได้สุทธิ เพื่อรับมือวันรายได้สะดุด']);if(incomeScore<21)rec.push(['บันทึกหลักฐานรายได้ต่อเนื่อง','ช่วยให้เห็นแนวโน้มรายได้และใช้วางแผนกระแสเงินสดได้ชัดเจนขึ้น']);if(docsScore<12)rec.push(['เตรียมเอกสารและพาร์ทเนอร์','ตรวจรายการเอกสารและประสาน Co-op/Fleet ให้ครบก่อนส่งต่อ']);if(learn<8)rec.push(['เข้าร่วมกิจกรรมเตรียมความพร้อม','ทบทวนแผนรายรับ-รายจ่ายและทางเลือกช่วยเหลือกับ F.A. Center']);if(work<18)rec.push(['สร้างประวัติการทำงานต่อเนื่อง','เก็บข้อมูลการทำงานต่อเนื่องแล้วประเมินใหม่ในระยะถัดไป']);while(rec.length<3)rec.push(['ทบทวนแผน 30 วัน','ติดตามรายรับ รายจ่าย และเป้าหมายเงินสำรองอย่างต่อเนื่อง']);document.getElementById('recommendations').innerHTML=rec.slice(0,3).map((r,i)=>'<div class="recommend"><b>'+(i+1)+'. '+r[0]+'</b><span>'+r[1]+'</span></div>').join('');document.getElementById('readinessResult').classList.remove('hide');saveForm();showSection('readinessResult');}
-function renderQuestion(){let [title,opts]=questions[qIndex];document.getElementById('qCount').textContent='ข้อ '+(qIndex+1)+' จาก 5';document.getElementById('questionHost').innerHTML='<div class="question active"><h3>'+title+'</h3><div class="answers">'+opts.map(x=>'<button class="answer" onclick="answerQuestion(\''+x.replace(/'/g,"\\'")+'\')">'+x+'</button>').join('')+'</div></div>';}
-function answerQuestion(val){answers.push(val);qIndex++;if(qIndex<questions.length){renderQuestion();return;}let priority=answers[3]||'วางแผนรายรับรายจ่าย';document.getElementById('supportOutcome').innerHTML='<b>สรุปจากคำตอบต่อเนื่อง</b><br>ระบบสาธิตจะแนะนำให้เริ่มจาก <b>'+esc(priority)+'</b> และติดตามแผนผ่านช่องทาง <b>'+esc(answers[4]||'ดูในระบบ')+'</b> คะแนนล่าสุดคือ <b>'+lastScore+'/100</b> ข้อมูลนี้ใช้เพื่อสร้างแผนสาธิตและไม่เปลี่ยนผลการพิจารณาสินเชื่อ';document.getElementById('support').classList.remove('hide');showSection('support');localStorage.setItem('tcg_demo_answers',JSON.stringify(answers));}
+function calculate(){let months=n('months'),income=n('income'),expense=n('expense'),reserve=n('reserve'),partner=document.getElementById('partner').value,docs=document.getElementById('docs').value,learning=document.getElementById('learning').value;let work=Math.min(25,Math.round(months/24*25));let incomeScore=income>=30000?25:income>=24000?21:income>=18000?16:10;let surplus=Math.max(0,income-expense),cash=Math.min(25,Math.round((surplus/10000)*13+(reserve/12000)*12));let docsScore=(partner==='yes'?8:2)+(docs==='yes'?7:2);let learn=learning==='yes'?10:3;let score=Math.min(100,work+incomeScore+cash+docsScore+learn);lastScore=score;let tier=score>=80?'Ready to Own':score>=60?'Build Readiness':score>=40?'Need Support':'Start with Foundation';let tierClass=score>=80?'green':score>=60?'amber':'red';let txt=score>=80?'พร้อมส่งต่อเพื่อพิจารณากับ FI ตามขั้นตอนของโครงการ':score>=60?'มีศักยภาพ และมีแผนเสริมความพร้อมก่อนส่งต่อ FI':'ควรเริ่มจากแผนสร้างความพร้อมและรับคำปรึกษาเพิ่มเติม';document.getElementById('tierTag').textContent=tier.toUpperCase();document.getElementById('tierTag').className='tag '+tierClass;document.getElementById('tierLabel').textContent=tier;document.getElementById('scoreNum').textContent=score;document.getElementById('scoreText').textContent=txt;document.getElementById('ring').style.setProperty('--deg',(score*3.6)+'deg');let metrics=[['ความต่อเนื่องของงาน',work,25,'เพิ่มหลักฐานการทำงาน/การให้บริการอย่างต่อเนื่อง และกลับมาอัปเดตข้อมูลเมื่อมีประสบการณ์เพิ่มขึ้น'],['คุณภาพและเสถียรภาพรายได้',incomeScore,25,'เก็บหลักฐานรายได้สม่ำเสมอ และติดตามแนวโน้มรายรับเพื่อเห็นความต่อเนื่อง'],['กระแสเงินสดและความสามารถรับภาระ',cash,25,'ทำงบรายรับ-รายจ่าย ลดค่าใช้จ่ายที่ไม่จำเป็น และตั้งเป้าเงินสำรองรายสัปดาห์'],['ความพร้อมเอกสาร/พันธมิตร',docsScore,15,'ตรวจเอกสารที่เกี่ยวข้อง และประสาน Co-op/Fleet เพื่อให้ข้อมูลพร้อมก่อนส่งต่อ'],['ความพร้อมต่อเนื่องและการเรียนรู้',learn,10,'เข้าร่วมกิจกรรมเตรียมความพร้อมและทบทวนแผนการเงินก่อนยื่นเรื่อง']];document.getElementById('metrics').innerHTML=metrics.map((m,i)=>`<div class="metric"><div class="metric-head"><span>${m[0]}</span><span>${m[1]} / ${m[2]}</span></div><div class="progress"><span style="width:${m[1]/m[2]*100}%"></span></div><button onclick="this.parentElement.classList.toggle('open')">ดูวิธีเพิ่มคะแนน</button><div class="tips">${m[3]}</div></div>`).join('');let rec=[];if(cash<18)rec.push(['สร้างเงินสำรองให้ถึงเป้าหมาย','วางเป้าหมายเงินสำรองรายสัปดาห์จากรายได้สุทธิ เพื่อรับมือวันรายได้สะดุด']);if(incomeScore<21)rec.push(['บันทึกหลักฐานรายได้ต่อเนื่อง','ช่วยให้เห็นแนวโน้มรายได้และใช้วางแผนกระแสเงินสดได้ชัดเจนขึ้น']);if(docsScore<12)rec.push(['เตรียมเอกสารและพาร์ทเนอร์','ตรวจรายการเอกสารและประสาน Co-op/Fleet ให้ครบก่อนส่งต่อ']);if(learn<8)rec.push(['เข้าร่วมกิจกรรมเตรียมความพร้อม','ทบทวนแผนรายรับ-รายจ่ายและทางเลือกช่วยเหลือกับ F.A. Center']);if(work<18)rec.push(['สร้างประวัติการทำงานต่อเนื่อง','เก็บข้อมูลการทำงานต่อเนื่องแล้วประเมินใหม่ในระยะถัดไป']);while(rec.length<3)rec.push(['ทบทวนแผน 30 วัน','ติดตามรายรับ รายจ่าย และเป้าหมายเงินสำรองอย่างต่อเนื่อง']);document.getElementById('recommendations').innerHTML=rec.slice(0,3).map((r,i)=>`<div class="recommend"><b>${i+1}. ${r[0]}</b><span>${r[1]}</span></div>`).join('');document.getElementById('result').classList.remove('hide');saveForm();showSection('result');}
+function renderQuestion(){let [title,opts]=questions[qIndex];document.getElementById('qCount').textContent=`ข้อ ${qIndex+1} จาก 5`;document.getElementById('questionHost').innerHTML=`<div class="question active"><h3>${title}</h3><div class="answers">${opts.map(x=>`<button class="answer" onclick="answerQuestion('${x.replace(/'/g,"\\'")}')">${x}</button>`).join('')}</div></div>`;}
+function answerQuestion(val){answers.push(val);qIndex++;if(qIndex<questions.length){renderQuestion();return;}let priority=answers[3]||'วางแผนรายรับรายจ่าย';document.getElementById('supportOutcome').innerHTML=`<b>สรุปจากคำตอบต่อเนื่อง</b><br>ระบบสาธิตจะแนะนำให้เริ่มจาก <b>${esc(priority)}</b> และติดตามแผนผ่านช่องทาง <b>${esc(answers[4]||'ดูในระบบ')}</b> คะแนนล่าสุดคือ <b>${lastScore}/100</b> ข้อมูลนี้ใช้เพื่อสร้างแผนสาธิตและไม่เปลี่ยนผลการพิจารณาสินเชื่อ`;document.getElementById('support').classList.remove('hide');showSection('support');localStorage.setItem('tcg_demo_answers',JSON.stringify(answers));}
 function saveForm(){let ids=['name','months','income','expense','reserve','partner','docs','learning'];let d={};ids.forEach(i=>d[i]=document.getElementById(i).value);localStorage.setItem('tcg_ev_taxi_demo_form',JSON.stringify(d));}
 function restore(){try{let d=JSON.parse(localStorage.getItem('tcg_ev_taxi_demo_form')||'{}');Object.keys(d).forEach(k=>{let e=document.getElementById(k);if(e)e.value=d[k]});}catch(e){}}
 function resetDemo(){localStorage.removeItem('tcg_ev_taxi_demo_form');localStorage.removeItem('tcg_demo_answers');location.hash='';location.reload();}
-document.querySelectorAll('#readinessApply input,#readinessApply select').forEach(e=>e.addEventListener('change',saveForm));renderCases();restore();renderQuestion();
-if(location.hash==='#apply')showSection('readinessApply'); if(location.hash==='#demo-ready')loadCase('ready');
+document.querySelectorAll('#apply input,#apply select').forEach(e=>e.addEventListener('change',saveForm));renderCases();restore();renderQuestion();
+if(location.hash==='#apply')showSection('apply'); if(location.hash==='#demo-ready')loadCase('ready');
 </script>
 </body>
 </html>
