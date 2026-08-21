@@ -63,6 +63,12 @@
     @media(max-width:650px){.gate-top .brand-lockup{gap:7px}.gate-top .tcg-logo{width:66px;height:46px}}
     @media(max-width:960px){.gateway-content{grid-template-columns:1fr}.gateway-intro{align-items:flex-start;flex-direction:column}.app{grid-template-columns:78px 1fr}.side .brand span,.side .brand small,.side-badge,.nav button span,.nav .group,.backhome b{display:none}.nav button{text-align:center;font-size:18px}.card.kpi{grid-column:span 6}.s4,.s5,.s6,.s7,.s8{grid-column:span 12}.role-gate{grid-template-columns:1fr 1fr}.split{grid-template-columns:1fr}}
     @media(max-width:650px){body{overflow-x:hidden}.gate-top{padding:14px 16px}.gate-hero,.gateway-content,.flow{width:min(100% - 24px,1200px)}.gate-hero{padding:18px 0 28px}.gateway-hero-frame{border-radius:16px}.gateway-hero-image{object-fit:contain}.gateway-intro{margin-top:15px;padding:0}.gateway-intro h1{font-size:27px}.gateway-intro-actions{width:100%}.gateway-intro-actions .btn{flex:1}.fa-card{grid-template-columns:1fr}.fa-illustration{min-height:210px}.steps{grid-template-columns:1fr 1fr}.app{display:block;min-width:0}.side{position:relative;height:auto;display:flex;gap:12px;align-items:center;padding:11px;overflow:hidden}.side .brand{flex:0 0 auto}.nav{display:flex;overflow-x:auto;margin-top:0;scrollbar-width:thin}.nav button{min-width:46px;width:auto;flex:0 0 auto}.topbar{position:relative;align-items:flex-start;flex-direction:column}.selectors{width:100%;overflow:auto}.content{padding:13px;min-width:0}.card.kpi{grid-column:span 12}.page-title,.title{align-items:flex-start;flex-direction:column}.role-gate{grid-template-columns:1fr}.metric-grid{grid-template-columns:1fr}.funnel{grid-template-columns:repeat(2,1fr)}.form-grid{grid-template-columns:1fr}.form-grid .full{grid-column:auto}.toolbar{align-items:stretch}.toolbar .field{min-width:calc(50% - 4px)}.tblwrap{max-width:100%;overflow-x:auto}.modal-card{padding:17px}.hero-visual{min-height:300px}.fa-service-head{flex-direction:column}.service-grid{grid-template-columns:1fr}.contact-actions .btn{width:100%}}
+    .day-hero{background:linear-gradient(145deg,#eefaff,#fff);border-color:#cfe9f4;margin-bottom:13px}.day-hero-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}.day-hero-head h3{margin:5px 0 5px;font-size:23px;color:var(--navy)}.day-hero-head p{margin:0;color:var(--muted);font-size:12px;line-height:1.6}.day-hero-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+    .xray-flow{display:grid;gap:0}.xray-step{border:1px solid #e2edf3;border-radius:14px;padding:13px 15px;background:rgba(255,255,255,.92)}.xray-step .value{font-size:22px;margin-top:4px}.xray-step.minus .value{color:var(--danger)}.xray-arrow{justify-self:center;color:#9fb4c4;font-size:16px;line-height:1;padding:6px 0}.xray-hero{border-radius:18px;padding:18px 20px;background:linear-gradient(140deg,#071a33,#0a4f86);color:#fff;box-shadow:0 16px 38px rgba(7,26,51,.22)}.xray-hero .label,.xray-hero .mini{color:#c7e7f5}.xray-hero .value{font-size:38px;letter-spacing:-.02em;margin-top:6px}.xray-tag{display:block;margin-top:5px;font-size:10.5px;font-weight:900;letter-spacing:.14em;color:#74e6dc}.xray-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+    .badge{display:inline-flex;align-items:center;gap:5px;border-radius:999px;padding:5px 9px;font-size:10.5px;font-weight:900;margin-top:6px}.badge.ok{background:#e8fbf3;color:#08714e;border:1px solid #bfead9}.badge.pending{background:#fff4db;color:#895e00;border:1px solid #f0d796}.badge.sim{background:#eef2ff;color:#3b3f9e;border:1px solid #cfd6f7}.src{display:inline-block;margin-top:6px;padding:3px 8px;border-radius:7px;background:#f1f6fa;color:#5b7288;font-size:10px;font-weight:800}
+    .own-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-top:12px}.own-item{border:1px solid #e2edf3;border-radius:14px;padding:12px;background:rgba(255,255,255,.9)}.own-item .value{font-size:19px}.own-item .value.up{color:var(--success)}.opex-detail{margin-top:10px;border-top:1px dashed #dbe7ee;padding-top:10px}.empty-day{text-align:center;padding:26px 14px}.sim-card{border-color:#cfd6f7;background:linear-gradient(145deg,#f6f7ff,#fff);margin-top:13px}
+    @media(max-width:900px){.own-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+    @media(max-width:650px){.xray-grid,.own-grid{grid-template-columns:1fr}.xray-hero{padding:16px}.xray-hero .value{font-size:30px}.xray-step .value{font-size:20px}.day-hero-head{flex-direction:column}.day-hero-actions .btn{flex:1 1 100%}.day-hero-head h3{font-size:20px}}
   </style>
 </head>
 <body>
@@ -137,14 +143,43 @@
           <section id="driver-home" class="screen active">
             <div class="page-title"><div><h2>วันนี้ของฉัน</h2><p>รายได้ การขับ การจัดสรร และเส้นทางสู่การเป็นเจ้าของ</p></div><div class="actions"><button class="btn ghost" onclick="go('driver','ownership')">ดูแผนชำระเงิน</button><button class="btn primary" onclick="openIncident()">แจ้งหยุดวิ่ง / ขอความช่วยเหลือ</button></div></div>
             <div class="notice"><b>หลักการ:</b> Route2Own ใช้ KM/EMU เพื่อจัดจังหวะ PAYD เท่านั้น ไม่ได้สร้างหนี้ตามกิโลเมตร และ DPD/Arrears มาจาก FI เท่านั้น</div>
+            <section class="card pad day-hero" aria-labelledby="dayHeroTitle">
+              <div class="day-hero-head">
+                <div><span class="label">Daily Financial Companion</span><h3 id="dayHeroTitle">เช็กเงินวันนี้</h3><p class="mini" id="dayHeroLead">วันนี้รายได้เท่าไร หลังกันต้นทุนทำมาหากินและเงินใช้ชีวิตแล้ว จ่ายไหวจริงเท่าไร</p></div>
+                <span class="pill blue" id="dayHeroBadge">กำลังโหลด</span>
+              </div>
+              <div class="day-hero-actions">
+                <button class="btn primary" type="button" id="dayReportBtn" onclick="openDailyIncome()">+ บันทึกรายได้วันนี้</button>
+                <button class="btn ghost" type="button" id="daySimBtn" aria-expanded="false" aria-controls="driverSimPanel" onclick="toggleSimulation()">ลองคำนวณก่อน</button>
+                <button class="btn ghost" type="button" onclick="openZeroIncome()">วันนี้ไม่มีรายได้</button>
+              </div>
+            </section>
             <div class="metric-grid" id="driverTodayMetrics"></div>
-            <div class="split" style="margin-top:13px">
-              <div class="card pad"><div class="section-head"><h3>ภาพรวมการเงินรายวัน</h3><span class="pill blue">ปรับค่าได้</span></div><div class="form-grid">
+            <section class="card pad" style="margin-top:13px" aria-labelledby="xrayTitle">
+              <div class="section-head"><h3 id="xrayTitle">ภาพการเงินของวันนี้ · Today's Financial X-Ray</h3><span class="pill blue" id="xraySourcePill">แหล่งข้อมูล</span></div>
+              <div id="driverXray"></div>
+            </section>
+            <section class="card pad" style="margin-top:13px" aria-labelledby="principalTitle">
+              <div class="section-head"><h3 id="principalTitle">เงินต้นของฉัน</h3><span class="pill blue">Principal Allocation</span></div>
+              <div id="driverPrincipal"></div>
+            </section>
+            <section class="card pad" style="margin-top:13px" aria-labelledby="ownershipTitle">
+              <div class="section-head"><h3 id="ownershipTitle">เส้นทางสู่การเป็นเจ้าของรถ</h3><span class="pill blue">ประมาณการ</span></div>
+              <div id="driverOwnership"></div>
+            </section>
+            <section class="card pad sim-card" id="driverSimPanel" hidden aria-labelledby="simTitle">
+              <div class="section-head"><h3 id="simTitle">ลองคำนวณก่อน</h3><span class="badge sim">Simulation · ไม่ใช่รายการจริง</span></div>
+              <p class="mini" style="margin:0 0 10px">ทดลองใส่ตัวเลขเพื่อดูผลลัพธ์ โดยไม่บันทึกเป็นข้อมูลจริง ไม่เปลี่ยนรายการเดินบัญชี ประวัติการชำระ สถานะจาก FI จำนวนวันค้างชำระ หรือสถานะเฝ้าระวัง</p>
+              <div class="form-grid">
                 <div class="field"><label for="xrayRevenue">รายได้รวมวันนี้</label><input id="xrayRevenue" type="number" step="0.01" value="1850.52"></div>
                 <div class="field"><label for="xrayVerifyRate">อัตรายืนยันรายได้ (%)</label><input id="xrayVerifyRate" type="number" step="0.1" value="95"></div>
                 <div class="field"><label for="xrayOpex">ค่าใช้จ่ายดำเนินงานที่ยอมรับได้</label><input id="xrayOpex" type="number" step="0.01" value="477.45"></div>
                 <div class="field"><label for="xrayProtected">เงินคงเหลือคุ้มครองการดำรงชีพ</label><input id="xrayProtected" type="number" step="0.01" value="600"></div>
-              </div><div class="callout" style="margin-top:12px"><b>เงินพร้อมจัดสรร</b><div class="value" id="xrayAvailable">฿680.54</div><span class="mini">รายได้ที่ตรวจสอบแล้ว − OpEx − เงินคงเหลือคุ้มครองการดำรงชีพ</span></div></div>
+              </div>
+              <div class="callout" style="margin-top:12px"><b>เงินพร้อมจัดสรร (ประมาณการ)</b><div class="value" id="xrayAvailable">฿680.54</div><span class="mini">รายได้ที่ตรวจสอบได้ − ต้นทุนอาชีพ − เงินกันไว้ใช้ชีวิต</span></div>
+              <div class="tblwrap" id="xraySimOut" style="margin-top:12px"></div>
+            </section>
+            <div style="margin-top:13px">
               <div class="card pad"><div class="section-head"><h3>แผนวันนี้</h3><span class="pill green">ปกติ</span></div><div class="timeline"><div class="timeline-item"><span class="timeline-dot"></span><div><b>รับรายได้และยืนยันแหล่งข้อมูล</b><small>รายได้ยืนยันแล้ว 95%</small></div></div><div class="timeline-item"><span class="timeline-dot"></span><div><b>กันต้นทุนอาชีพและเงินคุ้มครอง</b><small>ไม่คำนวณซ้ำ</small></div></div><div class="timeline-item"><span class="timeline-dot"></span><div><b>จัดสรร การจ่ายตามรายได้แบบยืดหยุ่น (PAYD)</b><small>เป้าหมาย 477.69 บาท · ยอดหักไม่เกินเงินพร้อมจัดสรร</small></div></div><div class="timeline-item"><span class="timeline-dot"></span><div><b>ติดตามเงินต้น</b><small>แนวโน้มเงินต้น เป็นไปตามแผน</small></div></div></div></div>
             </div>
           </section>
@@ -460,6 +495,31 @@
     </div>
   </div>
 
+  <div class="modal" id="dailyIncomeModal" role="dialog" aria-modal="true" aria-labelledby="dailyIncomeTitle">
+    <div class="modal-card"><button class="close" type="button" onclick="closeDailyIncome()" aria-label="ปิดแบบฟอร์มบันทึกรายได้">×</button><h3 id="dailyIncomeTitle">บันทึกรายได้วันนี้</h3><p class="mini">ข้อมูลที่กรอกเองจะถูกทำเครื่องหมายว่า &ldquo;ผู้ขับกรอกเอง · รอตรวจสอบ&rdquo; และใช้เป็นประมาณการเท่านั้น ยังไม่ใช่ยอดที่ใช้สำหรับการจัดสรรเงินจริง</p>
+      <form id="dailyIncomeForm" novalidate>
+        <div class="form-grid">
+          <div class="field full"><label for="dailyGross">รายได้รวมวันนี้ (บาท) *</label><input id="dailyGross" type="number" step="0.01" min="0" inputmode="decimal" placeholder="0.00" required><div class="error" id="dailyGrossError">กรุณากรอกรายได้รวมวันนี้</div></div>
+          <div class="field"><label for="dailyApp">รายได้จากแอป / แพลตฟอร์ม (บาท)</label><input id="dailyApp" type="number" step="0.01" min="0" inputmode="decimal" placeholder="ไม่บังคับ"><div class="error" id="dailyAppError">กรุณากรอกเป็นตัวเลขไม่ติดลบ</div></div>
+          <div class="field"><label for="dailyCash">รายได้เงินสด (บาท)</label><input id="dailyCash" type="number" step="0.01" min="0" inputmode="decimal" placeholder="ไม่บังคับ"><div class="error" id="dailyCashError">กรุณากรอกเป็นตัวเลขไม่ติดลบ</div></div>
+          <div class="field"><label for="dailyKm">ระยะทางวันนี้ (กม.)</label><input id="dailyKm" type="number" step="1" min="0" inputmode="decimal" placeholder="ไม่บังคับ"><div class="error" id="dailyKmError">กรุณากรอกเป็นตัวเลขไม่ติดลบ</div></div>
+          <div class="field"><label for="dailyEmu">EMU วันนี้</label><input id="dailyEmu" type="number" step="1" min="0" inputmode="decimal" placeholder="ไม่บังคับ"><div class="error" id="dailyEmuError">กรุณากรอกเป็นตัวเลขไม่ติดลบ</div></div>
+          <div class="field full"><label for="dailyNote">หมายเหตุ</label><textarea id="dailyNote" rows="3" placeholder="เช่น วันนี้วิ่งครึ่งวันเพราะฝนตก"></textarea></div>
+        </div>
+        <div class="notice" id="dailySplitError" style="margin:10px 0 0" hidden>รายได้จากแอปรวมกับเงินสดมากกว่ารายได้รวมวันนี้</div>
+        <p class="mini" style="margin:10px 0 0">ระยะทางที่กรอกเองจะไม่ถูกนับเป็น EMU โดยอัตโนมัติ เพราะ EMU ต้องมาจากการแปลงค่าจากข้อมูลการเดินทางที่ตรวจสอบแล้ว</p>
+        <div class="actions" style="margin-top:14px"><button class="btn ghost" type="button" onclick="closeDailyIncome()">ยกเลิก</button><button class="btn primary" type="submit">คำนวณเงินที่จ่ายไหววันนี้</button></div>
+      </form>
+    </div>
+  </div>
+
+  <div class="modal" id="zeroIncomeModal" role="dialog" aria-modal="true" aria-labelledby="zeroIncomeTitle">
+    <div class="modal-card" style="width:min(470px,94vw)"><button class="close" type="button" onclick="closeZeroIncome()" aria-label="ปิดหน้าต่างยืนยัน">×</button><h3 id="zeroIncomeTitle">ยืนยันว่า วันนี้ยังไม่มีรายได้ใช่หรือไม่?</h3><p class="mini">เมื่อยืนยัน ระบบจะบันทึกรายได้วันนี้เป็น ฿0 และไม่มีการหัก PAYD</p>
+      <div class="callout warn" style="margin-top:12px"><b>PAYD = 0 ไม่ได้หมายความว่ายอดครบกำหนดตามสัญญาหรือ DPD ของสถาบันการเงินเป็นศูนย์</b><p class="mini" style="margin:6px 0 0">สถานะสินเชื่อและจำนวนวันค้างชำระยังคงกำหนดโดยสถาบันการเงินเท่านั้น การกดปุ่มนี้ไม่เปลี่ยนยอดครบกำหนดตามสัญญา</p></div>
+      <div class="actions" style="margin-top:14px"><button class="btn ghost" type="button" onclick="closeZeroIncome()">ยกเลิก</button><button class="btn primary" type="button" id="zeroIncomeConfirm" onclick="confirmZeroIncome()">ยืนยัน วันนี้ไม่มีรายได้</button></div>
+    </div>
+  </div>
+
   <div class="modal" id="caseModal" role="dialog" aria-modal="true" aria-labelledby="caseTitle"><div class="modal-card"><button class="close" type="button" onclick="closeCaseEditor()" aria-label="ปิดหน้าต่างแก้ไขเคส">×</button><h3 id="caseTitle">อัปเดตเคส F.A.</h3><p class="mini" id="caseSubtitle">บันทึกเจ้าของงาน SLA เหตุผล และขั้นตอนถัดไปเพื่อสร้างประวัติการตรวจสอบ</p><form id="caseForm"><input id="caseId" type="hidden"><div class="form-grid"><div class="field"><label for="caseStatus">สถานะ</label><select id="caseStatus"><option value="NEW">ใหม่</option><option value="TRIAGE">คัดกรอง</option><option value="SCHEDULED">นัดหมายแล้ว</option><option value="REFERRED">ส่งต่อแล้ว</option><option value="OEM FOLLOW-UP">ติดตามผู้ให้บริการรถ</option><option value="RESOLVED">แก้ไขแล้ว</option><option value="REOPENED">เปิดใหม่</option></select></div><div class="field"><label for="casePriority">ระดับความสำคัญ</label><select id="casePriority" disabled><option value="LOW">ต่ำ</option><option value="MEDIUM">ปานกลาง</option><option value="HIGH">สูง</option></select></div><div class="field"><label for="caseOwner">เจ้าของงาน</label><input id="caseOwner"></div><div class="field"><label for="caseSla">SLA</label><input id="caseSla"></div><div class="field full"><label for="caseAppointment">นัดหมาย</label><input id="caseAppointment" placeholder="21 ส.ค. 2026 10:00"></div><div class="field full"><label for="caseNextAction">ขั้นตอนถัดไป</label><textarea id="caseNextAction" rows="2"></textarea></div><div class="field full"><label for="caseOutcome">ผลลัพธ์ / หมายเหตุ</label><textarea id="caseOutcome" rows="2"></textarea></div></div><div class="actions" style="margin-top:15px"><button class="btn ghost" type="button" onclick="closeCaseEditor()">ยกเลิก</button><button class="btn primary" type="submit">บันทึกการเปลี่ยนแปลง</button></div></form></div></div>
 
   <div class="modal" id="partnerActionModal" role="dialog" aria-modal="true" aria-labelledby="partnerActionTitle"><div class="modal-card"><button class="close" type="button" onclick="closePartnerAction()" aria-label="ปิดหน้าต่างดำเนินงาน">×</button><h3 id="partnerActionTitle">บันทึกการดำเนินงาน พาร์ทเนอร์</h3><p class="mini">ทุกการดำเนินงานต้องมีเจ้าของงาน SLA เหตุผล และขั้นตอนถัดไปเพื่อสร้างประวัติการตรวจสอบ</p><form id="partnerActionForm" novalidate><div class="form-grid"><div class="field"><label for="partnerActionType">ประเภท การดำเนินงาน *</label><select id="partnerActionType"><option value="FOLLOW_UP">ติดตามงาน</option><option value="REQUEST_DOCUMENT">ขอเอกสาร</option><option value="ASSIGN_OWNER">มอบหมายเจ้าของงาน</option><option value="REFER_PROMPTCURE">ส่งต่อ PromptCure</option><option value="EWS_REVIEW">ทบทวน EWS</option><option value="CONTACT_RESULT">บันทึกผลติดต่อ</option><option value="ESCALATE_TDR">ยกระดับ ก่อนปรับโครงสร้างหนี้ (Pre-TDR)</option><option value="ELG_REVIEW">ทบทวน E-LG / เงื่อนไขด้านกฎหมาย</option><option value="EXIT_REVIEW">ทบทวน ปรับโครงสร้างหนี้ / ออกจากโครงการ</option><option value="REQUEST_EVIDENCE">ขอหลักฐานการเคลม</option><option value="DATA_FOLLOW_UP">ติดตามข้อมูลผิดปกติ</option><option value="DATA_EXCEPTION">บันทึก ข้อยกเว้นด้านข้อมูล</option><option value="CLOSE_CASE">ปิดเคส</option></select></div><div class="field"><label for="partnerActionEntity">เคส / รายการอ้างอิง *</label><input id="partnerActionEntity"></div><div class="field"><label for="partnerActionDriver">ผู้ขับ</label><input id="partnerActionDriver" placeholder="D-xxxxxx หรือ -"></div><div class="field"><label for="partnerActionOwner">เจ้าของงาน *</label><input id="partnerActionOwner" placeholder="FI / Co-op / OEM / Team"></div><div class="field"><label for="partnerActionSla">SLA</label><input id="partnerActionSla" value="8 ชั่วโมง"></div><div class="field full"><label for="partnerActionReason">เหตุผล / ผลการติดต่อ *</label><textarea id="partnerActionReason" rows="3"></textarea></div><div class="field full"><label for="partnerActionNext">ขั้นตอนถัดไป</label><textarea id="partnerActionNext" rows="2"></textarea></div></div><div class="actions" style="margin-top:15px"><button class="btn ghost" type="button" onclick="closePartnerAction()">ยกเลิก</button><button class="btn primary" type="submit">บันทึก การดำเนินงาน และ ประวัติการตรวจสอบ</button></div></form></div></div>
@@ -471,8 +531,8 @@
   <script>
     /* R2O_CORE_START */
     const R2O = globalThis.R2O = {
-      schemaVersion: 4,
-      storageKey: 'route2own.postapproval.v4',
+      schemaVersion: 5,
+      storageKey: 'route2own.postapproval.v5',
       routes: {
         driver: ['home','activity','money','ownership','wallet','help','cure'],
         partner: ['overview','pipeline','portfolio','daily','incidents','ews','cure','elg','exit','claim','finance','partners'],
@@ -616,7 +676,7 @@
 
     R2O.defaults = function() {
       return {
-        meta: { schemaVersion: 4, lastUpdated: '2026-08-20T09:00:00+07:00', role: 'tcg', tenant: 'บสย. / TCG' },
+        meta: { schemaVersion: 5, lastUpdated: '2026-08-20T09:00:00+07:00', role: 'tcg', tenant: 'บสย. / TCG' },
         program: {
           activeDrivers: 480, activeElg: 476, exposure: 198000000,
           operatingToday: 442, inactive3d: 26, vehicleDown: 7,
@@ -628,10 +688,10 @@
           rbpCollected: 1740000, cureReserve: 820000, hmcUsed: 18, stopLossUsed: 11
         },
         drivers: [
-          { id:'D-000381', name:'นายสมชาย ใจดี', coop:'Co-op A', fi:'KBank', area:'กรุงเทพฯ', tier:'B', ews:'GREEN', fiDpd:0, status:'ACTIVE', incomeToday:1850.52, verifiedRevenue:1757.99, km:250, emu:228, paydTarget:477.69, sweepActual:477.69, opEx:477.45, protectedCash:600, availableCash:680.54, debtStart:780000, debtBalance:562420, monthlyDue:8985.84, cureReserve:1280 },
-          { id:'D-000422', name:'นางสาวพิมพ์ชนก มีสุข', coop:'Co-op B', fi:'SCB', area:'กรุงเทพฯ', tier:'B', ews:'YELLOW', fiDpd:0, status:'ILLNESS', incomeToday:0, verifiedRevenue:0, km:0, emu:0, paydTarget:0, sweepActual:0, opEx:0, protectedCash:600, availableCash:0, debtStart:760000, debtBalance:468000, monthlyDue:8750, cureReserve:1540 },
-          { id:'D-000437', name:'นายวิชาญ มั่นคง', coop:'Co-op C', fi:'KBank', area:'นนทบุรี', tier:'C', ews:'RED', fiDpd:12, status:'ACTIVE', incomeToday:1220, verifiedRevenue:1159, km:184, emu:164, paydTarget:344, sweepActual:220, opEx:421, protectedCash:600, availableCash:138, debtStart:790000, debtBalance:502000, monthlyDue:9120, cureReserve:820 },
-          { id:'D-000451', name:'นางจันทร์เพ็ญ แสงดี', coop:'Co-op A', fi:'Krungsri', area:'สมุทรปราการ', tier:'B', ews:'YELLOW', fiDpd:0, status:'VEHICLE_DOWN', incomeToday:0, verifiedRevenue:0, km:0, emu:0, paydTarget:0, sweepActual:0, opEx:0, protectedCash:600, availableCash:0, debtStart:775000, debtBalance:511600, monthlyDue:8910, cureReserve:990 }
+          { id:'D-000381', name:'นายสมชาย ใจดี', coop:'Co-op A', fi:'KBank', area:'กรุงเทพฯ', tier:'B', ews:'GREEN', fiDpd:0, status:'ACTIVE', incomeToday:1850.52, verifiedRevenue:1757.99, km:250, emu:228, paydTarget:477.69, sweepActual:477.69, opEx:477.45, protectedCash:600, availableCash:680.54, debtStart:780000, debtBalance:562420, monthlyDue:8985.84, cureReserve:1280, verifyRate:0.95, paydPace:477.69, paydCap:900, catchUp:0, verifiedAt:'2026-08-20T09:00:00+07:00', operatingBreakdown:[{label:'ค่าไฟ / ค่าชาร์จ',amount:214.20},{label:'ค่าเช่าและค่าบำรุงรักษา',amount:138.25},{label:'ประกันภัยและใบอนุญาต',amount:74.00},{label:'ค่าใช้จ่ายจำเป็นอื่น ๆ',amount:51.00}] },
+          { id:'D-000422', name:'นางสาวพิมพ์ชนก มีสุข', coop:'Co-op B', fi:'SCB', area:'กรุงเทพฯ', tier:'B', ews:'YELLOW', fiDpd:0, status:'ILLNESS', incomeToday:0, verifiedRevenue:0, km:0, emu:0, paydTarget:0, sweepActual:0, opEx:0, protectedCash:600, availableCash:0, verifyRate:0.95, paydPace:460, paydCap:880, catchUp:0, verifiedAt:'2026-08-20T09:00:00+07:00', debtStart:760000, debtBalance:468000, monthlyDue:8750, cureReserve:1540 },
+          { id:'D-000437', name:'นายวิชาญ มั่นคง', coop:'Co-op C', fi:'KBank', area:'นนทบุรี', tier:'C', ews:'RED', fiDpd:12, status:'ACTIVE', incomeToday:1220, verifiedRevenue:1159, km:184, emu:164, paydTarget:344, sweepActual:220, opEx:421, protectedCash:600, availableCash:138, verifyRate:0.95, paydPace:344, paydCap:900, catchUp:0, verifiedAt:'2026-08-20T09:00:00+07:00', debtStart:790000, debtBalance:502000, monthlyDue:9120, cureReserve:820 },
+          { id:'D-000451', name:'นางจันทร์เพ็ญ แสงดี', coop:'Co-op A', fi:'Krungsri', area:'สมุทรปราการ', tier:'B', ews:'YELLOW', fiDpd:0, status:'VEHICLE_DOWN', incomeToday:0, verifiedRevenue:0, km:0, emu:0, paydTarget:0, sweepActual:0, opEx:0, protectedCash:600, availableCash:0, verifyRate:0.95, paydPace:452, paydCap:890, catchUp:0, verifiedAt:'2026-08-20T09:00:00+07:00', debtStart:775000, debtBalance:511600, monthlyDue:8910, cureReserve:990 }
         ],
         portfolio: [
           { driverId:'D-000381', vin:'VIN...0381', elg:'ELG-80381', fi:'KBank', coop:'Co-op A', area:'กรุงเทพฯ', balance:562420, dpd:0, status:'ACTIVE', accountStatus:'ACTIVE', ews:'GREEN', onTime:100, revenueVsAverage:6, riskScore:24 },
@@ -713,6 +773,7 @@
         operations: [
           { id:'OP-001', action:'FOLLOW_UP', entity:'FA-1047', driverId:'D-000437', owner:'FI-KBank', sla:'เกินกำหนด', reason:'ติดตามข้อเสนอ Pre-TDR', nextAction:'FI affordability review', actor:'TCG-TOWER', role:'tower', timestamp:'2026-08-20T09:15:00+07:00' }
         ],
+        dailyIncome: null,
         incomePlan: { targetRevenue:12000, emptyKmReduction:8, reserveTarget:300, completedDays:3, totalDays:5 },
         debtPlan: { advice:'รักษา Protected Cash ก่อนจัดสรร PAYD', referral:'F.A. Center', followUp:'2026-08-27', status:'DRAFT' },
         auditTrail: [
@@ -847,6 +908,50 @@
       }, context);
     };
 
+    R2O.actions.reportDailyIncome = function(state, input, context) {
+      const errors = R2O.core.validateDailyIncome(input);
+      if (Object.keys(errors).length) return { state: state, errors: errors };
+      const next = R2O.core.clone(state);
+      const ctx = context || {};
+      const optional = function(value) {
+        if (value === '' || value === null || value === undefined) return null;
+        const amount = Number(value);
+        return Number.isFinite(amount) ? R2O.core.money(amount) : null;
+      };
+      const gross = R2O.core.money(input.gross);
+      next.dailyIncome = {
+        date: input.date || String(ctx.timestamp || next.meta.lastUpdated || '').slice(0, 10),
+        gross: gross,
+        app: optional(input.app), cash: optional(input.cash),
+        km: optional(input.km), emu: optional(input.emu),
+        note: String(input.note || '').trim(),
+        status: gross > 0 ? 'SELF_REPORTED' : 'SELF_REPORTED_ZERO',
+        reportedAt: ctx.timestamp || new Date().toISOString()
+      };
+      R2O.actions.addAudit(next, 'DRIVER_DAILY_REVENUE_REPORTED', Object.assign({}, ctx, {
+        entity: ((next.drivers || [])[0] || {}).id || 'DRIVER',
+        reason: 'ผู้ขับบันทึกรายได้ประจำวันด้วยตนเอง · สถานะรอตรวจสอบ ไม่ใช่ยอดที่ใช้จัดสรรจริง'
+      }));
+      return { state: next, errors: {} };
+    };
+
+    R2O.actions.reportZeroIncome = function(state, context) {
+      const next = R2O.core.clone(state);
+      const ctx = context || {};
+      next.dailyIncome = {
+        date: String(ctx.timestamp || next.meta.lastUpdated || '').slice(0, 10),
+        gross: 0, app: 0, cash: 0, km: 0, emu: 0,
+        note: 'ผู้ขับยืนยันว่าวันนี้ไม่มีรายได้',
+        status: 'SELF_REPORTED_ZERO',
+        reportedAt: ctx.timestamp || new Date().toISOString()
+      };
+      R2O.actions.addAudit(next, 'DRIVER_ZERO_INCOME_REPORTED', Object.assign({}, ctx, {
+        entity: ((next.drivers || [])[0] || {}).id || 'DRIVER',
+        reason: 'ผู้ขับยืนยันว่าวันนี้ไม่มีรายได้ · ไม่มีการหัก PAYD และไม่เปลี่ยนยอดครบกำหนดตามสัญญาหรือ DPD จาก FI'
+      }));
+      return next;
+    };
+
     R2O.actions.recordPartnerAction = function(state, input, context) {
       const errors = {};
       ['action','entity','owner','reason'].forEach(function(key) {
@@ -917,6 +1022,136 @@
       });
       return '\uFEFF' + [headers.map(R2O.core.csvEscape).join(',')].concat(body).join('\r\n');
     };
+    R2O.core.money = function(value) {
+      const amount = Number(value);
+      return Number.isFinite(amount) ? Math.round(amount * 100) / 100 : 0;
+    };
+
+    R2O.core.clockLabel = function(stamp) {
+      const match = /T(\d{2}):(\d{2})/.exec(String(stamp == null ? '' : stamp));
+      return match ? match[1] + ':' + match[2] : '--:--';
+    };
+
+    R2O.core.validateDailyIncome = function(input) {
+      const src = input || {};
+      const errors = {};
+      const read = function(value) {
+        if (value === '' || value === null || value === undefined) return null;
+        const amount = Number(value);
+        return Number.isFinite(amount) ? amount : NaN;
+      };
+      const gross = read(src.gross);
+      if (gross === null) errors.gross = 'กรุณากรอกรายได้รวมวันนี้';
+      else if (Number.isNaN(gross)) errors.gross = 'รายได้รวมต้องเป็นตัวเลขเท่านั้น';
+      else if (gross < 0) errors.gross = 'รายได้รวมต้องไม่ติดลบ';
+      [['app','รายได้จากแอป'],['cash','รายได้เงินสด'],['km','ระยะทาง'],['emu','EMU']].forEach(function(pair) {
+        const value = read(src[pair[0]]);
+        if (value === null) return;
+        if (Number.isNaN(value)) errors[pair[0]] = pair[1] + 'ต้องเป็นตัวเลขเท่านั้น';
+        else if (value < 0) errors[pair[0]] = pair[1] + 'ต้องไม่ติดลบ';
+      });
+      if (!errors.gross && !errors.app && !errors.cash) {
+        const parts = (read(src.app) || 0) + (read(src.cash) || 0);
+        if (parts - gross > 0.005) errors.split = 'รายได้จากแอปรวมกับเงินสดมากกว่ารายได้รวมวันนี้';
+      }
+      return errors;
+    };
+
+    R2O.core.principalShare = function(state) {
+      const row = ((state || {}).amortization || [])[0];
+      if (!row) return 0;
+      const principal = Number(row.principal), interest = Number(row.interest);
+      if (!Number.isFinite(principal) || !Number.isFinite(interest) || principal + interest <= 0) return 0;
+      return Math.min(1, Math.max(0, principal / (principal + interest)));
+    };
+
+    R2O.core.dailyXray = function(input) {
+      const src = input || {};
+      const money = R2O.core.money;
+      const source = src.source || 'NONE';
+      const hasData = source !== 'NONE';
+      const gross = Math.max(0, money(src.gross));
+      const rate = Number(src.verifyRate);
+      const verified = (src.verifiedRevenue === null || src.verifiedRevenue === undefined)
+        ? money(gross * (Number.isFinite(rate) && rate >= 0 ? Math.min(1, rate) : 1))
+        : Math.max(0, money(src.verifiedRevenue));
+      const operatingNeed = Math.max(0, money(src.operatingNeed));
+      const protectedCash = Math.max(0, money(src.protectedCash));
+      const availableCash = hasData ? Math.max(0, money(verified - operatingNeed - protectedCash)) : 0;
+      const pace = Math.max(0, money(src.paydPace)) + Math.max(0, money(src.catchUp));
+      const capValue = Number(src.paydCap);
+      const cap = Number.isFinite(capValue) && capValue > 0 ? capValue : Infinity;
+      const paydTarget = hasData ? money(Math.min(pace, availableCash, cap)) : 0;
+      const sweepValue = Number(src.actualSweep);
+      const hasSweep = source === 'VERIFIED' && src.actualSweep !== null && src.actualSweep !== undefined && Number.isFinite(sweepValue);
+      const actualSweep = hasSweep ? Math.max(0, money(Math.min(sweepValue, availableCash))) : null;
+      const paydApplied = hasSweep ? actualSweep : paydTarget;
+      const share = Math.min(1, Math.max(0, Number(src.principalShare) || 0));
+      return {
+        hasData: hasData,
+        source: source,
+        estimate: source !== 'VERIFIED',
+        sweepIsEstimate: !hasSweep,
+        grossRevenue: hasData ? gross : 0,
+        verifiedRevenue: hasData ? verified : 0,
+        operatingNeed: hasData ? operatingNeed : 0,
+        protectedCash: hasData ? protectedCash : 0,
+        availableCash: availableCash,
+        paydTarget: paydTarget,
+        actualSweep: actualSweep,
+        paydApplied: paydApplied,
+        contractualDue: Math.max(0, money(src.contractualDue)),
+        residualCash: hasData ? Math.max(0, money(availableCash - paydApplied)) : 0,
+        principalToday: money(paydApplied * share),
+        interestToday: money(paydApplied - money(paydApplied * share))
+      };
+    };
+
+    R2O.core.driverToday = function(state) {
+      const safe = state || {};
+      const driver = (safe.drivers || [])[0] || {};
+      const entry = safe.dailyIncome && safe.dailyIncome.status ? safe.dailyIncome : null;
+      const base = {
+        verifyRate: driver.verifyRate === undefined ? 0.95 : driver.verifyRate,
+        operatingNeed: driver.opEx,
+        protectedCash: driver.protectedCash,
+        paydPace: driver.paydPace === undefined ? driver.paydTarget : driver.paydPace,
+        paydCap: driver.paydCap,
+        catchUp: driver.catchUp || 0,
+        contractualDue: driver.monthlyDue,
+        principalShare: R2O.core.principalShare(safe)
+      };
+      if (entry) return R2O.core.dailyXray(Object.assign({}, base, { source:'SELF_REPORTED', gross: entry.gross }));
+      if (Number(driver.verifiedRevenue) > 0) {
+        return R2O.core.dailyXray(Object.assign({}, base, {
+          source:'VERIFIED', gross: driver.incomeToday,
+          verifiedRevenue: driver.verifiedRevenue, actualSweep: driver.sweepActual
+        }));
+      }
+      return R2O.core.dailyXray(Object.assign({}, base, { source:'NONE' }));
+    };
+
+    R2O.core.ownership = function(state) {
+      const safe = state || {};
+      const driver = (safe.drivers || [])[0] || {};
+      const money = R2O.core.money;
+      const start = Math.max(0, money(driver.debtStart));
+      const balance = Math.min(Math.max(0, money(driver.debtBalance)), start || Infinity);
+      const paid = Math.max(0, money(start - balance));
+      const percent = start > 0 ? Math.min(100, Math.round(paid / start * 1000) / 10) : 0;
+      const schedule = safe.amortization || [];
+      const monthPrincipal = Math.max(0, money((schedule[0] || {}).principal));
+      // the current period is still in progress, so project the run rate from the last
+      // fully paid period instead of a part-month figure
+      const settled = schedule.filter(function(row) { return String(row.status || '').toUpperCase() === 'PAID'; });
+      const pace = Math.max(0, money((settled[0] || schedule[0] || {}).principal));
+      return {
+        start: start, balance: balance, paid: paid, percent: percent,
+        monthPrincipal: monthPrincipal, pacePrincipal: pace,
+        monthsToGoal: pace > 0 && balance > 0 ? Math.ceil(balance / pace) : null
+      };
+    };
+
     /* R2O_CORE_END */
 
     R2O.store.load = function() {
@@ -993,13 +1228,157 @@
 
     R2O.activityRange = 7;
 
+    R2O.localStamp = function(date) {
+      const now = date || new Date();
+      const pad = function(value) { return String(value).padStart(2, '0'); };
+      return now.getFullYear() + '-' + pad(now.getMonth() + 1) + '-' + pad(now.getDate()) +
+        'T' + pad(now.getHours()) + ':' + pad(now.getMinutes()) + ':' + pad(now.getSeconds());
+    };
+
+    R2O.render.xrayStep = function(options) {
+      return '<div class="xray-step' + (options.minus ? ' minus' : '') + '">' +
+        '<span class="label">' + R2O.ui.esc(options.label) + '</span>' +
+        '<div class="value">' + (options.minus ? '−' : '') + R2O.ui.esc(options.value) + '</div>' +
+        (options.badge || '') +
+        (options.mini ? '<span class="mini" style="display:block;margin-top:5px">' + options.mini + '</span>' : '') +
+        (options.source ? '<span class="src">ที่มา: ' + R2O.ui.esc(options.source) + '</span>' : '') +
+        (options.extra || '') +
+        '</div>';
+    };
+
+    R2O.render.driverDaily = function() {
+      const state = R2O.state;
+      const driver = (state.drivers || [])[0] || {};
+      const entry = state.dailyIncome && state.dailyIncome.status ? state.dailyIncome : null;
+      const zero = Boolean(entry && entry.status === 'SELF_REPORTED_ZERO');
+      const xray = R2O.core.driverToday(state);
+      const own = R2O.core.ownership(state);
+      const esc = R2O.ui.esc, baht = R2O.ui.baht;
+      const arrow = '<div class="xray-arrow" aria-hidden="true">↓</div>';
+      const pill = document.getElementById('xraySourcePill');
+      const heroBadge = document.getElementById('dayHeroBadge');
+      const heroLead = document.getElementById('dayHeroLead');
+      const reportBtn = document.getElementById('dayReportBtn');
+      const xrayNode = document.getElementById('driverXray');
+      const principalNode = document.getElementById('driverPrincipal');
+      const ownershipNode = document.getElementById('driverOwnership');
+      if (!xrayNode || !principalNode || !ownershipNode) return;
+
+      reportBtn.textContent = entry ? 'แก้ไขรายได้วันนี้' : '+ บันทึกรายได้วันนี้';
+
+      if (!xray.hasData) {
+        pill.className = 'pill amber';
+        pill.textContent = 'ยังไม่มีข้อมูลวันนี้';
+        heroBadge.className = 'pill amber';
+        heroBadge.textContent = 'ยังไม่มีข้อมูลรายได้ของวันนี้';
+        heroLead.textContent = 'บันทึกรายได้เพื่อดูว่าหลังกันต้นทุนและเงินใช้ชีวิตแล้ว วันนี้คุณมี Available Cash เท่าไร';
+        xrayNode.innerHTML = '<div class="callout empty-day"><b>ยังไม่มีข้อมูลรายได้ของวันนี้</b>' +
+          '<p class="mini" style="margin:7px 0 13px">บันทึกรายได้เพื่อดูว่าหลังกันต้นทุนและเงินใช้ชีวิตแล้ว วันนี้คุณมี Available Cash เท่าไร</p>' +
+          '<button class="btn primary" type="button" onclick="openDailyIncome()">+ บันทึกรายได้วันนี้</button></div>';
+      } else {
+        const verified = xray.source === 'VERIFIED';
+        pill.className = verified ? 'pill green' : 'pill amber';
+        pill.textContent = verified ? 'ข้อมูลตรวจสอบแล้ว' : 'ประมาณการจากข้อมูลผู้ขับ';
+        heroBadge.className = verified ? 'pill green' : 'pill amber';
+        heroBadge.textContent = zero ? 'วันนี้ไม่มีรายได้' : (verified ? '✓ ตรวจสอบแล้ว' : 'ผู้ขับกรอกเอง · รอตรวจสอบ');
+        heroLead.textContent = zero
+          ? 'วันนี้ไม่มีรายได้ จึงไม่มีการหัก PAYD · ยอดครบกำหนดตามสัญญาและ DPD ยังกำหนดโดยสถาบันการเงิน'
+          : 'วันนี้รายได้เท่าไร หลังกันต้นทุนทำมาหากินและเงินใช้ชีวิตแล้ว จ่ายไหวจริงเท่าไร';
+
+        const revenueBadge = verified
+          ? '<span class="badge ok">✓ ตรวจสอบแล้ว</span>'
+          : '<span class="badge pending">ผู้ขับกรอกเอง · รอตรวจสอบ</span>';
+        const stampLine = verified
+          ? 'อัปเดตล่าสุด ' + esc(R2O.core.clockLabel(driver.verifiedAt)) + ' น.'
+          : 'บันทึกเมื่อ ' + esc(R2O.core.clockLabel(entry && entry.reportedAt)) + ' น. · วันที่ ' + esc((entry && entry.date) || '-');
+        const breakdown = (driver.operatingBreakdown || []);
+        const breakdownHtml = breakdown.length
+          ? '<div class="opex-detail" id="opexDetail" hidden><table class="tbl"><tbody>' +
+            breakdown.map(function(row) {
+              return '<tr><td>' + esc(row.label) + '</td><td class="num">' + baht(row.amount, 2) + '</td></tr>';
+            }).join('') +
+            '<tr><td><b>รวม</b></td><td class="num"><b>' + baht(breakdown.reduce(function(sum, row) { return sum + Number(row.amount || 0); }, 0), 2) + '</b></td></tr>' +
+            '</tbody></table><p class="mini" style="margin:8px 0 0">รายการเหล่านี้ถูกนับครั้งเดียว และไม่ถูกนับซ้ำในเงินกันไว้ใช้ชีวิต (No Double Counting)</p></div>'
+          : '';
+
+        const paydCards = [
+          '<div class="xray-step"><span class="label">PAYD เป้าหมายวันนี้</span><div class="value">' + baht(xray.paydTarget, 2) + '</div><span class="mini" style="display:block;margin-top:5px">ยอดที่โมเดลเสนอให้จัดสรรวันนี้</span><span class="src">ที่มา: Route2Own Calculation</span></div>',
+          '<div class="xray-step"><span class="label">Actual Sweep</span><div class="value">' + (xray.actualSweep === null ? 'ยังไม่เกิดขึ้น' : baht(xray.actualSweep, 2)) + '</div><span class="mini" style="display:block;margin-top:5px">' + (xray.actualSweep === null ? 'ยอดที่ถูกจัดสรรจริงจะปรากฏหลังการหักเงินสำเร็จ' : 'ยอดที่ถูกจัดสรรจริงและกระทบยอดแล้ว') + '</span><span class="src">ที่มา: ' + (xray.actualSweep === null ? 'ยังไม่มีข้อมูล' : 'Payment Data') + '</span></div>',
+          '<div class="xray-step"><span class="label">ยอดครบกำหนดตามสัญญา</span><div class="value">' + baht(xray.contractualDue, 2) + '</div><span class="mini" style="display:block;margin-top:5px">งวดรายเดือนตามสัญญาของสถาบันการเงิน · DPD ปัจจุบัน ' + esc(driver.fiDpd == null ? '-' : driver.fiDpd) + ' วัน</span><span class="src">ที่มา: FI Data</span></div>'
+        ].join('');
+
+        xrayNode.innerHTML = '<div class="xray-flow">' +
+          R2O.render.xrayStep({
+            label: 'รายได้วันนี้', value: baht(xray.grossRevenue, 2),
+            badge: revenueBadge, mini: stampLine,
+            source: verified ? 'Platform Data' : 'ผู้ขับกรอกเอง'
+          }) + arrow +
+          R2O.render.xrayStep({
+            label: 'รายได้ที่ตรวจสอบได้ · Verified Revenue', value: baht(xray.verifiedRevenue, 2),
+            mini: verified
+              ? 'ยอดที่ผ่านการตรวจสอบและใช้สำหรับการจัดสรรจริง'
+              : '<b>ประมาณการ</b> · ผลคำนวณเบื้องต้นจากข้อมูลที่ผู้ขับกรอก ยังไม่ใช่ยอดที่ใช้สำหรับการจัดสรรเงินจริง',
+            source: verified ? 'Partner Data / Platform Data' : 'Route2Own Calculation (ประมาณการ)'
+          }) + arrow +
+          R2O.render.xrayStep({
+            label: 'ต้นทุนอาชีพ · Eligible Operating Need', value: baht(xray.operatingNeed, 2), minus: true,
+            mini: 'ต้นทุนที่จำเป็นต่อการทำงาน หักก่อนคำนวณเงินที่จ่ายไหว',
+            source: 'Demo / Simulation',
+            extra: breakdown.length ? '<div style="margin-top:9px"><button class="btn ghost" type="button" onclick="toggleOpexDetail()" aria-expanded="false" aria-controls="opexDetail" id="opexDetailBtn">ดูรายละเอียด</button></div>' + breakdownHtml : ''
+          }) + arrow +
+          R2O.render.xrayStep({
+            label: 'เงินกันไว้ใช้ชีวิต · Protected Cash', value: baht(xray.protectedCash, 2), minus: true,
+            mini: 'เงินส่วนนี้ถูกกันไว้ก่อน และไม่ถูกนำไปคำนวณ PAYD',
+            source: 'Route2Own Calculation'
+          }) + arrow +
+          '<div class="xray-hero"><span class="label">วันนี้คุณ “จ่ายไหว”</span><div class="value">' + baht(xray.availableCash, 2) + '</div>' +
+          '<span class="xray-tag">AVAILABLE CASH' + (xray.estimate ? ' · ประมาณการ' : '') + '</span>' +
+          '<span class="mini" style="display:block;margin-top:7px">รายได้ที่ตรวจสอบได้ − ต้นทุนอาชีพ − เงินกันไว้ใช้ชีวิต</span></div>' + arrow +
+          '<div class="xray-grid">' + paydCards + '</div>' + arrow +
+          R2O.render.xrayStep({
+            label: 'เงินเหลือหลังจัดสรรวันนี้ · Residual Cash', value: baht(xray.residualCash, 2),
+            mini: xray.sweepIsEstimate
+              ? '<b>ประมาณการ</b> · คำนวณจาก PAYD Target เพราะยังไม่มียอดจัดสรรจริง (Available Cash − PAYD Target)'
+              : 'Available Cash − ยอดจัดสรรจริง',
+            source: 'Route2Own Calculation'
+          }) +
+          '</div>' +
+          (zero
+            ? '<div class="callout warn" style="margin-top:13px"><b>วันนี้ไม่มีรายได้ → ไม่มีการหัก PAYD</b><p class="mini" style="margin:6px 0 0">PAYD = 0 ไม่ได้หมายความว่ายอดครบกำหนดตามสัญญาหรือ DPD ของสถาบันการเงินเป็นศูนย์</p></div>'
+            : '') +
+          '<div class="notice" style="margin:13px 0 0"><b>สิ่งที่ต้องแยกจากกัน:</b> PAYD Target ไม่ใช่ยอดครบกำหนดตามสัญญา · PAYD ≠ DPD · Route2Own ไม่ได้เปลี่ยนเงื่อนไขการชำระสินเชื่อของสถาบันการเงิน และสถานะเครดิตยังกำหนดโดยสถาบันการเงินเท่านั้น</div>';
+      }
+
+      const principalEstimate = xray.sweepIsEstimate || xray.estimate;
+      principalNode.innerHTML = '<div class="own-grid">' + [
+        '<div class="own-item"><span class="label">เงินต้นลดวันนี้</span><div class="value up">+ ' + baht(xray.principalToday, 2) + '</div><span class="mini">' + (principalEstimate ? 'ประมาณการจาก PAYD Target' : 'จากยอดจัดสรรจริง') + ' · ดอกเบี้ย ' + baht(xray.interestToday, 2) + '</span></div>',
+        '<div class="own-item"><span class="label">เงินต้นลดเดือนนี้</span><div class="value up">+ ' + baht(own.monthPrincipal, 2) + '</div><span class="mini">จาก Principal Allocation ของงวดปัจจุบัน</span></div>',
+        '<div class="own-item"><span class="label">เงินต้นลดตั้งแต่เริ่ม Route2Own</span><div class="value up">+ ' + baht(own.paid) + '</div><span class="mini">เงินต้นเริ่มต้น ' + baht(own.start) + '</span></div>',
+        '<div class="own-item"><span class="label">เงินต้นคงเหลือ</span><div class="value">' + baht(own.balance) + '</div><span class="mini">ยอดคงเหลือตามบัญชีสินเชื่อของ FI</span></div>'
+      ].join('') + '</div>' +
+        '<div class="notice" style="margin:13px 0 0"><b>เงินต้นลดคำนวณจาก Principal Allocation เท่านั้น</b> ไม่ได้นำยอด PAYD ทั้งก้อนมาเรียกว่าเงินต้นที่ลดลง เพราะยอดจัดสรรถูกแบ่งเป็นเงินต้นและดอกเบี้ยตามตารางลดหนี้ · ตัวเลขรายวันเป็นข้อมูลสาธิต</div>';
+
+      ownershipNode.innerHTML =
+        '<div class="progress" role="img" aria-label="ความคืบหน้าสู่การเป็นเจ้าของรถ ' + esc(own.percent) + ' เปอร์เซ็นต์"><span style="width:' + esc(own.percent) + '%"></span></div>' +
+        '<div class="value" style="margin-top:9px">' + esc(own.percent) + '%</div>' +
+        '<p class="mini" style="margin:4px 0 0">คุณเดินทางมาแล้ว ' + esc(own.percent) + '% สู่เป้าหมายการเป็นเจ้าของรถ</p>' +
+        '<div class="own-grid">' + [
+          '<div class="own-item"><span class="label">เงินต้นเริ่มต้น</span><div class="value">' + baht(own.start) + '</div></div>',
+          '<div class="own-item"><span class="label">เงินต้นที่ชำระแล้ว</span><div class="value up">' + baht(own.paid) + '</div></div>',
+          '<div class="own-item"><span class="label">เงินต้นคงเหลือ</span><div class="value">' + baht(own.balance) + '</div></div>',
+          '<div class="own-item"><span class="label">คาดว่าจะถึงเป้าหมาย</span><div class="value">' + (own.monthsToGoal === null ? '-' : 'ประมาณ ' + esc(own.monthsToGoal) + ' เดือน') + '</div><span class="mini">ประมาณการ</span></div>'
+        ].join('') + '</div>' +
+        '<div class="notice" style="margin:13px 0 0"><b>ประมาณการ:</b> หากรักษารูปแบบรายได้และการชำระระดับปัจจุบัน (เงินต้นเฉลี่ย ' + baht(own.pacePrincipal, 2) + ' ต่อเดือน จากงวดที่ชำระครบล่าสุด) คาดว่าจะถึงเป้าหมายในประมาณ ' + (own.monthsToGoal === null ? '-' : esc(own.monthsToGoal)) + ' เดือน · เป็นการคาดการณ์จากข้อมูลสาธิต ไม่ใช่คำมั่นสัญญาทางการเงิน และไม่ใช่เงื่อนไขตามสัญญาสินเชื่อ</div>';
+    };
+
     R2O.render.driver = function() {
       const d = R2O.state.drivers[0];
+      const today = R2O.core.driverToday(R2O.state);
       document.getElementById('driverTodayMetrics').innerHTML = [
-        R2O.ui.metric('รายได้วันนี้', R2O.ui.baht(d.incomeToday, 2), 'Verified ' + R2O.ui.baht(d.verifiedRevenue, 2), 'accent'),
-        R2O.ui.metric('ระยะทาง / EMU', d.km + ' km', 'EMU ' + d.emu, ''),
-        R2O.ui.metric('Adaptive PAYD', R2O.ui.baht(d.paydTarget, 2), 'Actual ' + R2O.ui.baht(d.sweepActual, 2), ''),
-        R2O.ui.metric('หนี้คงเหลือ', R2O.ui.baht(d.debtBalance), 'Principal on track', '')
+        R2O.ui.metric('เงินพร้อมจัดสรร · Available Cash', R2O.ui.baht(today.availableCash, 2), today.estimate ? 'ประมาณการ · ยังไม่ใช่ยอดจัดสรรจริง' : 'รายได้ที่ตรวจสอบได้ − ต้นทุนอาชีพ − เงินกันไว้ใช้ชีวิต', 'accent'),
+        R2O.ui.metric('รายได้วันนี้', R2O.ui.baht(today.grossRevenue, 2), 'Verified ' + R2O.ui.baht(today.verifiedRevenue, 2) + ' · ' + d.km + ' km / EMU ' + d.emu, ''),
+        R2O.ui.metric('PAYD เป้าหมายวันนี้', R2O.ui.baht(today.paydTarget, 2), today.actualSweep === null ? 'Actual Sweep ยังไม่เกิดขึ้น' : 'Actual Sweep ' + R2O.ui.baht(today.actualSweep, 2), ''),
+        R2O.ui.metric('เงินเหลือหลังจัดสรร', R2O.ui.baht(today.residualCash, 2), 'Residual Cash · ' + (today.sweepIsEstimate ? 'ประมาณการ' : 'ตามยอดจัดสรรจริง'), '')
       ].join('');
       const cases = R2O.state.cases.filter(function(item) { return item.driverId === d.id; });
       document.getElementById('driverCaseCount').textContent = cases.length + ' เคส';
@@ -1028,6 +1407,7 @@
       document.getElementById('driverStatementRows').innerHTML = statement.map(function(row) {
         return '<tr><td>' + row.date + '</td><td>' + R2O.ui.esc(row.type) + '</td><td>' + R2O.ui.esc(row.description) + '</td><td class="num">' + (row.debit ? R2O.ui.baht(row.debit, 2) : '-') + '</td><td class="num">' + (row.credit ? R2O.ui.baht(row.credit, 2) : '-') + '</td><td>' + R2O.ui.pill(row.status) + '</td></tr>';
       }).join('');
+      R2O.render.driverDaily();
     };
 
     R2O.render.partner = function() {
@@ -1241,12 +1621,36 @@
     globalThis.closeCaseEditor = function() { R2O.closeModal('caseModal'); };
 
     R2O.calculateXray = function() {
-      const revenue = Number(document.getElementById('xrayRevenue').value || 0);
-      const rate = Number(document.getElementById('xrayVerifyRate').value || 0) / 100;
-      const opEx = Number(document.getElementById('xrayOpex').value || 0);
-      const protectedCash = Number(document.getElementById('xrayProtected').value || 0);
-      const available = Math.max(0, revenue * rate - opEx - protectedCash);
-      document.getElementById('xrayAvailable').textContent = R2O.ui.baht(available, 2);
+      const driver = (R2O.state.drivers || [])[0] || {};
+      const sim = R2O.core.dailyXray({
+        source: 'SIMULATION',
+        gross: document.getElementById('xrayRevenue').value,
+        verifyRate: Number(document.getElementById('xrayVerifyRate').value || 0) / 100,
+        operatingNeed: document.getElementById('xrayOpex').value,
+        protectedCash: document.getElementById('xrayProtected').value,
+        paydPace: driver.paydPace === undefined ? driver.paydTarget : driver.paydPace,
+        paydCap: driver.paydCap,
+        catchUp: driver.catchUp || 0,
+        contractualDue: driver.monthlyDue,
+        principalShare: R2O.core.principalShare(R2O.state)
+      });
+      document.getElementById('xrayAvailable').textContent = R2O.ui.baht(sim.availableCash, 2);
+      const rows = [
+        ['รายได้', R2O.ui.baht(sim.grossRevenue, 2), ''],
+        ['รายได้ที่ใช้ประมาณการ', R2O.ui.baht(sim.verifiedRevenue, 2), ''],
+        ['ต้นทุนอาชีพ', '−' + R2O.ui.baht(sim.operatingNeed, 2), 'minus'],
+        ['เงินกันไว้ใช้ชีวิต (Protected Cash)', '−' + R2O.ui.baht(sim.protectedCash, 2), 'minus'],
+        ['Available Cash', R2O.ui.baht(sim.availableCash, 2), 'total'],
+        ['PAYD Target', R2O.ui.baht(sim.paydTarget, 2), ''],
+        ['Residual Cash', R2O.ui.baht(sim.residualCash, 2), 'total']
+      ];
+      document.getElementById('xraySimOut').innerHTML = '<table class="tbl"><tbody>' + rows.map(function(row) {
+        const strong = row[2] === 'total';
+        return '<tr><td>' + (strong ? '<b>' + R2O.ui.esc(row[0]) + '</b>' : R2O.ui.esc(row[0])) +
+          '</td><td class="num"' + (row[2] === 'minus' ? ' style="color:var(--danger)"' : '') + '>' +
+          (strong ? '<b>' + R2O.ui.esc(row[1]) + '</b>' : R2O.ui.esc(row[1])) + '</td></tr>';
+      }).join('') + '</tbody></table>' +
+        '<p class="mini" style="margin:9px 0 0">Simulation · ไม่ใช่รายการจริง · ไม่บันทึกลงรายการเดินบัญชี ประวัติการชำระ สถานะจาก FI จำนวนวันค้างชำระ หรือสถานะเฝ้าระวัง</p>';
     };
 
     R2O.downloadQueueCsv = function() {
@@ -1309,6 +1713,56 @@
       R2O.renderAll();
       R2O.ui.toast('รับคำขอแล้ว · การส่งคำขอไม่เปลี่ยนสถานะเครดิตโดยอัตโนมัติ');
       R2O.navigate('driver','help');
+    };
+
+    globalThis.openDailyIncome = function() {
+      const entry = R2O.state.dailyIncome && R2O.state.dailyIncome.status ? R2O.state.dailyIncome : null;
+      const driver = (R2O.state.drivers || [])[0] || {};
+      document.querySelectorAll('#dailyIncomeForm .field.invalid').forEach(function(field) { field.classList.remove('invalid'); });
+      document.getElementById('dailySplitError').hidden = true;
+      document.getElementById('dailyGross').value = entry ? entry.gross : '';
+      document.getElementById('dailyApp').value = entry && entry.app !== null && entry.app !== undefined ? entry.app : '';
+      document.getElementById('dailyCash').value = entry && entry.cash !== null && entry.cash !== undefined ? entry.cash : '';
+      document.getElementById('dailyKm').value = entry && entry.km !== null && entry.km !== undefined ? entry.km : (driver.km || '');
+      document.getElementById('dailyEmu').value = entry && entry.emu !== null && entry.emu !== undefined ? entry.emu : '';
+      document.getElementById('dailyNote').value = entry ? entry.note : '';
+      R2O.openModal('dailyIncomeModal');
+      document.getElementById('dailyGross').focus();
+    };
+    globalThis.closeDailyIncome = function() { R2O.closeModal('dailyIncomeModal'); };
+
+    globalThis.openZeroIncome = function() {
+      R2O.openModal('zeroIncomeModal');
+      document.getElementById('zeroIncomeConfirm').focus();
+    };
+    globalThis.closeZeroIncome = function() { R2O.closeModal('zeroIncomeModal'); };
+    globalThis.confirmZeroIncome = function() {
+      R2O.state = R2O.actions.reportZeroIncome(R2O.state, { actor:'D-000381', role:'driver', timestamp: R2O.localStamp() });
+      R2O.store.save();
+      R2O.closeModal('zeroIncomeModal');
+      R2O.renderAll();
+      R2O.ui.toast('บันทึกแล้ว · วันนี้ไม่มีรายได้ จึงไม่มีการหัก PAYD และไม่เปลี่ยนยอดครบกำหนดตามสัญญาหรือ DPD');
+    };
+
+    globalThis.toggleSimulation = function() {
+      const panel = document.getElementById('driverSimPanel');
+      const button = document.getElementById('daySimBtn');
+      panel.hidden = !panel.hidden;
+      button.setAttribute('aria-expanded', String(!panel.hidden));
+      button.textContent = panel.hidden ? 'ลองคำนวณก่อน' : 'ปิดการทดลองคำนวณ';
+      if (!panel.hidden) {
+        R2O.calculateXray();
+        document.getElementById('xrayRevenue').focus();
+      }
+    };
+
+    globalThis.toggleOpexDetail = function() {
+      const detail = document.getElementById('opexDetail');
+      const button = document.getElementById('opexDetailBtn');
+      if (!detail || !button) return;
+      detail.hidden = !detail.hidden;
+      button.setAttribute('aria-expanded', String(!detail.hidden));
+      button.textContent = detail.hidden ? 'ดูรายละเอียด' : 'ซ่อนรายละเอียด';
     };
 
     globalThis.openPartnerAction = function(action, entity, driverId) {
@@ -1393,6 +1847,38 @@
       R2O.closeModal('incidentModal');
       R2O.renderAll();
       R2O.ui.toast('ส่ง Incident แล้ว · เปิด F.A. Case และ Action Queue อัตโนมัติ');
+    });
+
+    document.getElementById('dailyIncomeForm').addEventListener('submit', function(event) {
+      event.preventDefault();
+      const stamp = R2O.localStamp();
+      const result = R2O.actions.reportDailyIncome(R2O.state, {
+        gross: document.getElementById('dailyGross').value,
+        app: document.getElementById('dailyApp').value,
+        cash: document.getElementById('dailyCash').value,
+        km: document.getElementById('dailyKm').value,
+        emu: document.getElementById('dailyEmu').value,
+        note: document.getElementById('dailyNote').value,
+        date: stamp.slice(0, 10)
+      }, { actor:'D-000381', role:'driver', timestamp: stamp });
+      const idMap = { gross:'dailyGross', app:'dailyApp', cash:'dailyCash', km:'dailyKm', emu:'dailyEmu' };
+      Object.keys(idMap).forEach(function(key) {
+        const node = document.getElementById(idMap[key]);
+        node.closest('.field').classList.toggle('invalid', Boolean(result.errors[key]));
+        if (result.errors[key]) document.getElementById(idMap[key] + 'Error').textContent = result.errors[key];
+      });
+      const splitNode = document.getElementById('dailySplitError');
+      splitNode.hidden = !result.errors.split;
+      if (result.errors.split) splitNode.textContent = result.errors.split;
+      if (Object.keys(result.errors).length) {
+        (document.querySelector('#dailyIncomeForm .field.invalid input') || document.getElementById('dailyGross')).focus();
+        return;
+      }
+      R2O.state = result.state;
+      R2O.store.save();
+      R2O.closeModal('dailyIncomeModal');
+      R2O.renderAll();
+      R2O.ui.toast('บันทึกรายได้แล้ว · สถานะ “ผู้ขับกรอกเอง · รอตรวจสอบ” ผลคำนวณเป็นประมาณการเท่านั้น');
     });
 
     document.getElementById('faIntakeForm').addEventListener('submit', function(event) {
