@@ -674,6 +674,65 @@ section('L', () => {
     }));
 });
 
+
+/* ══════════════ M. final pre-merge audit ══════════════
+ * No seeded number may be presented as if it were derived, and no figure
+ * may be presented as a risk measure without a locked definition.
+ */
+section('M', () => {
+  // the phrase survives only in the legend that explains why the column is gone
+  ok('M', 'riskScore is gone from state, markup and export',
+    st.portfolio.every((row) => row.riskScore === undefined) &&
+    !SRC.includes('riskScore') &&
+    !/<th[^>]*>คะแนนความเสี่ยง/.test(SRC) &&
+    (SRC.match(/คะแนนความเสี่ยง/g) || []).length ===
+      (SRC.match(/คะแนนความเสี่ยง ถูกถอดออก/g) || []).length);
+  ok('M', 'no seeded revenue-vs-average survives next to the derived one',
+    st.portfolio.every((row) => row.revenueVsAverage === undefined));
+  ok('M', 'onTime is the only illustrative column left and it is labelled',
+    st.portfolio.every((row) => typeof row.onTime === 'number') &&
+    SRC.includes('ตรงเวลา<span class="mini"> ภาพประกอบ</span>') &&
+    SRC.includes('Competition Illustration'));
+  ok('M', 'the portfolio legend names each column authoritative, derived or illustrative',
+    SRC.includes('ที่มาของแต่ละคอลัมน์') && SRC.includes('(authoritative)') &&
+    SRC.includes('(derived)'));
+  ok('M', 'the risk filter offers every level the derived column can show',
+    ['GREEN','WATCH','YELLOW','RED','UNKNOWN'].every((level) =>
+      SRC.includes('<option value="' + level + '">')));
+  const levels = R2O.core.portfolioView(st).map((row) => row.ews);
+  ok('M', 'every risk level the table shows is reachable by the filter',
+    levels.every((level) => SRC.includes('<option value="' + level + '">')));
+
+  ok('M', 'no haircut ratio or 95% claim survives anywhere',
+    !/95\s*%/.test(SRC) && !/verifyRate/.test(SRC) && !/\*\s*0\.95/.test(SCRIPT));
+  ok('M', 'no stale haircut-era amount survives anywhere',
+    ['1,757.99','1757.99','680.54','202.85','38,675.89','14,972.00','4,462.82']
+      .every((amount) => !SRC.includes(amount)));
+  ok('M', 'no legacy case status is persisted or offered',
+    !/(status|faStatus)\s*[:=]\s*'(NEW|CLOSED|REFERRED|REOPENED|SCHEDULED|TRIAGE)'/.test(SCRIPT) &&
+    !/value="(REOPENED|SCHEDULED)"/.test(SRC) && !SRC.includes('OEM FOLLOW-UP'));
+  ok('M', 'no prohibited pre-approval phrase is presented to a user',
+    ['OWN READY','BUILD READINESS','Readiness Certificate','Pre-E-LG','Front-Door',
+     'Seasoning','Pre-Score','Appropriate Route']
+      .every((phrase) => !SRC.toUpperCase().includes(phrase.toUpperCase())));
+  ok('M', 'the claim tier boundary keeps its own name',
+    !SRC.includes('maxClaimPerVehicle') && !/Max Claim per Vehicle/i.test(SRC) &&
+    !!st.claimArchitecture.portfolioTierBoundary);
+
+  // activityDaily has no driverId: prove nothing reads it for a second driver
+  ok('M', 'activityDaily is only ever read for the portfolio driver',
+    (SCRIPT.match(/activityDaily/g) || []).length === 2 &&
+    st.activityDaily.every((row) => row.driverId === undefined));
+  ok('M', 'every per-driver figure comes from the ledger, which is keyed by driver',
+    st.evidence.every((row) => typeof row.driverId === 'string') &&
+    R2O.core.driverFinancials(st, 'D-000422').hasLedger === false &&
+    R2O.core.driverFinancials(st, 'D-000381').history.length === 7);
+  ok('M', 'a second driver cannot inherit the portfolio driver’s trend',
+    R2O.core.riskConsoleRows(st, {})
+      .filter((row) => row.item.driverId !== 'D-000381')
+      .every((row) => row.history.length === 0));
+});
+
 /* ───────────────────────────── report ───────────────────────────── */
 
 const byGroup = {};

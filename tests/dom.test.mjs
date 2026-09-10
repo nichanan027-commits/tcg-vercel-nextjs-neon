@@ -445,6 +445,89 @@ ok('SS', 'the F.A. debt plan reads the same figures as the driver',
 await page.setViewportSize({ width: 1440, height: 900 });
 await page.evaluate(() => localStorage.clear());
 
+
+/* ══════════════ AU. final pre-merge audit, in the rendered UI ══════════════ */
+await page.setViewportSize({ width: 1440, height: 900 });
+await page.evaluate(() => { localStorage.clear(); R2O.state = R2O.defaults(); R2O.renderAll(); });
+
+await go('#partner:portfolio');
+await page.selectOption('#roleSelect', 'tcg'); await page.waitForTimeout(180);
+const portfolioScreen = await page.locator('#partner-portfolio').innerText();
+ok('AU', 'the portfolio no longer presents an undefined risk score',
+  !/คะแนนความเสี่ยง(?! ถูกถอดออก)/.test(portfolioScreen) &&
+  (await page.locator('#partner-portfolio thead th').count()) === 10);
+ok('AU', 'the portfolio legend classifies every column',
+  portfolioScreen.includes('ที่มาของแต่ละคอลัมน์') &&
+  portfolioScreen.includes('(authoritative)') && portfolioScreen.includes('(derived)') &&
+  portfolioScreen.includes('Competition Illustration'));
+ok('AU', 'the illustrative column is marked in its own header',
+  (await page.locator('#partner-portfolio thead th').nth(6).innerText()).includes('ภาพประกอบ'));
+
+await page.selectOption('#partnerPortfolioEws', 'WATCH'); await page.waitForTimeout(180);
+ok('AU', 'a risk level the table can show is reachable by the filter',
+  (await page.locator('#partnerPortfolioRows tr').count()) ===
+  (await page.evaluate(() => R2O.core.portfolioView(R2O.state).filter((r) => r.ews === 'WATCH').length)));
+await page.selectOption('#partnerPortfolioEws', 'ALL'); await page.waitForTimeout(180);
+
+await go('#partner:ews');
+await page.selectOption('#roleSelect', 'tcg'); await page.waitForTimeout(180);
+const ewsScreen = await page.locator('#partner-ews').innerText();
+ok('AU', 'the watch list is derived, not a hardcoded pair of rows',
+  (await page.locator('#partnerEwsRows tr').count()) ===
+  (await page.evaluate(() => R2O.state.drivers
+    .filter((d) => R2O.core.currentRiskStatus(R2O.state, d.id) !== 'GREEN').length)));
+ok('AU', 'the watch list drops the undefined risk score too',
+  !/คะแนนความเสี่ยง(?! ถูกถอดออก)/.test(ewsScreen));
+ok('AU', 'the watch list agrees with the portfolio on every driver',
+  await page.evaluate(() => {
+    const view = R2O.core.portfolioView(R2O.state);
+    return Array.from(document.querySelectorAll('#partnerEwsRows tr')).every((tr) => {
+      const cells = tr.querySelectorAll('td');
+      if (cells.length < 7) return true;
+      const id = cells[0].textContent.trim();
+      const label = { GREEN:'ปกติ', WATCH:'จับตา', YELLOW:'เฝ้าระวัง', RED:'เสี่ยงสูง', UNKNOWN:'ไม่มีข้อมูล' };
+      const row = view.find((r) => r.driverId === id);
+      return !!row && cells[6].textContent.trim() === label[row.ews];
+    });
+  }));
+ok('AU', 'the watch list shows a missing trend as missing, not as a number',
+  ewsScreen.includes('ไม่มีข้อมูล') && !ewsScreen.includes('-32%') && !ewsScreen.includes('-18%'));
+
+await go('#driver:activity');
+const activityScreen = await page.locator('#driver-activity').innerText();
+ok('AU', 'gross revenue is shown, not a zero standing in for a missing field',
+  activityScreen.includes('1,850.52') && activityScreen.includes('1,715.50') &&
+  !/รายได้รวมวันนี้\s*฿0\.00/.test(activityScreen));
+ok('AU', 'EMU renders a real number rather than undefined',
+  activityScreen.includes('EMU 228') && !activityScreen.includes('undefined'));
+ok('AU', 'continuity is counted from the ledger',
+  activityScreen.includes('8 / 8 วัน') && !activityScreen.includes('6 / 7 วัน'));
+
+await go('#driver:home');
+const homeScreen = await page.locator('#driver-home').innerText();
+ok('AU', 'the day plan states the evidence instead of a 95% ratio',
+  !homeScreen.includes('95%') && homeScreen.includes('ยืนยันแล้ว ฿1,715.50') &&
+  homeScreen.includes('฿1,850.52'));
+ok('AU', 'the day plan reads the same risk level as every other surface',
+  await page.evaluate(() => document.getElementById('driverTodayRisk').textContent.trim() ===
+    ({ GREEN:'ปกติ', WATCH:'จับตา', YELLOW:'เฝ้าระวัง', RED:'เสี่ยงสูง', UNKNOWN:'ไม่มีข้อมูล' })[
+      R2O.core.currentRiskStatus(R2O.state, 'D-000381')]));
+ok('AU', 'the day plan PAYD figure comes from the accessor',
+  homeScreen.includes('477.69'));
+
+const portfolioCsv = await page.evaluate(() => {
+  let captured = null;
+  const original = R2O.downloadCsv;
+  R2O.downloadCsv = (name, body) => { captured = body; };
+  try { downloadPartnerCsv('portfolio'); } finally { R2O.downloadCsv = original; }
+  return captured;
+});
+ok('AU', 'the portfolio export drops the risk score and marks the illustration',
+  !!portfolioCsv && !portfolioCsv.includes('Risk Score') &&
+  portfolioCsv.includes('On-time (illustration)') && portfolioCsv.includes('ไม่มีข้อมูล'));
+
+await page.evaluate(() => localStorage.clear());
+
 ok('V', 'no JavaScript errors anywhere in the run', errors.length === 0);
 
 await browser.close();

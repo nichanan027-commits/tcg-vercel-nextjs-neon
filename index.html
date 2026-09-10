@@ -221,7 +221,7 @@
               <div class="tblwrap" id="xraySimOut" style="margin-top:12px"></div>
             </section>
             <div style="margin-top:13px">
-              <div class="card pad"><div class="section-head"><h3>แผนวันนี้</h3><span class="pill green">ปกติ</span></div><div class="timeline"><div class="timeline-item"><span class="timeline-dot"></span><div><b>รับรายได้และยืนยันแหล่งข้อมูล</b><small>รายได้ยืนยันแล้ว 95%</small></div></div><div class="timeline-item"><span class="timeline-dot"></span><div><b>กันต้นทุนอาชีพและเงินคุ้มครอง</b><small>ไม่คำนวณซ้ำ</small></div></div><div class="timeline-item"><span class="timeline-dot"></span><div><b>จัดสรร การจ่ายตามรายได้แบบยืดหยุ่น (PAYD)</b><small>เป้าหมาย 477.69 บาท · ยอดหักไม่เกินเงินพร้อมจัดสรร</small></div></div><div class="timeline-item"><span class="timeline-dot"></span><div><b>ติดตามเงินต้น</b><small>แนวโน้มเงินต้น เป็นไปตามแผน</small></div></div></div></div>
+              <div class="card pad"><div class="section-head"><h3>แผนวันนี้</h3><span id="driverTodayRisk" class="pill">-</span></div><div class="timeline"><div class="timeline-item"><span class="timeline-dot"></span><div><b>รับรายได้และยืนยันแหล่งข้อมูล</b><small id="driverPlanVerified">-</small></div></div><div class="timeline-item"><span class="timeline-dot"></span><div><b>กันต้นทุนอาชีพและเงินคุ้มครอง</b><small>ไม่คำนวณซ้ำ</small></div></div><div class="timeline-item"><span class="timeline-dot"></span><div><b>จัดสรร การจ่ายตามรายได้แบบยืดหยุ่น (PAYD)</b><small id="driverPlanPayd">-</small></div></div><div class="timeline-item"><span class="timeline-dot"></span><div><b>ติดตามเงินต้น</b><small>แนวโน้มเงินต้น เป็นไปตามแผน</small></div></div></div></div>
             </div>
           </section>
 
@@ -306,8 +306,8 @@
 
           <section id="partner-portfolio" class="screen">
             <div class="title"><div><h2>พอร์ตที่ใช้งานอยู่</h2><p>หลังสถาบันการเงินอนุมัติและผ่านเงื่อนไขเปิดใช้งาน</p></div><button class="btn primary" onclick="downloadPartnerCsv('portfolio')">ส่งออกรายงาน CSV</button></div>
-            <div class="toolbar"><div class="field"><label for="partnerPortfolioSearch">ค้นหา</label><input id="partnerPortfolioSearch" placeholder="Driver / VIN / FI / Co-op"></div><div class="field"><label for="partnerPortfolioEws">EWS</label><select id="partnerPortfolioEws"><option value="ALL">ทั้งหมด</option><option value="GREEN">ปกติ</option><option value="YELLOW">เฝ้าระวัง</option><option value="RED">เสี่ยงสูง</option></select></div><div class="field"><label for="partnerPortfolioStatus">สถานะบัญชี</label><select id="partnerPortfolioStatus"><option value="ALL">ทั้งหมด</option><option value="ACTIVE">ใช้งานอยู่</option><option value="REVIEW">รอตรวจสอบ</option></select></div><div class="field"><label for="partnerPortfolioDpd">DPD</label><select id="partnerPortfolioDpd"><option value="ALL">ทั้งหมด</option><option value="0">0</option><option value="1-7">1–7</option><option value="8-30">8–30</option><option value="30+">มากกว่า 30</option></select></div><div class="field"><label for="partnerPortfolioArea">พื้นที่</label><select id="partnerPortfolioArea"><option value="ALL">ทุกพื้นที่</option><option>กรุงเทพฯ</option><option>นนทบุรี</option><option>สมุทรปราการ</option></select></div></div>
-            <div class="card pad tblwrap"><table class="tbl"><thead><tr><th>ผู้ขับ</th><th>Co-op / FI</th><th>พื้นที่</th><th>VIN / Child E-LG</th><th class="num">ยอดคงเหลือ</th><th class="num">DPD</th><th class="num">ตรงเวลา</th><th class="num">รายได้เทียบเฉลี่ย</th><th class="num">คะแนนความเสี่ยง</th><th>EWS</th><th>ดำเนินการ</th></tr></thead><tbody id="partnerPortfolioRows"></tbody></table></div>
+            <div class="toolbar"><div class="field"><label for="partnerPortfolioSearch">ค้นหา</label><input id="partnerPortfolioSearch" placeholder="Driver / VIN / FI / Co-op"></div><div class="field"><label for="partnerPortfolioEws">EWS</label><select id="partnerPortfolioEws"><option value="ALL">ทั้งหมด</option><option value="GREEN">ปกติ</option><option value="WATCH">จับตา</option><option value="YELLOW">เฝ้าระวัง</option><option value="RED">เสี่ยงสูง</option><option value="UNKNOWN">ไม่มีข้อมูล</option></select></div><div class="field"><label for="partnerPortfolioStatus">สถานะบัญชี</label><select id="partnerPortfolioStatus"><option value="ALL">ทั้งหมด</option><option value="ACTIVE">ใช้งานอยู่</option><option value="REVIEW">รอตรวจสอบ</option></select></div><div class="field"><label for="partnerPortfolioDpd">DPD</label><select id="partnerPortfolioDpd"><option value="ALL">ทั้งหมด</option><option value="0">0</option><option value="1-7">1–7</option><option value="8-30">8–30</option><option value="30+">มากกว่า 30</option></select></div><div class="field"><label for="partnerPortfolioArea">พื้นที่</label><select id="partnerPortfolioArea"><option value="ALL">ทุกพื้นที่</option><option>กรุงเทพฯ</option><option>นนทบุรี</option><option>สมุทรปราการ</option></select></div></div>
+            <div class="card pad tblwrap"><table class="tbl"><thead><tr><th>ผู้ขับ</th><th>Co-op / FI</th><th>พื้นที่</th><th>VIN / Child E-LG</th><th class="num">ยอดคงเหลือ</th><th class="num">DPD</th><th class="num">ตรงเวลา<span class="mini"> ภาพประกอบ</span></th><th class="num">รายได้เทียบเฉลี่ย</th><th>EWS</th><th>ดำเนินการ</th></tr></thead><tbody id="partnerPortfolioRows"></tbody></table><p class="mini" style="margin:10px 0 0"><b>ที่มาของแต่ละคอลัมน์:</b> ยอดคงเหลือ · DPD มาจากสถาบันการเงิน (authoritative) · รายได้เทียบเฉลี่ย · EWS คำนวณจากสมุดหลักฐานรายได้ (derived) · ตรงเวลา เป็นภาพประกอบสำหรับการนำเสนอ ยังไม่มีนิยามที่ล็อกไว้สำหรับระบบหลังอนุมัติ (Competition Illustration) · คอลัมน์ คะแนนความเสี่ยง ถูกถอดออกเพราะยังไม่มีสูตรที่ล็อกไว้ ระดับความเสี่ยงปัจจุบันดูที่ EWS</p></div>
           </section>
 
           <section id="partner-daily" class="screen">
@@ -326,7 +326,7 @@
           <section id="partner-ews" class="screen">
             <div class="title"><div><h2>ความเสี่ยง / ระบบเตือนภัยล่วงหน้า (EWS)</h2><p>สัญญาณตามสาเหตุ: การใช้งาน, ผลตอบแทน, การชำระเงิน, ต้นทุน, ความสามารถในการชำระ, เวลาที่รถหยุดใช้งาน</p></div><button class="btn primary" onclick="openPartnerAction('EWS_REVIEW','FA-1047','D-000437')">เปิดการทบทวนความเสี่ยง</button></div>
             <div class="metric-grid"><div class="metric warn"><b>U · การใช้งาน</b><div class="value">18</div><span class="mini">เคสเฝ้าระวัง</span></div><div class="metric warn"><b>Y · ผลตอบแทน</b><div class="value">14</div><span class="mini">รายได้/EMU ลดลง</span></div><div class="metric risk"><b>P · การชำระเงิน</b><div class="value">11</div><span class="mini">ยอดหัก / DPD</span></div><div class="metric warn"><b>D · เวลาที่รถหยุดใช้งาน</b><div class="value">16</div><span class="mini">รถ/ข้อมูล/ป่วย</span></div></div>
-            <div class="card pad tblwrap" style="margin-top:13px"><table class="tbl"><thead><tr><th>ผู้ขับ</th><th>เหตุ</th><th class="num">จำนวนวันค้างชำระ (DPD)</th><th>แนวโน้มรายได้</th><th>สถานะการวิ่ง</th><th class="num">คะแนนความเสี่ยง</th><th>เงินต้น</th><th>EWS</th><th>การดำเนินการ</th></tr></thead><tbody><tr><td>D-000422</td><td>ป่วย 4 วัน</td><td class="num">0</td><td class="num">-32%</td><td>หยุดวิ่ง 4 วัน</td><td class="num">57</td><td>เป็นไปตามแผน</td><td><span class="pill amber">เฝ้าระวัง</span></td><td><button class="btn ghost" onclick="openPartnerAction('EWS_REVIEW','FA-1042','D-000422')">การวินิจฉัย</button></td></tr><tr><td>D-000437</td><td>DPD 12 วัน + ความสามารถในการชำระ</td><td class="num">12</td><td class="num">-18%</td><td>ใช้งานอยู่</td><td class="num">82</td><td>เฝ้าระวังช่องว่าง</td><td><span class="pill red">เสี่ยงสูง</span></td><td><button class="btn ghost" onclick="openPartnerAction('ESCALATE_TDR','FA-1047','D-000437')">ก่อนปรับโครงสร้างหนี้ (Pre-TDR)</button></td></tr></tbody></table></div>
+            <div class="card pad tblwrap" style="margin-top:13px"><table class="tbl"><thead><tr><th>ผู้ขับ</th><th>เหตุ</th><th class="num">จำนวนวันค้างชำระ (DPD)</th><th class="num">แนวโน้มรายได้</th><th>สถานะการวิ่ง</th><th>เงินต้น<span class="mini"> ภาพประกอบ</span></th><th>EWS</th><th>การดำเนินการ</th></tr></thead><tbody id="partnerEwsRows"></tbody></table><p class="mini" style="margin:10px 0 0"><b>ที่มาของแต่ละคอลัมน์:</b> จำนวนวันค้างชำระมาจากสถาบันการเงิน (authoritative) · แนวโน้มรายได้ · EWS คำนวณจากสมุดหลักฐานรายได้ (derived) · เงินต้น เป็นภาพประกอบสำหรับการนำเสนอ (Competition Illustration) · คอลัมน์ คะแนนความเสี่ยง ถูกถอดออกเพราะยังไม่มีสูตรที่ล็อกไว้</p></div>
           </section>
 
           <section id="partner-cure" class="screen">
@@ -801,10 +801,10 @@
           { id:'D-000451', name:'นางจันทร์เพ็ญ แสงดี', coop:'Co-op A', fi:'Krungsri', area:'สมุทรปราการ', tier:'B', fiDpd:0, status:'VEHICLE_DOWN', km:0, emu:0, opEx:0, protectedCash:600, paydPace:452, paydCap:890, catchUp:0, dailyCap:890, availableToDebit:0, authorizedDebitLimit:1000, paymentReserve:{balance:0, target:2260.00}, verifiedAt:'2026-09-09T09:00:00+07:00', debtStart:775000, debtBalance:511600, monthlyDue:8910, cureReserve:990 }
         ],
         portfolio: [
-          { driverId:'D-000381', vin:'VIN...0381', elg:'ELG-80381', fi:'KBank', coop:'Co-op A', area:'กรุงเทพฯ', balance:562420, dpd:0, status:'ACTIVE', accountStatus:'ACTIVE', onTime:100, revenueVsAverage:6, riskScore:24 },
-          { driverId:'D-000422', vin:'VIN...0422', elg:'ELG-80422', fi:'SCB', coop:'Co-op B', area:'กรุงเทพฯ', balance:468000, dpd:0, status:'ILLNESS', accountStatus:'REVIEW', onTime:98, revenueVsAverage:-32, riskScore:57 },
-          { driverId:'D-000437', vin:'VIN...0437', elg:'ELG-80437', fi:'KBank', coop:'Co-op C', area:'นนทบุรี', balance:502000, dpd:12, status:'ACTIVE', accountStatus:'ACTIVE', onTime:86, revenueVsAverage:-18, riskScore:82 },
-          { driverId:'D-000451', vin:'VIN...0451', elg:'ELG-80451', fi:'Krungsri', coop:'Co-op A', area:'สมุทรปราการ', balance:511600, dpd:0, status:'VEHICLE_DOWN', accountStatus:'REVIEW', onTime:100, revenueVsAverage:-41, riskScore:61 }
+          { driverId:'D-000381', vin:'VIN...0381', elg:'ELG-80381', fi:'KBank', coop:'Co-op A', area:'กรุงเทพฯ', balance:562420, dpd:0, status:'ACTIVE', accountStatus:'ACTIVE', onTime:100 },
+          { driverId:'D-000422', vin:'VIN...0422', elg:'ELG-80422', fi:'SCB', coop:'Co-op B', area:'กรุงเทพฯ', balance:468000, dpd:0, status:'ILLNESS', accountStatus:'REVIEW', onTime:98 },
+          { driverId:'D-000437', vin:'VIN...0437', elg:'ELG-80437', fi:'KBank', coop:'Co-op C', area:'นนทบุรี', balance:502000, dpd:12, status:'ACTIVE', accountStatus:'ACTIVE', onTime:86 },
+          { driverId:'D-000451', vin:'VIN...0451', elg:'ELG-80451', fi:'Krungsri', coop:'Co-op A', area:'สมุทรปราการ', balance:511600, dpd:0, status:'VEHICLE_DOWN', accountStatus:'REVIEW', onTime:100 }
         ],
         // Post-Approval Activation Pipeline. This screen begins after FI final
         // approval; nothing about readiness, pre-scoring or FI matching belongs here.
@@ -2254,18 +2254,43 @@
         R2O.ui.metric('เงินเหลือหลังจัดสรร', R2O.ui.baht(today.residualCash, 2), 'Residual Cash · ' + (today.sweepIsEstimate ? 'ประมาณการ' : 'ตามยอดจัดสรรจริง'), '')
       ].join('');
       document.getElementById('xrayAvailable').textContent = R2O.ui.baht(today.availableCash, 2);
+      // the day's plan states the evidence itself; there is no verified-to-reported ratio
+      const planMoney = R2O.core.driverFinancials(R2O.state, d.id);
+      const risk = R2O.core.currentRiskStatus(R2O.state, d.id);
+      const riskPill = document.getElementById('driverTodayRisk');
+      riskPill.className = 'pill ' + (risk === 'RED' ? 'red' : risk === 'YELLOW' ? 'amber' : risk === 'GREEN' ? 'green' : 'blue');
+      riskPill.textContent = { GREEN:'ปกติ', WATCH:'จับตา', YELLOW:'เฝ้าระวัง', RED:'เสี่ยงสูง', UNKNOWN:'ไม่มีข้อมูล' }[risk] || risk;
+      document.getElementById('driverPlanVerified').textContent = planMoney.hasLedger
+        ? 'ยืนยันแล้ว ' + R2O.ui.baht(planMoney.verified, 2) + ' จากที่รายงาน ' + R2O.ui.baht(planMoney.reported, 2)
+        : 'ยังไม่มีสมุดหลักฐานรายได้';
+      document.getElementById('driverPlanPayd').textContent = planMoney.hasLedger
+        ? 'ที่ต้องเติมวันนี้ ' + R2O.ui.baht(planMoney.required, 2) + ' บาท · ยอดหักไม่เกินเงินพร้อมจัดสรร'
+        : 'ประเมินไม่ได้จนกว่าจะมีหลักฐานรายได้';
       const cases = R2O.state.cases.filter(function(item) { return item.driverId === d.id; });
       document.getElementById('driverCaseCount').textContent = cases.length + ' เคส';
       document.getElementById('driverCaseRows').innerHTML = cases.length ? cases.map(function(item) {
         return '<tr><td>' + R2O.ui.esc(item.id) + '</td><td>' + R2O.ui.esc(item.topic) + '</td><td>' + R2O.ui.pill(item.status) + '</td><td>' + R2O.ui.esc(item.owner) + '</td><td>' + R2O.ui.esc(item.nextAction) + '</td></tr>';
       }).join('') : '<tr><td colspan="5" class="empty">ยังไม่มีคำขอเปิดอยู่</td></tr>';
       const activity = R2O.state.activityDaily || [];
-      const latest = activity[activity.length - 1] || { revenue:0, verified:0, km:0, emu:0, hours:0 };
+      const latest = activity[activity.length - 1] || {};
+      // gross and verified both come from the ledger; the activity row carries
+      // distance and hours only, so EMU is read from the driver record
+      const ledgerDays = ((R2O.state.evidence || []).filter(function(row) { return row.driverId === d.id; })
+        .map(function(row) { return row.date; })
+        .filter(function(value, index, all) { return all.indexOf(value) === index; }));
+      const earningDays = ledgerDays.filter(function(date) {
+        return R2O.core.verifiedRevenue(R2O.core.evidenceDay(R2O.state, date, d.id)) > 0;
+      }).length;
+      const na = function(value, digits) {
+        return value === null || value === undefined ? 'ไม่มีข้อมูล' : R2O.ui.baht(value, digits);
+      };
       document.getElementById('driverActivityMetrics').innerHTML = [
-        R2O.ui.metric('รายได้รวมวันนี้', R2O.ui.baht(latest.revenue, 2), 'Verified ' + R2O.ui.baht(latest.verified, 2), 'accent'),
-        R2O.ui.metric('ระยะทางวันนี้', latest.km + ' km', 'EMU ' + latest.emu, ''),
-        R2O.ui.metric('ชั่วโมงใช้งาน', latest.hours + ' ชั่วโมง', 'ข้อมูลจากงานที่ยืนยัน', ''),
-        R2O.ui.metric('ความต่อเนื่อง', '6 / 7 วัน', 'Downtime 1 วัน', 'warn')
+        R2O.ui.metric('รายได้รวมวันนี้', na(today.grossRevenue, 2), 'Verified ' + na(today.verifiedRevenue, 2), 'accent'),
+        R2O.ui.metric('ระยะทางวันนี้', (latest.km === undefined ? d.km : latest.km) + ' km', 'EMU ' + d.emu, ''),
+        R2O.ui.metric('ชั่วโมงใช้งาน', (latest.hours === undefined ? '-' : latest.hours) + ' ชั่วโมง', 'ข้อมูลจากงานที่ยืนยัน', ''),
+        R2O.ui.metric('ความต่อเนื่อง', ledgerDays.length ? earningDays + ' / ' + ledgerDays.length + ' วัน' : 'ไม่มีข้อมูล',
+          ledgerDays.length ? 'วันที่มีรายได้ที่ตรวจยันแล้ว' : 'ยังไม่มีสมุดหลักฐาน',
+          ledgerDays.length && earningDays < ledgerDays.length ? 'warn' : '')
       ].join('');
       const chartRows = R2O.activityRange === 30 ? (R2O.state.activity30 || []) : activity;
       document.getElementById('driverActivityChartTitle').textContent = R2O.activityRange === 30 ? 'แนวโน้มรายได้ยืนยันแล้ว 30 วัน' : 'รายได้ยืนยันแล้ว 7 วัน';
@@ -2544,8 +2569,8 @@
         area:document.getElementById('partnerPortfolioArea').value
       });
       document.getElementById('partnerPortfolioRows').innerHTML = portfolio.map(function(row) {
-        return '<tr><td>' + row.driverId + '</td><td>' + row.coop + '<br><span class="mini">' + row.fi + '</span></td><td>' + row.area + '</td><td>' + row.vin + '<br><span class="mini">' + row.elg + '</span></td><td class="num">' + R2O.ui.baht(row.balance) + '</td><td class="num">' + row.dpd + '</td><td class="num">' + row.onTime + '%</td><td class="num">' + (row.revenueVsAverage === null || row.revenueVsAverage === undefined ? 'ไม่มีข้อมูล' : (row.revenueVsAverage > 0 ? '+' : '') + row.revenueVsAverage + '%') + '</td><td class="num"><b>' + row.riskScore + '</b></td><td>' + R2O.ui.pill(row.ews) + '</td><td><button class="btn ghost" onclick="openPartnerAction(\'FOLLOW_UP\',\'' + row.elg + '\',\'' + row.driverId + '\')">เปิดเคส</button></td></tr>';
-      }).join('') || '<tr><td colspan="11" class="empty">ไม่พบรายการในขอบเขตสิทธิ์</td></tr>';
+        return '<tr><td>' + row.driverId + '</td><td>' + row.coop + '<br><span class="mini">' + row.fi + '</span></td><td>' + row.area + '</td><td>' + row.vin + '<br><span class="mini">' + row.elg + '</span></td><td class="num">' + R2O.ui.baht(row.balance) + '</td><td class="num">' + row.dpd + '</td><td class="num">' + row.onTime + '%</td><td class="num">' + (row.revenueVsAverage === null || row.revenueVsAverage === undefined ? 'ไม่มีข้อมูล' : (row.revenueVsAverage > 0 ? '+' : '') + row.revenueVsAverage + '%') + '</td><td>' + R2O.ui.pill(row.ews) + '</td><td><button class="btn ghost" onclick="openPartnerAction(\'FOLLOW_UP\',\'' + row.elg + '\',\'' + row.driverId + '\')">เปิดเคส</button></td></tr>';
+      }).join('') || '<tr><td colspan="10" class="empty">ไม่พบรายการในขอบเขตสิทธิ์</td></tr>';
       const allowedIds = new Set(scoped.map(function(row) { return row.driverId; }));
       document.getElementById('partnerIncidentRows').innerHTML = R2O.state.incidents.filter(function(row) { return allowedIds.has(row.driverId); }).map(function(row) {
         return '<tr><td>' + row.driverId + '</td><td>' + row.startDate + '</td><td class="num">' + row.inactiveDays + '</td><td>' + row.cause + '</td><td class="num">' + R2O.ui.baht(row.impact) + '</td><td>' + row.owner + '</td><td>' + R2O.ui.pill(row.sla) + '</td><td>' + R2O.ui.esc(row.nextAction) + '</td></tr>';
@@ -2573,6 +2598,30 @@
       document.getElementById('partnerFinanceRows').innerHTML = (R2O.state.reconciliations || []).map(function(row) {
         return '<tr><td>' + row.date + '</td><td class="num">' + R2O.ui.baht(row.verifiedRevenue) + '</td><td class="num">' + R2O.ui.baht(row.payd) + '</td><td class="num">' + R2O.ui.baht(row.principal) + '</td><td class="num">' + R2O.ui.baht(row.interest) + '</td><td class="num">' + R2O.ui.baht(row.reserve) + '</td><td>' + R2O.ui.pill(row.status) + '</td></tr>';
       }).join('');
+      // the watch list is derived: a driver appears because today's evidence puts
+      // them above GREEN, not because a row was written for them
+      const RISK_TH = { GREEN:'ปกติ', WATCH:'จับตา', YELLOW:'เฝ้าระวัง', RED:'เสี่ยงสูง', UNKNOWN:'ไม่มีข้อมูล' };
+      document.getElementById('partnerEwsRows').innerHTML = R2O.state.drivers
+        .filter(function(row) { return allowedIds.has(row.id); })
+        .map(function(row) { return { driver: row, risk: R2O.core.currentRisk(R2O.state, row.id) }; })
+        .filter(function(entry) { return entry.risk.level !== 'GREEN'; })
+        .map(function(entry) {
+          const row = entry.driver;
+          const trend = R2O.core.revenueVsAverage(R2O.state, row.id);
+          const incident = (R2O.state.incidents || []).filter(function(item) { return item.driverId === row.id; })[0];
+          const openCase = (R2O.state.interventions || []).filter(function(item) {
+            return item.driverId === row.id && R2O.core.isOpenCase(item.workflow);
+          })[0];
+          const cure = (R2O.state.promptCure || []).filter(function(item) { return item.driverId === row.id; })[0];
+          return '<tr><td>' + row.id + '</td>' +
+            '<td>' + R2O.ui.esc(entry.risk.primaryTriggerLabel) + '</td>' +
+            '<td class="num">' + (row.fiDpd === undefined ? '-' : row.fiDpd) + '</td>' +
+            '<td class="num">' + (trend === null ? 'ไม่มีข้อมูล' : (trend > 0 ? '+' : '') + trend + '%') + '</td>' +
+            '<td>' + R2O.ui.esc(incident ? incident.cause + ' · หยุดวิ่ง ' + incident.inactiveDays + ' วัน' : 'ใช้งานอยู่') + '</td>' +
+            '<td>' + R2O.ui.esc(row.status === 'ACTIVE' ? 'เป็นไปตามแผน' : 'เฝ้าระวังช่องว่าง') + '</td>' +
+            '<td>' + R2O.ui.pill(RISK_TH[entry.risk.level] || entry.risk.level) + '</td>' +
+            '<td>' + R2O.ui.esc(cure ? cure.stage : openCase ? openCase.nextAction : 'การวินิจฉัย') + '</td></tr>';
+        }).join('') || '<tr><td colspan="8" class="empty">ไม่มีผู้ขับที่ต้องเฝ้าระวังในขอบเขตสิทธิ์</td></tr>';
       document.getElementById('partnerAuditRows').innerHTML = R2O.render.auditRows();
     };
 
@@ -2929,7 +2978,7 @@
         const role = document.getElementById('roleSelect').value, org = document.getElementById('orgSelect').value;
         rows = R2O.state.pipeline.filter(function(row) { return (role !== 'fi' || row.fi === org) && (role !== 'coop' || row.coop === org); }).map(function(row) { return [row.driverId,row.coop,row.fi,row.elg,row.vin,row.stage,row.insurance,row.warranty,row.paymentRail,row.status]; });
       } else if (type === 'portfolio') {
-        headers = ['ผู้ขับ','Co-op','FI','พื้นที่','VIN','Child E-LG','Balance','DPD','On-time','Revenue vs Avg','Risk Score','EWS'];
+        headers = ['ผู้ขับ','Co-op','FI','พื้นที่','VIN','Child E-LG','Balance','DPD','On-time (illustration)','Revenue vs Avg','EWS'];
         const filtered = R2O.core.filterPortfolio(Object.assign({}, R2O.state, { portfolio:R2O.scopedPortfolio() }), {
           search:document.getElementById('partnerPortfolioSearch').value,
           ews:document.getElementById('partnerPortfolioEws').value,
@@ -2937,7 +2986,10 @@
           dpd:document.getElementById('partnerPortfolioDpd').value,
           area:document.getElementById('partnerPortfolioArea').value
         });
-        rows = filtered.map(function(row) { return [row.driverId,row.coop,row.fi,row.area,row.vin,row.elg,row.balance,row.dpd,row.onTime,row.revenueVsAverage,row.riskScore,row.ews]; });
+        rows = filtered.map(function(row) {
+          return [row.driverId,row.coop,row.fi,row.area,row.vin,row.elg,row.balance,row.dpd,row.onTime,
+            row.revenueVsAverage === null ? 'ไม่มีข้อมูล' : row.revenueVsAverage, row.ews];
+        });
       } else if (type === 'daily') {
         headers = ['ผู้ขับ','Verified Revenue','KM','EMU','Required PAYD','Actual Sweep','Binding Gate','Status'];
         rows = R2O.state.drivers.map(function(row) {
