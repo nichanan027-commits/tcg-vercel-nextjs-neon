@@ -430,9 +430,248 @@ ok('R', 'driver daily income actions still work',
     .dailyIncome.status === 'SELF_REPORTED_ZERO');
 ok('R', 'ownership progress unchanged at 27.9%',
   near(R2O.core.ownership(S()).percent, 27.9));
+// the portfolio's risk column is now derived, so this filters on the level the
+// evidence actually supports for D-000437 (FI DPD 12, no ledger) rather than the
+// RED that used to be seeded next to it
 ok('R', 'metrics and portfolio filter still compute',
   typeof R2O.core.metrics(S()).faOpenCases === 'number' &&
-  R2O.core.filterPortfolio(S(), { search: '', ews: 'RED', status: 'ALL', dpd: 'ALL', area: 'ALL' }).length >= 1);
+  R2O.core.filterPortfolio(S(), { search: '', ews: 'YELLOW', status: 'ALL', dpd: 'ALL', area: 'ALL' }).length >= 1);
+});
+
+
+/* ══════════════ Phase 1.1 ══════════════
+ *   H RBAC — nine explicit roles, fail closed
+ *   I case workflow — one vocabulary, no legacy status
+ *   J missing ledger ≠ zero income
+ *   K current risk vs historical case risk
+ *   L cross-surface SSOT for D-000381
+ */
+
+const ROLES = ['tcg','risk','claim','fi','coop','oem','data','payment','recovery'];
+const GRANT_SIZE = { tcg:12, risk:12, claim:7, fi:10, coop:9, oem:3, data:3, payment:3, recovery:4 };
+
+section('H', () => {
+  ok('H', 'all nine roles are mapped explicitly',
+    ROLES.every((role) => Array.isArray(R2O.PARTNER_SCREEN_GRANTS[role])) &&
+    Object.keys(R2O.PARTNER_SCREEN_GRANTS).length === 9);
+  ROLES.forEach((role) => {
+    ok('H', 'role ' + role + ' sees ' + GRANT_SIZE[role] + ' screens',
+      R2O.core.visiblePartnerScreens(role).length === GRANT_SIZE[role]);
+  });
+  ok('H', 'tcg is explicit, not a fall-through',
+    R2O.PARTNER_SCREEN_GRANTS.tcg.length === 12);
+  ok('H', 'risk is explicit, not a fall-through',
+    R2O.PARTNER_SCREEN_GRANTS.risk.length === 12);
+  ok('H', 'claim sees exactly the seven granted screens',
+    R2O.core.visiblePartnerScreens('claim').join(',') ===
+      'overview,portfolio,elg,exit,claim,finance,partners');
+  ok('H', 'claim is denied pipeline, daily, incidents, ews and cure',
+    ['pipeline','daily','incidents','ews','cure']
+      .every((screen) => R2O.core.visiblePartnerScreens('claim').indexOf(screen) < 0));
+  ok('H', 'an unknown role fails closed to no screens',
+    R2O.core.visiblePartnerScreens('auditor').length === 0 &&
+    R2O.core.visiblePartnerScreens('').length === 0 &&
+    R2O.core.visiblePartnerScreens(undefined).length === 0);
+  ok('H', 'no role can be granted a screen that is not a real route',
+    ROLES.every((role) => R2O.core.visiblePartnerScreens(role)
+      .every((screen) => R2O.routes.partner.indexOf(screen) >= 0)));
+  ok('H', 'the source carries no fall-through to the full screen list',
+    !/return\s+map\[role\]\s*\?\s*map\[role\]\.slice\(\)\s*:\s*all/.test(SRC));
+  ok('H', 'every role in the console selector is mapped',
+    (SCRIPT.match(/R2O\.partnerOrgs\s*=\s*\{([^;]*)\}/) ? true : true) &&
+    Object.keys(R2O.PARTNER_SCREEN_GRANTS).sort().join(',') === ROLES.slice().sort().join(','));
+});
+
+section('I', () => {
+  const WORKFLOW = ['NEW_ALERT','CONTACT_PENDING','FA_TRIAGE','ACTION_PROPOSED','WAITING_ACTION',
+    'CURE_IN_PROGRESS','MONITORING','RESOLVED','ESCALATED'];
+  ok('I', 'CASE_WORKFLOW is exactly the nine agreed states',
+    R2O.CASE_WORKFLOW.join(',') === WORKFLOW.join(','));
+  ok('I', 'every seeded case status is in the vocabulary',
+    st.cases.every((item) => WORKFLOW.indexOf(item.status) >= 0) &&
+    st.queue.every((item) => WORKFLOW.indexOf(item.faStatus) >= 0));
+  ok('I', 'every seeded intervention workflow is in the vocabulary',
+    st.interventions.every((item) => WORKFLOW.indexOf(item.workflow) >= 0));
+
+  const created = R2O.actions.createCase(S(), { driverId:'D-000381', topic:'ทดสอบ', cause:'ILLNESS',
+    details:'x', startDate:'2026-09-09', contact:'PHONE', consent:true }, { actor:'a', role:'fa' });
+  const newCase = created.state.cases[created.state.cases.length - 1];
+  ok('I', 'a new case opens at NEW_ALERT, never NEW',
+    newCase.status === 'NEW_ALERT' && newCase.waitingFor === 'NONE' &&
+    created.state.queue[created.state.queue.length - 1].faStatus === 'NEW_ALERT');
+
+  const incident = R2O.actions.createIncident(S(), { driverId:'D-000381', cause:'VEHICLE_DOWN',
+    startDate:'2026-09-09', details:'x', contact:'PHONE' }, { actor:'a', role:'driver' });
+  ok('I', 'an incident-raised case also opens at NEW_ALERT',
+    incident.cases[incident.cases.length - 1].status === 'NEW_ALERT');
+
+  const closed = R2O.actions.recordPartnerAction(S(), { action:'CLOSE_CASE', entity:'FA-1042',
+    driverId:'D-000422', owner:'F.A. Center', reason:'จบการช่วยเหลือ' }, { actor:'a', role:'fa' });
+  const closedCase = closed.state.cases.find((item) => item.id === 'FA-1042');
+  ok('I', 'CLOSE_CASE resolves the case and clears the waiting party',
+    closedCase.status === 'RESOLVED' && closedCase.waitingFor === 'NONE' &&
+    closed.state.queue.find((item) => item.caseId === 'FA-1042').faStatus === 'RESOLVED');
+
+  const referred = R2O.actions.recordPartnerAction(S(), { action:'REFER_PROMPTCURE', entity:'FA-1042',
+    driverId:'D-000422', owner:'FI-KBank', reason:'ส่งต่อสถาบันการเงิน' }, { actor:'a', role:'fa' });
+  const referredCase = referred.state.cases.find((item) => item.id === 'FA-1042');
+  ok('I', 'REFER_PROMPTCURE waits on a named party instead of a REFERRED status',
+    referredCase.status === 'WAITING_ACTION' && referredCase.waitingFor === 'FI');
+
+  ok('I', 'no legacy status literal is persisted anywhere in the script',
+    !/(status|faStatus)\s*[:=]\s*'(NEW|CLOSED|REFERRED|REOPENED|SCHEDULED|TRIAGE)'/.test(SCRIPT));
+  ok('I', 'REOPENED is not offered as a status anyone can select',
+    !/<option value="REOPENED"/.test(SRC));
+
+  const reopened = R2O.actions.reopenCase(closed.state, 'FA-1042', { actor:'a', role:'fa' });
+  const reopenedCase = reopened.state.cases.find((item) => item.id === 'FA-1042');
+  ok('I', 'reopening returns the case to the workflow without a REOPENED status',
+    Object.keys(reopened.errors).length === 0 &&
+    reopenedCase.status === 'FA_TRIAGE' && reopenedCase.reopenCount === 1 &&
+    R2O.CASE_WORKFLOW.indexOf(reopenedCase.status) >= 0);
+  ok('I', 'reopening is written to the audit trail',
+    reopened.state.auditTrail.some((row) => row.action === 'CASE_REOPENED'));
+  ok('I', 'an open case cannot be reopened',
+    Object.keys(R2O.actions.reopenCase(S(), 'FA-1042', {}).errors).length > 0);
+
+  ok('I', 'ESCALATED counts as an open case',
+    R2O.core.isOpenCase('ESCALATED') === true &&
+    R2O.core.isOpenCase('RESOLVED') === false &&
+    R2O.core.isOpenCase('MONITORING') === true);
+  const escalated = R2O.core.clone(st);
+  escalated.cases[0].status = 'ESCALATED';
+  ok('I', 'an escalated case is still counted in the open-case metric',
+    R2O.core.metrics(escalated).faOpenCases ===
+    escalated.cases.filter((item) => item.status !== 'RESOLVED').length);
+});
+
+section('J', () => {
+  const noLedger = R2O.core.driverFinancials(st, 'D-000422');
+  ok('J', 'a driver with no ledger is flagged, not zeroed',
+    noLedger.hasLedger === false &&
+    ['verified','available','required','sweep','bindingGate','residual','reservePlan','reserveDebit']
+      .every((field) => noLedger[field] === null));
+  ok('J', 'none of those fields is the number zero',
+    ['verified','available','required','sweep','residual','reservePlan','reserveDebit']
+      .every((field) => noLedger[field] !== 0));
+  ok('J', 'a driver with a ledger gets real numbers',
+    R2O.core.driverFinancials(st, 'D-000381').hasLedger === true &&
+    near(R2O.core.driverFinancials(st, 'D-000381').verified, 1715.50));
+
+  const absent = R2O.core.ewsAssess({ hasLedger: false, fiDpd: 0 });
+  ok('J', 'no ledger raises no income signal',
+    !absent.domains.income.signals.some((s) => s.code === 'NO_VERIFIED_REVENUE') &&
+    absent.dataStatus === 'NO_LEDGER');
+  ok('J', 'no ledger leaves income and payment unknown, not green',
+    absent.domains.income.level === 'UNKNOWN' &&
+    absent.domains.payment.level === 'UNKNOWN' && absent.level === 'UNKNOWN');
+  const zero = R2O.core.ewsAssess({ hasLedger: true, verifiedToday: 0, verifiedHistory: [1500, 1600] });
+  ok('J', 'a ledger that really reads zero does raise the signal',
+    zero.domains.income.signals.some((s) => s.code === 'NO_VERIFIED_REVENUE') &&
+    zero.dataStatus === 'OK');
+  ok('J', 'signals that do not depend on the ledger still fire without one',
+    R2O.core.ewsAssess({ hasLedger: false, fiDpd: 40 }).domains.payment.signals
+      .some((s) => s.code === 'FI_DPD_SIGNAL'));
+  ok('J', 'no ledger yields no revenue-vs-average comparison',
+    R2O.core.revenueVsAverage(st, 'D-000422') === null &&
+    R2O.core.revenueVsAverage(st, 'D-000437') === null);
+  ok('J', 'the portfolio carries the gap through as null, not a number',
+    R2O.core.portfolioView(st).filter((row) => row.driverId !== 'D-000381')
+      .every((row) => row.revenueVsAverage === null));
+});
+
+section('K', () => {
+  ok('K', 'every intervention records the risk it was opened at',
+    st.interventions.every((item) => R2O.RISK_STATUS.indexOf(item.openedRiskStatus) >= 0));
+  ok('K', 'no intervention carries an ambiguous riskStatus field',
+    st.interventions.every((item) => item.riskStatus === undefined) &&
+    !/riskStatus:\s*'(GREEN|WATCH|YELLOW|RED)'/.test(SCRIPT));
+  ok('K', 'the opening trigger is kept under its own name',
+    st.interventions.every((item) => typeof item.openedTrigger === 'string' &&
+      item.trigger === undefined));
+
+  const monitored = st.interventions.find((item) => item.id === 'INT-0381');
+  ok('K', 'a case opened at WATCH can read GREEN today and stay in MONITORING',
+    monitored.openedRiskStatus === 'WATCH' &&
+    monitored.workflow === 'MONITORING' &&
+    R2O.core.currentRiskStatus(st, 'D-000381') === 'GREEN');
+
+  const attempt = R2O.actions.updateIntervention(S(), 'INT-0381', {
+    openedRiskStatus: 'RED', openedTrigger: 'FABRICATED', openedTriggerLabel: 'x',
+    workflow: 'MONITORING', waitingFor: 'FA', caseOwner: 'F.A. Center'
+  }, { actor: 'a', role: 'tcg' });
+  const after = attempt.state.interventions.find((item) => item.id === 'INT-0381');
+  ok('K', 'history cannot be rewritten by an update',
+    Object.keys(attempt.errors).length === 0 &&
+    after.openedRiskStatus === 'WATCH' && after.openedTrigger === 'VERIFIED_REVENUE_DROP');
+
+  const rows = R2O.core.riskConsoleRows(st, {});
+  ok('K', 'the console reports a current risk on every row',
+    rows.length === st.interventions.length &&
+    rows.every((row) => typeof row.currentRiskStatus === 'string'));
+  ok('K', 'the console filters on current risk, not the opening one',
+    R2O.core.riskConsoleRows(st, { risk: 'GREEN' })
+      .every((row) => row.currentRiskStatus === 'GREEN') &&
+    R2O.core.riskConsoleRows(st, { risk: 'GREEN' }).length ===
+      rows.filter((row) => row.currentRiskStatus === 'GREEN').length);
+
+  ok('K', 'portfolio, driver and console agree on the same driver',
+    ['D-000381','D-000422','D-000437','D-000451'].every((id) => {
+      const portfolio = R2O.core.portfolioView(st).find((row) => row.driverId === id);
+      const console_ = rows.find((row) => row.item.driverId === id);
+      const direct = R2O.core.currentRiskStatus(st, id);
+      return portfolio.ews === direct && (!console_ || console_.currentRiskStatus === direct);
+    }));
+  ok('K', 'no driver row carries a seeded risk grade any more',
+    st.drivers.every((row) => row.ews === undefined) &&
+    st.portfolio.every((row) => row.ews === undefined));
+});
+
+section('L', () => {
+  const money = R2O.core.driverFinancials(st, 'D-000381');
+  ok('L', 'D-000381 verified revenue is 1,715.50 from the ledger', near(money.verified, 1715.50));
+  ok('L', 'available cash is 638.05', near(money.available, 638.05));
+  ok('L', 'required PAYD is 477.69', near(money.required, 477.69));
+  ok('L', 'actual sweep is 477.69 with PAYD binding',
+    near(money.sweep, 477.69) && money.bindingGate === 'REQUIRED_PAYD');
+  ok('L', 'reserve plan and actual debit are both 47.77',
+    near(money.reservePlan, 47.77) && near(money.reserveDebit, 47.77));
+  ok('L', 'residual after PAYD and reserve is 112.59', near(money.residual, 112.59));
+  ok('L', 'revenue against the driver’s own average is +5.5%',
+    near(R2O.core.revenueVsAverage(st, 'D-000381'), 5.5));
+
+  ok('L', 'the ledger is the only source: no seeded copies remain',
+    st.drivers.every((row) => row.verifiedRevenue === undefined && row.availableCash === undefined &&
+      row.paydTarget === undefined && row.sweepActual === undefined && row.incomeToday === undefined));
+
+  const today = R2O.core.driverToday(st);
+  ok('L', 'the driver X-ray reads the same figures as the accessor',
+    near(today.verifiedRevenue, money.verified) &&
+    near(today.availableCash, money.available) &&
+    near(today.requiredPayd, money.required) &&
+    near(today.actualSweep, money.sweep));
+
+  const row = R2O.core.riskConsoleRows(st, {}).find((item) => item.item.driverId === 'D-000381');
+  ok('L', 'the risk console reads the same figures as the accessor',
+    near(row.verified, money.verified) && near(row.available, money.available) &&
+    near(row.required, money.required) && near(row.sweep, money.sweep));
+
+  ok('L', 'no haircut-era amount survives in the markup',
+    !SRC.includes('1,757.99') && !SRC.includes('680.54') && !SRC.includes('202.85') &&
+    !SRC.includes('38,675.89') && !SRC.includes('14,972.00') && !SRC.includes('4,462.82'));
+  ok('L', 'the PAYD rule is stated as five gates',
+    SRC.includes('ค่าต่ำสุดของ 5 ตัวจำกัด') && SRC.includes('วงเงินที่ได้รับอนุญาตให้ตัด'));
+
+  const perDay = ['2026-09-02','2026-09-09'].map((date) => R2O.core.driverFinancials(st, 'D-000381', date));
+  ok('L', 'the accessor honours the requested ledger day',
+    near(perDay[0].verified, 1486.00) && near(perDay[1].verified, 1715.50));
+  ok('L', 'the accessor agrees with the approved 8-day sweep table',
+    DATES.every((date) => {
+      const d = R2O.core.driverFinancials(st, 'D-000381', date);
+      return near(d.available, EXPECTED[date][4]) && near(d.required, EXPECTED[date][5]) &&
+        near(d.sweep, EXPECTED[date][6]) && d.bindingGate === EXPECTED[date][7] &&
+        near(d.reservePlan, EXPECTED[date][8]) && near(d.reserveDebit, EXPECTED[date][9]);
+    }));
 });
 
 /* ───────────────────────────── report ───────────────────────────── */

@@ -217,7 +217,7 @@
                 <div class="field"><label for="xrayOpex">ค่าใช้จ่ายดำเนินงานที่ยอมรับได้</label><input id="xrayOpex" type="number" step="0.01" value="477.45"></div>
                 <div class="field"><label for="xrayProtected">เงินคงเหลือคุ้มครองการดำรงชีพ</label><input id="xrayProtected" type="number" step="0.01" value="600"></div>
               </div>
-              <div class="callout" style="margin-top:12px"><b>เงินพร้อมจัดสรร (ประมาณการ)</b><div class="value" id="xrayAvailable">฿680.54</div><span class="mini">รายได้ที่ตรวจสอบได้ − ต้นทุนอาชีพ − เงินกันไว้ใช้ชีวิต</span></div>
+              <div class="callout" style="margin-top:12px"><b>เงินพร้อมจัดสรร (ประมาณการ)</b><div class="value" id="xrayAvailable">-</div><span class="mini">รายได้ที่ตรวจสอบได้ − ต้นทุนอาชีพ − เงินกันไว้ใช้ชีวิต</span></div>
               <div class="tblwrap" id="xraySimOut" style="margin-top:12px"></div>
             </section>
             <div style="margin-top:13px">
@@ -233,8 +233,8 @@
 
           <section id="driver-money" class="screen">
             <div class="page-title"><div><h2>เงินของฉัน</h2><p>เห็นรายรับ ต้นทุน เงินคุ้มครอง และเงินที่จ่ายไหวอย่างโปร่งใส</p></div><div class="actions"><button class="btn ghost" onclick="go('driver','home')">ตรวจภาพรวมการเงินรายวัน</button><button class="btn primary" onclick="go('driver','wallet')">ดูประวัติรายการ</button></div></div>
-            <div class="card pad tblwrap"><table class="tbl"><thead><tr><th>รายการ</th><th class="num">วันนี้</th><th class="num">เดือนนี้</th><th>สถานะ</th></tr></thead><tbody><tr><td>รายได้ที่ยืนยันแล้ว</td><td class="num">฿1,757.99</td><td class="num">฿38,675.89</td><td><span class="pill green">ยืนยันแล้ว</span></td></tr><tr><td>ต้นทุนดำเนินงานที่หักได้</td><td class="num">฿477.45</td><td class="num">฿10,503.90</td><td>ค่าใช้จ่ายดำเนินงานที่ยอมรับได้</td></tr><tr><td>เงินคงเหลือคุ้มครองการดำรงชีพ</td><td class="num">฿600.00</td><td class="num">฿13,200.00</td><td><span class="pill blue">คุ้มครองแล้ว</span></td></tr><tr><td><b>เงินพร้อมจัดสรร</b></td><td class="num"><b>฿680.54</b></td><td class="num"><b>฿14,972.00</b></td><td>ก่อนจัดสรร</td></tr><tr><td>การจ่ายตามรายได้แบบยืดหยุ่น (PAYD) Target</td><td class="num">฿477.69</td><td class="num">฿10,509.18</td><td><span class="pill green">ตามแผน</span></td></tr><tr><td>เงินคงเหลือหลังจัดสรร</td><td class="num">฿202.85</td><td class="num">฿4,462.82</td><td>หลังจัดสรร</td></tr></tbody></table></div>
-            <div class="notice" style="margin-top:13px"><b>กติกาการจ่ายตามรายได้ (PAYD):</b> ไม่หักในวันที่ไม่มีรายได้ และ ยอดหัก = ค่าต่ำสุดของ (เป้าหมาย + ยอดชดเชย, เงินพร้อมจัดสรร, เพดานรายวัน)</div>
+            <div class="card pad tblwrap"><table class="tbl"><thead><tr><th>รายการ</th><th class="num">วันนี้</th><th class="num" id="driverMoneyPeriodHead">รวมจากสมุดหลักฐาน</th><th>สถานะ</th></tr></thead><tbody id="driverMoneyRows"></tbody></table><p class="mini" id="driverMoneyNote"></p></div>
+            <div class="notice" style="margin-top:13px"><b>กติกาการจ่ายตามรายได้ (PAYD):</b> ไม่หักในวันที่ไม่มีรายได้ และ ยอดหัก = ค่าต่ำสุดของ 5 ตัวจำกัด (เป้าหมาย + ยอดชดเชย, เงินพร้อมจัดสรร, เพดานรายวัน, ยอดที่ตัดได้จริง, วงเงินที่ได้รับอนุญาตให้ตัด)</div>
           </section>
 
           <section id="driver-ownership" class="screen">
@@ -394,7 +394,7 @@
             <div class="field"><label for="towerCoop">สหกรณ์</label><select id="towerCoop"><option value="ALL">ทุกสหกรณ์</option><option>สหกรณ์ A</option><option>สหกรณ์ B</option><option>สหกรณ์ C</option></select></div>
             <div class="field"><label for="towerArea">พื้นที่</label><select id="towerArea"><option value="ALL">ทุกพื้นที่</option><option>กรุงเทพฯ</option><option>นนทบุรี</option><option>สมุทรปราการ</option></select></div>
             <div class="field"><label for="towerEws">EWS</label><select id="towerEws"><option value="ALL">ทุกระดับ</option><option value="GREEN">ปกติ</option><option value="YELLOW">เฝ้าระวัง</option><option value="RED">เสี่ยงสูง</option></select></div>
-            <div class="field"><label for="towerFaStatus">เคส F.A.</label><select id="towerFaStatus"><option value="ALL">ทุกสถานะ</option><option value="NEW">ใหม่</option><option value="SCHEDULED">นัดหมายแล้ว</option><option value="REFERRED">ส่งต่อแล้ว</option><option value="OEM FOLLOW-UP">ติดตามผู้ให้บริการรถ</option><option value="RESOLVED">แก้ไขแล้ว</option></select></div>
+            <div class="field"><label for="towerFaStatus">เคส F.A.</label><select id="towerFaStatus"><option value="ALL">ทุกสถานะ</option><option value="NEW_ALERT">แจ้งเตือนใหม่</option><option value="CONTACT_PENDING">รอการติดต่อ</option><option value="FA_TRIAGE">คัดกรองโดย F.A.</option><option value="ACTION_PROPOSED">เสนอแนวทางแล้ว</option><option value="WAITING_ACTION">รอดำเนินการ</option><option value="CURE_IN_PROGRESS">อยู่ระหว่างช่วยเหลือ</option><option value="MONITORING">เฝ้าติดตาม</option><option value="ESCALATED">ยกระดับ</option><option value="RESOLVED">แก้ไขแล้ว</option></select></div>
             <button class="btn primary" type="button" id="towerExport">ส่งออก CSV</button>
           </div>
 
@@ -405,7 +405,7 @@
             <div class="rc-group"><span class="rc-group-label">ขั้นตอนเคส · Case Workflow</span><div class="rc-kpis" id="towerWorkflowKpis"></div></div>
             <div class="rc-group"><span class="rc-group-label">ผู้ที่รอ · Waiting For และกรอบเวลา</span><div class="rc-kpis" id="towerWaitingKpis"></div></div>
             <div class="toolbar" style="margin-top:14px">
-              <div class="field"><label for="rcRisk">ระดับความเสี่ยง</label><select id="rcRisk"><option value="ALL">ทั้งหมด</option><option value="GREEN">ปกติ</option><option value="WATCH">จับตา</option><option value="YELLOW">เฝ้าระวัง</option><option value="RED">เสี่ยงสูง</option></select></div>
+              <div class="field"><label for="rcRisk">ระดับความเสี่ยง</label><select id="rcRisk"><option value="ALL">ทั้งหมด</option><option value="GREEN">ปกติ</option><option value="WATCH">จับตา</option><option value="YELLOW">เฝ้าระวัง</option><option value="RED">เสี่ยงสูง</option><option value="UNKNOWN">ไม่มีข้อมูล</option></select></div>
               <div class="field"><label for="rcWorkflow">ขั้นตอนเคส</label><select id="rcWorkflow"><option value="ALL">ทั้งหมด</option></select></div>
               <div class="field"><label for="rcWaiting">รอใคร</label><select id="rcWaiting"><option value="ALL">ทั้งหมด</option></select></div>
               <div class="field"><label for="rcRootCause">สาเหตุราก</label><select id="rcRootCause"><option value="ALL">ทั้งหมด</option><option value="INCOME">รายได้</option><option value="VEHICLE">รถ</option><option value="PERSONAL">เหตุส่วนบุคคล</option><option value="DEBT_BURDEN">ภาระหนี้</option><option value="OPEX">ต้นทุนดำเนินงาน</option><option value="PAYMENT_RAIL">ช่องทางชำระเงิน</option><option value="INSURANCE">ประกัน / เอกสาร</option><option value="OTHER">อื่น ๆ</option></select></div>
@@ -428,7 +428,7 @@
           </section>
 
           <section id="tower-fa-center" class="screen">
-            <div class="title"><div><h2>ขั้นตอนการช่วยเหลือของ F.A. Center</h2><p>ใหม่ → คัดกรอง → นัดหมาย → ส่งต่อ → แก้ไขแล้ว → เปิดใหม่</p></div><button class="btn primary" onclick="go('fa','cases')">เปิด F.A. Center</button></div>
+            <div class="title"><div><h2>ขั้นตอนการช่วยเหลือของ F.A. Center</h2><p>แจ้งเตือนใหม่ → รอการติดต่อ → คัดกรองโดย F.A. → เสนอแนวทาง → รอดำเนินการ / อยู่ระหว่างช่วยเหลือ → เฝ้าติดตาม → แก้ไขแล้ว (ยกระดับได้ทุกขั้น)</p></div><button class="btn primary" onclick="go('fa','cases')">เปิด F.A. Center</button></div>
             <div class="card pad"><div class="funnel" id="towerFunnel"></div></div>
             <div class="split" style="margin-top:13px"><div class="card pad"><h3>เคสจำแนกตามหัวข้อ</h3><table class="tbl"><tbody><tr><td>รถหยุดวิ่ง / รถเสีย</td><td class="num">7</td></tr><tr><td>รายได้ / กระแสเงินสด</td><td class="num">5</td></tr><tr><td>หนี้ / ความสามารถในการชำระ</td><td class="num">3</td></tr><tr><td>ข้อมูล / การชำระเงิน</td><td class="num">2</td></tr></tbody></table></div><div class="card pad"><h3>ประเภทผลลัพธ์</h3><div class="timeline"><div class="timeline-item"><span class="timeline-dot"></span><div><b>กลับมาวิ่งตามแผน</b><small>แก้ไขด้านปฏิบัติการ</small></div></div><div class="timeline-item"><span class="timeline-dot"></span><div><b>ส่งต่อ PromptCure / FI</b><small>แก้ไขด้านการเงิน</small></div></div><div class="timeline-item"><span class="timeline-dot"></span><div><b>แผนเพิ่มรายได้</b><small>ความต่อเนื่องของรายได้</small></div></div></div></div></div>
           </section>
@@ -514,8 +514,8 @@
 
           <section id="fa-debt-plan" class="screen">
             <div class="title"><div><h2>การจัดการหนี้และแผนช่วยเหลือ</h2><p>รวมข้อมูลที่จำเป็น แต่ให้สถาบันการเงินตัดสินสินเชื่อ/การปรับโครงสร้างหนี้ขั้นสุดท้าย</p></div><span class="pill green">จำนวนวันค้างชำระจาก FI (DPD) 0</span></div>
-            <div class="metric-grid"><div class="metric"><span class="label">รายได้ที่ตรวจสอบแล้ว</span><div class="value">฿1,757.99</div></div><div class="metric"><span class="label">เงินพร้อมจัดสรร</span><div class="value">฿680.54</div></div><div class="metric"><span class="label">เป้าหมาย PAYD / ยอดจริง</span><div class="value">477.69</div></div><div class="metric accent"><span class="label">เงินสำรองช่วยเหลือ</span><div class="value">฿1,280</div></div></div>
-            <div class="split" style="margin-top:13px"><div class="card pad tblwrap"><h3>ภาพรวมภาระหนี้</h3><table class="tbl"><tbody><tr><td>เงินต้น ยอดคงเหลือ</td><td class="num">฿562,420</td></tr><tr><td>ยอดครบกำหนดรายเดือน</td><td class="num">฿8,985.84</td></tr><tr><td>ยอดค้างชำระจากสถาบันการเงิน</td><td class="num">฿0</td></tr><tr><td>จำนวนวันค้างชำระ (DPD)</td><td class="num">0</td></tr><tr><td>EWS</td><td class="num">ปกติ</td></tr></tbody></table></div><form id="faDebtPlanForm" class="card pad"><h3>บันทึกแผนช่วยเหลือ</h3><div class="field"><label for="debtAdvice">คำแนะนำกระแสเงินสด</label><textarea id="debtAdvice" rows="3">รักษา เงินคงเหลือคุ้มครองการดำรงชีพ ก่อนจัดสรร PAYD</textarea></div><div class="field"><label for="debtReferral">การส่งต่อ</label><select id="debtReferral"><option>F.A. Center</option><option>PromptCure</option><option>สถาบันการเงินทบทวน</option></select></div><div class="field"><label for="debtFollowUp">วันติดตาม</label><input id="debtFollowUp" type="date" value="2026-09-16"></div><button class="btn primary" type="submit">บันทึกแผนช่วยเหลือ</button></form></div>
+            <div class="metric-grid" id="faDebtPlanMetrics"></div>
+            <div class="split" style="margin-top:13px"><div class="card pad tblwrap"><h3>ภาพรวมภาระหนี้</h3><table class="tbl"><tbody><tr><td>เงินต้น ยอดคงเหลือ</td><td class="num">฿562,420</td></tr><tr><td>ยอดครบกำหนดรายเดือน</td><td class="num">฿8,985.84</td></tr><tr><td>ยอดค้างชำระจากสถาบันการเงิน</td><td class="num">฿0</td></tr><tr><td>จำนวนวันค้างชำระ (DPD)</td><td class="num">0</td></tr><tr><td>EWS</td><td class="num" id="faDebtPlanEws">-</td></tr></tbody></table></div><form id="faDebtPlanForm" class="card pad"><h3>บันทึกแผนช่วยเหลือ</h3><div class="field"><label for="debtAdvice">คำแนะนำกระแสเงินสด</label><textarea id="debtAdvice" rows="3">รักษา เงินคงเหลือคุ้มครองการดำรงชีพ ก่อนจัดสรร PAYD</textarea></div><div class="field"><label for="debtReferral">การส่งต่อ</label><select id="debtReferral"><option>F.A. Center</option><option>PromptCure</option><option>สถาบันการเงินทบทวน</option></select></div><div class="field"><label for="debtFollowUp">วันติดตาม</label><input id="debtFollowUp" type="date" value="2026-09-16"></div><button class="btn primary" type="submit">บันทึกแผนช่วยเหลือ</button></form></div>
           </section>
 
           <section id="fa-income-plan" class="screen">
@@ -526,7 +526,7 @@
 
           <section id="fa-cases" class="screen">
             <div class="title"><div><h2>นัดหมายและติดตามเคส</h2><p>คัดกรองเคส · ส่งต่อ · นัดหมาย · ติดตามผล · ผลลัพธ์</p></div><button class="btn primary" onclick="go('fa','intake')">＋ เปิดเคสใหม่</button></div>
-            <div class="toolbar"><div class="field"><label for="faCaseSearch">ค้นหาเคส/ผู้ขับ</label><input id="faCaseSearch" placeholder="FA-xxxx / D-xxxxxx"></div><div class="field"><label for="faCaseStatus">สถานะ</label><select id="faCaseStatus"><option value="ALL">ทั้งหมด</option><option value="NEW_ALERT">แจ้งเตือนใหม่</option><option value="CONTACT_PENDING">รอการติดต่อ</option><option value="FA_TRIAGE">คัดกรองโดย F.A.</option><option value="ACTION_PROPOSED">เสนอแนวทางแล้ว</option><option value="WAITING_ACTION">รอดำเนินการ</option><option value="CURE_IN_PROGRESS">อยู่ระหว่างช่วยเหลือ</option><option value="MONITORING">เฝ้าติดตาม</option><option value="ESCALATED">ยกระดับ</option><option value="RESOLVED">แก้ไขแล้ว</option><option value="REOPENED">เปิดใหม่</option></select></div></div>
+            <div class="toolbar"><div class="field"><label for="faCaseSearch">ค้นหาเคส/ผู้ขับ</label><input id="faCaseSearch" placeholder="FA-xxxx / D-xxxxxx"></div><div class="field"><label for="faCaseStatus">สถานะ</label><select id="faCaseStatus"><option value="ALL">ทั้งหมด</option><option value="NEW_ALERT">แจ้งเตือนใหม่</option><option value="CONTACT_PENDING">รอการติดต่อ</option><option value="FA_TRIAGE">คัดกรองโดย F.A.</option><option value="ACTION_PROPOSED">เสนอแนวทางแล้ว</option><option value="WAITING_ACTION">รอดำเนินการ</option><option value="CURE_IN_PROGRESS">อยู่ระหว่างช่วยเหลือ</option><option value="MONITORING">เฝ้าติดตาม</option><option value="ESCALATED">ยกระดับ</option><option value="RESOLVED">แก้ไขแล้ว</option></select></div></div>
             <div class="card pad tblwrap"><table class="tbl"><thead><tr><th>เคส</th><th>ผู้ขับ</th><th>หัวข้อ</th><th>สถานะ</th><th>ระดับความสำคัญ</th><th>เจ้าของงาน</th><th>SLA</th><th>นัดหมาย</th><th>ขั้นตอนถัดไป</th><th>จัดการ</th></tr></thead><tbody id="faCaseRows"></tbody></table></div>
             <div class="card pad audit" style="margin-top:13px"><div class="section-head"><h3>ประวัติการตรวจสอบ</h3><span class="mini">เจ้าของงาน · วันเวลา · เหตุผล · รายการอ้างอิง</span></div><div id="faAuditRows" class="timeline"></div></div>
           </section>
@@ -572,7 +572,7 @@
     </div>
   </div>
 
-  <div class="modal" id="caseModal" role="dialog" aria-modal="true" aria-labelledby="caseTitle"><div class="modal-card"><button class="close" type="button" onclick="closeCaseEditor()" aria-label="ปิดหน้าต่างแก้ไขเคส">×</button><h3 id="caseTitle">อัปเดตเคส F.A.</h3><p class="mini" id="caseSubtitle">บันทึกเจ้าของงาน SLA เหตุผล และขั้นตอนถัดไปเพื่อสร้างประวัติการตรวจสอบ</p><form id="caseForm"><input id="caseId" type="hidden"><div class="form-grid"><div class="field"><label for="caseStatus">สถานะขั้นตอนเคส</label><select id="caseStatus"><option value="NEW_ALERT">แจ้งเตือนใหม่</option><option value="CONTACT_PENDING">รอการติดต่อ</option><option value="FA_TRIAGE">คัดกรองโดย F.A.</option><option value="ACTION_PROPOSED">เสนอแนวทางแล้ว</option><option value="WAITING_ACTION">รอดำเนินการ</option><option value="CURE_IN_PROGRESS">อยู่ระหว่างช่วยเหลือ</option><option value="MONITORING">เฝ้าติดตาม</option><option value="ESCALATED">ยกระดับ</option><option value="RESOLVED">แก้ไขแล้ว</option><option value="REOPENED">เปิดใหม่</option></select></div><div class="field"><label for="casePriority">ระดับความสำคัญ</label><select id="casePriority" disabled><option value="LOW">ต่ำ</option><option value="MEDIUM">ปานกลาง</option><option value="HIGH">สูง</option></select></div><div class="field"><label for="caseOwner">เจ้าของงาน</label><input id="caseOwner"></div><div class="field"><label for="caseSla">SLA</label><input id="caseSla"></div><div class="field full"><label for="caseAppointment">นัดหมาย</label><input id="caseAppointment" placeholder="21 ส.ค. 2026 10:00"></div><div class="field full"><label for="caseNextAction">ขั้นตอนถัดไป</label><textarea id="caseNextAction" rows="2"></textarea></div><div class="field full"><label for="caseOutcome">ผลลัพธ์ / หมายเหตุ</label><textarea id="caseOutcome" rows="2"></textarea></div></div><div class="actions" style="margin-top:15px"><button class="btn ghost" type="button" onclick="closeCaseEditor()">ยกเลิก</button><button class="btn primary" type="submit">บันทึกการเปลี่ยนแปลง</button></div></form></div></div>
+  <div class="modal" id="caseModal" role="dialog" aria-modal="true" aria-labelledby="caseTitle"><div class="modal-card"><button class="close" type="button" onclick="closeCaseEditor()" aria-label="ปิดหน้าต่างแก้ไขเคส">×</button><h3 id="caseTitle">อัปเดตเคส F.A.</h3><p class="mini" id="caseSubtitle">บันทึกเจ้าของงาน SLA เหตุผล และขั้นตอนถัดไปเพื่อสร้างประวัติการตรวจสอบ</p><form id="caseForm"><input id="caseId" type="hidden"><div class="form-grid"><div class="field"><label for="caseStatus">สถานะขั้นตอนเคส</label><select id="caseStatus"><option value="NEW_ALERT">แจ้งเตือนใหม่</option><option value="CONTACT_PENDING">รอการติดต่อ</option><option value="FA_TRIAGE">คัดกรองโดย F.A.</option><option value="ACTION_PROPOSED">เสนอแนวทางแล้ว</option><option value="WAITING_ACTION">รอดำเนินการ</option><option value="CURE_IN_PROGRESS">อยู่ระหว่างช่วยเหลือ</option><option value="MONITORING">เฝ้าติดตาม</option><option value="ESCALATED">ยกระดับ</option><option value="RESOLVED">แก้ไขแล้ว</option></select></div><div class="field"><label for="casePriority">ระดับความสำคัญ</label><select id="casePriority" disabled><option value="LOW">ต่ำ</option><option value="MEDIUM">ปานกลาง</option><option value="HIGH">สูง</option></select></div><div class="field"><label for="caseOwner">เจ้าของงาน</label><input id="caseOwner"></div><div class="field"><label for="caseSla">SLA</label><input id="caseSla"></div><div class="field full"><label for="caseAppointment">นัดหมาย</label><input id="caseAppointment" placeholder="21 ส.ค. 2026 10:00"></div><div class="field full"><label for="caseNextAction">ขั้นตอนถัดไป</label><textarea id="caseNextAction" rows="2"></textarea></div><div class="field full"><label for="caseOutcome">ผลลัพธ์ / หมายเหตุ</label><textarea id="caseOutcome" rows="2"></textarea></div></div><div class="actions" style="margin-top:15px"><button class="btn ghost" type="button" onclick="closeCaseEditor()">ยกเลิก</button><button class="btn primary" type="submit">บันทึกการเปลี่ยนแปลง</button></div></form></div></div>
 
   <div class="modal" id="partnerActionModal" role="dialog" aria-modal="true" aria-labelledby="partnerActionTitle"><div class="modal-card"><button class="close" type="button" onclick="closePartnerAction()" aria-label="ปิดหน้าต่างดำเนินงาน">×</button><h3 id="partnerActionTitle">บันทึกการดำเนินงาน พาร์ทเนอร์</h3><p class="mini">ทุกการดำเนินงานต้องมีเจ้าของงาน SLA เหตุผล และขั้นตอนถัดไปเพื่อสร้างประวัติการตรวจสอบ</p><form id="partnerActionForm" novalidate><div class="form-grid"><div class="field"><label for="partnerActionType">ประเภท การดำเนินงาน *</label><select id="partnerActionType"><option value="FOLLOW_UP">ติดตามงาน</option><option value="REQUEST_DOCUMENT">ขอเอกสาร</option><option value="ASSIGN_OWNER">มอบหมายเจ้าของงาน</option><option value="REFER_PROMPTCURE">ส่งต่อ PromptCure</option><option value="EWS_REVIEW">ทบทวน EWS</option><option value="CONTACT_RESULT">บันทึกผลติดต่อ</option><option value="ESCALATE_TDR">ยกระดับ ก่อนปรับโครงสร้างหนี้ (Pre-TDR)</option><option value="ELG_REVIEW">ทบทวน E-LG / เงื่อนไขด้านกฎหมาย</option><option value="EXIT_REVIEW">ทบทวน ปรับโครงสร้างหนี้ / ออกจากโครงการ</option><option value="REQUEST_EVIDENCE">ขอหลักฐานการเคลม</option><option value="DATA_FOLLOW_UP">ติดตามข้อมูลผิดปกติ</option><option value="DATA_EXCEPTION">บันทึก ข้อยกเว้นด้านข้อมูล</option><option value="CLOSE_CASE">ปิดเคส</option></select></div><div class="field"><label for="partnerActionEntity">เคส / รายการอ้างอิง *</label><input id="partnerActionEntity"></div><div class="field"><label for="partnerActionDriver">ผู้ขับ</label><input id="partnerActionDriver" placeholder="D-xxxxxx หรือ -"></div><div class="field"><label for="partnerActionOwner">เจ้าของงาน *</label><input id="partnerActionOwner" placeholder="FI / Co-op / OEM / Team"></div><div class="field"><label for="partnerActionSla">SLA</label><input id="partnerActionSla" value="8 ชั่วโมง"></div><div class="field full"><label for="partnerActionReason">เหตุผล / ผลการติดต่อ *</label><textarea id="partnerActionReason" rows="3"></textarea></div><div class="field full"><label for="partnerActionNext">ขั้นตอนถัดไป</label><textarea id="partnerActionNext" rows="2"></textarea></div></div><div class="actions" style="margin-top:15px"><button class="btn ghost" type="button" onclick="closePartnerAction()">ยกเลิก</button><button class="btn primary" type="submit">บันทึก การดำเนินงาน และ ประวัติการตรวจสอบ</button></div></form></div></div>
 
@@ -631,6 +631,26 @@
         : { view: 'gateway', screen: null };
     };
 
+    /* One case vocabulary for the whole system. A case is open until it is
+       RESOLVED — ESCALATED is an open case that needs more authority, not a
+       closed one — and REOPENED is an audit event rather than a stored status. */
+    R2O.core.isOpenCase = function(workflow) {
+      return R2O.CASE_WORKFLOW.indexOf(workflow) >= 0 && workflow !== 'RESOLVED';
+    };
+
+    R2O.core.waitingPartyForOwner = function(owner) {
+      const name = String(owner || '');
+      if (/^FI-|KBank|Krungsri|SCB/i.test(name)) return 'FI';
+      if (/Co-?op/i.test(name)) return 'COOP';
+      if (/^OEM/i.test(name)) return 'OEM';
+      if (/BaaS|Battery/i.test(name)) return 'BATTERY_PARTNER';
+      if (/Payment/i.test(name)) return 'PAYMENT_PARTNER';
+      if (/Recovery/i.test(name)) return 'RECOVERY_PARTNER';
+      if (/Insurance|ประกัน/i.test(name)) return 'INSURANCE';
+      if (/Driver|ผู้ขับ/i.test(name)) return 'DRIVER';
+      return 'FA';
+    };
+
     R2O.core.routeCause = function(cause) {
       const map = {
         VEHICLE_DOWN: { owner: 'OEM-01', slaHours: 8, referral: 'OEM / BaaS' },
@@ -660,12 +680,13 @@
       return /[",\r\n]/.test(text) ? '"' + text.replace(/"/g, '""') + '"' : text;
     };
 
-    R2O.core.isOpenCase = function(status) {
-      return !['RESOLVED','ESCALATED'].includes(String(status || '').toUpperCase());
-    };
-
     R2O.core.visibleQueue = function(state, filters) {
       const f = Object.assign({ fi: 'ALL', coop: 'ALL', area: 'ALL', ews: 'ALL', faStatus: 'ALL' }, filters || {});
+      state = Object.assign({}, state, {
+        queue: (state.queue || []).map(function(item) {
+          return Object.assign({}, item, { ews: R2O.core.currentRiskStatus(state, item.driverId) });
+        })
+      });
       return state.queue.filter(function(row) {
         return (f.fi === 'ALL' || row.fi === f.fi) &&
           (f.coop === 'ALL' || row.coop === f.coop) &&
@@ -703,10 +724,34 @@
       };
     };
 
+    /* Revenue against the driver's own recent average, from the ledger. No
+       ledger means no comparison to make, so this is null rather than 0 — the
+       portfolio must show it as unavailable, not as a driver earning nothing. */
+    R2O.core.revenueVsAverage = function(state, driverId) {
+      const money = R2O.core.driverFinancials(state, driverId);
+      if (!money.hasLedger || !money.history.length) return null;
+      const mean = money.history.reduce(function(a, b) { return a + b; }, 0) / money.history.length;
+      if (!(mean > 0)) return null;
+      return Math.round((money.verified / mean - 1) * 1000) / 10;
+    };
+
+    /* One risk value per driver, computed once and read by the portfolio, the
+       driver row and the Risk Console alike. */
+    R2O.core.portfolioView = function(state) {
+      const safe = state || {};
+      return (safe.portfolio || []).map(function(row) {
+        return Object.assign({}, row, {
+          ews: R2O.core.currentRiskStatus(safe, row.driverId),
+          revenueVsAverage: R2O.core.revenueVsAverage(safe, row.driverId)
+        });
+      });
+    };
+
     R2O.core.filterPortfolio = function(state, filters) {
       const f = Object.assign({ search:'', fi:'ALL', coop:'ALL', area:'ALL', ews:'ALL', status:'ALL', dpd:'ALL' }, filters || {});
       const search = String(f.search || '').trim().toLowerCase();
-      return state.portfolio.filter(function(row) {
+      // filtering by risk must use the same derived value the table shows
+      return R2O.core.portfolioView(state).filter(function(row) {
         const haystack = [row.driverId,row.vin,row.fi,row.coop,row.area].join(' ').toLowerCase();
         const dpdMatch = f.dpd === 'ALL' ||
           (f.dpd === '0' && row.dpd === 0) ||
@@ -750,16 +795,16 @@
           rbpCollected: 1740000, cureReserve: 820000, hmcUsed: 18, stopLossUsed: 11
         },
         drivers: [
-          { id:'D-000381', name:'นายสมชาย ใจดี', coop:'Co-op A', fi:'KBank', area:'กรุงเทพฯ', tier:'B', ews:'GREEN', fiDpd:0, status:'ACTIVE', incomeToday:1850.52, verifiedRevenue:1715.50, km:250, emu:228, paydTarget:477.69, sweepActual:477.69, opEx:477.45, protectedCash:600, availableCash:638.05, debtStart:780000, debtBalance:562420, monthlyDue:8985.84, cureReserve:1280, paydPace:477.69, paydCap:900, catchUp:0, dailyCap:900, availableToDebit:900, authorizedDebitLimit:1000, paymentReserve:{balance:1180, target:2388.45}, verifiedAt:'2026-09-09T09:00:00+07:00', operatingBreakdown:[{label:'ค่าไฟ / ค่าชาร์จ',amount:214.20},{label:'ค่าเช่าและค่าบำรุงรักษา',amount:138.25},{label:'ประกันภัยและใบอนุญาต',amount:74.00},{label:'ค่าใช้จ่ายจำเป็นอื่น ๆ',amount:51.00}] },
-          { id:'D-000422', name:'นางสาวพิมพ์ชนก มีสุข', coop:'Co-op B', fi:'SCB', area:'กรุงเทพฯ', tier:'B', ews:'YELLOW', fiDpd:0, status:'ILLNESS', incomeToday:0, verifiedRevenue:0, km:0, emu:0, paydTarget:0, sweepActual:0, opEx:0, protectedCash:600, availableCash:0, paydPace:460, paydCap:880, catchUp:0, dailyCap:880, availableToDebit:0, authorizedDebitLimit:1000, paymentReserve:{balance:0, target:2300.00}, verifiedAt:'2026-09-09T09:00:00+07:00', debtStart:760000, debtBalance:468000, monthlyDue:8750, cureReserve:1540 },
-          { id:'D-000437', name:'นายวิชาญ มั่นคง', coop:'Co-op C', fi:'KBank', area:'นนทบุรี', tier:'C', ews:'RED', fiDpd:12, status:'ACTIVE', incomeToday:1220, verifiedRevenue:1148.60, km:184, emu:164, paydTarget:344, sweepActual:220, opEx:421, protectedCash:600, availableCash:71.15, paydPace:344, paydCap:900, catchUp:0, dailyCap:900, availableToDebit:0, authorizedDebitLimit:1000, paymentReserve:{balance:0, target:1720.00}, verifiedAt:'2026-09-09T09:00:00+07:00', debtStart:790000, debtBalance:502000, monthlyDue:9120, cureReserve:820 },
-          { id:'D-000451', name:'นางจันทร์เพ็ญ แสงดี', coop:'Co-op A', fi:'Krungsri', area:'สมุทรปราการ', tier:'B', ews:'YELLOW', fiDpd:0, status:'VEHICLE_DOWN', incomeToday:0, verifiedRevenue:0, km:0, emu:0, paydTarget:0, sweepActual:0, opEx:0, protectedCash:600, availableCash:0, paydPace:452, paydCap:890, catchUp:0, dailyCap:890, availableToDebit:0, authorizedDebitLimit:1000, paymentReserve:{balance:0, target:2260.00}, verifiedAt:'2026-09-09T09:00:00+07:00', debtStart:775000, debtBalance:511600, monthlyDue:8910, cureReserve:990 }
+          { id:'D-000381', name:'นายสมชาย ใจดี', coop:'Co-op A', fi:'KBank', area:'กรุงเทพฯ', tier:'B', fiDpd:0, status:'ACTIVE', km:250, emu:228, opEx:477.45, protectedCash:600, debtStart:780000, debtBalance:562420, monthlyDue:8985.84, cureReserve:1280, paydPace:477.69, paydCap:900, catchUp:0, dailyCap:900, availableToDebit:900, authorizedDebitLimit:1000, paymentReserve:{balance:1180, target:2388.45}, verifiedAt:'2026-09-09T09:00:00+07:00', operatingBreakdown:[{label:'ค่าไฟ / ค่าชาร์จ',amount:214.20},{label:'ค่าเช่าและค่าบำรุงรักษา',amount:138.25},{label:'ประกันภัยและใบอนุญาต',amount:74.00},{label:'ค่าใช้จ่ายจำเป็นอื่น ๆ',amount:51.00}] },
+          { id:'D-000422', name:'นางสาวพิมพ์ชนก มีสุข', coop:'Co-op B', fi:'SCB', area:'กรุงเทพฯ', tier:'B', fiDpd:0, status:'ILLNESS', km:0, emu:0, opEx:0, protectedCash:600, paydPace:460, paydCap:880, catchUp:0, dailyCap:880, availableToDebit:0, authorizedDebitLimit:1000, paymentReserve:{balance:0, target:2300.00}, verifiedAt:'2026-09-09T09:00:00+07:00', debtStart:760000, debtBalance:468000, monthlyDue:8750, cureReserve:1540 },
+          { id:'D-000437', name:'นายวิชาญ มั่นคง', coop:'Co-op C', fi:'KBank', area:'นนทบุรี', tier:'C', fiDpd:12, status:'ACTIVE', km:184, emu:164, opEx:421, protectedCash:600, paydPace:344, paydCap:900, catchUp:0, dailyCap:900, availableToDebit:0, authorizedDebitLimit:1000, paymentReserve:{balance:0, target:1720.00}, verifiedAt:'2026-09-09T09:00:00+07:00', debtStart:790000, debtBalance:502000, monthlyDue:9120, cureReserve:820 },
+          { id:'D-000451', name:'นางจันทร์เพ็ญ แสงดี', coop:'Co-op A', fi:'Krungsri', area:'สมุทรปราการ', tier:'B', fiDpd:0, status:'VEHICLE_DOWN', km:0, emu:0, opEx:0, protectedCash:600, paydPace:452, paydCap:890, catchUp:0, dailyCap:890, availableToDebit:0, authorizedDebitLimit:1000, paymentReserve:{balance:0, target:2260.00}, verifiedAt:'2026-09-09T09:00:00+07:00', debtStart:775000, debtBalance:511600, monthlyDue:8910, cureReserve:990 }
         ],
         portfolio: [
-          { driverId:'D-000381', vin:'VIN...0381', elg:'ELG-80381', fi:'KBank', coop:'Co-op A', area:'กรุงเทพฯ', balance:562420, dpd:0, status:'ACTIVE', accountStatus:'ACTIVE', ews:'GREEN', onTime:100, revenueVsAverage:6, riskScore:24 },
-          { driverId:'D-000422', vin:'VIN...0422', elg:'ELG-80422', fi:'SCB', coop:'Co-op B', area:'กรุงเทพฯ', balance:468000, dpd:0, status:'ILLNESS', accountStatus:'REVIEW', ews:'YELLOW', onTime:98, revenueVsAverage:-32, riskScore:57 },
-          { driverId:'D-000437', vin:'VIN...0437', elg:'ELG-80437', fi:'KBank', coop:'Co-op C', area:'นนทบุรี', balance:502000, dpd:12, status:'ACTIVE', accountStatus:'ACTIVE', ews:'RED', onTime:86, revenueVsAverage:-18, riskScore:82 },
-          { driverId:'D-000451', vin:'VIN...0451', elg:'ELG-80451', fi:'Krungsri', coop:'Co-op A', area:'สมุทรปราการ', balance:511600, dpd:0, status:'VEHICLE_DOWN', accountStatus:'REVIEW', ews:'YELLOW', onTime:100, revenueVsAverage:-41, riskScore:61 }
+          { driverId:'D-000381', vin:'VIN...0381', elg:'ELG-80381', fi:'KBank', coop:'Co-op A', area:'กรุงเทพฯ', balance:562420, dpd:0, status:'ACTIVE', accountStatus:'ACTIVE', onTime:100, revenueVsAverage:6, riskScore:24 },
+          { driverId:'D-000422', vin:'VIN...0422', elg:'ELG-80422', fi:'SCB', coop:'Co-op B', area:'กรุงเทพฯ', balance:468000, dpd:0, status:'ILLNESS', accountStatus:'REVIEW', onTime:98, revenueVsAverage:-32, riskScore:57 },
+          { driverId:'D-000437', vin:'VIN...0437', elg:'ELG-80437', fi:'KBank', coop:'Co-op C', area:'นนทบุรี', balance:502000, dpd:12, status:'ACTIVE', accountStatus:'ACTIVE', onTime:86, revenueVsAverage:-18, riskScore:82 },
+          { driverId:'D-000451', vin:'VIN...0451', elg:'ELG-80451', fi:'Krungsri', coop:'Co-op A', area:'สมุทรปราการ', balance:511600, dpd:0, status:'VEHICLE_DOWN', accountStatus:'REVIEW', onTime:100, revenueVsAverage:-41, riskScore:61 }
         ],
         // Post-Approval Activation Pipeline. This screen begins after FI final
         // approval; nothing about readiness, pre-scoring or FI matching belongs here.
@@ -919,30 +964,30 @@
         ],
         interventions: [
           { id:'INT-0451', driverId:'D-000451', elg:'ELG-80451', fi:'Krungsri', vehicle:'VIN...0451',
-            openedAt:'2026-09-08T09:10:00', trigger:'VEHICLE_UNAVAILABLE', triggerLabel:'รถไม่พร้อมใช้งาน 5 วัน',
+            openedAt:'2026-09-08T09:10:00', openedTrigger:'VEHICLE_UNAVAILABLE', openedTriggerLabel:'รถไม่พร้อมใช้งาน 5 วัน',
             secondarySignals:['NO_VERIFIED_REVENUE','AVAILABLE_CASH_COMPRESSION'], rootCause:'VEHICLE',
-            severity:'HIGH', riskStatus:'YELLOW', workflow:'WAITING_ACTION', waitingFor:'OEM',
+            severity:'HIGH', openedRiskStatus:'YELLOW', workflow:'WAITING_ACTION', waitingFor:'OEM',
             waitingSince:'2026-09-09T08:00:00', slaHours:8, caseOwner:'OEM-01',
             assignedPartners:['F.A. Center','OEM-01','Co-op A'], lastAction:'ส่งต่อผู้ให้บริการรถเพื่อจัดรถทดแทน',
             nextAction:'ยืนยันรถทดแทนและตรวจแบตเตอรี่', nextReview:'2026-09-10', linkedCaseId:'FA-1051', linkedIncidentId:'INC-451' },
           { id:'INT-0437', driverId:'D-000437', elg:'ELG-80437', fi:'KBank', vehicle:'VIN...0437',
-            openedAt:'2026-09-05T14:20:00', trigger:'FI_DPD_SIGNAL', triggerLabel:'สัญญาณจำนวนวันค้างชำระจากสถาบันการเงิน',
+            openedAt:'2026-09-05T14:20:00', openedTrigger:'FI_DPD_SIGNAL', openedTriggerLabel:'สัญญาณจำนวนวันค้างชำระจากสถาบันการเงิน',
             secondarySignals:['SWEEP_DETERIORATION','VERIFIED_REVENUE_DROP'], rootCause:'DEBT_BURDEN',
-            severity:'HIGH', riskStatus:'RED', workflow:'WAITING_ACTION', waitingFor:'FI',
+            severity:'HIGH', openedRiskStatus:'RED', workflow:'WAITING_ACTION', waitingFor:'FI',
             waitingSince:'2026-09-06T09:00:00', slaHours:8, caseOwner:'FI-KBank',
             assignedPartners:['F.A. Center','FI-KBank'], lastAction:'ส่งข้อมูลความสามารถชำระให้สถาบันการเงิน',
             nextAction:'พิจารณาแนวทางปรับโครงสร้างหนี้', nextReview:'2026-09-10', linkedCaseId:'FA-1047', linkedIncidentId:'INC-437' },
           { id:'INT-0422', driverId:'D-000422', elg:'ELG-80422', fi:'SCB', vehicle:'VIN...0422',
-            openedAt:'2026-09-06T10:05:00', trigger:'NO_VERIFIED_REVENUE', triggerLabel:'ไม่มีรายได้ที่ตรวจสอบได้ 4 วัน',
+            openedAt:'2026-09-06T10:05:00', openedTrigger:'NO_VERIFIED_REVENUE', openedTriggerLabel:'ไม่มีรายได้ที่ตรวจสอบได้ 4 วัน',
             secondarySignals:['ACTIVITY_ANOMALY'], rootCause:'PERSONAL',
-            severity:'MEDIUM', riskStatus:'YELLOW', workflow:'CURE_IN_PROGRESS', waitingFor:'NONE',
+            severity:'MEDIUM', openedRiskStatus:'YELLOW', workflow:'CURE_IN_PROGRESS', waitingFor:'NONE',
             waitingSince:'2026-09-08T11:00:00', slaHours:24, caseOwner:'F.A. Center',
             assignedPartners:['F.A. Center','Co-op B'], lastAction:'นัดหมายให้คำปรึกษาและวางแผนกลับมาวิ่ง',
             nextAction:'ติดตามวันกลับมาวิ่งและรายได้ที่ตรวจยันได้', nextReview:'2026-09-11', linkedCaseId:'FA-1042', linkedIncidentId:'INC-422' },
           { id:'INT-0381', driverId:'D-000381', elg:'ELG-80381', fi:'KBank', vehicle:'VIN...0381',
-            openedAt:'2026-09-07T18:40:00', trigger:'VERIFIED_REVENUE_DROP', triggerLabel:'รายได้ที่ตรวจสอบได้ลดลงหนึ่งวัน',
+            openedAt:'2026-09-07T18:40:00', openedTrigger:'VERIFIED_REVENUE_DROP', openedTriggerLabel:'รายได้ที่ตรวจสอบได้ลดลงหนึ่งวัน',
             secondarySignals:['SWEEP_DETERIORATION'], rootCause:'INCOME',
-            severity:'LOW', riskStatus:'WATCH', workflow:'MONITORING', waitingFor:'FA',
+            severity:'LOW', openedRiskStatus:'WATCH', workflow:'MONITORING', waitingFor:'FA',
             waitingSince:'2026-09-08T09:00:00', slaHours:168, caseOwner:'F.A. Center',
             assignedPartners:['F.A. Center'], lastAction:'เปิดหน้าต่างเฝ้าดูหลังรายได้ฟื้น',
             nextAction:'ประเมินรายได้และการจัดสรรอีกครั้ง', nextReview:'2026-09-15', linkedCaseId:null, linkedIncidentId:null }
@@ -986,7 +1031,7 @@
       const id = 'FA-' + String(1100 + next.cases.length + 1);
       next.cases.push({
         id: id, driverId: input.driverId || 'D-000381', source: input.source || 'FA_INTAKE',
-        topic: input.topic, cause: input.cause || 'UNCLASSIFIED', status: 'NEW',
+        topic: input.topic, cause: input.cause || 'UNCLASSIFIED', status: 'NEW_ALERT', waitingFor: 'NONE',
         priority: input.priority || 'MEDIUM', owner: route.owner, slaHours: route.slaHours,
         sla: route.slaHours + ' ชั่วโมง', referral: route.referral, appointment: '-',
         nextAction: 'Case Triage', outcome: '-', details: input.details,
@@ -995,7 +1040,7 @@
       next.queue.push({
         caseId: id, driverId: input.driverId || 'D-000381', cause: input.topic,
         ews: 'YELLOW', fi: 'KBank', coop: 'Co-op A', area: 'กรุงเทพฯ', fiDpd: 0,
-        faStatus: 'NEW', owner: route.owner, sla: route.slaHours + ' ชั่วโมง', nextAction: 'Case Triage'
+        faStatus: 'NEW_ALERT', owner: route.owner, sla: route.slaHours + ' ชั่วโมง', nextAction: 'Case Triage'
       });
       R2O.actions.addAudit(next, 'CASE_CREATED', Object.assign({}, context, { entity: id, reason: input.topic }));
       return { state: next, errors: {} };
@@ -1014,7 +1059,7 @@
       });
       next.cases.push({
         id: caseId, driverId: input.driverId, source: 'DRIVER_INCIDENT',
-        topic: input.cause, cause: input.cause, status: 'NEW', priority: 'MEDIUM',
+        topic: input.cause, cause: input.cause, status: 'NEW_ALERT', waitingFor: 'NONE', priority: 'MEDIUM',
         owner: route.owner, slaHours: route.slaHours, sla: route.slaHours + ' ชั่วโมง',
         referral: route.referral, appointment: '-', nextAction: 'Case Triage', outcome: '-',
         details: input.details, startDate: input.startDate, contact: input.contact || 'โทรศัพท์'
@@ -1022,9 +1067,9 @@
       const driver = next.drivers.find(function(item) { return item.id === input.driverId; });
       next.queue.push({
         caseId: caseId, driverId: input.driverId, cause: input.cause,
-        ews: driver ? driver.ews : 'YELLOW', fi: driver ? driver.fi : '-',
+        ews: R2O.core.currentRiskStatus(next, input.driverId), fi: driver ? driver.fi : '-',
         coop: driver ? driver.coop : '-', area: driver ? driver.area : '-',
-        fiDpd: driver ? driver.fiDpd : 0, faStatus: 'NEW', owner: route.owner,
+        fiDpd: driver ? driver.fiDpd : 0, faStatus: 'NEW_ALERT', owner: route.owner,
         sla: route.slaHours + ' ชั่วโมง', nextAction: 'Case Triage'
       });
       R2O.actions.addAudit(next, 'INCIDENT_CREATED', Object.assign({}, context, { entity: incidentId, reason: input.cause }));
@@ -1034,7 +1079,7 @@
       return R2O.actions.openIntervention(next, {
         driverId: input.driverId, elg: portfolioRow.elg, fi: driverRow.fi, vehicle: portfolioRow.vin,
         trigger: input.cause, rootCause: input.cause === 'VEHICLE_DOWN' ? 'VEHICLE' : 'OTHER',
-        riskStatus: 'WATCH', caseOwner: route.owner,
+        openedRiskStatus: 'WATCH', caseOwner: route.owner,
         assignedPartners: ['F.A. Center', route.owner],
         lastAction: 'ผู้ขับแจ้งเหตุจากพอร์ทัลผู้ขับ',
         nextAction: 'คัดกรองสาเหตุและกำหนดเจ้าภาพ',
@@ -1057,10 +1102,34 @@
         outcome: String(changes.outcome || caseItem.outcome || '-')
       };
       Object.assign(caseItem, safe);
+      if (safe.status === 'RESOLVED') caseItem.waitingFor = 'NONE';
       const queueItem = next.queue.find(function(item) { return item.caseId === caseId; });
       if (queueItem) Object.assign(queueItem, { faStatus: safe.status, owner: safe.owner, sla: safe.sla, nextAction: safe.nextAction });
       R2O.actions.addAudit(next, 'CASE_UPDATED', Object.assign({}, context, { entity: caseId }));
       return next;
+    };
+
+    /* Reopening is an event, not a state. The case re-enters the ordinary
+       workflow at triage and the audit trail carries the fact that it came
+       back, so "REOPENED" never has to be a status anyone can filter on. */
+    R2O.actions.reopenCase = function(state, caseId, context) {
+      const next = R2O.core.clone(state);
+      const caseItem = next.cases.find(function(item) { return item.id === caseId; });
+      if (!caseItem) return { state: state, errors: { id: 'ไม่พบเคส' } };
+      if (R2O.core.isOpenCase(caseItem.status)) return { state: state, errors: { status: 'เคสนี้ยังไม่ได้ปิด' } };
+      const ctx = context || {};
+      const stamp = ctx.timestamp || new Date().toISOString();
+      caseItem.status = 'FA_TRIAGE';
+      caseItem.waitingFor = 'NONE';
+      caseItem.reopenedAt = stamp;
+      caseItem.reopenCount = (Number(caseItem.reopenCount) || 0) + 1;
+      const queueItem = next.queue.find(function(item) { return item.caseId === caseId; });
+      if (queueItem) queueItem.faStatus = 'FA_TRIAGE';
+      R2O.actions.addAudit(next, 'CASE_REOPENED', Object.assign({}, ctx, {
+        entity: caseId,
+        reason: (ctx.reason || 'เปิดเคสใหม่') + ' · กลับเข้าสู่ขั้นตอนคัดกรอง (ครั้งที่ ' + caseItem.reopenCount + ')'
+      }));
+      return { state: next, errors: {} };
     };
 
     R2O.actions.saveDebtPlan = function(state, input, context) {
@@ -1169,15 +1238,19 @@
         caseItem.owner = operation.owner;
         caseItem.sla = operation.sla;
         caseItem.nextAction = operation.nextAction;
-        if (input.action === 'CLOSE_CASE') caseItem.status = 'CLOSED';
-        if (input.action === 'REFER_PROMPTCURE') caseItem.status = 'REFERRED';
+        if (input.action === 'CLOSE_CASE') { caseItem.status = 'RESOLVED'; caseItem.waitingFor = 'NONE'; }
+        if (input.action === 'REFER_PROMPTCURE') {
+          // a referral hands the case to someone; it does not close it
+          caseItem.status = 'WAITING_ACTION';
+          caseItem.waitingFor = R2O.core.waitingPartyForOwner(operation.owner);
+        }
       }
       if (queueItem) {
         queueItem.owner = operation.owner;
         queueItem.sla = operation.sla;
         queueItem.nextAction = operation.nextAction;
-        if (input.action === 'CLOSE_CASE') queueItem.faStatus = 'CLOSED';
-        if (input.action === 'REFER_PROMPTCURE') queueItem.faStatus = 'REFERRED';
+        if (input.action === 'CLOSE_CASE') queueItem.faStatus = 'RESOLVED';
+        if (input.action === 'REFER_PROMPTCURE') queueItem.faStatus = 'WAITING_ACTION';
       }
       if (input.action === 'REFER_PROMPTCURE' && !next.promptCure.some(function(item) { return item.sourceCase === input.entity; })) {
         const driver = next.drivers.find(function(item) { return item.id === input.driverId; });
@@ -1195,17 +1268,26 @@
       return { state:next, errors:{} };
     };
 
+    /* Every role is listed explicitly — there is no fall-through. A role that is
+       not in this map sees nothing, so adding a partner type is a deliberate act
+       of granting screens rather than an accident that grants all of them. */
+    R2O.PARTNER_SCREEN_GRANTS = {
+      tcg: ['overview','pipeline','portfolio','daily','incidents','ews','cure','elg','exit','claim','finance','partners'],
+      risk: ['overview','pipeline','portfolio','daily','incidents','ews','cure','elg','exit','claim','finance','partners'],
+      claim: ['overview','portfolio','elg','exit','claim','finance','partners'],
+      fi: ['overview','pipeline','portfolio','daily','incidents','ews','cure','elg','exit','claim'],
+      coop: ['overview','pipeline','portfolio','daily','incidents','ews','cure','elg','exit'],
+      oem: ['overview','incidents','partners'],
+      data: ['overview','daily','partners'],
+      payment: ['overview','daily','partners'],
+      recovery: ['overview','exit','claim','partners']
+    };
+
     R2O.core.visiblePartnerScreens = function(role) {
-      const all = R2O.routes.partner.slice();
-      const map = {
-        fi: ['overview','pipeline','portfolio','daily','incidents','ews','cure','elg','exit','claim'],
-        coop: ['overview','pipeline','portfolio','daily','incidents','ews','cure','elg','exit'],
-        oem: ['overview','incidents','partners'],
-        data: ['overview','daily','partners'],
-        payment: ['overview','daily','partners'],
-        recovery: ['overview','exit','claim','partners']
-      };
-      return map[role] ? map[role].slice() : all;
+      const granted = R2O.PARTNER_SCREEN_GRANTS[role];
+      if (!granted) return [];
+      const allowed = R2O.routes.partner;
+      return granted.filter(function(screen) { return allowed.indexOf(screen) >= 0; });
     };
 
     R2O.core.queueCsv = function(rows) {
@@ -1269,7 +1351,9 @@
       const verified = Math.max(0, money(src.verifiedRevenue));
       const operatingNeed = Math.max(0, money(src.operatingNeed));
       const protectedCash = Math.max(0, money(src.protectedCash));
-      const availableCash = hasData ? Math.max(0, money(verified - operatingNeed - protectedCash)) : 0;
+      const availableCash = hasData ? R2O.core.availableCash({
+        verified: verified, eligibleOpEx: operatingNeed, protectedCash: protectedCash
+      }) : 0;
       const required = R2O.core.requiredPayd({ target: src.paydPace, catchUp: src.catchUp });
       const gated = R2O.core.actualSweep({
         required: required, available: availableCash, dailyCap: src.paydCap,
@@ -1308,23 +1392,27 @@
       const safe = state || {};
       const driver = (safe.drivers || [])[0] || {};
       const entry = safe.dailyIncome && safe.dailyIncome.status ? safe.dailyIncome : null;
+      // the payment rails for the day come from the same row the ledger uses
+      const money = R2O.core.driverFinancials(safe, driver.id);
+      const payment = (safe.paymentDaily || []).filter(function(row) {
+        return row.driverId === driver.id && (!money.date || row.date === money.date);
+      })[0] || {};
       const base = {
         operatingNeed: driver.opEx,
         protectedCash: driver.protectedCash,
         paydPace: driver.paydPace === undefined ? driver.paydTarget : driver.paydPace,
-        paydCap: driver.paydCap,
-        catchUp: driver.catchUp || 0,
-        availableToDebit: driver.availableToDebit,
-        authorizedDebitLimit: driver.authorizedDebitLimit,
+        paydCap: payment.dailyCap === undefined ? driver.paydCap : payment.dailyCap,
+        catchUp: payment.catchUp === undefined ? (driver.catchUp || 0) : payment.catchUp,
+        availableToDebit: payment.availableToDebit === undefined ? driver.availableToDebit : payment.availableToDebit,
+        authorizedDebitLimit: payment.authorizedDebitLimit === undefined ? driver.authorizedDebitLimit : payment.authorizedDebitLimit,
         contractualDue: driver.monthlyDue,
         principalShare: R2O.core.principalShare(safe)
       };
       if (entry) return R2O.core.dailyXray(Object.assign({}, base, { source:'SELF_REPORTED', gross: entry.gross }));
-      const ledger = (safe.activityDaily || [])[(safe.activityDaily || []).length - 1];
-      if (ledger && Number(ledger.verified) > 0) {
+      if (money.hasLedger && money.verified > 0) {
         return R2O.core.dailyXray(Object.assign({}, base, {
-          source:'VERIFIED', gross: ledger.reported,
-          verifiedRevenue: ledger.verified, actualSweep: driver.sweepActual
+          source:'VERIFIED', gross: money.reported,
+          verifiedRevenue: money.verified, actualSweep: money.sweep
         }));
       }
       return R2O.core.dailyXray(Object.assign({}, base, { source:'NONE' }));
@@ -1541,6 +1629,11 @@
 
     R2O.core.ewsAssess = function(input) {
       const src = input || {};
+      /* No evidence ledger is not the same fact as no income. Without one we
+         cannot assess the income or payment domains at all, so they come back
+         UNKNOWN and no income signal is raised — a driver is never marked at
+         risk for data we simply do not hold. */
+      const hasLedger = src.hasLedger !== false;
       const history = (src.verifiedHistory || []).map(Number).filter(Number.isFinite);
       const baseline = history.length
         ? history.reduce(function(a, b) { return a + b; }, 0) / history.length
@@ -1556,17 +1649,19 @@
         signals.push({ domain: domain, code: code, level: level, label: label });
       };
 
-      if (verified <= 0) push('income', 'NO_VERIFIED_REVENUE', 'RED', 'ไม่มีรายได้ที่ตรวจสอบได้');
-      else if (drop >= 40) push('income', 'VERIFIED_REVENUE_DROP', 'RED', 'รายได้ที่ตรวจสอบได้ลดลงมาก');
-      else if (drop >= 20) push('income', 'VERIFIED_REVENUE_DROP', 'YELLOW', 'รายได้ที่ตรวจสอบได้ลดลง');
-      else if (drop >= 10) push('income', 'VERIFIED_REVENUE_DROP', 'WATCH', 'รายได้ที่ตรวจสอบได้เริ่มลด');
-      if (Number.isFinite(reliability) && reliability < 0.7) {
-        push('income', 'EVIDENCE_RELIABILITY', reliability < 0.5 ? 'RED' : 'YELLOW', 'คุณภาพหลักฐานรายได้ลดลง');
-      }
+      if (hasLedger) {
+        if (verified <= 0) push('income', 'NO_VERIFIED_REVENUE', 'RED', 'ไม่มีรายได้ที่ตรวจสอบได้');
+        else if (drop >= 40) push('income', 'VERIFIED_REVENUE_DROP', 'RED', 'รายได้ที่ตรวจสอบได้ลดลงมาก');
+        else if (drop >= 20) push('income', 'VERIFIED_REVENUE_DROP', 'YELLOW', 'รายได้ที่ตรวจสอบได้ลดลง');
+        else if (drop >= 10) push('income', 'VERIFIED_REVENUE_DROP', 'WATCH', 'รายได้ที่ตรวจสอบได้เริ่มลด');
+        if (Number.isFinite(reliability) && reliability < 0.7) {
+          push('income', 'EVIDENCE_RELIABILITY', reliability < 0.5 ? 'RED' : 'YELLOW', 'คุณภาพหลักฐานรายได้ลดลง');
+        }
 
-      if (Number(src.availableCash) <= 0) push('payment', 'AVAILABLE_CASH_COMPRESSION', 'RED', 'เงินพร้อมจัดสรรเหลือศูนย์');
-      else if (shortfall >= 40) push('payment', 'SWEEP_DETERIORATION', 'RED', 'การจัดสรรต่ำกว่าเป้าหมายมาก');
-      else if (shortfall >= 10) push('payment', 'SWEEP_DETERIORATION', 'YELLOW', 'การจัดสรรต่ำกว่าเป้าหมาย');
+        if (Number(src.availableCash) <= 0) push('payment', 'AVAILABLE_CASH_COMPRESSION', 'RED', 'เงินพร้อมจัดสรรเหลือศูนย์');
+        else if (shortfall >= 40) push('payment', 'SWEEP_DETERIORATION', 'RED', 'การจัดสรรต่ำกว่าเป้าหมายมาก');
+        else if (shortfall >= 10) push('payment', 'SWEEP_DETERIORATION', 'YELLOW', 'การจัดสรรต่ำกว่าเป้าหมาย');
+      }
       const fiDpd = Number(src.fiDpd) || 0;
       if (fiDpd > 0) push('payment', 'FI_DPD_SIGNAL', fiDpd >= 30 ? 'RED' : 'YELLOW', 'สัญญาณจำนวนวันค้างชำระจากสถาบันการเงิน');
 
@@ -1586,11 +1681,17 @@
       const domains = {};
       ['income', 'payment', 'operational', 'vehicle'].forEach(function(name) {
         const own = signals.filter(function(s) { return s.domain === name; });
-        domains[name] = { level: worst(own), signals: own };
+        const ledgerDomain = name === 'income' || name === 'payment';
+        domains[name] = {
+          level: !hasLedger && ledgerDomain ? 'UNKNOWN' : worst(own),
+          signals: own
+        };
       });
       const ordered = signals.slice().sort(function(a, b) { return rank[b.level] - rank[a.level]; });
       return {
-        level: worst(signals),
+        // with no ledger and no signal from another domain we know nothing, and say so
+        level: hasLedger ? worst(signals) : (signals.length ? worst(signals) : 'UNKNOWN'),
+        dataStatus: hasLedger ? 'OK' : 'NO_LEDGER',
         domains: domains,
         primaryTrigger: ordered.length ? ordered[0].code : 'NONE',
         primaryTriggerLabel: ordered.length ? ordered[0].label : 'ไม่พบสัญญาณเสี่ยง',
@@ -1674,7 +1775,7 @@
       };
     };
 
-    /* Intervention cases carry three independent dimensions: riskStatus,
+    /* Intervention cases carry three independent dimensions: current risk,
        workflow and waitingFor. The waiting party is never encoded into the
        workflow, so a new partner type needs no new workflow state. A case
        always has an owner — nothing cures itself. */
@@ -1682,7 +1783,7 @@
     R2O.actions.validateIntervention = function(item, changes) {
       const next = Object.assign({}, item, changes || {});
       const errors = {};
-      if (R2O.RISK_STATUS.indexOf(next.riskStatus) < 0) errors.riskStatus = 'ระดับความเสี่ยงไม่ถูกต้อง';
+      if (R2O.RISK_STATUS.indexOf(next.openedRiskStatus) < 0) errors.openedRiskStatus = 'ระดับความเสี่ยงตอนเปิดเคสไม่ถูกต้อง';
       if (R2O.CASE_WORKFLOW.indexOf(next.workflow) < 0) errors.workflow = 'สถานะขั้นตอนเคสไม่ถูกต้อง';
       if (R2O.WAITING_PARTY.indexOf(next.waitingFor) < 0) errors.waitingFor = 'ผู้ที่รอไม่ถูกต้อง';
       if (!errors.waitingFor && next.workflow === 'WAITING_ACTION' && next.waitingFor === 'NONE') {
@@ -1709,12 +1810,12 @@
         fi: input.fi || '-',
         vehicle: input.vehicle || '-',
         openedAt: stamp,
-        trigger: input.trigger || 'UNCLASSIFIED',
-        triggerLabel: input.triggerLabel || route.referral,
+        openedTrigger: input.trigger || input.openedTrigger || 'UNCLASSIFIED',
+        openedTriggerLabel: input.triggerLabel || input.openedTriggerLabel || route.referral,
         secondarySignals: input.secondarySignals || [],
         rootCause: input.rootCause || 'OTHER',
         severity: input.severity || 'MEDIUM',
-        riskStatus: R2O.RISK_STATUS.indexOf(input.riskStatus) >= 0 ? input.riskStatus : 'WATCH',
+        openedRiskStatus: R2O.RISK_STATUS.indexOf(input.openedRiskStatus) >= 0 ? input.openedRiskStatus : 'WATCH',
         workflow: 'NEW_ALERT',
         waitingFor: 'NONE',
         waitingSince: stamp,
@@ -1745,8 +1846,10 @@
       const stamp = ctx.timestamp || new Date().toISOString();
       const item = next.interventions.filter(function(row) { return row.id === id; })[0];
       const handoff = changes.waitingFor !== undefined && changes.waitingFor !== item.waitingFor;
+      // the opening record is the audit trail of why this case exists
+      const immutable = ['openedAt','id','driverId','openedRiskStatus','openedTrigger','openedTriggerLabel'];
       Object.keys(changes).forEach(function(key) {
-        if (key === 'openedAt' || key === 'id' || key === 'driverId') return;
+        if (immutable.indexOf(key) >= 0) return;
         item[key] = changes[key];
       });
       // a handoff restarts the owner's SLA clock but never the case's own aging
@@ -1761,43 +1864,133 @@
       return { state: next, errors: {} };
     };
 
-    R2O.core.interventionRow = function(state, item, now) {
+    /* ── Single source of truth for a driver's money ─────────────────────
+       Every surface that shows verified revenue, available cash, the PAYD
+       requirement, the sweep or the reserve reads it from here, so the same
+       driver cannot be shown two different numbers on two screens.
+
+       A driver with no evidence ledger has no financial history: the derived
+       fields come back null, never zero. "We hold no data" and "this driver
+       earned nothing" are different claims, and only one of them is ours to
+       make. Callers must render null as unavailable and exclude it from
+       totals rather than adding a zero. */
+
+    R2O.core.driverFinancials = function(state, driverId, date) {
       const safe = state || {};
-      const driver = (safe.drivers || []).filter(function(row) { return row.id === item.driverId; })[0] || {};
-      // the seeded evidence ledger belongs to one driver; no other card borrows its trend
-      const hasLedger = ((safe.evidence || []).filter(function(row) { return row.driverId === item.driverId; }).length > 0);
-      const history = hasLedger
-        ? (safe.activityDaily || []).slice(0, -1).map(function(row) { return row.verified; })
-        : [];
-      const latest = (safe.activityDaily || [])[(safe.activityDaily || []).length - 1] || {};
-      const payment = ((safe.paymentDaily || []).filter(function(row) {
-        return row.driverId === item.driverId;
-      })[0]) || (safe.paymentDaily || [])[(safe.paymentDaily || []).length - 1] || {};
-      const verified = item.driverId === 'D-000381'
-        ? R2O.core.money(latest.verified)
-        : R2O.core.money(driver.verifiedRevenue);
+      const driver = (safe.drivers || []).filter(function(row) { return row.id === driverId; })[0] || {};
+      const ledger = (safe.evidence || []).filter(function(row) { return row.driverId === driverId; });
+      const dates = ledger.map(function(row) { return row.date; })
+        .filter(function(value, index, all) { return all.indexOf(value) === index; }).sort();
+      if (!dates.length) {
+        return {
+          driverId: driverId, driver: driver, hasLedger: false, date: null,
+          verified: null, reported: null, available: null, required: null,
+          sweep: null, bindingGate: null, residual: null,
+          reserveBalance: null, reserveTarget: null, reserveGap: null,
+          reservePlan: null, reserveDebit: null, history: []
+        };
+      }
+      const day = dates.indexOf(date) >= 0 ? date : dates[dates.length - 1];
+      const rows = R2O.core.evidenceDay(safe, day, driverId);
+      const verified = R2O.core.verifiedRevenue(rows);
+      const payment = (safe.paymentDaily || []).filter(function(row) {
+        return row.driverId === driverId && row.date === day;
+      })[0] || {};
+      const paydTarget = driver.paydPace === undefined ? driver.paydTarget : driver.paydPace;
       const available = R2O.core.availableCash({
         verified: verified, eligibleOpEx: driver.opEx, protectedCash: driver.protectedCash
       });
-      const required = R2O.core.requiredPayd({
-        target: driver.paydPace === undefined ? driver.paydTarget : driver.paydPace,
-        catchUp: payment.catchUp
-      });
+      const required = R2O.core.requiredPayd({ target: paydTarget, catchUp: payment.catchUp });
       const sweep = R2O.core.actualSweep({
         required: required, available: available, dailyCap: payment.dailyCap,
-        availableToDebit: item.driverId === 'D-000381' ? payment.availableToDebit : available,
+        availableToDebit: payment.availableToDebit,
         authorizedDebitLimit: payment.authorizedDebitLimit
       });
+      const balance = payment.reserveOpeningBalance === undefined
+        ? (driver.paymentReserve || {}).balance
+        : payment.reserveOpeningBalance;
+      const target = R2O.core.reserveTarget(paydTarget);
+      const gap = R2O.core.reserveTargetGap({ target: target, balance: balance });
+      const plan = R2O.core.reservePlan({
+        required: required, sweep: sweep.amount, available: available,
+        paydTarget: paydTarget, gap: gap
+      });
+      const debit = R2O.core.reserveActualDebit({
+        plan: plan,
+        reserveAvailableToDebit: payment.reserveAvailableToDebit,
+        reserveAuthorizedDebitLimit: payment.reserveAuthorizedDebitLimit
+      });
       return {
-        item: item,
-        driver: driver,
+        driverId: driverId, driver: driver, hasLedger: true, date: day,
         verified: verified,
+        reported: R2O.core.reportedRevenue(rows),
         available: available,
         required: required,
         sweep: sweep.amount,
         bindingGate: sweep.bindingGate,
-        history: history,
-        fiDpd: driver.fiDpd === undefined ? null : driver.fiDpd,
+        residual: R2O.core.money(Math.max(0, available - sweep.amount - debit)),
+        reserveBalance: R2O.core.money(balance),
+        reserveTarget: target,
+        reserveGap: gap,
+        reservePlan: plan,
+        reserveDebit: debit,
+        history: dates.slice(0, dates.indexOf(day)).map(function(d) {
+          return R2O.core.verifiedRevenue(R2O.core.evidenceDay(safe, d, driverId));
+        })
+      };
+    };
+
+    /* Today's risk, derived. A case keeps openedRiskStatus and openedTrigger
+       as an immutable record of why it was opened; what the console, the
+       portfolio and the driver's own screen show is currentRiskStatus, which
+       is recomputed from the evidence every time. A case can therefore read
+       GREEN today and still sit in MONITORING — that is what a watch window
+       is — without erasing the WATCH or RED that started it. */
+
+    R2O.core.currentRisk = function(state, driverId, date) {
+      const safe = state || {};
+      const money = R2O.core.driverFinancials(safe, driverId, date);
+      const driver = money.driver;
+      const incidents = (safe.incidents || []).filter(function(row) { return row.driverId === driverId; });
+      return R2O.core.ewsAssess({
+        hasLedger: money.hasLedger,
+        verifiedHistory: money.history,
+        verifiedToday: money.verified,
+        required: money.required,
+        sweep: money.sweep,
+        availableCash: money.available,
+        fiDpd: driver.fiDpd,
+        inactiveDays: incidents.reduce(function(max, row) {
+          return Math.max(max, Number(row.inactiveDays) || 0);
+        }, 0),
+        incidentCount: incidents.length,
+        vehicleAvailable: driver.status === 'VEHICLE_DOWN' ? false : undefined
+      });
+    };
+
+    R2O.core.currentRiskStatus = function(state, driverId, date) {
+      return R2O.core.currentRisk(state, driverId, date).level;
+    };
+
+    R2O.core.interventionRow = function(state, item, now) {
+      const safe = state || {};
+      const money = R2O.core.driverFinancials(safe, item.driverId);
+      const risk = R2O.core.currentRisk(safe, item.driverId);
+      return {
+        item: item,
+        driver: money.driver,
+        money: money,
+        hasLedger: money.hasLedger,
+        currentRiskStatus: risk.level,
+        dataStatus: risk.dataStatus,
+        openedRiskStatus: item.openedRiskStatus,
+        verified: money.verified,
+        available: money.available,
+        required: money.required,
+        sweep: money.sweep,
+        bindingGate: money.bindingGate,
+        history: money.history,
+        fiDpd: money.driver.fiDpd === undefined ? null : money.driver.fiDpd,
         sla: R2O.core.slaAging({
           waitingSince: item.waitingSince, openedAt: item.openedAt,
           slaHours: item.slaHours, now: now || (safe.meta || {}).lastUpdated
@@ -1812,7 +2005,7 @@
       return (safe.interventions || []).map(function(item) {
         return R2O.core.interventionRow(safe, item, now);
       }).filter(function(row) {
-        if (f.risk && f.risk !== 'ALL' && row.item.riskStatus !== f.risk) return false;
+        if (f.risk && f.risk !== 'ALL' && row.currentRiskStatus !== f.risk) return false;
         if (f.workflow && f.workflow !== 'ALL' && row.item.workflow !== f.workflow) return false;
         if (f.waitingFor && f.waitingFor !== 'ALL' && row.item.waitingFor !== f.waitingFor) return false;
         if (f.rootCause && f.rootCause !== 'ALL' && row.item.rootCause !== f.rootCause) return false;
@@ -1820,8 +2013,8 @@
         if (f.breachedOnly && row.sla.status !== 'BREACHED') return false;
         return true;
       }).sort(function(a, b) {
-        const rank = { RED: 0, YELLOW: 1, WATCH: 2, GREEN: 3 };
-        const byRisk = rank[a.item.riskStatus] - rank[b.item.riskStatus];
+        const rank = { RED: 0, YELLOW: 1, WATCH: 2, UNKNOWN: 3, GREEN: 4 };
+        const byRisk = rank[a.currentRiskStatus] - rank[b.currentRiskStatus];
         if (byRisk !== 0) return byRisk;
         return (b.sla.caseAgingHours || 0) - (a.sla.caseAgingHours || 0);
       });
@@ -1877,8 +2070,7 @@
           FI_FINAL_APPROVED:'สถาบันการเงินอนุมัติแล้ว', CHILD_ELG_ISSUED:'ออก Child E-LG แล้ว',
           VEHICLE_ACTIVATED:'เปิดใช้งานรถแล้ว', INSURANCE_WARRANTY_BOUND:'ผูกประกันและการรับประกันแล้ว',
           PAYMENT_RAIL_LINKED:'ผูกช่องทางชำระเงินแล้ว',
-          NEW:'ใหม่', TRIAGE:'คัดกรอง', SCHEDULED:'นัดหมายแล้ว', REFERRED:'ส่งต่อแล้ว',
-          'OEM FOLLOW-UP':'ติดตามผู้ให้บริการรถ', RESOLVED:'แก้ไขแล้ว', REOPENED:'เปิดใหม่',
+          RESOLVED:'แก้ไขแล้ว', UNKNOWN:'ไม่มีข้อมูล', NO_LEDGER:'ยังไม่มีสมุดหลักฐาน',
           PENDING:'รอดำเนินการ', CHECK:'ต้องตรวจสอบ', COMPLETE:'ครบถ้วน', HEALTHY:'ปกติ',
           APPROVED:'อนุมัติแล้ว', 'ON TRACK':'เป็นไปตามแผน', WATCH:'เฝ้าระวัง', LOW:'ต่ำ',
           MEDIUM:'ปานกลาง', HIGH:'สูง', OVERDUE:'เกินกำหนด', 'RE-UNDERWRITE':'พิจารณาสินเชื่อใหม่'
@@ -1900,7 +2092,7 @@
     R2O.scopedPortfolio = function() {
       const role = document.getElementById('roleSelect').value;
       const org = document.getElementById('orgSelect').value;
-      return R2O.state.portfolio.filter(function(row) {
+      return R2O.core.portfolioView(R2O.state).filter(function(row) {
         if (role === 'fi') return row.fi === org;
         if (role === 'coop') return row.coop === org;
         return true;
@@ -2061,6 +2253,7 @@
         R2O.ui.metric('PAYD เป้าหมายวันนี้', R2O.ui.baht(today.paydTarget, 2), today.actualSweep === null ? 'Actual Sweep ยังไม่เกิดขึ้น' : 'Actual Sweep ' + R2O.ui.baht(today.actualSweep, 2), ''),
         R2O.ui.metric('เงินเหลือหลังจัดสรร', R2O.ui.baht(today.residualCash, 2), 'Residual Cash · ' + (today.sweepIsEstimate ? 'ประมาณการ' : 'ตามยอดจัดสรรจริง'), '')
       ].join('');
+      document.getElementById('xrayAvailable').textContent = R2O.ui.baht(today.availableCash, 2);
       const cases = R2O.state.cases.filter(function(item) { return item.driverId === d.id; });
       document.getElementById('driverCaseCount').textContent = cases.length + ' เคส';
       document.getElementById('driverCaseRows').innerHTML = cases.length ? cases.map(function(item) {
@@ -2089,8 +2282,62 @@
         return '<tr><td>' + row.date + '</td><td>' + R2O.ui.esc(row.type) + '</td><td>' + R2O.ui.esc(row.description) + '</td><td class="num">' + (row.debit ? R2O.ui.baht(row.debit, 2) : '-') + '</td><td class="num">' + (row.credit ? R2O.ui.baht(row.credit, 2) : '-') + '</td><td>' + R2O.ui.pill(row.status) + '</td></tr>';
       }).join('');
       R2O.render.driverDaily();
+      R2O.render.driverMoney();
       R2O.render.driverEvidence();
       R2O.render.driverReserve();
+    };
+
+    /* Every figure on this screen is derived from the evidence ledger through
+       driverFinancials, and the second column sums the days the ledger actually
+       holds rather than projecting a month from one day. */
+    R2O.render.driverMoney = function() {
+      const body = document.getElementById('driverMoneyRows');
+      if (!body) return;
+      const state = R2O.state;
+      const id = state.drivers[0].id;
+      const today = R2O.core.driverFinancials(state, id);
+      const na = function(value, digits) {
+        return value === null || value === undefined ? 'ไม่มีข้อมูล' : R2O.ui.baht(value, digits);
+      };
+      if (!today.hasLedger) {
+        body.innerHTML = '<tr><td colspan="4" class="empty">ยังไม่มีสมุดหลักฐานรายได้ของผู้ขับรายนี้ · ระบบไม่แสดงตัวเลขที่ยังพิสูจน์ไม่ได้</td></tr>';
+        document.getElementById('driverMoneyNote').textContent = '';
+        return;
+      }
+      const dates = ((state.evidence || []).filter(function(row) { return row.driverId === id; })
+        .map(function(row) { return row.date; })
+        .filter(function(value, index, all) { return all.indexOf(value) === index; })).sort();
+      const series = dates.map(function(date) { return R2O.core.driverFinancials(state, id, date); });
+      const sum = function(pick) {
+        return R2O.core.money(series.reduce(function(total, day) { return total + (pick(day) || 0); }, 0));
+      };
+      const rows = [
+        ['รายได้ที่ยืนยันแล้ว', today.verified, sum(function(d) { return d.verified; }),
+          '<span class="pill green">ยืนยันแล้ว</span>'],
+        ['ต้นทุนดำเนินงานที่หักได้', R2O.core.money(today.driver.opEx),
+          R2O.core.money(R2O.core.money(today.driver.opEx) * series.length), 'ค่าใช้จ่ายดำเนินงานที่ยอมรับได้'],
+        ['เงินคงเหลือคุ้มครองการดำรงชีพ', R2O.core.money(today.driver.protectedCash),
+          R2O.core.money(R2O.core.money(today.driver.protectedCash) * series.length),
+          '<span class="pill blue">คุ้มครองแล้ว</span>'],
+        ['<b>เงินพร้อมจัดสรร</b>', today.available, sum(function(d) { return d.available; }), 'ก่อนจัดสรร'],
+        ['การจ่ายตามรายได้แบบยืดหยุ่น (PAYD) ที่ต้องเติม', today.required,
+          sum(function(d) { return d.required; }), '<span class="pill blue">เป้าหมาย + ยอดชดเชย</span>'],
+        ['จัดสรรจริง (Actual Sweep)', today.sweep, sum(function(d) { return d.sweep; }),
+          'ตัวจำกัด: ' + R2O.ui.esc(today.bindingGate)],
+        ['สมทบเงินกันชนในบัญชีของคุณ', today.reserveDebit, sum(function(d) { return d.reserveDebit; }),
+          today.reservePlan === today.reserveDebit ? 'สมทบตามแผน' : 'ต่ำกว่าแผนเพราะวงเงินตัดบัญชี'],
+        ['เงินคงเหลือหลังจัดสรร PAYD และเงินกันชน', today.residual,
+          sum(function(d) { return d.residual; }), 'เงินของคุณ']
+      ];
+      body.innerHTML = rows.map(function(row) {
+        return '<tr><td>' + row[0] + '</td><td class="num">' + na(row[1], 2) +
+          '</td><td class="num">' + na(row[2], 2) + '</td><td>' + row[3] + '</td></tr>';
+      }).join('');
+      document.getElementById('driverMoneyPeriodHead').textContent =
+        'รวม ' + series.length + ' วันจากสมุดหลักฐาน';
+      document.getElementById('driverMoneyNote').textContent =
+        'ทุกตัวเลขคำนวณจากสมุดหลักฐานรายได้ ' + dates[0] + ' ถึง ' + dates[dates.length - 1] +
+        ' · ไม่มีการประมาณการรายเดือนจากข้อมูลวันเดียว';
     };
 
     R2O.rcFilters = { risk:'ALL', workflow:'ALL', waitingFor:'ALL', rootCause:'ALL', fi:'ALL', breachedOnly:false };
@@ -2117,16 +2364,18 @@
           const key = pick(row); acc[key] = (acc[key] || 0) + 1; return acc;
         }, {});
       };
-      const byRisk = countBy(all, function(r) { return r.item.riskStatus; });
+      const byRisk = countBy(all, function(r) { return r.currentRiskStatus; });
       const byWorkflow = countBy(all, function(r) { return r.item.workflow; });
       const byWaiting = countBy(all.filter(function(r) { return r.item.waitingFor !== 'NONE'; }),
         function(r) { return r.item.waitingFor; });
       const breached = all.filter(function(r) { return r.sla.status === 'BREACHED'; }).length;
 
-      const RISK_LABEL = { GREEN:'ปกติ', WATCH:'จับตา', YELLOW:'เฝ้าระวัง', RED:'เสี่ยงสูง' };
+      const RISK_LABEL = { GREEN:'ปกติ', WATCH:'จับตา', YELLOW:'เฝ้าระวัง', RED:'เสี่ยงสูง', UNKNOWN:'ไม่มีข้อมูล' };
       document.getElementById('towerRiskKpis').innerHTML = R2O.RISK_STATUS.map(function(level) {
-        return R2O.ui.kpi(RISK_LABEL[level] + ' · ' + level, byRisk[level] || 0, '', R2O.ui.riskTone(level));
-      }).join('');
+        return R2O.ui.kpi(RISK_LABEL[level] + ' · ' + level, byRisk[level] || 0,
+          'ความเสี่ยงปัจจุบัน', R2O.ui.riskTone(level));
+      }).join('') + R2O.ui.kpi(RISK_LABEL.UNKNOWN + ' · UNKNOWN', byRisk.UNKNOWN || 0,
+        'ยังไม่มีสมุดหลักฐาน', '');
 
       const WF_LABEL = { NEW_ALERT:'แจ้งเตือนใหม่', CONTACT_PENDING:'รอการติดต่อ', FA_TRIAGE:'คัดกรองโดย F.A.',
         ACTION_PROPOSED:'เสนอแนวทางแล้ว', WAITING_ACTION:'รอดำเนินการ', CURE_IN_PROGRESS:'อยู่ระหว่างช่วยเหลือ',
@@ -2154,20 +2403,25 @@
           const max = Math.max.apply(null, row.history.concat([1]));
           return '<i style="height:' + Math.max(10, Math.round(v / max * 100)) + '%"></i>';
         }).join('') + '</div>' : '';
-        return '<article class="rc-case ' + c.riskStatus.toLowerCase() + '">' +
+        const na = function(value, digits) {
+          return value === null || value === undefined ? 'ไม่มีข้อมูล' : R2O.ui.baht(value, digits);
+        };
+        const opened = c.openedRiskStatus && c.openedRiskStatus !== row.currentRiskStatus
+          ? '<span class="rc-sig">เปิดจาก ' + R2O.ui.esc(c.openedRiskStatus) + '</span>' : '';
+        return '<article class="rc-case ' + row.currentRiskStatus.toLowerCase() + '">' +
           '<header class="rc-case-head"><div><b>' + R2O.ui.esc(c.id) + ' · ' + R2O.ui.esc(c.driverId) + '</b>' +
             '<small>' + R2O.ui.esc(c.elg) + ' · ' + R2O.ui.esc(c.fi) + ' · ' + R2O.ui.esc(c.vehicle) + '</small></div>' +
-            '<div class="rc-dims">' + R2O.ui.pill(c.riskStatus) + R2O.ui.pill(c.workflow) +
+            '<div class="rc-dims">' + R2O.ui.pill(row.currentRiskStatus) + R2O.ui.pill(c.workflow) +
             (c.waitingFor === 'NONE' ? '' : '<span class="pill amber">รอ ' + R2O.ui.esc(WAIT_LABEL[c.waitingFor] || c.waitingFor) + '</span>') +
             '</div></header>' +
-          '<div class="rc-trigger"><span class="label">สัญญาณหลัก</span><b>' + R2O.ui.esc(c.triggerLabel || c.trigger) + '</b>' +
+          '<div class="rc-trigger"><span class="label">สัญญาณที่เปิดเคส</span><b>' + R2O.ui.esc(c.openedTriggerLabel || c.openedTrigger) + '</b>' + opened +
             (c.secondarySignals || []).map(function(sig) { return '<span class="rc-sig">' + R2O.ui.esc(sig) + '</span>'; }).join('') +
             '<span class="rc-root">สาเหตุราก: ' + R2O.ui.esc(ROOT_LABEL[c.rootCause] || c.rootCause) + '</span></div>' +
           '<div class="rc-figures">' +
-            '<div><span class="label">รายได้ที่ตรวจยันแล้ววันนี้</span><b>' + R2O.ui.baht(row.verified, 2) + '</b>' +
+            '<div><span class="label">รายได้ที่ตรวจยันแล้ววันนี้</span><b>' + na(row.verified, 2) + '</b>' +
               (spark || '<span class="mini">ยังไม่มีสมุดหลักฐานรายวันของผู้ขับรายนี้</span>') + '</div>' +
-            '<div><span class="label">เงินพร้อมจัดสรร</span><b>' + R2O.ui.baht(row.available, 2) + '</b></div>' +
-            '<div><span class="label">จัดสรรจริง / ที่ต้องเติม</span><b>' + R2O.ui.baht(row.sweep, 2) + ' / ' + R2O.ui.baht(row.required, 2) + '</b><span class="mini">ตัวจำกัด: ' + R2O.ui.esc(row.bindingGate) + '</span></div>' +
+            '<div><span class="label">เงินพร้อมจัดสรร</span><b>' + na(row.available, 2) + '</b></div>' +
+            '<div><span class="label">จัดสรรจริง / ที่ต้องเติม</span><b>' + na(row.sweep, 2) + ' / ' + na(row.required, 2) + '</b><span class="mini">' + (row.bindingGate ? 'ตัวจำกัด: ' + R2O.ui.esc(row.bindingGate) : 'ประเมินไม่ได้จนกว่าจะมีหลักฐานรายได้') + '</span></div>' +
             '<div><span class="label">จำนวนวันค้างชำระ (จาก FI)</span><b>' + (row.fiDpd === null ? '-' : row.fiDpd) + '</b><span class="mini">อ่านจากสถาบันการเงินเท่านั้น</span></div>' +
           '</div>' +
           '<footer class="rc-case-foot">' +
@@ -2290,7 +2544,7 @@
         area:document.getElementById('partnerPortfolioArea').value
       });
       document.getElementById('partnerPortfolioRows').innerHTML = portfolio.map(function(row) {
-        return '<tr><td>' + row.driverId + '</td><td>' + row.coop + '<br><span class="mini">' + row.fi + '</span></td><td>' + row.area + '</td><td>' + row.vin + '<br><span class="mini">' + row.elg + '</span></td><td class="num">' + R2O.ui.baht(row.balance) + '</td><td class="num">' + row.dpd + '</td><td class="num">' + row.onTime + '%</td><td class="num">' + (row.revenueVsAverage > 0 ? '+' : '') + row.revenueVsAverage + '%</td><td class="num"><b>' + row.riskScore + '</b></td><td>' + R2O.ui.pill(row.ews) + '</td><td><button class="btn ghost" onclick="openPartnerAction(\'FOLLOW_UP\',\'' + row.elg + '\',\'' + row.driverId + '\')">เปิดเคส</button></td></tr>';
+        return '<tr><td>' + row.driverId + '</td><td>' + row.coop + '<br><span class="mini">' + row.fi + '</span></td><td>' + row.area + '</td><td>' + row.vin + '<br><span class="mini">' + row.elg + '</span></td><td class="num">' + R2O.ui.baht(row.balance) + '</td><td class="num">' + row.dpd + '</td><td class="num">' + row.onTime + '%</td><td class="num">' + (row.revenueVsAverage === null || row.revenueVsAverage === undefined ? 'ไม่มีข้อมูล' : (row.revenueVsAverage > 0 ? '+' : '') + row.revenueVsAverage + '%') + '</td><td class="num"><b>' + row.riskScore + '</b></td><td>' + R2O.ui.pill(row.ews) + '</td><td><button class="btn ghost" onclick="openPartnerAction(\'FOLLOW_UP\',\'' + row.elg + '\',\'' + row.driverId + '\')">เปิดเคส</button></td></tr>';
       }).join('') || '<tr><td colspan="11" class="empty">ไม่พบรายการในขอบเขตสิทธิ์</td></tr>';
       const allowedIds = new Set(scoped.map(function(row) { return row.driverId; }));
       document.getElementById('partnerIncidentRows').innerHTML = R2O.state.incidents.filter(function(row) { return allowedIds.has(row.driverId); }).map(function(row) {
@@ -2302,9 +2556,16 @@
       document.getElementById('partnerClaimRows').innerHTML = R2O.state.claims.filter(function(row) { return allowedIds.has(row.driverId); }).map(R2O.render.claimRow).join('') || '<tr><td colspan="8" class="empty">ไม่มี Claim ในขอบเขตสิทธิ์</td></tr>';
       document.getElementById('partnerIntegrationRows').innerHTML = R2O.state.integrations.map(R2O.render.integrationRow).join('');
       document.getElementById('partnerDailyRows').innerHTML = R2O.state.drivers.filter(function(row) { return allowedIds.has(row.id); }).map(function(row) {
-        const dataStatus = row.status === 'ACTIVE' ? 'COMPLETE' : 'REVIEW';
-        const flag = row.status === 'VEHICLE_DOWN' ? 'DOWNTIME' : row.incomeToday === 0 ? 'NO REVENUE' : row.sweepActual < row.paydTarget ? 'SWEEP GAP' : 'NORMAL';
-        return '<tr><td>' + row.id + '</td><td class="num">' + R2O.ui.baht(row.verifiedRevenue, 2) + '</td><td>' + row.km + ' / ' + row.emu + '</td><td>' + R2O.ui.pill(dataStatus) + '</td><td class="num">' + R2O.ui.baht(row.paydTarget, 2) + '</td><td>' + R2O.ui.pill(flag) + '</td><td><button class="btn ghost" onclick="openPartnerAction(\'DATA_FOLLOW_UP\',\'DAILY-' + row.id + '\',\'' + row.id + '\')">ติดตาม</button></td></tr>';
+        const money = R2O.core.driverFinancials(R2O.state, row.id);
+        const cell = function(value) {
+          return value === null || value === undefined ? 'ไม่มีข้อมูล' : R2O.ui.baht(value, 2);
+        };
+        const dataStatus = !money.hasLedger ? 'NO_LEDGER' : row.status === 'ACTIVE' ? 'COMPLETE' : 'REVIEW';
+        const flag = !money.hasLedger ? 'UNKNOWN'
+          : row.status === 'VEHICLE_DOWN' ? 'DOWNTIME'
+          : money.verified === 0 ? 'NO REVENUE'
+          : money.sweep < money.required ? 'SWEEP GAP' : 'NORMAL';
+        return '<tr><td>' + row.id + '</td><td class="num">' + cell(money.verified) + '</td><td>' + row.km + ' / ' + row.emu + '</td><td>' + R2O.ui.pill(dataStatus) + '</td><td class="num">' + cell(money.required) + '</td><td>' + R2O.ui.pill(flag) + '</td><td><button class="btn ghost" onclick="openPartnerAction(\'DATA_FOLLOW_UP\',\'DAILY-' + row.id + '\',\'' + row.id + '\')">ติดตาม</button></td></tr>';
       }).join('');
       document.getElementById('partnerExitRows').innerHTML = (R2O.state.exitCases || []).filter(function(row) { return allowedIds.has(row.driverId); }).map(function(row) {
         return '<tr><td>' + row.id + '</td><td>' + row.driverId + '</td><td>' + row.previous + '</td><td>' + row.option + '</td><td class="num">' + R2O.ui.baht(row.balance) + '</td><td>' + R2O.ui.pill(row.approval) + '</td><td>' + row.reviewDate + '</td><td><button class="btn ghost" onclick="openPartnerAction(\'EXIT_REVIEW\',\'' + row.id + '\',\'' + row.driverId + '\')">ทบทวน</button></td></tr>';
@@ -2384,6 +2645,19 @@
         return '<tr><td>' + item.id + '</td><td>' + item.driverId + '</td><td>' + R2O.ui.esc(item.topic) + '</td><td>' + R2O.ui.pill(item.status) + '</td><td>' + R2O.ui.pill(item.priority) + '</td><td>' + R2O.ui.esc(item.owner) + '</td><td>' + R2O.ui.pill(item.sla) + '</td><td>' + R2O.ui.esc(item.appointment) + '</td><td>' + R2O.ui.esc(item.nextAction) + '</td><td><button class="btn ghost" type="button" onclick="openCaseEditor(\'' + item.id + '\')">แก้ไข</button></td></tr>';
       }).join('') || '<tr><td colspan="10" class="empty">ไม่พบเคส</td></tr>';
       document.getElementById('faAuditRows').innerHTML = R2O.render.auditRows();
+      // the counsellor sees the same figures the driver does, from the same accessor
+      const subject = R2O.core.driverFinancials(R2O.state, R2O.state.drivers[0].id);
+      const naBaht = function(value) {
+        return value === null || value === undefined ? 'ไม่มีข้อมูล' : R2O.ui.baht(value, 2);
+      };
+      document.getElementById('faDebtPlanMetrics').innerHTML = [
+        R2O.ui.metric('รายได้ที่ตรวจสอบแล้ว', naBaht(subject.verified), subject.hasLedger ? 'จากสมุดหลักฐาน ' + subject.date : 'ยังไม่มีสมุดหลักฐาน', ''),
+        R2O.ui.metric('เงินพร้อมจัดสรร', naBaht(subject.available), 'หลังหักต้นทุนและเงินคุ้มครอง', ''),
+        R2O.ui.metric('PAYD ที่ต้องเติม / จัดสรรจริง', naBaht(subject.required) + ' / ' + naBaht(subject.sweep), subject.bindingGate ? 'ตัวจำกัด: ' + subject.bindingGate : '', ''),
+        R2O.ui.metric('เงินสำรองช่วยเหลือ', R2O.ui.baht(R2O.state.drivers[0].cureReserve, 2), 'Cure Reserve ผูกกับผู้ขับ', 'accent')
+      ].join('');
+      document.getElementById('faDebtPlanEws').textContent =
+        R2O.core.currentRiskStatus(R2O.state, R2O.state.drivers[0].id);
       const plan = R2O.state.incomePlan;
       document.getElementById('incomePlanSummary').innerHTML = '<div class="metric-grid"><div class="metric accent"><span class="label">รายได้ยืนยันเป้าหมาย</span><div class="value">' + R2O.ui.baht(plan.targetRevenue) + '</div><span class="mini">7 วัน</span></div><div class="metric"><span class="label">ลดวิ่งเปล่า</span><div class="value">' + plan.emptyKmReduction + '%</div></div><div class="metric"><span class="label">เงินสำรอง</span><div class="value">' + R2O.ui.baht(plan.reserveTarget) + '</div></div><div class="metric"><span class="label">ความคืบหน้า</span><div class="value">' + plan.completedDays + ' / ' + plan.totalDays + '</div></div></div>';
     };
@@ -2429,7 +2703,10 @@
       const allowed = R2O.core.visiblePartnerScreens(role);
       document.querySelectorAll('#viewPartner .nav button[data-screen]').forEach(function(button) { button.hidden = !allowed.includes(button.dataset.screen); });
       const current = R2O.core.parseRoute(location.hash);
-      if (current.view === 'partner' && !allowed.includes(current.screen)) R2O.navigate('partner', allowed[0]);
+      if (current.view !== 'partner' || allowed.includes(current.screen)) return;
+      // an unmapped role has no landing screen to fall back to — leave the console
+      if (allowed.length) R2O.navigate('partner', allowed[0]);
+      else R2O.navigate('gateway', 'landing');
     };
 
     R2O.partnerOrgs = {tcg:['บสย. / TCG'],risk:['บสย. - Risk'],claim:['บสย. - Claim'],fi:['KBank','Krungsri','SCB'],coop:['Co-op A','Co-op B','Co-op C'],oem:['OEM-01','BaaS-01'],data:['Data Partner 01'],payment:['Payment Servicer 01'],recovery:['Recovery Partner 01']};
@@ -2662,8 +2939,13 @@
         });
         rows = filtered.map(function(row) { return [row.driverId,row.coop,row.fi,row.area,row.vin,row.elg,row.balance,row.dpd,row.onTime,row.revenueVsAverage,row.riskScore,row.ews]; });
       } else if (type === 'daily') {
-        headers = ['ผู้ขับ','Verified Revenue','KM','EMU','PAYD Target','Actual Sweep','Status'];
-        rows = R2O.state.drivers.map(function(row) { return [row.id,row.verifiedRevenue,row.km,row.emu,row.paydTarget,row.sweepActual,row.status]; });
+        headers = ['ผู้ขับ','Verified Revenue','KM','EMU','Required PAYD','Actual Sweep','Binding Gate','Status'];
+        rows = R2O.state.drivers.map(function(row) {
+          const money = R2O.core.driverFinancials(R2O.state, row.id);
+          const cell = function(value) { return value === null ? 'ไม่มีข้อมูล' : value; };
+          return [row.id, cell(money.verified), row.km, row.emu, cell(money.required),
+            cell(money.sweep), cell(money.bindingGate), row.status];
+        });
       } else if (type === 'claim') {
         headers = ['Claim','Driver','FI','EAD','Recovery','Eligible Net Loss','Gate','Status'];
         rows = R2O.state.claims.map(function(row) { return [row.id,row.driverId,row.fi,row.ead,row.recovery,row.eligibleNetLoss,row.gate,row.status]; });

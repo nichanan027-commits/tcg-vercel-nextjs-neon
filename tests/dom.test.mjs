@@ -53,8 +53,10 @@ ok('RC', 'risk console renders', await page.locator('#towerCaseBoard').isVisible
 const riskKpis = await page.locator('#towerRiskKpis .rc-kpi').count();
 const wfKpis = await page.locator('#towerWorkflowKpis .rc-kpi').count();
 const waitKpis = await page.locator('#towerWaitingKpis .rc-kpi').count();
-ok('RC', 'three KPI groups match the three dimensions (4 / 9 / 9+SLA)',
-  riskKpis === 4 && wfKpis === 9 && waitKpis === 10);
+// the risk row carries a fifth tile for drivers whose ledger is missing, so the
+// console never shows "no data" as if it were "no risk"
+ok('RC', 'three KPI groups match the three dimensions (4+unknown / 9 / 9+SLA)',
+  riskKpis === 5 && wfKpis === 9 && waitKpis === 10);
 ok('RC', 'risk and workflow are shown as separate dimensions',
   (await page.locator('#towerRiskKpis').innerText()).includes('เสี่ยงสูง') &&
   (await page.locator('#towerWorkflowKpis').innerText()).includes('รอดำเนินการ'));
@@ -64,7 +66,7 @@ const cases = await page.locator('#towerCaseBoard .rc-case').count();
 ok('RC', 'case board lists the seeded intervention cases', cases === 4);
 const board = await page.locator('#towerCaseBoard').innerText();
 ok('RC', 'a card answers who / trigger / root cause / waiting / next action',
-  board.includes('INT-0451') && board.includes('สัญญาณหลัก') && board.includes('สาเหตุราก') &&
+  board.includes('INT-0451') && board.includes('สัญญาณที่เปิดเคส') && board.includes('สาเหตุราก') &&
   board.includes('รอ ') && board.includes('ขั้นตอนถัดไป') && board.includes('เจ้าของเคส'));
 ok('RC', 'FI DPD is labelled as coming from the FI', board.includes('อ่านจากสถาบันการเงินเท่านั้น'));
 ok('RC', 'binding sweep gate is shown per case', board.includes('ตัวจำกัด'));
@@ -73,9 +75,13 @@ ok('RC', 'competition illustration label present',
 ok('RC', '7-day evidence mix rendered',
   (await page.locator('#towerEvidenceMix .rc-mix').count()) === 7);
 
-await page.selectOption('#rcRisk', 'RED'); await page.waitForTimeout(150);
+// risk is derived now: with the ledger silent on these drivers, DPD 12 and a
+// vehicle outage read YELLOW — the RED that used to sit in the seed is gone
+await page.selectOption('#rcRisk', 'YELLOW'); await page.waitForTimeout(150);
 ok('RC', 'risk filter narrows the board',
-  (await page.locator('#towerCaseBoard .rc-case').count()) === 1);
+  (await page.locator('#towerCaseBoard .rc-case').count()) ===
+  (await page.evaluate(() => R2O.core.riskConsoleRows(R2O.state, {})
+    .filter((r) => r.currentRiskStatus === 'YELLOW').length)));
 await page.selectOption('#rcRisk', 'ALL');
 await page.selectOption('#rcWaiting', 'OEM'); await page.waitForTimeout(150);
 ok('RC', 'waiting-party filter works independently of workflow',
@@ -196,6 +202,248 @@ await page.screenshot({ path: path.join(HERE, '..', '.artifacts', 'risk-console-
 await page.setViewportSize({ width: 1440, height: 900 });
 await go('#driver:home');
 await page.screenshot({ path: path.join(HERE, '..', '.artifacts', 'driver-home-desktop.png'), fullPage: true });
+
+
+/* ══════════════ Phase 1.1 browser coverage ══════════════
+ *   RB RBAC across all nine roles, in the real console
+ *   FC F.A. Center contact routes and navigation
+ *   UI the driver-facing paths the core suite cannot reach
+ *   SS cross-surface consistency for D-000381
+ */
+
+/* ── RB. RBAC in the rendered console ── */
+// the responsive pass above left a phone viewport; the console chrome needs a desktop one
+await page.setViewportSize({ width: 1440, height: 900 });
+const GRANTS = { tcg:12, risk:12, claim:7, fi:10, coop:9, oem:3, data:3, payment:3, recovery:4 };
+await go('#partner:overview');
+for (const [role, count] of Object.entries(GRANTS)) {
+  await page.selectOption('#roleSelect', role);
+  await page.waitForTimeout(120);
+  const visible = await page.locator('#viewPartner .nav button[data-screen]:not([hidden])').count();
+  ok('RB', 'role ' + role + ' sees ' + count + ' screens in the console', visible === count);
+}
+await page.selectOption('#roleSelect', 'claim');
+await page.waitForTimeout(120);
+ok('RB', 'claim cannot see the operational screens',
+  (await page.locator('#viewPartner .nav button[data-screen="daily"]').isHidden()) &&
+  (await page.locator('#viewPartner .nav button[data-screen="ews"]').isHidden()) &&
+  (await page.locator('#viewPartner .nav button[data-screen="pipeline"]').isHidden()));
+
+await page.selectOption('#roleSelect', 'tcg'); await page.waitForTimeout(120);
+await go('#partner:daily');
+ok('RB', 'tcg can stand on the daily screen', await page.locator('#partner-daily.active').isVisible());
+await page.selectOption('#roleSelect', 'claim');
+await page.waitForTimeout(220);
+ok('RB', 'switching to a role without that screen leaves it safely',
+  !(await page.locator('#partner-daily.active').isVisible()) &&
+  (await page.evaluate(() => location.hash)) === '#partner:overview');
+
+ok('RB', 'an unmapped role is sent out of the console entirely',
+  await page.evaluate(() => {
+    const select = document.getElementById('roleSelect');
+    const option = document.createElement('option');
+    option.value = 'auditor';
+    select.appendChild(option);
+    select.value = 'auditor';
+    location.hash = '#partner:overview';
+    R2O.applyPartnerPermissions();
+    const visible = document.querySelectorAll('#viewPartner .nav button[data-screen]:not([hidden])').length;
+    const hash = location.hash;
+    option.remove();
+    select.value = 'tcg';
+    return visible === 0 && hash === '#gateway';
+  }));
+// that check leaves the console entirely, which is the point — reload back into it
+await go('#partner:overview');
+await page.selectOption('#roleSelect', 'tcg'); await page.waitForTimeout(120);
+
+/* ── FC. F.A. Center contact routes ── */
+await go('#gateway');
+await page.locator('button:has-text("ขอรับคำปรึกษาฟรีจาก บสย. F.A. Center")').first().click();
+await page.waitForTimeout(220);
+ok('FC', 'the gateway button really opens the F.A. Center intake',
+  (await page.evaluate(() => location.hash)) === '#fa:intake' &&
+  await page.locator('#fa-intake.active').isVisible());
+
+const CONTACTS = [
+  ['โทร 02-890-9999', 'tel:028909999', false],
+  ['LINE @tcgfirst', 'https://line.me/R/ti/p/%40tcgfirst', true],
+  ['ลงทะเบียนรับคำปรึกษา', 'https://www.tcg.or.th/news_inside.php?news_id=7431', true]
+];
+for (const [label, href, external] of CONTACTS) {
+  const link = page.locator('.contact-actions a', { hasText: label }).first();
+  ok('FC', 'contact "' + label + '" points at the full URL',
+    (await link.getAttribute('href')) === href);
+  if (external) {
+    ok('FC', 'contact "' + label + '" opens safely in a new tab',
+      (await link.getAttribute('target')) === '_blank' &&
+      ((await link.getAttribute('rel')) || '').includes('noopener'));
+  }
+}
+const guide = page.locator('.contact-note a').first();
+ok('FC', 'the service guide PDF is linked and opens safely',
+  ((await guide.getAttribute('href')) || '').endsWith('.pdf') &&
+  (await guide.getAttribute('target')) === '_blank' &&
+  ((await guide.getAttribute('rel')) || '').includes('noopener'));
+ok('FC', 'no shortened link is used for the registration route',
+  !(await page.content()).includes('bit.ly'));
+
+await page.goBack(); await page.waitForTimeout(220);
+ok('FC', 'the browser back button returns to the gateway',
+  await page.locator('#viewGateway').isVisible());
+
+/* ── UI. driver-facing paths ── */
+await go('#fa:intake');
+await page.selectOption('#faTopic', 'INCOME_DROP');
+await page.fill('#faDetails', 'ทดสอบเส้นทางความยินยอม');
+await page.fill('#faStartDate', '2026-09-09');
+await page.selectOption('#faContact', { index: 1 });
+const casesBefore = await page.evaluate(() => R2O.state.cases.length);
+await page.locator('#faIntakeForm button[type="submit"]').click();
+await page.waitForTimeout(220);
+ok('UI', 'the consent gate blocks a request and creates no case',
+  (await page.evaluate(() => R2O.state.cases.length)) === casesBefore);
+await page.check('#faConsent');
+await page.locator('#faIntakeForm button[type="submit"]').click();
+await page.waitForTimeout(260);
+const afterConsent = await page.evaluate(() => ({
+  cases: R2O.state.cases.length,
+  last: R2O.state.cases[R2O.state.cases.length - 1],
+  audited: R2O.state.auditTrail.some((row) => row.action === 'CASE_CREATED')
+}));
+ok('UI', 'with consent the case is created, routed and audited',
+  afterConsent.cases === casesBefore + 1 &&
+  afterConsent.last.status === 'NEW_ALERT' &&
+  !!afterConsent.last.owner && afterConsent.audited);
+
+await page.evaluate(() => { localStorage.clear(); R2O.state = R2O.defaults(); R2O.renderAll(); });
+await go('#driver:home');
+await page.locator('#dayReportBtn').click(); await page.waitForTimeout(160);
+ok('UI', 'the daily income form opens',
+  await page.locator('#dailyIncomeForm').isVisible());
+await page.fill('#dailyGross', '-50');
+await page.locator('#dailyIncomeForm button[type="submit"]').click();
+await page.waitForTimeout(160);
+ok('UI', 'a negative amount is rejected and nothing is stored',
+  (await page.evaluate(() => (R2O.state.dailyIncome || {}).status || null)) === null);
+await page.fill('#dailyGross', '1000');
+await page.fill('#dailyApp', '800');
+await page.fill('#dailyCash', '400');
+await page.locator('#dailyIncomeForm button[type="submit"]').click();
+await page.waitForTimeout(160);
+ok('UI', 'app plus cash cannot exceed the gross',
+  (await page.evaluate(() => (R2O.state.dailyIncome || {}).status || null)) === null &&
+  !(await page.locator('#dailySplitError').isHidden()));
+await page.fill('#dailyApp', '600');
+await page.fill('#dailyCash', '400');
+await page.locator('#dailyIncomeForm button[type="submit"]').click();
+await page.waitForTimeout(280);
+ok('UI', 'a valid entry is stored as self-reported, not as verified',
+  (await page.evaluate(() => (R2O.state.dailyIncome || {}).status)) === 'SELF_REPORTED');
+
+await page.evaluate(() => { localStorage.clear(); R2O.state = R2O.defaults(); R2O.renderAll(); });
+await go('#driver:home');
+await page.locator('button:has-text("วันนี้ไม่มีรายได้")').first().click();
+await page.waitForTimeout(160);
+await page.locator('#zeroIncomeConfirm').click();
+await page.waitForTimeout(280);
+ok('UI', 'a zero-income day is recorded without touching the FI figures',
+  (await page.evaluate(() => R2O.state.dailyIncome.status)) === 'SELF_REPORTED_ZERO' &&
+  (await page.evaluate(() => R2O.state.drivers[0].fiDpd)) === 0);
+
+await page.evaluate(() => { localStorage.clear(); R2O.state = R2O.defaults(); R2O.renderAll(); });
+await go('#driver:home');
+await page.locator('#daySimBtn').click(); await page.waitForTimeout(160);
+ok('UI', 'the simulator panel opens and is labelled as a simulation',
+  (await page.locator('#driverSimPanel').isVisible()) &&
+  (await page.locator('#driverSimPanel .badge.sim').innerText()).includes('Simulation'));
+const beforeSim = await page.evaluate(() => JSON.stringify(R2O.state));
+await page.fill('#xrayRevenue', '900');
+await page.waitForTimeout(220);
+ok('UI', 'the affordability simulator writes nothing to state',
+  (await page.evaluate(() => JSON.stringify(R2O.state))) === beforeSim);
+ok('UI', 'the simulator does update the figure it shows',
+  (await page.locator('#xrayAvailable').innerText()) !== '-');
+
+ok('UI', 'CSV escaping still quotes separators and embedded quotes',
+  await page.evaluate(() => R2O.core.csvEscape('a,"b"') === '"a,""b"""'));
+await go('#partner:daily');
+const download = await page.evaluate(() => {
+  let captured = null;
+  const original = R2O.downloadCsv;
+  R2O.downloadCsv = (name, body) => { captured = { name: name, body: body }; };
+  try { downloadPartnerCsv('daily'); } finally { R2O.downloadCsv = original; }
+  return captured;
+});
+ok('UI', 'the daily CSV exports the derived figures, gaps included',
+  !!download && download.body.includes('Binding Gate') &&
+  download.body.includes('1715.5') && download.body.includes('ไม่มีข้อมูล'));
+
+ok('UI', 'a corrupt saved state falls back to the demo data instead of crashing',
+  await page.evaluate(() => {
+    localStorage.setItem(R2O.storageKey, '{ this is not json');
+    const restored = R2O.store.load();
+    localStorage.clear();
+    return !!restored && Array.isArray(restored.drivers) && restored.drivers.length > 0;
+  }));
+
+/* ── SS. cross-surface consistency for D-000381 ── */
+await page.evaluate(() => { localStorage.clear(); R2O.state = R2O.defaults(); R2O.renderAll(); });
+const truth = await page.evaluate(() => R2O.core.driverFinancials(R2O.state, 'D-000381'));
+ok('SS', 'the accessor holds the agreed set of figures',
+  Math.abs(truth.verified - 1715.50) < 0.005 && Math.abs(truth.available - 638.05) < 0.005 &&
+  Math.abs(truth.required - 477.69) < 0.005 && Math.abs(truth.residual - 112.59) < 0.005);
+
+await go('#driver:money');
+const moneyText = await page.locator('#driver-money').innerText();
+ok('SS', 'the driver money screen shows the derived figures',
+  moneyText.includes('1,715.50') && moneyText.includes('638.05') && moneyText.includes('112.59'));
+ok('SS', 'no haircut-era amount is left on the driver money screen',
+  !moneyText.includes('1,757.99') && !moneyText.includes('680.54') && !moneyText.includes('202.85'));
+ok('SS', 'the PAYD rule is written as five gates',
+  moneyText.includes('5 ตัวจำกัด') && moneyText.includes('วงเงินที่ได้รับอนุญาตให้ตัด'));
+ok('SS', 'the period column sums the ledger rather than projecting a month',
+  (await page.locator('#driverMoneyPeriodHead').innerText()).includes('8 วัน'));
+
+await go('#partner:daily');
+await page.selectOption('#roleSelect', 'tcg'); await page.waitForTimeout(180);
+const dailyText = await page.locator('#partnerDailyRows').innerText();
+ok('SS', 'the partner daily table shows the same verified revenue',
+  dailyText.includes('1,715.50') && dailyText.includes('477.69'));
+ok('SS', 'drivers without a ledger read as unavailable, not as zero',
+  dailyText.includes('ไม่มีข้อมูล') && !dailyText.includes('฿0.00'));
+
+await go('#partner:portfolio');
+const portfolioText = await page.locator('#partnerPortfolioRows').innerText();
+ok('SS', 'the portfolio shows the derived revenue trend',
+  portfolioText.includes('+5.5%') && !portfolioText.includes('+6%'));
+ok('SS', 'portfolio and risk console show one risk level per driver',
+  await page.evaluate(() => {
+    const rows = R2O.core.riskConsoleRows(R2O.state, {});
+    return R2O.core.portfolioView(R2O.state).every((row) => {
+      const seen = rows.find((item) => item.item.driverId === row.driverId);
+      return row.ews === R2O.core.currentRiskStatus(R2O.state, row.driverId) &&
+        (!seen || seen.currentRiskStatus === row.ews);
+    });
+  }));
+
+await go('#tower:monitor');
+ok('SS', 'the console keeps the risk a case was opened at on record',
+  (await page.locator('#towerCaseBoard').innerText()).includes('เปิดจาก'));
+ok('SS', 'a case can read GREEN today and still be monitored',
+  await page.evaluate(() => {
+    const item = R2O.state.interventions.find((row) => row.id === 'INT-0381');
+    return item.openedRiskStatus === 'WATCH' && item.workflow === 'MONITORING' &&
+      R2O.core.currentRiskStatus(R2O.state, 'D-000381') === 'GREEN';
+  }));
+
+await go('#fa:debt-plan');
+const debtText = await page.locator('#fa-debt-plan').innerText();
+ok('SS', 'the F.A. debt plan reads the same figures as the driver',
+  debtText.includes('1,715.50') && debtText.includes('638.05') && !debtText.includes('1,757.99'));
+
+await page.setViewportSize({ width: 1440, height: 900 });
+await page.evaluate(() => localStorage.clear());
 
 ok('V', 'no JavaScript errors anywhere in the run', errors.length === 0);
 
