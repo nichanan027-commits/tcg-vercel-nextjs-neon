@@ -3,29 +3,44 @@ import path from 'node:path';
 import assert from 'node:assert/strict';
 
 const root = path.join(import.meta.dirname, '..');
-const wrapper = path.join(root, 'competition-final-v3.html');
+const page = path.join(root, 'competition-final-v3.html');
 const vercel = path.join(root, 'vercel.json');
 
-assert.ok(fs.existsSync(wrapper), 'competition-final-v3.html must exist');
-const html = fs.readFileSync(wrapper, 'utf8');
+assert.ok(fs.existsSync(page), 'competition-final-v3.html must exist');
+const html = fs.readFileSync(page, 'utf8');
 
-assert.match(html, /const CORE_PATH = 'index\.html'/, 'must load existing System B index without changing it');
-assert.match(html, /req\.ead\s*=\s*null/, 'per-case EAD must exist as reference data');
-assert.match(html, /req\.eligibleNetLoss\s*=\s*null/, 'per-case Eligible Net Loss must exist as reference data');
-assert.match(html, /req\.hardMaxClaim\s*=\s*null/, 'per-case HMC must exist as reference data');
-assert.doesNotMatch(html, /req\.stopLoss\s*=/, 'Stop Loss must not be assigned per case');
-assert.match(html, /compensationRiskControl/, 'portfolio risk-control object must exist');
-assert.match(html, /stopLossLimit\s*:\s*null/, 'Stop Loss limit defaults to pending/null');
-assert.match(html, /stopLossUtilizationPct\s*:\s*null/, 'Stop Loss utilization defaults to pending/null');
-assert.match(html, /ข้อมูลประกอบการพิจารณา/, 'must identify the fields as reference data');
-assert.match(html, /Risk \/ Claim Reference Data/, 'must include the reference-data label');
-assert.match(html, /ไม่ใช่จำนวนเงินอนุมัติจ่ายอัตโนมัติ/, 'must disclaim automatic payout approval');
-assert.doesNotMatch(html, /claimPayable\s*=|Math\.min\s*\(\s*eligibleNetLoss|ead\s*-\s*recovery/i,
-  'must not restore legacy claim calculation formulas');
-assert.doesNotMatch(html, /insertAdjacentElement\('afterend'/,
-  'must not change the existing compensation-request table row model');
+assert.match(html, /EAD · Exposure at Default/, 'case-level EAD must be visible');
+assert.match(html, /Eligible Net Loss/, 'case-level Eligible Net Loss must be visible');
+assert.match(html, /HMC · Hard Max Claim/, 'case-level HMC must be visible');
+assert.match(html, /Stop Loss Limit/, 'portfolio-level Stop Loss limit must be visible');
+assert.match(html, /Stop Loss Utilization/, 'portfolio-level Stop Loss utilization must be visible');
+
+assert.match(html, /ead:null/, 'EAD must default to pending/null rather than an invented amount');
+assert.match(html, /eligibleNetLoss:null/, 'Eligible Net Loss must default to pending/null');
+assert.match(html, /hardMaxClaim:null/, 'HMC must default to pending/null');
+assert.match(html, /stopLossLimit:null/, 'Stop Loss limit must default to pending/null');
+assert.match(html, /stopLossUtilizationPct:null/, 'Stop Loss utilization must default to pending/null');
+
+assert.match(html, /ระดับรายคำขอ/, 'case-level scope must be stated');
+assert.match(html, /ตัวควบคุมระดับพอร์ต/, 'portfolio-level scope must be stated');
+assert.match(html, /ไม่ใช่จำนวนเงินอนุมัติจ่ายอัตโนมัติ/, 'automatic payout approval must be disclaimed');
+
+assert.doesNotMatch(
+  html,
+  /claimPayable\s*=|Math\.min\s*\(\s*eligibleNetLoss|ead\s*-\s*recovery/i,
+  'legacy claim-calculation formulas must not be restored'
+);
+
+assert.match(html, /driver:\['home','activity','money','ownership','wallet','help','cure'\]/,
+  'Driver Portal must keep 7 routes');
+assert.match(html, /partner:\['overview','pipeline','portfolio','daily','incidents','ews','cure','elg','exit','claim','finance','partners'\]/,
+  'Partner workspace must keep 12 routes');
+assert.match(html, /tower:\['monitor','queue','risk-map','fa-center','promptcure-sla','claim-monitor','data-health'\]/,
+  'Control Tower must keep 7 routes');
+assert.match(html, /fa:\['intake','interruption','debt-plan','income-plan','cases'\]/,
+  'F.A. Center must keep 5 routes');
 
 const config = JSON.parse(fs.readFileSync(vercel, 'utf8'));
 assert.deepEqual(config.rewrites, [{ source: '/', destination: '/competition-final-v3.html' }]);
 
-console.log('PASS: compensation risk/reference shell contract');
+console.log('PASS: competition risk/reference contract');
