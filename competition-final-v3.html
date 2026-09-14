@@ -1,0 +1,293 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Route to Own Operations Center</title>
+  <style>
+    html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#f5faff}
+    #appFrame{display:block;width:100%;height:100%;border:0;background:#f5faff}
+  </style>
+</head>
+<body>
+<iframe id="appFrame" title="Route to Own Operations Center"></iframe>
+<script>
+(() => {
+  'use strict';
+
+  const CORE_PATH = 'index.html';
+  const frame = document.getElementById('appFrame');
+  let syncing = false;
+
+  const coreUrl = () => CORE_PATH + (location.hash || '');
+  frame.src = coreUrl();
+
+  function syncTopToFrame(){
+    if (syncing || !frame.contentWindow) return;
+    const target = location.hash || '';
+    if ((frame.contentWindow.location.hash || '') !== target) {
+      syncing = true;
+      frame.contentWindow.location.hash = target;
+      setTimeout(() => { syncing = false; }, 0);
+    }
+  }
+
+  window.addEventListener('hashchange', syncTopToFrame);
+
+  function installRiskReferenceLayer(win){
+    const R2O = win.R2O;
+    if (!R2O || !R2O.state || !R2O.render) return false;
+    if (R2O.__riskReferenceLayerInstalled) return true;
+    R2O.__riskReferenceLayerInstalled = true;
+
+    function ensureReferenceData(){
+      const requests = Array.isArray(R2O.state.compensationRequests)
+        ? R2O.state.compensationRequests : [];
+
+      for (const req of requests) {
+        if (!Object.prototype.hasOwnProperty.call(req, 'ead')) req.ead = null;
+        if (!Object.prototype.hasOwnProperty.call(req, 'eligibleNetLoss')) req.eligibleNetLoss = null;
+        if (!Object.prototype.hasOwnProperty.call(req, 'hardMaxClaim')) req.hardMaxClaim = null;
+        if (!Object.prototype.hasOwnProperty.call(req, 'riskReferenceStatus')) {
+          req.riskReferenceStatus = 'PENDING_CONFIRMATION';
+        }
+      }
+
+      if (!R2O.state.compensationRiskControl) {
+        R2O.state.compensationRiskControl = {
+          stopLossLimit: null,
+          cumulativeEligibleNetLoss: null,
+          stopLossUtilizationPct: null,
+          status: 'PENDING_POLICY_CONFIRMATION'
+        };
+      }
+    }
+
+    function moneyOrPending(value, pendingText){
+      if (typeof value === 'number' && Number.isFinite(value)) {
+        return '฿' + value.toLocaleString('th-TH', {maximumFractionDigits: 0});
+      }
+      return pendingText;
+    }
+
+    function pctOrPending(value){
+      if (typeof value === 'number' && Number.isFinite(value)) {
+        return value.toLocaleString('th-TH', {maximumFractionDigits: 1}) + '%';
+      }
+      return 'รอข้อมูลพอร์ต';
+    }
+
+    function injectStyle(doc){
+      if (doc.getElementById('r2o-risk-reference-style')) return;
+      const style = doc.createElement('style');
+      style.id = 'r2o-risk-reference-style';
+      style.textContent = `
+        .r2o-risk-reference-wrap{margin:14px 0 16px;padding:16px;border:1px solid rgba(20,124,229,.18);border-radius:18px;background:linear-gradient(135deg,rgba(255,255,255,.96),rgba(240,248,255,.92));box-shadow:0 10px 28px rgba(7,26,51,.06)}
+        .r2o-risk-reference-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:12px;flex-wrap:wrap}
+        .r2o-risk-reference-title{font-weight:800;color:#071a33;font-size:15px;line-height:1.35}
+        .r2o-risk-reference-sub{margin-top:3px;color:#60758d;font-size:12px;line-height:1.5}
+        .r2o-risk-reference-badge{display:inline-flex;align-items:center;padding:5px 9px;border-radius:999px;background:#e9f4ff;color:#0b67c2;font-size:11px;font-weight:800;white-space:nowrap}
+        .r2o-risk-reference-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+        .r2o-risk-reference-card{padding:12px;border:1px solid rgba(7,26,51,.08);border-radius:14px;background:rgba(255,255,255,.88);min-width:0}
+        .r2o-risk-reference-k{color:#60758d;font-size:11px;font-weight:700;line-height:1.35}
+        .r2o-risk-reference-v{margin-top:5px;color:#071a33;font-size:15px;font-weight:850;line-height:1.35;word-break:break-word}
+        .r2o-risk-reference-note{margin-top:4px;color:#7b8da0;font-size:10.5px;line-height:1.45}
+        .r2o-risk-reference-warning{margin-top:12px;padding:10px 12px;border-radius:12px;background:#fff8e8;color:#7a5710;font-size:11.5px;line-height:1.55;border:1px solid rgba(183,121,31,.18)}
+        .r2o-risk-reference-case{margin-top:10px;padding:10px;border-radius:14px;background:#f7fbff;border:1px solid rgba(20,124,229,.12)}
+        .r2o-risk-reference-casehead{display:flex;gap:8px;align-items:center;justify-content:space-between;flex-wrap:wrap;margin-bottom:8px;color:#071a33;font-size:12px}
+        .r2o-risk-reference-casehead span{color:#60758d;font-weight:650}
+        .r2o-risk-case-inline{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+        .r2o-risk-case-inline .r2o-risk-reference-card{padding:9px 10px;background:white}
+        @media(max-width:900px){.r2o-risk-reference-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.r2o-risk-case-inline{grid-template-columns:1fr}}
+        @media(max-width:560px){.r2o-risk-reference-grid{grid-template-columns:1fr}}
+      `;
+      doc.head.appendChild(style);
+    }
+
+    function replaceOldDisclaimer(doc){
+      const needle = 'ระบบนี้ไม่คำนวณ EAD, Eligible Net Loss, Hard Max Claim, Stop-loss หรือวงเงินชดเชย';
+      const replacement = 'ระบบแสดง EAD, Eligible Net Loss และ HMC เป็นข้อมูลอ้างอิงรายเคส และ Stop Loss เป็นตัวควบคุมระดับพอร์ต เพื่อประกอบการพิจารณาเท่านั้น — ไม่ใช่จำนวนเงินอนุมัติจ่ายอัตโนมัติ';
+      const walker = doc.createTreeWalker(doc.body, win.NodeFilter.SHOW_TEXT);
+      const nodes = [];
+      while (walker.nextNode()) {
+        if (walker.currentNode.nodeValue && walker.currentNode.nodeValue.includes(needle)) nodes.push(walker.currentNode);
+      }
+      nodes.forEach(n => { n.nodeValue = n.nodeValue.replace(needle, replacement); });
+    }
+
+    function findCompensationTable(doc){
+      return [...doc.querySelectorAll('table')].find(table => {
+        const t = table.textContent || '';
+        return t.includes('Next Action') && t.includes('รอใคร') && t.includes('คำขอ');
+      });
+    }
+
+    function buildPortfolioCard(doc){
+      const ctl = R2O.state.compensationRiskControl || {};
+      const wrap = doc.createElement('section');
+      wrap.className = 'r2o-risk-reference-wrap';
+      wrap.dataset.riskReference = 'portfolio';
+      wrap.innerHTML = `
+        <div class="r2o-risk-reference-head">
+          <div>
+            <div class="r2o-risk-reference-title">ข้อมูลประกอบการพิจารณา · Risk / Claim Reference Data</div>
+            <div class="r2o-risk-reference-sub">EAD / Eligible Net Loss / HMC ใช้ระดับรายเคส · Stop Loss ใช้ควบคุมความเสี่ยงระดับพอร์ต</div>
+          </div>
+          <span class="r2o-risk-reference-badge">REFERENCE ONLY</span>
+        </div>
+        <div class="r2o-risk-reference-grid">
+          <div class="r2o-risk-reference-card">
+            <div class="r2o-risk-reference-k">Stop Loss Limit · เพดานพอร์ต</div>
+            <div class="r2o-risk-reference-v">${moneyOrPending(ctl.stopLossLimit, 'รอค่าเพดานโครงการ')}</div>
+            <div class="r2o-risk-reference-note">นโยบายระดับ Portfolio ไม่ใช่ค่าของเคสใดเคสหนึ่ง</div>
+          </div>
+          <div class="r2o-risk-reference-card">
+            <div class="r2o-risk-reference-k">Stop Loss Utilization</div>
+            <div class="r2o-risk-reference-v">${pctOrPending(ctl.stopLossUtilizationPct)}</div>
+            <div class="r2o-risk-reference-note">การใช้ Risk Budget เทียบกับเพดานที่อนุมัติ</div>
+          </div>
+          <div class="r2o-risk-reference-card">
+            <div class="r2o-risk-reference-k">Cumulative Eligible Net Loss</div>
+            <div class="r2o-risk-reference-v">${moneyOrPending(ctl.cumulativeEligibleNetLoss, 'รอข้อมูลพอร์ต')}</div>
+            <div class="r2o-risk-reference-note">ใช้เพื่อมอนิเตอร์พอร์ต ไม่ใช้คำนวณยอดจ่ายของเคสนี้</div>
+          </div>
+          <div class="r2o-risk-reference-card">
+            <div class="r2o-risk-reference-k">Policy Status</div>
+            <div class="r2o-risk-reference-v">รอยืนยันนโยบาย</div>
+            <div class="r2o-risk-reference-note">ต้องอ้างอิงเกณฑ์โครงการ/ผู้มีอำนาจอนุมัติ</div>
+          </div>
+        </div>
+        <div class="r2o-risk-reference-warning"><strong>Governance:</strong> ข้อมูลชุดนี้เป็นข้อมูลประกอบการพิจารณาและกรอบควบคุมความเสี่ยง ไม่ใช่จำนวนเงินอนุมัติจ่ายอัตโนมัติ และระบบชั้นนี้ไม่สร้างสิทธิชดเชยแทนผู้มีอำนาจอนุมัติ</div>
+      `;
+      return wrap;
+    }
+
+    function buildCaseReferencePanel(doc){
+      const requests = Array.isArray(R2O.state.compensationRequests) ? R2O.state.compensationRequests : [];
+      const section = doc.createElement('section');
+      section.className = 'r2o-risk-reference-wrap';
+      section.dataset.riskReference = 'cases';
+      const cards = requests.map(req => `
+        <div class="r2o-risk-reference-case">
+          <div class="r2o-risk-reference-casehead"><strong>${req.requestId}</strong><span>${req.driver || req.driverId || req.caseId || ''}</span></div>
+          <div class="r2o-risk-case-inline">
+            <div class="r2o-risk-reference-card">
+              <div class="r2o-risk-reference-k">EAD · Exposure at Default</div>
+              <div class="r2o-risk-reference-v">${moneyOrPending(req.ead, 'รอข้อมูลยืนยันจาก FI')}</div>
+              <div class="r2o-risk-reference-note">ยอดภาระคงค้าง ณ จุด Default</div>
+            </div>
+            <div class="r2o-risk-reference-card">
+              <div class="r2o-risk-reference-k">Eligible Net Loss</div>
+              <div class="r2o-risk-reference-v">${moneyOrPending(req.eligibleNetLoss, 'รอข้อมูล Recovery / สิทธิ')}</div>
+              <div class="r2o-risk-reference-note">ความเสียหายสุทธิที่เข้าเกณฑ์หลังข้อมูล Recovery ที่ยืนยันแล้ว</div>
+            </div>
+            <div class="r2o-risk-reference-card">
+              <div class="r2o-risk-reference-k">HMC · Hard Max Claim</div>
+              <div class="r2o-risk-reference-v">${moneyOrPending(req.hardMaxClaim, 'รอเพดานตามเงื่อนไขโครงการ')}</div>
+              <div class="r2o-risk-reference-note">เพดานอ้างอิงของเคส ไม่ใช่ยอดอนุมัติจ่าย</div>
+            </div>
+          </div>
+        </div>`).join('');
+      section.innerHTML = `
+        <div class="r2o-risk-reference-head">
+          <div>
+            <div class="r2o-risk-reference-title">ข้อมูลอ้างอิงรายคำขอ · Case Risk Reference</div>
+            <div class="r2o-risk-reference-sub">แสดง EAD / Eligible Net Loss / HMC แยกตามคำขอ โดยไม่คำนวณสิทธิหรือคำสั่งจ่าย</div>
+          </div>
+          <span class="r2o-risk-reference-badge">CASE LEVEL</span>
+        </div>${cards}`;
+      return section;
+    }
+
+    function injectCompensationRiskReference(){
+      ensureReferenceData();
+      const doc = win.document;
+      injectStyle(doc);
+      replaceOldDisclaimer(doc);
+      const table = findCompensationTable(doc);
+      if (!table) return;
+      if (table.dataset.riskReferenceEnhanced === '1') return;
+      table.dataset.riskReferenceEnhanced = '1';
+
+      const holder = table.parentElement || table;
+      if (!doc.querySelector('[data-risk-reference="portfolio"]')) {
+        holder.insertBefore(buildPortfolioCard(doc), table);
+      }
+      if (!doc.querySelector('[data-risk-reference="cases"]')) {
+        holder.insertBefore(buildCaseReferencePanel(doc), table);
+      }
+    }
+
+    ensureReferenceData();
+
+    const originalCompensationRequests = typeof R2O.render.compensationRequests === 'function'
+      ? R2O.render.compensationRequests.bind(R2O.render) : null;
+    if (originalCompensationRequests) {
+      R2O.render.compensationRequests = function(...args){
+        ensureReferenceData();
+        const result = originalCompensationRequests(...args);
+        win.setTimeout(injectCompensationRiskReference, 0);
+        return result;
+      };
+    }
+
+    const originalOpenCompensationRequest = typeof R2O.render.openCompensationRequest === 'function'
+      ? R2O.render.openCompensationRequest.bind(R2O.render) : null;
+    if (originalOpenCompensationRequest) {
+      R2O.render.openCompensationRequest = function(...args){
+        ensureReferenceData();
+        const result = originalOpenCompensationRequest(...args);
+        win.setTimeout(injectCompensationRiskReference, 0);
+        return result;
+      };
+    }
+
+    if (R2O.DataLayer && typeof R2O.DataLayer.reset === 'function') {
+      const originalReset = R2O.DataLayer.reset.bind(R2O.DataLayer);
+      R2O.DataLayer.reset = function(...args){
+        const result = originalReset(...args);
+        ensureReferenceData();
+        win.setTimeout(injectCompensationRiskReference, 0);
+        return result;
+      };
+    }
+
+    const observer = new win.MutationObserver(() => {
+      win.clearTimeout(R2O.__riskReferenceMutationTimer);
+      R2O.__riskReferenceMutationTimer = win.setTimeout(injectCompensationRiskReference, 25);
+    });
+    observer.observe(win.document.body, {childList:true, subtree:true});
+
+    win.setTimeout(injectCompensationRiskReference, 0);
+    return true;
+  }
+
+  function installWhenReady(){
+    const win = frame.contentWindow;
+    if (!win) return;
+    let tries = 0;
+    const timer = setInterval(() => {
+      tries += 1;
+      try {
+        if (installRiskReferenceLayer(win)) {
+          clearInterval(timer);
+          win.addEventListener('hashchange', () => {
+            if (syncing) return;
+            syncing = true;
+            const h = win.location.hash || '';
+            if (location.hash !== h) history.replaceState(null, '', h || location.pathname);
+            setTimeout(() => { syncing = false; }, 0);
+          });
+        }
+      } catch (e) {
+        console.error('[RiskReferenceLayer]', e);
+      }
+      if (tries > 100) clearInterval(timer);
+    }, 50);
+  }
+
+  frame.addEventListener('load', installWhenReady);
+})();
+</script>
+</body>
+</html>
