@@ -528,6 +528,95 @@ ok('AU', 'the portfolio export drops the risk score and marks the illustration',
 
 await page.evaluate(() => localStorage.clear());
 
+
+/* ══════════════ CR. compensation request tracking in the rendered UI ══════════════ */
+await page.setViewportSize({ width: 1440, height: 900 });
+await page.evaluate(() => { localStorage.clear(); R2O.state = R2O.defaults(); R2O.renderAll(); });
+
+await go('#partner:claim');
+await page.selectOption('#roleSelect', 'tcg'); await page.waitForTimeout(180);
+const crScreen = await page.locator('#partner-claim').innerText();
+ok('CR', 'the partner screen tracks requests rather than claims',
+  crScreen.includes('ติดตามคำขอรับเงินค่าชดเชย') &&
+  (await page.locator('#partner-claim thead th').count()) === 12);
+ok('CR', 'every seeded request is listed',
+  (await page.locator('#partnerClaimRows tr').count()) ===
+  (await page.evaluate(() => R2O.state.compensationRequests.length)));
+ok('CR', 'the row answers stage, owner, waiting party and next action',
+  crScreen.includes('CR-0012') && crScreen.includes('อยู่ระหว่างตรวจสอบ') &&
+  crScreen.includes('รอ สถาบันการเงิน') && crScreen.includes('ขั้นตอนถัดไป'));
+ok('CR', 'loan account and Child E-LG are shown for reconciliation',
+  crScreen.includes('KBK-2209455013') && crScreen.includes('ELG-80437'));
+ok('CR', 'the screen states that it does not calculate entitlement or amounts',
+  crScreen.includes('ไม่คำนวณสิทธิ') && crScreen.includes('ไม่คำนวณจำนวนเงิน') &&
+  crScreen.includes('ไม่ตัดสินภาระชดเชย'));
+ok('CR', 'APPROVED is explained as a process state only',
+  crScreen.includes('ไม่ใช่การอนุมัติสินเชื่อ') &&
+  crScreen.includes('ไม่ใช่การรับรองสิทธิ') &&
+  crScreen.includes('ไม่ใช่คำสั่งให้จ่ายเงิน'));
+ok('CR', 'no baht amount appears anywhere on the request screen',
+  !/฿/.test(crScreen));
+
+await go('#tower:claim-monitor');
+const towerCr = await page.locator('#tower-claim-monitor').innerText();
+ok('CR', 'the TCG board groups requests by status and by waiting party',
+  (await page.locator('#towerCrStatusKpis .rc-kpi').count()) === 8 &&
+  (await page.locator('#towerCrWaitingKpis .rc-kpi').count()) === 10);
+ok('CR', 'the board lists every request with its SLA',
+  (await page.locator('#towerClaimRows tr').count()) ===
+  (await page.evaluate(() => R2O.state.compensationRequests.length)) &&
+  towerCr.includes('เกินกรอบเวลา SLA'));
+ok('CR', 'no baht amount appears anywhere on the board',
+  !/฿/.test(towerCr));
+ok('CR', 'a request not yet submitted says so instead of showing a number',
+  towerCr.includes('ยังไม่ยื่น'));
+
+await go('#partner:finance');
+const financeScreen = await page.locator('#partner-finance').innerText();
+ok('CR', 'the finance screen no longer shows a claim ceiling or stop-loss gauge',
+  !financeScreen.includes('HMC') && !financeScreen.includes('เพดานเคลม') &&
+  !financeScreen.includes('เพดานหยุดขาดทุน') &&
+  financeScreen.includes('ไม่คำนวณ'));
+
+// the old programme KPI strip was dead code whose container no longer exists;
+// what matters is that no surface anywhere still sums a net loss
+await go('#tower:monitor');
+const towerMonitor = await page.locator('#tower-monitor').innerText();
+ok('CR', 'no surface sums a compensation net loss any more',
+  !towerMonitor.includes('Net Loss') && !towerMonitor.includes('ผลขาดทุนสุทธิ') &&
+  await page.evaluate(() => {
+    const m = R2O.core.metrics(R2O.state);
+    return m.eligibleNetLoss === undefined && m.recoveries === undefined &&
+      typeof m.compensationRequestsOpen === 'number';
+  }));
+await go('#partner:overview');
+const overviewScreen = await page.locator('#partner-overview').innerText();
+ok('CR', 'the partner overview drops the claim-ceiling wording too',
+  !overviewScreen.includes('เพดานเคลม') && !overviewScreen.includes('HMC') &&
+  overviewScreen.includes('คำขอรับเงินค่าชดเชย'));
+
+const crCsv = await page.evaluate(() => {
+  let captured = null;
+  const original = R2O.downloadCsv;
+  R2O.downloadCsv = (name, body) => { captured = body; };
+  try { downloadPartnerCsv('claim'); } finally { R2O.downloadCsv = original; }
+  return captured;
+});
+ok('CR', 'the export carries the fourteen fields and no amount column',
+  !!crCsv && crCsv.includes('Case ID') && crCsv.includes('Next Action') &&
+  crCsv.includes('Waiting For') &&
+  !crCsv.includes('EAD') && !crCsv.includes('Eligible Net Loss') && !crCsv.includes('Gate'));
+
+ok('CR', 'no removed claim symbol survives on the page object',
+  await page.evaluate(() => R2O.core.claimContract === undefined &&
+    R2O.core.claimRules === undefined && R2O.core.coverageForYear === undefined &&
+    R2O.core.portfolioTierBoundary === undefined &&
+    R2O.core.legalInitialClaimCeiling === undefined &&
+    R2O.CLAIM_FORMULA_STATUS === undefined &&
+    R2O.state.claims === undefined && R2O.state.claimArchitecture === undefined));
+
+await page.evaluate(() => localStorage.clear());
+
 ok('V', 'no JavaScript errors anywhere in the run', errors.length === 0);
 
 await browser.close();

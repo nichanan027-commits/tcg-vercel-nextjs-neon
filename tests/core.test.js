@@ -352,26 +352,132 @@ ok('F', 'old readiness / certificate data cannot be restored into post-approval 
 });
 
 /* ───────────────────────────── G. Claim ───────────────────────────── */
+/* ───── G. Compensation request tracking — process only, never amounts ───── */
 section('G', () => {
 
-ok('G', 'CLAIM_FORMULA_STATUS is LOCKED_PARTIAL',
-  R2O.CLAIM_FORMULA_STATUS === 'LOCKED_PARTIAL' &&
-  R2O.core.claimContract().status === 'LOCKED_PARTIAL');
-ok('G', 'ER / ENL / RPC / FCE are unbound and return null', (() => {
-  const c = R2O.core.claimContract();
-  return ['eligibleRecovery', 'eligibleNetLoss', 'riskParticipationCoverage', 'finalClaimExposure']
-    .every((k) => k in c && c[k] === null);
-})());
-ok('G', 'locked coverage and legal constants are correct',
-  R2O.core.coverageForYear(2) === 0.80 && R2O.core.coverageForYear(4) === 0.80 &&
-  R2O.core.coverageForYear(5) === 1.00 && R2O.core.coverageForYear(7) === 1.00 &&
-  R2O.core.coverageForYear(1) === null &&
-  near(R2O.core.legalInitialClaimCeiling(1000000), 250000));
-ok('G', '32.8 / 34.0 / 35.2 are named portfolioTierBoundary, never max-claim-per-vehicle',
-  near(R2O.core.portfolioTierBoundary('A'), 0.328) &&
-  near(R2O.core.portfolioTierBoundary('B'), 0.340) &&
-  near(R2O.core.portfolioTierBoundary('C'), 0.352) &&
-  !/maxClaimPerVehicle/i.test(SRC) && !/Max Claim per Vehicle/i.test(SRC));
+const WORKFLOW = ['PREPARING','EVIDENCE_PENDING','SUBMITTED','UNDER_REVIEW',
+  'MORE_INFO_REQUIRED','APPROVED','REJECTED','CLOSED'];
+const FIELDS = ['caseId','driverId','loanAccount','childElg','evidenceStatus','recoveryStatus',
+  'insuranceStatus','requestStatus','owner','waitingFor','slaHours','submittedAt',
+  'lastAction','nextAction'];
+
+ok('G', 'the request workflow is exactly the eight agreed states',
+  R2O.COMPENSATION_REQUEST_WORKFLOW.join(',') === WORKFLOW.join(','));
+ok('G', 'every request carries exactly the fourteen agreed fields',
+  FIELDS.length === 14 &&
+  st.compensationRequests.every((row) => Object.keys(row).sort().join(',') === FIELDS.slice().sort().join(',')));
+ok('G', 'nextAction is present on every request',
+  st.compensationRequests.every((row) => typeof row.nextAction === 'string' && row.nextAction.trim().length > 0));
+ok('G', 'every seeded status is inside its own vocabulary',
+  st.compensationRequests.every((row) =>
+    WORKFLOW.indexOf(row.requestStatus) >= 0 &&
+    R2O.EVIDENCE_PACK_STATUS.indexOf(row.evidenceStatus) >= 0 &&
+    R2O.RECOVERY_STATUS.indexOf(row.recoveryStatus) >= 0 &&
+    R2O.INSURANCE_STATUS.indexOf(row.insuranceStatus) >= 0 &&
+    R2O.WAITING_PARTY.indexOf(row.waitingFor) >= 0));
+
+ok('G', 'a request is open until it is closed or rejected',
+  R2O.core.isOpenCompensationRequest('UNDER_REVIEW') === true &&
+  R2O.core.isOpenCompensationRequest('APPROVED') === true &&
+  R2O.core.isOpenCompensationRequest('CLOSED') === false &&
+  R2O.core.isOpenCompensationRequest('REJECTED') === false);
+
+const rows = R2O.core.compensationRequestRows(st, {});
+ok('G', 'the tracker answers where each request stands',
+  rows.length === st.compensationRequests.length &&
+  rows.every((row) => typeof row.item.requestStatus === 'string' &&
+    typeof row.item.owner === 'string' && typeof row.item.waitingFor === 'string' &&
+    row.sla && typeof row.sla.status === 'string'));
+ok('G', 'rows are ordered along the workflow',
+  rows.map((row) => WORKFLOW.indexOf(row.item.requestStatus))
+    .every((value, index, all) => index === 0 || all[index - 1] <= value));
+ok('G', 'filtering by waiting party and by status works',
+  R2O.core.compensationRequestRows(st, { waitingFor: 'FI' })
+    .every((row) => row.item.waitingFor === 'FI') &&
+  R2O.core.compensationRequestRows(st, { requestStatus: 'PREPARING' })
+    .every((row) => row.item.requestStatus === 'PREPARING'));
+
+ok('G', 'a submitted status cannot exist without a submission date',
+  Object.keys(R2O.core.validateCompensationRequest(st.compensationRequests[0],
+    { requestStatus: 'SUBMITTED' })).indexOf('submittedAt') >= 0);
+ok('G', 'a closed request cannot still be waiting on someone',
+  Object.keys(R2O.core.validateCompensationRequest(st.compensationRequests[1],
+    { requestStatus: 'CLOSED', waitingFor: 'FI' })).indexOf('waitingFor') >= 0);
+ok('G', 'an unknown request status is rejected',
+  Object.keys(R2O.core.validateCompensationRequest(st.compensationRequests[0],
+    { requestStatus: 'PAID' })).indexOf('requestStatus') >= 0);
+
+const moved = R2O.actions.updateCompensationRequest(S(), 'CR-0012',
+  { requestStatus: 'MORE_INFO_REQUIRED', waitingFor: 'COOP', lastAction: 'ขอเอกสารเพิ่ม' },
+  { actor: 'a', role: 'claim' });
+ok('G', 'a valid move is applied and audited',
+  Object.keys(moved.errors).length === 0 &&
+  moved.state.compensationRequests.find((r) => r.caseId === 'CR-0012').requestStatus === 'MORE_INFO_REQUIRED' &&
+  moved.state.auditTrail.some((r) => r.action === 'COMPENSATION_REQUEST_UPDATED'));
+ok('G', 'the audit says APPROVED is a process state, not a payment instruction',
+  moved.state.auditTrail.some((r) => r.reason.includes('ไม่ใช่คำสั่งจ่ายเงิน')));
+ok('G', 'identity fields cannot be rewritten by an update',
+  (() => {
+    const attempt = R2O.actions.updateCompensationRequest(S(), 'CR-0012',
+      { loanAccount: 'CHANGED', childElg: 'CHANGED', driverId: 'D-999999',
+        requestStatus: 'UNDER_REVIEW' }, { actor: 'a', role: 'claim' });
+    const item = attempt.state.compensationRequests.find((r) => r.caseId === 'CR-0012');
+    return item.loanAccount === 'KBK-2209455013' && item.childElg === 'ELG-80437' &&
+      item.driverId === 'D-000437';
+  })());
+
+/* ── negative tests: nothing anywhere may price a compensation request ── */
+
+ok('G', 'no compensation figure is stored on any request',
+  st.compensationRequests.every((row) => FIELDS.every((key) => {
+    const forbidden = ['ead','recovery','recoveryAmount','insuranceProceeds','eligibleRecovery',
+      'eligibleNetLoss','coverageRate','claimAmount','finalExposure','amount'];
+    return forbidden.indexOf(key) < 0;
+  })) &&
+  st.compensationRequests.every((row) =>
+    Object.values(row).every((value) => typeof value !== 'number' || value === row.slaHours)));
+
+ok('G', 'the claim rate constants are gone from state and core',
+  st.claimArchitecture === undefined &&
+  R2O.core.claimRules === undefined &&
+  R2O.core.claimContract === undefined &&
+  R2O.core.coverageForYear === undefined &&
+  R2O.core.portfolioTierBoundary === undefined &&
+  R2O.core.legalInitialClaimCeiling === undefined &&
+  R2O.CLAIM_FORMULA_STATUS === undefined);
+
+ok('G', 'no claim rate literal survives in the script',
+  !/0\.328|0\.340|0\.352|32\.8\s*%|34\.0\s*%|35\.2\s*%/.test(SCRIPT) &&
+  !/legalInitialClaimCap|coverageByYear|LOCKED_PARTIAL/.test(SCRIPT));
+
+ok('G', 'the four formula names appear nowhere',
+  ['eligibleRecovery','eligibleNetLoss','riskParticipationCoverage','finalClaimExposure',
+   'maxClaimPerVehicle','finalEntitlement','claimAmount']
+    .every((name) => !SCRIPT.includes(name)));
+
+// the base64 image assets contain incidental letter runs, so the acronym is
+// checked against the script and the visible wording against the whole file
+ok('G', 'no ceiling or stop-loss wording is presented to a user',
+  !/\bHMC\b/.test(SCRIPT) &&
+  !SRC.includes('เพดานเคลม') && !SRC.includes('เพดานหยุดขาดทุน') &&
+  !SRC.includes('ผลขาดทุนสุทธิ') && !SRC.includes('ยอดเคลมที่จ่ายได้') &&
+  !SRC.includes('(HMC)'));
+
+ok('G', 'the state declares that it does not calculate entitlement or amounts',
+  st.compensationPolicy.calculatesEntitlement === false &&
+  st.compensationPolicy.calculatesAmount === false);
+
+ok('G', 'programme metrics count requests instead of summing money',
+  (() => {
+    const m = R2O.core.metrics(st);
+    return typeof m.compensationRequestsOpen === 'number' &&
+      m.recoveries === undefined && m.eligibleNetLoss === undefined && m.claimPending === undefined;
+  })());
+
+ok('G', 'APPROVED is labelled as a request outcome, never as an amount',
+  SRC.includes('คำขอได้รับอนุมัติ') &&
+  SRC.includes('ไม่ใช่การอนุมัติสินเชื่อ') &&
+  SRC.includes('ไม่ใช่คำสั่งให้จ่ายเงิน'));
 });
 
 /* ──────────────── R. Regression of pre-existing behaviour ──────────────── */
@@ -715,9 +821,9 @@ section('M', () => {
     ['OWN READY','BUILD READINESS','Readiness Certificate','Pre-E-LG','Front-Door',
      'Seasoning','Pre-Score','Appropriate Route']
       .every((phrase) => !SRC.toUpperCase().includes(phrase.toUpperCase())));
-  ok('M', 'the claim tier boundary keeps its own name',
+  ok('M', 'no claim entitlement vocabulary survives anywhere',
     !SRC.includes('maxClaimPerVehicle') && !/Max Claim per Vehicle/i.test(SRC) &&
-    !!st.claimArchitecture.portfolioTierBoundary);
+    !SRC.includes('portfolioTierBoundary') && st.claimArchitecture === undefined);
 
   // activityDaily has no driverId: prove nothing reads it for a second driver
   ok('M', 'activityDaily is only ever read for the portfolio driver',

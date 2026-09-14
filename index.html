@@ -295,7 +295,7 @@
           <section id="partner-overview" class="screen active">
             <div class="title"><div><h2>ภาพรวมผู้บริหาร</h2><p>กระบวนการต้นทาง → พอร์ตที่ใช้งานอยู่ → ก่อนเกิดหนี้เสีย → Claim</p></div><div class="actions"><span class="pill blue">วันทำการ 20 ส.ค. 2569</span><button class="btn primary" onclick="openPartnerAction('FOLLOW_UP','PROGRAM','-')">บันทึก งานที่ต้องดำเนินการวันนี้</button></div></div>
             <div class="metric-grid"><div class="metric"><span class="label">ผู้ขับที่ใช้งานอยู่</span><div class="value">480</div><span class="mini">476 หนังสือค้ำประกันรายคันที่ใช้งานอยู่</span></div><div class="metric accent"><span class="label">พอร์ตที่มีความเสี่ยง</span><div class="value">10.2%</div><span class="mini">เฝ้าระวัง + เสี่ยงสูง</span></div><div class="metric warn"><span class="label">EWS เฝ้าระวัง / เสี่ยงสูง</span><div class="value">38 / 11</div><span class="mini">ทบทวนตามสาเหตุ</span></div><div class="metric"><span class="label">อัตราช่วยเหลือสำเร็จ</span><div class="value">78%</div><span class="mini">เปิดอยู่ 14 · เกินกรอบเวลาให้บริการ (SLA) 4</span></div></div>
-            <div class="split" style="margin-top:13px"><div class="card pad"><div class="section-head"><h3>ผลการดำเนินงาน 6 เดือน</h3><span class="pill green">พอร์ตมีเสถียรภาพ</span></div><div class="bars"><div class="bar" style="height:69%"><i>มี.ค.</i></div><div class="bar" style="height:74%"><i>เม.ย.</i></div><div class="bar" style="height:78%"><i>พ.ค.</i></div><div class="bar" style="height:81%"><i>มิ.ย.</i></div><div class="bar" style="height:86%"><i>ก.ค.</i></div><div class="bar" style="height:90%"><i>ส.ค.</i></div></div><p class="mini">พอร์ตที่ใช้งานอยู่ · ชำระตรงเวลา · ผลการช่วยเหลือ</p></div><div class="card pad"><h3>งานที่ต้องดำเนินการวันนี้</h3><div class="timeline"><div class="timeline-item"><span class="timeline-dot"></span><div><b>3 เคส คิวงานเร่งด่วน</b><small>ป่วย · ความสามารถในการชำระ · รถเสีย</small></div></div><div class="timeline-item"><span class="timeline-dot"></span><div><b>PromptCure เกิน SLA 4 เคส</b><small>เร่งเจ้าของงานยืนยันขั้นตอนถัดไป</small></div></div><div class="timeline-item"><span class="timeline-dot"></span><div><b>2 การเคลมรอตรวจเงื่อนไข</b><small>หลักฐาน / เพดานเคลมสูงสุด (HMC)</small></div></div></div></div></div>
+            <div class="split" style="margin-top:13px"><div class="card pad"><div class="section-head"><h3>ผลการดำเนินงาน 6 เดือน</h3><span class="pill green">พอร์ตมีเสถียรภาพ</span></div><div class="bars"><div class="bar" style="height:69%"><i>มี.ค.</i></div><div class="bar" style="height:74%"><i>เม.ย.</i></div><div class="bar" style="height:78%"><i>พ.ค.</i></div><div class="bar" style="height:81%"><i>มิ.ย.</i></div><div class="bar" style="height:86%"><i>ก.ค.</i></div><div class="bar" style="height:90%"><i>ส.ค.</i></div></div><p class="mini">พอร์ตที่ใช้งานอยู่ · ชำระตรงเวลา · ผลการช่วยเหลือ</p></div><div class="card pad"><h3>งานที่ต้องดำเนินการวันนี้</h3><div class="timeline"><div class="timeline-item"><span class="timeline-dot"></span><div><b>3 เคส คิวงานเร่งด่วน</b><small>ป่วย · ความสามารถในการชำระ · รถเสีย</small></div></div><div class="timeline-item"><span class="timeline-dot"></span><div><b>PromptCure เกิน SLA 4 เคส</b><small>เร่งเจ้าของงานยืนยันขั้นตอนถัดไป</small></div></div><div class="timeline-item"><span class="timeline-dot"></span><div><b>2 คำขอรับเงินค่าชดเชยอยู่ระหว่างดำเนินการ</b><small>รอหลักฐาน / รอผลตรวจสอบ</small></div></div></div></div></div>
           </section>
 
           <section id="partner-pipeline" class="screen">
@@ -347,15 +347,15 @@
           </section>
 
           <section id="partner-claim" class="screen">
-            <div class="title"><div><h2>Claim &amp; Recovery</h2><p>ติดตามหนี้คืนก่อน → ผลขาดทุนสุทธิที่เข้าเกณฑ์ → HMC / เพดานหยุดขาดทุน → ยอดเคลมที่จ่ายได้</p></div><div class="actions"><button class="btn ghost" onclick="downloadPartnerCsv('claim')">ส่งออก CSV</button><button class="btn primary" onclick="openPartnerAction('REQUEST_EVIDENCE','CL-0011','D-000422')">ขอหลักฐานเพิ่มเติม</button></div></div>
-            <div class="metric-grid"><div class="metric warn"><span class="label">รายการเคลมที่เปิดอยู่</span><div class="value">2</div></div><div class="metric"><span class="label">เอกสารที่รอดำเนินการ</span><div class="value">1</div></div><div class="metric accent"><span class="label">การติดตามหนี้</span><div class="value">฿679.5k</div></div><div class="metric"><span class="label">อัตราติดตามหนี้คืน</span><div class="value">70%</div></div></div>
-            <div class="card pad tblwrap"><table class="tbl"><thead><tr><th>การเคลม</th><th>ผู้ขับ</th><th>FI</th><th class="num">EAD</th><th class="num">การติดตามหนี้</th><th class="num">ผลขาดทุนสุทธิที่เข้าเกณฑ์</th><th>เงื่อนไขตรวจสอบ</th><th>สถานะ</th></tr></thead><tbody id="partnerClaimRows"></tbody></table></div>
+            <div class="title"><div><h2>ติดตามคำขอรับเงินค่าชดเชย</h2><p>เตรียมเรื่อง → รอหลักฐาน → ยื่นคำขอ → ตรวจสอบ → ผลการพิจารณา → ปิดเรื่อง</p></div><div class="actions"><button class="btn ghost" onclick="downloadPartnerCsv('claim')">ส่งออก CSV</button><button class="btn primary" onclick="openPartnerAction('REQUEST_EVIDENCE','CR-0011','D-000422')">ขอหลักฐานเพิ่มเติม</button></div></div>
+            <div class="metric-grid" id="partnerCrMetrics"></div>
+            <div class="card pad tblwrap"><table class="tbl"><thead><tr><th>คำขอ</th><th>ผู้ขับ / บัญชีสินเชื่อ</th><th>Child E-LG</th><th>หลักฐาน</th><th>การติดตามหนี้</th><th>ประกัน</th><th>สถานะคำขอ</th><th>เจ้าของเรื่อง / รอใคร</th><th>SLA</th><th>วันที่ยื่น</th><th>ดำเนินการล่าสุด</th><th>ขั้นตอนถัดไป</th></tr></thead><tbody id="partnerClaimRows"></tbody></table><p class="mini" style="margin:10px 0 0"><b>ขอบเขตของหน้านี้:</b> ระบบติดตามว่าคำขออยู่ขั้นไหน รอใคร และต้องทำอะไรต่อเท่านั้น <b>ไม่คำนวณสิทธิ ไม่คำนวณจำนวนเงิน และไม่ตัดสินภาระชดเชย</b> · สถานะ <b>คำขอได้รับอนุมัติ</b> หมายถึงคำขอผ่านขั้นตอนของกระบวนการแล้วเท่านั้น ไม่ใช่การอนุมัติสินเชื่อ ไม่ใช่การรับรองสิทธิ และไม่ใช่คำสั่งให้จ่ายเงิน</p></div>
           </section>
 
           <section id="partner-finance" class="screen">
-            <div class="title"><div><h2>การควบคุมการเงินโครงการ</h2><p>ขีดความสามารถการค้ำประกัน ค่าธรรมเนียม เงินสำรองช่วยเหลือ HMC และเพดานหยุดขาดทุน</p></div><div class="actions"><span class="pill blue">สถานการณ์จำลอง / การปรับเทียบ</span><button class="btn primary" onclick="downloadPartnerCsv('finance')">ส่งออกรายงานการเงิน CSV</button></div></div>
+            <div class="title"><div><h2>การควบคุมการเงินโครงการ</h2><p>ขีดความสามารถการค้ำประกัน ค่าธรรมเนียม และเงินสำรองช่วยเหลือ</p></div><div class="actions"><span class="pill blue">สถานการณ์จำลอง / การปรับเทียบ</span><button class="btn primary" onclick="downloadPartnerCsv('finance')">ส่งออกรายงานการเงิน CSV</button></div></div>
             <div class="metric-grid"><div class="metric"><span class="label">วงเงินโครงการ</span><div class="value">฿300 ล้าน</div></div><div class="metric accent"><span class="label">ภาระค้ำประกันที่เปิดใช้</span><div class="value">฿198 ล้าน</div></div><div class="metric"><span class="label">วงเงินคงเหลือ</span><div class="value">฿102 ล้าน</div></div><div class="metric warn"><span class="label">เงินสำรองช่วยเหลือ</span><div class="value">฿0.82 ล้าน</div><span class="mini">เงินผู้ขับ</span></div></div>
-            <div class="split" style="margin-top:13px"><div class="card pad"><h3>ค่าธรรมเนียม / เงินสำรอง</h3><table class="tbl"><tbody><tr><td>ค่าธรรมเนียม RBP ที่จัดเก็บ</td><td class="num">฿1.74 ล้าน</td></tr><tr><td>ค่าธรรมเนียมติดตาม</td><td class="num">฿0.19 ล้าน</td></tr><tr><td>เงินสำรองช่วยเหลือ ยอดคงเหลือ</td><td class="num">฿0.82 ล้าน</td></tr></tbody></table><p class="mini">เงินสำรองช่วยเหลือ เป็นเงินของผู้ขับ ไม่ใช่รายได้ของโครงการ</p></div><div class="card pad"><h3>ความสามารถรองรับความเสี่ยง</h3><span class="label">ใช้เพดานเคลมสูงสุด (HMC) 18%</span><div class="progress"><span style="width:18%"></span></div><span class="label">ใช้เพดานหยุดขาดทุน 11%</span><div class="progress amber"><span style="width:11%"></span></div></div></div><div class="card pad tblwrap" style="margin-top:13px"><h3>การกระทบยอดรายวัน</h3><table class="tbl"><thead><tr><th>วันที่</th><th class="num">รายได้ที่ตรวจสอบแล้ว</th><th class="num">จ่ายตามรายได้ (PAYD)</th><th class="num">เงินต้น</th><th class="num">ดอกเบี้ย</th><th class="num">เงินสำรอง</th><th>สถานะ</th></tr></thead><tbody id="partnerFinanceRows"></tbody></table></div>
+            <div class="split" style="margin-top:13px"><div class="card pad"><h3>ค่าธรรมเนียม / เงินสำรอง</h3><table class="tbl"><tbody><tr><td>ค่าธรรมเนียม RBP ที่จัดเก็บ</td><td class="num">฿1.74 ล้าน</td></tr><tr><td>ค่าธรรมเนียมติดตาม</td><td class="num">฿0.19 ล้าน</td></tr><tr><td>เงินสำรองช่วยเหลือ ยอดคงเหลือ</td><td class="num">฿0.82 ล้าน</td></tr></tbody></table><p class="mini">เงินสำรองช่วยเหลือ เป็นเงินของผู้ขับ ไม่ใช่รายได้ของโครงการ</p></div><div class="card pad"><h3>ขอบเขตของระบบนี้</h3><p class="mini">ระบบติดตามกระบวนการหลังอนุมัติ — รับเรื่อง ประสานงาน และติดตามสถานะคำขอรับเงินค่าชดเชย</p><p class="mini" style="margin-top:8px"><b>ไม่คำนวณ</b> สิทธิ จำนวนเงิน อัตราความคุ้มครอง เพดานการชดเชย หรือภาระชดเชยของ บสย. — ตัวเลขเหล่านั้นตัดสินนอกระบบนี้</p></div></div><div class="card pad tblwrap" style="margin-top:13px"><h3>การกระทบยอดรายวัน</h3><table class="tbl"><thead><tr><th>วันที่</th><th class="num">รายได้ที่ตรวจสอบแล้ว</th><th class="num">จ่ายตามรายได้ (PAYD)</th><th class="num">เงินต้น</th><th class="num">ดอกเบี้ย</th><th class="num">เงินสำรอง</th><th>สถานะ</th></tr></thead><tbody id="partnerFinanceRows"></tbody></table></div>
           </section>
 
           <section id="partner-partners" class="screen">
@@ -439,9 +439,9 @@
           </section>
 
           <section id="tower-claim-monitor" class="screen">
-            <div class="title"><div><h2>หน้าติดตามการเคลม / ติดตามหนี้</h2><p>ติดตามหนี้คืนก่อน → ผลขาดทุนสุทธิที่เข้าเกณฑ์ → เงื่อนไขการเคลม</p></div></div>
-            <div class="metric-grid"><div class="metric warn"><span class="label">การเคลมที่รอดำเนินการ</span><div class="value">2</div></div><div class="metric"><span class="label">ยอดติดตามคืน</span><div class="value">฿679.5k</div></div><div class="metric risk"><span class="label">ผลขาดทุนสุทธิที่เข้าเกณฑ์</span><div class="value">฿290.5k</div></div><div class="metric"><span class="label">หลักฐานครบถ้วน</span><div class="value">50%</div></div></div>
-            <div class="card pad tblwrap" style="margin-top:13px"><table class="tbl"><thead><tr><th>การเคลม</th><th>ผู้ขับ</th><th>FI</th><th class="num">EAD</th><th class="num">การติดตามหนี้</th><th class="num">ผลขาดทุนสุทธิ</th><th>เงื่อนไขตรวจสอบ</th><th>สถานะ</th></tr></thead><tbody id="towerClaimRows"></tbody></table></div>
+            <div class="title"><div><h2>บอร์ดติดตามคำขอรับเงินค่าชดเชย</h2><p>คำขออยู่ขั้นไหน → รอใคร → เกินกรอบเวลาหรือยัง → ต้องทำอะไรต่อ</p></div></div>
+            <div class="section-head"><h3>สถานะคำขอ</h3></div><div class="rc-kpis" id="towerCrStatusKpis"></div><div class="section-head" style="margin-top:13px"><h3>รอใคร / กรอบเวลา</h3></div><div class="rc-kpis" id="towerCrWaitingKpis"></div>
+            <div class="card pad tblwrap" style="margin-top:13px"><table class="tbl"><thead><tr><th>คำขอ</th><th>ผู้ขับ / บัญชีสินเชื่อ</th><th>Child E-LG</th><th>หลักฐาน</th><th>การติดตามหนี้</th><th>ประกัน</th><th>สถานะคำขอ</th><th>เจ้าของเรื่อง / รอใคร</th><th>SLA</th><th>วันที่ยื่น</th><th>ดำเนินการล่าสุด</th><th>ขั้นตอนถัดไป</th></tr></thead><tbody id="towerClaimRows"></tbody></table><p class="mini" style="margin:10px 0 0"><b>ขอบเขตของหน้านี้:</b> ระบบติดตามว่าคำขออยู่ขั้นไหน รอใคร และต้องทำอะไรต่อเท่านั้น <b>ไม่คำนวณสิทธิ ไม่คำนวณจำนวนเงิน และไม่ตัดสินภาระชดเชย</b> · สถานะ <b>คำขอได้รับอนุมัติ</b> หมายถึงคำขอผ่านขั้นตอนของกระบวนการแล้วเท่านั้น ไม่ใช่การอนุมัติสินเชื่อ ไม่ใช่การรับรองสิทธิ และไม่ใช่คำสั่งให้จ่ายเงิน</p></div>
           </section>
 
           <section id="tower-data-health" class="screen">
@@ -594,7 +594,15 @@
       CASE_WORKFLOW: ['NEW_ALERT','CONTACT_PENDING','FA_TRIAGE','ACTION_PROPOSED','WAITING_ACTION','CURE_IN_PROGRESS','MONITORING','RESOLVED','ESCALATED'],
       WAITING_PARTY: ['DRIVER','FA','FI','COOP','OEM','BATTERY_PARTNER','INSURANCE','PAYMENT_PARTNER','RECOVERY_PARTNER','NONE'],
       ACTIVATION_STAGE: ['FI_FINAL_APPROVED','CHILD_ELG_ISSUED','VEHICLE_ACTIVATED','INSURANCE_WARRANTY_BOUND','PAYMENT_RAIL_LINKED','ACTIVE'],
-      CLAIM_FORMULA_STATUS: 'LOCKED_PARTIAL',
+      /* Compensation requests are tracked, never priced. Route to Own records
+         where a request has reached and who it waits on; it does not compute
+         entitlement, amounts, or any share of loss. APPROVED below is a state of
+         the request process only — it is not a credit approval, not a
+         confirmation of entitlement, and not an instruction to pay. */
+      COMPENSATION_REQUEST_WORKFLOW: ['PREPARING','EVIDENCE_PENDING','SUBMITTED','UNDER_REVIEW','MORE_INFO_REQUIRED','APPROVED','REJECTED','CLOSED'],
+      EVIDENCE_PACK_STATUS: ['NOT_STARTED','COLLECTING','COMPLETE','REJECTED'],
+      RECOVERY_STATUS: ['NOT_STARTED','IN_PROGRESS','COMPLETED','NOT_APPLICABLE'],
+      INSURANCE_STATUS: ['NOT_APPLICABLE','CLAIM_FILED','UNDER_REVIEW','SETTLED','DECLINED'],
       routes: {
         driver: ['home','activity','money','ownership','wallet','help','cure'],
         partner: ['overview','pipeline','portfolio','daily','incidents','ews','cure','elg','exit','claim','finance','partners'],
@@ -715,9 +723,15 @@
         promptCureOpen: p.promptCureOpen,
         slaOverdue: p.slaOverdue,
         faOpenCases: state.cases.filter(function(item) { return R2O.core.isOpenCase(item.status); }).length,
-        claimPending: state.claims.filter(function(item) { return item.status !== 'PAID'; }).length,
-        recoveries: state.claims.reduce(function(sum, item) { return sum + item.recovery; }, 0),
-        eligibleNetLoss: state.claims.reduce(function(sum, item) { return sum + item.eligibleNetLoss; }, 0),
+        compensationRequestsOpen: (state.compensationRequests || []).filter(function(item) {
+          return R2O.core.isOpenCompensationRequest(item.requestStatus);
+        }).length,
+        compensationRequestsSubmitted: (state.compensationRequests || []).filter(function(item) {
+          return !!item.submittedAt;
+        }).length,
+        compensationEvidencePending: (state.compensationRequests || []).filter(function(item) {
+          return item.evidenceStatus !== 'COMPLETE';
+        }).length,
         gpsCompleteness: p.gpsCompleteness,
         revenueReconciliation: p.revenueReconciliation,
         fiLedgerReceived: p.fiLedgerReceived
@@ -833,9 +847,22 @@
           { id:'PC-1038', driverId:'D-000422', cause:'ILLNESS', fiDpd:0, reserve:1540, stage:'DIAGNOSIS', owner:'Co-op B', sla:'วันนี้', nextAction:'ตรวจสอบวันที่กลับมาวิ่ง' },
           { id:'PC-1044', driverId:'D-000437', cause:'PAYMENT + AFFORDABILITY', fiDpd:12, reserve:820, stage:'FI REVIEW', owner:'FI-KBank', sla:'เกินกำหนด', nextAction:'ข้อเสนอ Pre-TDR' }
         ],
-        claims: [
-          { id:'CL-0011', driverId:'D-000422', fi:'SCB', ead:468000, recovery:318500, eligibleNetLoss:149500, gate:'Evidence', status:'PENDING' },
-          { id:'CL-0012', driverId:'D-000437', fi:'KBank', ead:502000, recovery:361000, eligibleNetLoss:141000, gate:'HMC', status:'CHECK' }
+        compensationRequests: [
+          { caseId:'CR-0011', driverId:'D-000422', loanAccount:'SCB-4471180022', childElg:'ELG-80422',
+            evidenceStatus:'COLLECTING', recoveryStatus:'IN_PROGRESS', insuranceStatus:'NOT_APPLICABLE',
+            requestStatus:'EVIDENCE_PENDING', owner:'F.A. Center', waitingFor:'COOP', slaHours:72,
+            submittedAt:null, lastAction:'ขอสำเนาสัญญาและหลักฐานการติดตามจากสหกรณ์',
+            nextAction:'รวบรวมเอกสารให้ครบก่อนยื่นคำขอ' },
+          { caseId:'CR-0012', driverId:'D-000437', loanAccount:'KBK-2209455013', childElg:'ELG-80437',
+            evidenceStatus:'COMPLETE', recoveryStatus:'IN_PROGRESS', insuranceStatus:'CLAIM_FILED',
+            requestStatus:'UNDER_REVIEW', owner:'บสย. - Claim', waitingFor:'FI', slaHours:120,
+            submittedAt:'2026-09-05T10:20:00', lastAction:'ยื่นคำขอรับเงินค่าชดเชยและอยู่ระหว่างตรวจสอบ',
+            nextAction:'รอผลตรวจสอบเอกสารจากสถาบันการเงิน' },
+          { caseId:'CR-0013', driverId:'D-000451', loanAccount:'KRS-8830271044', childElg:'ELG-80451',
+            evidenceStatus:'NOT_STARTED', recoveryStatus:'NOT_STARTED', insuranceStatus:'UNDER_REVIEW',
+            requestStatus:'PREPARING', owner:'Co-op A', waitingFor:'INSURANCE', slaHours:48,
+            submittedAt:null, lastAction:'เปิดเรื่องหลังรถไม่พร้อมใช้งานต่อเนื่อง',
+            nextAction:'รอผลพิจารณาประกันก่อนตัดสินใจขั้นถัดไป' }
         ],
         integrations: [
           { partner:'Co-op A', role:'Assignment / Activation', sla:'ทุกวัน 06:00', channel:'API', completeness:99.1, exceptions:2, status:'HEALTHY' },
@@ -992,13 +1019,10 @@
             assignedPartners:['F.A. Center'], lastAction:'เปิดหน้าต่างเฝ้าดูหลังรายได้ฟื้น',
             nextAction:'ประเมินรายได้และการจัดสรรอีกครั้ง', nextReview:'2026-09-15', linkedCaseId:null, linkedIncidentId:null }
         ],
-        claimArchitecture: {
-          status:'LOCKED_PARTIAL',
-          note:'สูตร ER / ENL / RPC / FCE ยังไม่ผูก รอ Claim Formula SSOT ฉบับเต็ม',
-          coverageByYear:[{ from:2, to:4, rate:0.80 },{ from:5, to:7, rate:1.00 }],
-          portfolioTierBoundary:{ A:0.328, B:0.340, C:0.352 },
-          legalInitialClaimCap:0.25,
-          paths:['VEHICLE_TRACEABLE','VEHICLE_UNTRACEABLE_LEGAL']
+        compensationPolicy: {
+          note:'ระบบนี้ติดตามสถานะคำขอรับเงินค่าชดเชยเท่านั้น ไม่คำนวณสิทธิ จำนวนเงิน หรือภาระชดเชย',
+          calculatesEntitlement: false,
+          calculatesAmount: false
         },
         dailyIncome: null,
         incomePlan: { targetRevenue:12000, emptyKmReduction:8, reserveTarget:300, completedDays:3, totalDays:5 },
@@ -1725,54 +1749,92 @@
       };
     };
 
-    /* ── Claim — locked constants only, formulas intentionally unbound ────
-       32.8 / 34.0 / 35.2 are Portfolio / Tier Boundary figures. They are not a
-       maximum claim per vehicle and must never be used as one. */
+    /* ── Compensation requests — tracking only ───────────────────────────
+       Route to Own records where a request stands and who holds it next. It
+       holds no rate, no ceiling and no multiplier, so there is nothing here
+       that could produce an amount even by accident. Entitlement and payment
+       are decided outside this system. */
 
-    R2O.core.claimRules = {
-      status: 'LOCKED_PARTIAL',
-      coverageByYear: [{ from: 2, to: 4, rate: 0.80 }, { from: 5, to: 7, rate: 1.00 }],
-      portfolioTierBoundary: { A: 0.328, B: 0.340, C: 0.352 },
-      legalInitialClaimCap: 0.25,
-      recoveryBeforeGuarantee: true,
-      noDoubleCompensation: true,
-      insuranceProceedsCountAsRecovery: true,
-      paths: ['VEHICLE_TRACEABLE', 'VEHICLE_UNTRACEABLE_LEGAL'],
-      unboundFormulas: ['eligibleRecovery', 'eligibleNetLoss', 'riskParticipationCoverage', 'finalClaimExposure']
+    R2O.core.isOpenCompensationRequest = function(status) {
+      return R2O.COMPENSATION_REQUEST_WORKFLOW.indexOf(status) >= 0 &&
+        status !== 'CLOSED' && status !== 'REJECTED';
     };
 
-    R2O.core.coverageForYear = function(year) {
-      const y = Number(year);
-      const band = R2O.core.claimRules.coverageByYear.filter(function(row) {
-        return y >= row.from && y <= row.to;
-      })[0];
-      return band ? band.rate : null;
+    R2O.core.validateCompensationRequest = function(item, changes) {
+      const next = Object.assign({}, item, changes || {});
+      const errors = {};
+      if (R2O.COMPENSATION_REQUEST_WORKFLOW.indexOf(next.requestStatus) < 0) {
+        errors.requestStatus = 'สถานะคำขอไม่ถูกต้อง';
+      }
+      if (R2O.EVIDENCE_PACK_STATUS.indexOf(next.evidenceStatus) < 0) errors.evidenceStatus = 'สถานะหลักฐานไม่ถูกต้อง';
+      if (R2O.RECOVERY_STATUS.indexOf(next.recoveryStatus) < 0) errors.recoveryStatus = 'สถานะการติดตามหนี้ไม่ถูกต้อง';
+      if (R2O.INSURANCE_STATUS.indexOf(next.insuranceStatus) < 0) errors.insuranceStatus = 'สถานะประกันไม่ถูกต้อง';
+      if (R2O.WAITING_PARTY.indexOf(next.waitingFor) < 0) errors.waitingFor = 'ผู้ที่รอไม่ถูกต้อง';
+      if (!String(next.owner || '').trim()) errors.owner = 'ต้องระบุเจ้าของเรื่อง';
+      // a request that has been submitted must carry the moment it was submitted
+      const submitted = ['SUBMITTED','UNDER_REVIEW','MORE_INFO_REQUIRED','APPROVED','REJECTED'];
+      if (submitted.indexOf(next.requestStatus) >= 0 && !next.submittedAt) {
+        errors.submittedAt = 'สถานะนี้ต้องมีวันที่ยื่นคำขอ';
+      }
+      if (next.requestStatus === 'CLOSED' && next.waitingFor !== 'NONE') {
+        errors.waitingFor = 'เรื่องที่ปิดแล้วต้องไม่ค้างรอผู้ใด';
+      }
+      return errors;
     };
 
-    R2O.core.portfolioTierBoundary = function(tier) {
-      const rate = R2O.core.claimRules.portfolioTierBoundary[String(tier).toUpperCase()];
-      return rate === undefined ? null : rate;
-    };
-
-    R2O.core.legalInitialClaimCeiling = function(base) {
-      return R2O.core.money(Math.max(0, R2O.core.money(base)) * R2O.core.claimRules.legalInitialClaimCap);
-    };
-
-    // typed placeholders: the four figures stay null until the Claim Formula
-    // source of truth is supplied. Nothing here guesses a calculation.
-    R2O.core.claimContract = function(input) {
-      const src = input || {};
+    R2O.core.compensationRequestRow = function(state, item, now) {
+      const safe = state || {};
+      const driver = (safe.drivers || []).filter(function(row) { return row.id === item.driverId; })[0] || {};
       return {
-        status: R2O.CLAIM_FORMULA_STATUS,
-        path: src.path || null,
-        coverageRate: src.guaranteeYear === undefined ? null : R2O.core.coverageForYear(src.guaranteeYear),
-        portfolioTierBoundary: src.tier === undefined ? null : R2O.core.portfolioTierBoundary(src.tier),
-        legalInitialClaimCap: R2O.core.claimRules.legalInitialClaimCap,
-        eligibleRecovery: null,
-        eligibleNetLoss: null,
-        riskParticipationCoverage: null,
-        finalClaimExposure: null
+        item: item,
+        driver: driver,
+        open: R2O.core.isOpenCompensationRequest(item.requestStatus),
+        sla: R2O.core.slaAging({
+          waitingSince: item.submittedAt || item.lastUpdatedAt,
+          openedAt: item.submittedAt || item.lastUpdatedAt,
+          slaHours: item.slaHours,
+          now: now || (safe.meta || {}).lastUpdated
+        })
       };
+    };
+
+    R2O.core.compensationRequestRows = function(state, filters) {
+      const safe = state || {};
+      const f = filters || {};
+      const now = f.now || (safe.meta || {}).lastUpdated;
+      const order = R2O.COMPENSATION_REQUEST_WORKFLOW;
+      return (safe.compensationRequests || []).map(function(item) {
+        return R2O.core.compensationRequestRow(safe, item, now);
+      }).filter(function(row) {
+        if (f.requestStatus && f.requestStatus !== 'ALL' && row.item.requestStatus !== f.requestStatus) return false;
+        if (f.waitingFor && f.waitingFor !== 'ALL' && row.item.waitingFor !== f.waitingFor) return false;
+        if (f.openOnly && !row.open) return false;
+        return true;
+      }).sort(function(x, y) {
+        return order.indexOf(x.item.requestStatus) - order.indexOf(y.item.requestStatus);
+      });
+    };
+
+    R2O.actions.updateCompensationRequest = function(state, caseId, changes, context) {
+      const current = ((state || {}).compensationRequests || [])
+        .filter(function(row) { return row.caseId === caseId; })[0];
+      if (!current) return { state: state, errors: { caseId: 'ไม่พบคำขอ' } };
+      const errors = R2O.core.validateCompensationRequest(current, changes);
+      if (Object.keys(errors).length) return { state: state, errors: errors };
+      const next = R2O.core.clone(state);
+      const ctx = context || {};
+      const item = next.compensationRequests.filter(function(row) { return row.caseId === caseId; })[0];
+      Object.keys(changes).forEach(function(key) {
+        if (key === 'caseId' || key === 'driverId' || key === 'loanAccount' || key === 'childElg') return;
+        item[key] = changes[key];
+      });
+      R2O.actions.addAudit(next, 'COMPENSATION_REQUEST_UPDATED', Object.assign({}, ctx, {
+        entity: caseId,
+        reason: (ctx.reason || 'อัปเดตคำขอรับเงินค่าชดเชย') + ' · ' + item.requestStatus +
+          (item.waitingFor === 'NONE' ? '' : ' · รอ ' + item.waitingFor) +
+          ' · เป็นสถานะของกระบวนการคำขอเท่านั้น ไม่ใช่การอนุมัติสินเชื่อและไม่ใช่คำสั่งจ่ายเงิน'
+      }));
+      return { state: next, errors: {} };
     };
 
     /* Intervention cases carry three independent dimensions: current risk,
@@ -2578,7 +2640,19 @@
       document.getElementById('partnerCureRows').innerHTML = R2O.state.promptCure.filter(function(row) { return allowedIds.has(row.driverId); }).map(function(row) {
         return '<tr><td>' + row.id + '</td><td>' + row.driverId + '</td><td>' + row.cause + '</td><td class="num">' + row.fiDpd + '</td><td class="num">' + R2O.ui.baht(row.reserve) + '</td><td>' + R2O.ui.pill(row.stage) + '</td><td>' + row.owner + '</td><td>' + R2O.ui.pill(row.sla) + '</td><td>' + R2O.ui.esc(row.nextAction) + '</td></tr>';
       }).join('') || '<tr><td colspan="9" class="empty">ไม่มี PromptCure ในขอบเขตสิทธิ์</td></tr>';
-      document.getElementById('partnerClaimRows').innerHTML = R2O.state.claims.filter(function(row) { return allowedIds.has(row.driverId); }).map(R2O.render.claimRow).join('') || '<tr><td colspan="8" class="empty">ไม่มี Claim ในขอบเขตสิทธิ์</td></tr>';
+      const crMetrics = R2O.core.metrics(R2O.state);
+      document.getElementById('partnerCrMetrics').innerHTML = [
+        R2O.ui.metric('คำขอที่เปิดอยู่', crMetrics.compensationRequestsOpen, 'ยังไม่ปิดเรื่อง', 'warn'),
+        R2O.ui.metric('ยื่นคำขอแล้ว', crMetrics.compensationRequestsSubmitted, 'มีวันที่ยื่นแล้ว', ''),
+        R2O.ui.metric('รอหลักฐาน', crMetrics.compensationEvidencePending, 'ชุดหลักฐานยังไม่ครบ', 'accent'),
+        R2O.ui.metric('เกินกรอบเวลา SLA', R2O.core.compensationRequestRows(R2O.state, {})
+          .filter(function(row) { return row.sla.status === 'BREACHED'; }).length, 'ต้องเร่งติดตาม', '')
+      ].join('');
+      document.getElementById('partnerClaimRows').innerHTML = R2O.core
+        .compensationRequestRows(R2O.state, {})
+        .filter(function(row) { return allowedIds.has(row.item.driverId); })
+        .map(R2O.render.compensationRequestRow).join('') ||
+        '<tr><td colspan="12" class="empty">ไม่มีคำขอรับเงินค่าชดเชยในขอบเขตสิทธิ์</td></tr>';
       document.getElementById('partnerIntegrationRows').innerHTML = R2O.state.integrations.map(R2O.render.integrationRow).join('');
       document.getElementById('partnerDailyRows').innerHTML = R2O.state.drivers.filter(function(row) { return allowedIds.has(row.id); }).map(function(row) {
         const money = R2O.core.driverFinancials(R2O.state, row.id);
@@ -2625,8 +2699,43 @@
       document.getElementById('partnerAuditRows').innerHTML = R2O.render.auditRows();
     };
 
-    R2O.render.claimRow = function(row) {
-      return '<tr><td>' + row.id + '</td><td>' + row.driverId + '</td><td>' + row.fi + '</td><td class="num">' + R2O.ui.baht(row.ead) + '</td><td class="num">' + R2O.ui.baht(row.recovery) + '</td><td class="num">' + R2O.ui.baht(row.eligibleNetLoss) + '</td><td>' + row.gate + '</td><td>' + R2O.ui.pill(row.status) + '</td></tr>';
+    R2O.ui.requestPill = function(value) {
+      const labels = {
+        PREPARING:'เตรียมเรื่อง', EVIDENCE_PENDING:'รอหลักฐาน', SUBMITTED:'ยื่นคำขอแล้ว',
+        UNDER_REVIEW:'อยู่ระหว่างตรวจสอบ', MORE_INFO_REQUIRED:'ขอข้อมูลเพิ่ม',
+        APPROVED:'คำขอได้รับอนุมัติ', REJECTED:'คำขอไม่ผ่าน', CLOSED:'ปิดเรื่อง',
+        NOT_STARTED:'ยังไม่เริ่ม', COLLECTING:'กำลังรวบรวม', COMPLETE:'ครบถ้วน',
+        IN_PROGRESS:'อยู่ระหว่างดำเนินการ', COMPLETED:'เสร็จสิ้น', NOT_APPLICABLE:'ไม่เกี่ยวข้อง',
+        CLAIM_FILED:'ยื่นเคลมประกันแล้ว', SETTLED:'ประกันจ่ายแล้ว', DECLINED:'ประกันปฏิเสธ'
+      };
+      const tone = value === 'APPROVED' ? 'green'
+        : value === 'REJECTED' || value === 'DECLINED' ? 'red'
+        : value === 'MORE_INFO_REQUIRED' || value === 'EVIDENCE_PENDING' ? 'amber' : 'blue';
+      return '<span class="pill ' + tone + '">' + R2O.ui.esc(labels[value] || value) + '</span>';
+    };
+
+    /* The table carries statuses and owners. There is deliberately no amount
+       column: an approved request here means the request passed its process
+       step, not that an entitlement or a payment has been decided. */
+    R2O.render.compensationRequestRow = function(row) {
+      const item = row.item;
+      const WAIT = { DRIVER:'ผู้ขับ', FA:'F.A. Center', FI:'สถาบันการเงิน', COOP:'สหกรณ์', OEM:'ผู้ให้บริการรถ',
+        BATTERY_PARTNER:'ผู้ให้บริการแบตเตอรี่', INSURANCE:'ประกัน', PAYMENT_PARTNER:'ผู้ให้บริการชำระเงิน',
+        RECOVERY_PARTNER:'ผู้ติดตามหนี้', NONE:'-' };
+      const SLA_LABEL = { ON_TRACK:'อยู่ในกรอบเวลา', DUE_SOON:'ใกล้ครบกำหนด', BREACHED:'เกินกรอบเวลา' };
+      return '<tr><td>' + R2O.ui.esc(item.caseId) + '</td>' +
+        '<td>' + R2O.ui.esc(item.driverId) + '<br><span class="mini">' + R2O.ui.esc(item.loanAccount) + '</span></td>' +
+        '<td>' + R2O.ui.esc(item.childElg) + '</td>' +
+        '<td>' + R2O.ui.requestPill(item.evidenceStatus) + '</td>' +
+        '<td>' + R2O.ui.requestPill(item.recoveryStatus) + '</td>' +
+        '<td>' + R2O.ui.requestPill(item.insuranceStatus) + '</td>' +
+        '<td>' + R2O.ui.requestPill(item.requestStatus) + '</td>' +
+        '<td>' + R2O.ui.esc(item.owner) + '<br><span class="mini">รอ ' + R2O.ui.esc(WAIT[item.waitingFor] || item.waitingFor) + '</span></td>' +
+        '<td>' + (row.sla.hoursWaiting === null ? 'ยังไม่ยื่น' : row.sla.hoursWaiting + ' ชม.') +
+          '<br><span class="mini">' + R2O.ui.esc(SLA_LABEL[row.sla.status] || row.sla.status) + ' · กรอบ ' + item.slaHours + ' ชม.</span></td>' +
+        '<td>' + R2O.ui.esc(item.submittedAt || 'ยังไม่ยื่น') + '</td>' +
+        '<td>' + R2O.ui.esc(item.lastAction) + '</td>' +
+        '<td>' + R2O.ui.esc(item.nextAction) + '</td></tr>';
     };
 
     R2O.render.integrationRow = function(row) {
@@ -2650,19 +2759,10 @@
     R2O.render.tower = function() {
       R2O.render.riskConsole();
       const m = R2O.core.metrics(R2O.state, R2O.filters);
-      const legacyGrid = document.getElementById('towerMetricGrid');
-      if (legacyGrid) legacyGrid.innerHTML = [
-        R2O.ui.metric('Active Drivers', m.activeDrivers, m.activeElg + ' Child E-LG', ''),
-        R2O.ui.metric('Exposure', R2O.ui.compactBaht(m.exposure), 'Activated', 'accent'),
-        R2O.ui.metric('Operating Today', m.operatingToday, 'Inactive ≥3d: ' + m.inactive3d, ''),
-        R2O.ui.metric('Vehicle Downtime', m.vehicleDown, 'SLA monitor', 'warn'),
-        R2O.ui.metric('Verified Revenue', R2O.ui.compactBaht(m.verifiedRevenue), 'EMU ' + m.emu.toLocaleString(), ''),
-        R2O.ui.metric('Sweep Success', m.sweepSuccess + '%', 'Daily clearing', 'accent'),
-        R2O.ui.metric('EWS Yellow / Red', m.ewsYellow + ' / ' + m.ewsRed, 'FI DPD>0: ' + m.dpdPositive, 'warn'),
-        R2O.ui.metric('F.A. Open Cases', m.faOpenCases, 'PromptCure ' + m.promptCureOpen + ' · Overdue ' + m.slaOverdue, 'risk'),
-        R2O.ui.metric('Claim Pending', m.claimPending, 'Net Loss ' + R2O.ui.compactBaht(m.eligibleNetLoss), ''),
-        R2O.ui.metric('GPS / Revenue / FI', m.gpsCompleteness + '%', m.revenueReconciliation + '% / ' + m.fiLedgerReceived + '%', '')
-      ].join('');
+      /* The programme KPI strip this used to fill was replaced by the Risk
+         Console in Phase 1; its container no longer exists in the markup, so
+         the block never ran. Removed rather than left to rot — it still held
+         claim figures nobody could see. */
       document.getElementById('towerLastUpdated').textContent = 'อัปเดต ' + R2O.state.meta.lastUpdated;
       const rows = R2O.core.visibleQueue(R2O.state, R2O.filters);
       document.getElementById('towerQueueCount').textContent = rows.length + ' รายการ';
@@ -2674,7 +2774,33 @@
       document.getElementById('towerCureRows').innerHTML = R2O.state.promptCure.map(function(row) {
         return '<tr><td>' + row.id + '</td><td>' + row.driverId + '</td><td>' + row.cause + '</td><td>' + R2O.ui.pill(row.stage) + '</td><td>' + row.owner + '</td><td>' + R2O.ui.pill(row.sla) + '</td><td>' + R2O.ui.esc(row.nextAction) + '</td></tr>';
       }).join('');
-      document.getElementById('towerClaimRows').innerHTML = R2O.state.claims.map(R2O.render.claimRow).join('');
+      document.getElementById('towerClaimRows').innerHTML = R2O.core
+        .compensationRequestRows(R2O.state, {})
+        .map(R2O.render.compensationRequestRow).join('') ||
+        '<tr><td colspan="12" class="empty">ไม่มีคำขอรับเงินค่าชดเชย</td></tr>';
+      const crAll = R2O.core.compensationRequestRows(R2O.state, {});
+      const crBy = function(pick) {
+        return crAll.reduce(function(acc, row) { const k = pick(row); acc[k] = (acc[k] || 0) + 1; return acc; }, {});
+      };
+      const crStatus = crBy(function(row) { return row.item.requestStatus; });
+      const crWaiting = crBy(function(row) { return row.item.waitingFor; });
+      const CR_LABEL = { PREPARING:'เตรียมเรื่อง', EVIDENCE_PENDING:'รอหลักฐาน', SUBMITTED:'ยื่นคำขอแล้ว',
+        UNDER_REVIEW:'อยู่ระหว่างตรวจสอบ', MORE_INFO_REQUIRED:'ขอข้อมูลเพิ่ม',
+        APPROVED:'คำขอได้รับอนุมัติ', REJECTED:'คำขอไม่ผ่าน', CLOSED:'ปิดเรื่อง' };
+      document.getElementById('towerCrStatusKpis').innerHTML =
+        R2O.COMPENSATION_REQUEST_WORKFLOW.map(function(step) {
+          return R2O.ui.kpi(CR_LABEL[step], crStatus[step] || 0, step,
+            step === 'MORE_INFO_REQUIRED' ? 'warn' : '');
+        }).join('');
+      const CR_WAIT = { DRIVER:'ผู้ขับ', FA:'F.A. Center', FI:'สถาบันการเงิน', COOP:'สหกรณ์', OEM:'ผู้ให้บริการรถ',
+        BATTERY_PARTNER:'ผู้ให้บริการแบตเตอรี่', INSURANCE:'ประกัน', PAYMENT_PARTNER:'ผู้ให้บริการชำระเงิน',
+        RECOVERY_PARTNER:'ผู้ติดตามหนี้' };
+      document.getElementById('towerCrWaitingKpis').innerHTML =
+        R2O.WAITING_PARTY.filter(function(p) { return p !== 'NONE'; }).map(function(party) {
+          return R2O.ui.kpi('รอ ' + CR_WAIT[party], crWaiting[party] || 0, party, '');
+        }).join('') +
+        R2O.ui.kpi('เกินกรอบเวลา SLA', crAll.filter(function(row) { return row.sla.status === 'BREACHED'; }).length,
+          'SLA BREACHED', '');
       document.getElementById('towerIntegrationRows').innerHTML = R2O.state.integrations.map(function(row) {
         return '<tr><td>' + row.partner + '</td><td>' + row.role + '</td><td>' + row.sla + '</td><td>' + row.channel + '</td><td>' + row.completeness + '%</td><td class="num">' + row.exceptions + '</td><td>' + R2O.ui.pill(row.status) + '</td></tr>';
       }).join('');
@@ -2999,8 +3125,13 @@
             cell(money.sweep), cell(money.bindingGate), row.status];
         });
       } else if (type === 'claim') {
-        headers = ['Claim','Driver','FI','EAD','Recovery','Eligible Net Loss','Gate','Status'];
-        rows = R2O.state.claims.map(function(row) { return [row.id,row.driverId,row.fi,row.ead,row.recovery,row.eligibleNetLoss,row.gate,row.status]; });
+        headers = ['Case ID','Driver','Loan Account','Child E-LG','Evidence','Recovery','Insurance',
+          'Request Status','Owner','Waiting For','SLA Hours','Submitted At','Last Action','Next Action'];
+        rows = (R2O.state.compensationRequests || []).map(function(row) {
+          return [row.caseId, row.driverId, row.loanAccount, row.childElg, row.evidenceStatus,
+            row.recoveryStatus, row.insuranceStatus, row.requestStatus, row.owner, row.waitingFor,
+            row.slaHours, row.submittedAt || 'ยังไม่ยื่น', row.lastAction, row.nextAction];
+        });
       } else {
         headers = ['Date','Verified Revenue','PAYD','Principal','Interest','Reserve','Status'];
         rows = (R2O.state.reconciliations || []).map(function(row) { return [row.date,row.verifiedRevenue,row.payd,row.principal,row.interest,row.reserve,row.status]; });
