@@ -1,0 +1,3 @@
+{
+  "rewrites": [{ "source": "/", "destination": "/competition-final-v3.html" }]
+}
