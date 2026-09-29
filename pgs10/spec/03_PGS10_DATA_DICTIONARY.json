@@ -1,0 +1,1785 @@
+{
+  "spec_name": "PGS10 Data Dictionary",
+  "spec_version": "1.0.0-DRAFT",
+  "frozen": false,
+  "basis": "PGS10 Claim Audit Master Rules 2026.09.29 (Rulebook 22 Controls) + PGS 10 Master Audit + locked rules L-01..L-14 (02_PGS10_OPERATIONAL_AUDIT_RULES.md)",
+  "conventions": {
+    "dates": "เก็บภายในเป็น ISO 8601 ปี ค.ศ. (YYYY-MM-DD); รับ/แสดงเป็น พ.ศ. (พ.ศ. = ค.ศ. + 543). ห้ามเก็บปี พ.ศ. ในสตริง ISO (M§29 ตัวอย่างเขียนผิด — A-22)",
+    "money": "Decimal เก็บเป็นจำนวนเต็มสตางค์; ห้าม Floating Point",
+    "rounding": "ROUND_HALF_UP ที่ 2 ตำแหน่ง ทำครั้งเดียวที่ปลายสูตร (claim_amount)",
+    "percent": "เก็บเป็น basis points (70% = 7000)",
+    "identifier_rule": "ห้ามแก้ค่าต้นทาง; เก็บทั้ง value และ normalized_value"
+  },
+  "provenance_schema": {
+    "description": "ทุกฟิลด์ที่อ่านจากเอกสารต้องเก็บ",
+    "fields": [
+      "value",
+      "normalized_value",
+      "source_document",
+      "source_page",
+      "page_type(document_page|pdf_page)",
+      "document_type",
+      "visible_on_rendered_page",
+      "bounding_box",
+      "extraction_method",
+      "confidence",
+      "rule_used"
+    ]
+  },
+  "source_priority": [
+    "P0 หลักเกณฑ์ PGS 10 ทางการ",
+    "P0' Operational Hard Controls ที่ล็อก",
+    "P1 เอกสารต้นฉบับของเคส",
+    "P2 หน้าจอระบบ",
+    "P3 OCR/Text Layer (ค้นหา/ช่วยอ่านเท่านั้น)"
+  ],
+  "document_types": [
+    "APPROVAL_LETTER_OR_CONTRACT",
+    "LG",
+    "STATEMENT",
+    "RESTRUCTURE_REPORT",
+    "DEMAND_LETTER",
+    "POSTAL_RECEIPT",
+    "RETURNED_ENVELOPE",
+    "POST_DEFAULT_CONFIRMATION_LETTER",
+    "RESTRUCTURE_AGREEMENT",
+    "TRACKING_REPORT",
+    "ADDRESS_EVIDENCE",
+    "OTHER"
+  ],
+  "case_status": {
+    "values": [
+      "PASS",
+      "PASS_WITH_SUPPORT",
+      "PASS_WITH_OBSERVATION",
+      "HOLD",
+      "FAIL"
+    ],
+    "precedence_high_to_low": [
+      "FAIL",
+      "HOLD",
+      "PASS_WITH_OBSERVATION",
+      "PASS_WITH_SUPPORT",
+      "PASS"
+    ],
+    "hold_if_any_control": [
+      "HOLD",
+      "NOT_TESTABLE",
+      "OBSERVATION_CANDIDATE(unapproved)"
+    ]
+  },
+  "control_status": [
+    "PASS",
+    "PASS_WITH_SUPPORT",
+    "OBSERVATION",
+    "OBSERVATION_CANDIDATE",
+    "HOLD",
+    "FAIL",
+    "NOT_APPLICABLE",
+    "NOT_TESTABLE"
+  ],
+  "legacy_status_mapping": {
+    "PASS_WITH_DOCUMENTARY_SUPPORT": "PASS_WITH_SUPPORT",
+    "HOLD_MISSING_DOCUMENT": "HOLD + *_MISSING",
+    "HOLD_INCOMPLETE_DOCUMENT": "HOLD + *_INCOMPLETE/*_VISUALLY_INCOMPLETE",
+    "HOLD_DATA_MISMATCH": "HOLD + *_MISMATCH",
+    "HOLD_NEED_CLARIFICATION": "HOLD + *_UNCONFIRMED/VERIFY_*",
+    "FAIL_ELIGIBILITY": "FAIL + ELIGIBILITY_*"
+  },
+  "transaction_types": [
+    "PAYMENT",
+    "DRAWDOWN",
+    "INTEREST_ACCRUAL",
+    "FEE",
+    "ADJUSTMENT",
+    "REVERSAL",
+    "PRINCIPAL_ADJUSTMENT",
+    "UNKNOWN"
+  ],
+  "rules": {
+    "PGS10-ELIG-001": {
+      "name": "Project / Product Eligibility",
+      "rulebook_control_no": 1
+    },
+    "PGS10-ID-001": {
+      "name": "Identity Integrity",
+      "rulebook_control_no": 2
+    },
+    "PGS10-CONTRACT-001": {
+      "name": "Contract / Approval Date",
+      "rulebook_control_no": 3
+    },
+    "PGS10-DOC-001": {
+      "name": "Document Page Completeness",
+      "rulebook_control_no": 4
+    },
+    "PGS10-VIS-001": {
+      "name": "Visual Completeness",
+      "rulebook_control_no": 5
+    },
+    "PGS10-LG-001": {
+      "name": "Guarantee Validity",
+      "rulebook_control_no": null
+    },
+    "PGS10-NPL-001": {
+      "name": "NPL Seasoning",
+      "rulebook_control_no": null
+    },
+    "PGS10-STM-001": {
+      "name": "Last Actual Payment",
+      "rulebook_control_no": 6
+    },
+    "PGS10-DEF-001": {
+      "name": "Default Date >= Last Actual Payment",
+      "rulebook_control_no": 7
+    },
+    "PGS10-DEF-002": {
+      "name": "Post-Default Payment Exception",
+      "rulebook_control_no": 8
+    },
+    "PGS10-FUP-001": {
+      "name": "Follow-up / Collection Evidence",
+      "rulebook_control_no": 9
+    },
+    "PGS10-RST-001": {
+      "name": "Restructure Requirement / Route",
+      "rulebook_control_no": null
+    },
+    "PGS10-RST-002": {
+      "name": "7-Month Uncontactable Exception",
+      "rulebook_control_no": null
+    },
+    "PGS10-RST-003": {
+      "name": "Restructure Date Evidence",
+      "rulebook_control_no": 10
+    },
+    "PGS10-DMD-001": {
+      "name": "Demand Letter Identity",
+      "rulebook_control_no": 11
+    },
+    "PGS10-DMD-002": {
+      "name": "Demand Principal as of Demand Date",
+      "rulebook_control_no": 12
+    },
+    "PGS10-DMD-003": {
+      "name": "Demand Waiting Period",
+      "rulebook_control_no": null
+    },
+    "PGS10-HIS-001": {
+      "name": "Historical Debt Snapshot",
+      "rulebook_control_no": 13
+    },
+    "PGS10-PST-001": {
+      "name": "Postal / Demand Letter Evidence",
+      "rulebook_control_no": 14
+    },
+    "PGS10-PST-002": {
+      "name": "Address Match",
+      "rulebook_control_no": 15
+    },
+    "PGS10-CUR-001": {
+      "name": "Current Outstanding",
+      "rulebook_control_no": 16
+    },
+    "PGS10-STM-002": {
+      "name": "Statement Cut-off vs Later Payments",
+      "rulebook_control_no": 17
+    },
+    "PGS10-CLM-001": {
+      "name": "Claim Filing Window",
+      "rulebook_control_no": null
+    },
+    "PGS10-CLM-002": {
+      "name": "Coverage Ratio",
+      "rulebook_control_no": 19
+    },
+    "PGS10-CLM-003": {
+      "name": "Claim Base",
+      "rulebook_control_no": 18
+    },
+    "PGS10-CLM-004": {
+      "name": "Claim Amount",
+      "rulebook_control_no": 20
+    },
+    "PGS10-CAP-001": {
+      "name": "CLAIM MAX / Portfolio Cap",
+      "rulebook_control_no": 21
+    },
+    "PGS10-TIME-001": {
+      "name": "Timeline Integrity",
+      "rulebook_control_no": 22
+    }
+  },
+  "reason_codes": [
+    {
+      "code": "ELIGIBILITY_NOT_PGS10",
+      "rules": [
+        "PGS10-ELIG-001"
+      ],
+      "control_status": "FAIL",
+      "meaning": "ไม่ใช่ PGS ระยะที่ 10"
+    },
+    {
+      "code": "ELIGIBILITY_PRODUCT_EXCLUDED",
+      "rules": [
+        "PGS10-ELIG-001"
+      ],
+      "control_status": "FAIL",
+      "meaning": "Product ไม่อยู่ในกลุ่มที่เข้าเกณฑ์"
+    },
+    {
+      "code": "ELIGIBILITY_HIRE_PURCHASE_LEASING",
+      "rules": [
+        "PGS10-ELIG-001"
+      ],
+      "control_status": "FAIL",
+      "meaning": "เป็นสินเชื่อเช่าซื้อ/ลิสซิ่ง"
+    },
+    {
+      "code": "ELIGIBILITY_NOT_NEW_BUSINESS_LOAN",
+      "rules": [
+        "PGS10-ELIG-001"
+      ],
+      "control_status": "FAIL",
+      "meaning": "ไม่ใช่สินเชื่อใหม่เพื่อธุรกิจ"
+    },
+    {
+      "code": "ELIGIBILITY_EXPOSURE_LIMIT_EXCEEDED",
+      "rules": [
+        "PGS10-ELIG-001"
+      ],
+      "control_status": "FAIL",
+      "meaning": "วงเงินรวมต่อรายเกินเพดาน"
+    },
+    {
+      "code": "ELIGIBILITY_GUARANTEE_BELOW_MINIMUM",
+      "rules": [
+        "PGS10-ELIG-001"
+      ],
+      "control_status": "FAIL",
+      "meaning": "วงเงินค้ำต่อครั้งต่ำกว่า 10,000 บาท"
+    },
+    {
+      "code": "PRODUCT_UNKNOWN",
+      "rules": [
+        "PGS10-ELIG-001"
+      ],
+      "control_status": "HOLD",
+      "meaning": "ระบุ Product ไม่ได้"
+    },
+    {
+      "code": "PGS_REVISION_MISMATCH",
+      "rules": [
+        "PGS10-ELIG-001"
+      ],
+      "control_status": "HOLD",
+      "meaning": "รุ่นปรับปรุงไม่ใช่ครั้งที่ 5"
+    },
+    {
+      "code": "ELIGIBILITY_UNCONFIRMED",
+      "rules": [
+        "PGS10-ELIG-001"
+      ],
+      "control_status": "HOLD",
+      "meaning": "ยังไม่ยืนยันคุณสมบัติบางข้อ"
+    },
+    {
+      "code": "IDENTITY_MISMATCH",
+      "rules": [
+        "PGS10-ID-001"
+      ],
+      "control_status": "HOLD",
+      "meaning": "LG/ชื่อ/วงเงิน/วันที่ LG ไม่ตรงกันข้ามเอกสาร"
+    },
+    {
+      "code": "VERIFY_REFERENCE_MAPPING",
+      "rules": [
+        "PGS10-ID-001"
+      ],
+      "control_status": "HOLD",
+      "meaning": "เลขบัญชี/สัญญาต่างกันที่ตัวเลขภายใน ต้องพิสูจน์ Mapping ห้าม Normalize เอง"
+    },
+    {
+      "code": "FORMAT_VARIANCE",
+      "rules": [
+        "PGS10-ID-001"
+      ],
+      "control_status": "OBSERVATION",
+      "meaning": "ต่างเฉพาะรูปแบบ (เช่น Leading Zero) องค์ประกอบอื่นตรงทั้งหมด"
+    },
+    {
+      "code": "CONTRACT_DATE_MISMATCH",
+      "rules": [
+        "PGS10-CONTRACT-001"
+      ],
+      "control_status": "HOLD",
+      "meaning": "วันที่แจ้งผลอนุมัติ ≠ วันที่สัญญาที่อ้างในหนังสือบอกกล่าว"
+    },
+    {
+      "code": "DOCUMENT_PAGE_SEQUENCE_GAP",
+      "rules": [
+        "PGS10-DOC-001"
+      ],
+      "control_status": "HOLD",
+      "meaning": "ลำดับ n of X ขาดหน้า"
+    },
+    {
+      "code": "DOCUMENT_TRUNCATED",
+      "rules": [
+        "PGS10-DOC-001"
+      ],
+      "control_status": "HOLD",
+      "meaning": "หลัง 1 of X หน้าถัดไปเป็นเอกสารอื่น"
+    },
+    {
+      "code": "DOCUMENT_PAGE_UNREADABLE",
+      "rules": [
+        "PGS10-DOC-001"
+      ],
+      "control_status": "HOLD",
+      "meaning": "หน้าที่ควรมี Crop/เสีย/อ่านไม่ได้"
+    },
+    {
+      "code": "DOCUMENT_VISUALLY_INCOMPLETE",
+      "rules": [
+        "PGS10-VIS-001"
+      ],
+      "control_status": "HOLD",
+      "meaning": "Critical Document ไม่ครบในภาพจริง"
+    },
+    {
+      "code": "CONFIRMATION_LETTER_VISUALLY_INCOMPLETE",
+      "rules": [
+        "PGS10-VIS-001",
+        "PGS10-DEF-002"
+      ],
+      "control_status": "HOLD",
+      "meaning": "หนังสือยืนยันการชำระหลังผิดนัดไม่สมบูรณ์ทางภาพ"
+    },
+    {
+      "code": "VISUAL_CHECK_PENDING",
+      "rules": [
+        "PGS10-VIS-001"
+      ],
+      "control_status": "NOT_TESTABLE",
+      "meaning": "ยังไม่ได้ตรวจภาพจริง"
+    },
+    {
+      "code": "LG_DATA_MISSING",
+      "rules": [
+        "PGS10-LG-001"
+      ],
+      "control_status": "HOLD",
+      "meaning": "ขาดข้อมูล LG"
+    },
+    {
+      "code": "LG_TENOR_EXCEEDED",
+      "rules": [
+        "PGS10-LG-001"
+      ],
+      "control_status": "HOLD",
+      "meaning": "อายุ LG เกิน 10 ปี"
+    },
+    {
+      "code": "LG_FEE_NOT_CONTINUOUS",
+      "rules": [
+        "PGS10-LG-001"
+      ],
+      "control_status": "HOLD",
+      "meaning": "ชำระค่าธรรมเนียมค้ำประกันไม่ต่อเนื่อง"
+    },
+    {
+      "code": "NPL_DATE_MAPPING_UNDEFINED",
+      "rules": [
+        "PGS10-NPL-001"
+      ],
+      "control_status": "NOT_TESTABLE",
+      "meaning": "ไม่มี npl_date และยังไม่มี Business Mapping จาก default_date"
+    },
+    {
+      "code": "NPL_SEASONING_NOT_MET",
+      "rules": [
+        "PGS10-NPL-001"
+      ],
+      "control_status": "HOLD",
+      "meaning": "ยังไม่พ้นระยะ seasoning (FAIL เมื่อ fail_scope=EXTENDED_M39)"
+    },
+    {
+      "code": "NO_PAYMENT_FOUND",
+      "rules": [
+        "PGS10-STM-001"
+      ],
+      "control_status": "OBSERVATION",
+      "meaning": "ไม่พบรายการรับชำระจริงใน Statement"
+    },
+    {
+      "code": "UNKNOWN_TRANSACTION_NEAR_DEFAULT",
+      "rules": [
+        "PGS10-STM-001"
+      ],
+      "control_status": "HOLD",
+      "meaning": "มีรายการ UNKNOWN ที่อาจเป็นเงินรับจริง ไม่เดา"
+    },
+    {
+      "code": "STATEMENT_MISSING",
+      "rules": [
+        "PGS10-STM-001"
+      ],
+      "control_status": "NOT_TESTABLE",
+      "meaning": "ไม่มี Statement"
+    },
+    {
+      "code": "POST_DEFAULT_PAYMENT",
+      "rules": [
+        "PGS10-DEF-001"
+      ],
+      "control_status": "HOLD",
+      "meaning": "default_date < last_actual_payment_date → เข้า DEF-002 (สถานะตามผล DEF-002)"
+    },
+    {
+      "code": "EXCEPTION_LETTER_MISSING",
+      "rules": [
+        "PGS10-DEF-002"
+      ],
+      "control_status": "HOLD",
+      "meaning": "ไม่มีหนังสือยืนยันการชำระหลังวันผิดนัด"
+    },
+    {
+      "code": "CONFIRMED_DEFAULT_DATE_MISMATCH",
+      "rules": [
+        "PGS10-DEF-002"
+      ],
+      "control_status": "HOLD",
+      "meaning": "Default Date ในหนังสือ ≠ หน้าจอ"
+    },
+    {
+      "code": "CONFIRMATION_CONTENT_INCOMPLETE",
+      "rules": [
+        "PGS10-DEF-002"
+      ],
+      "control_status": "HOLD",
+      "meaning": "หนังสือไม่ระบุสาระที่ต้องมี"
+    },
+    {
+      "code": "CONFIRMATION_IDENTIFIER_UNLINKED",
+      "rules": [
+        "PGS10-DEF-002"
+      ],
+      "control_status": "HOLD",
+      "meaning": "Identifier ในหนังสือไม่ตรง/พิสูจน์ไม่ได้ว่าเป็นเคสเดียวกัน"
+    },
+    {
+      "code": "POST_DEFAULT_PAYMENT_SUPPORTED",
+      "rules": [
+        "PGS10-DEF-001",
+        "PGS10-DEF-002"
+      ],
+      "control_status": "PASS_WITH_SUPPORT",
+      "meaning": "มีการชำระหลังผิดนัดและหนังสือยืนยันสมบูรณ์ ตรงหน้าจอ"
+    },
+    {
+      "code": "TRACKING_REPORT_MISSING",
+      "rules": [
+        "PGS10-FUP-001"
+      ],
+      "control_status": "HOLD",
+      "meaning": "ไม่มีรายงานติดตาม"
+    },
+    {
+      "code": "TRACKING_DATE_MISMATCH",
+      "rules": [
+        "PGS10-FUP-001"
+      ],
+      "control_status": "HOLD",
+      "meaning": "วันที่ติดตามหน้าจอ ≠ รายงาน"
+    },
+    {
+      "code": "TRACKING_EVIDENCE_INCOMPLETE",
+      "rules": [
+        "PGS10-FUP-001"
+      ],
+      "control_status": "HOLD",
+      "meaning": "ขาดวิธี/ผลติดตาม หรือผู้กู้/LG ไม่ยืนยัน"
+    },
+    {
+      "code": "RESTRUCTURE_PATH_UNDETERMINED",
+      "rules": [
+        "PGS10-RST-001"
+      ],
+      "control_status": "HOLD",
+      "meaning": "ยังไม่ระบุเส้นทาง Restructure (restructure_date=null ห้ามผ่านอัตโนมัติ)"
+    },
+    {
+      "code": "RESTRUCTURE_REQUIREMENT_NOT_MET",
+      "rules": [
+        "PGS10-RST-001"
+      ],
+      "control_status": "HOLD",
+      "meaning": "เส้นทางปกติยังไม่ครบ (พ้น 3 เดือน / ไม่ชำระอีก 3 เดือน)"
+    },
+    {
+      "code": "EXCEPTION_ROUTE_NOT_CONFIGURED",
+      "rules": [
+        "PGS10-RST-002"
+      ],
+      "control_status": "HOLD",
+      "meaning": "เลือกเส้นทาง 7 เดือนแต่ config ยังปิด"
+    },
+    {
+      "code": "UNCONTACTABLE_EXCEPTION_NOT_MET",
+      "rules": [
+        "PGS10-RST-002"
+      ],
+      "control_status": "HOLD",
+      "meaning": "ยังไม่พ้น 7 เดือน หรือขาดหนังสือบอกกล่าว/บอกเลิก"
+    },
+    {
+      "code": "TRACKING_REPORT_NOT_CERTIFIED",
+      "rules": [
+        "PGS10-RST-002"
+      ],
+      "control_status": "HOLD",
+      "meaning": "รายงานติดตามไม่ใช่ Certified"
+    },
+    {
+      "code": "RESTRUCTURE_EVIDENCE_MISSING",
+      "rules": [
+        "PGS10-RST-003"
+      ],
+      "control_status": "HOLD",
+      "meaning": "ไม่มีเอกสารปรับโครงสร้าง/หัว Statement"
+    },
+    {
+      "code": "CHECK_STATEMENT_HEADER",
+      "rules": [
+        "PGS10-RST-003"
+      ],
+      "control_status": "HOLD",
+      "meaning": "ไม่ตรง Level 1 ต้องตรวจหัว Statement ก่อนสรุป"
+    },
+    {
+      "code": "RESTRUCTURE_DATE_MISMATCH",
+      "rules": [
+        "PGS10-RST-003"
+      ],
+      "control_status": "HOLD",
+      "meaning": "ไม่ตรงทั้งเอกสารและหัว Statement"
+    },
+    {
+      "code": "MATCHED_STATEMENT_HEADER",
+      "rules": [
+        "PGS10-RST-003"
+      ],
+      "control_status": "PASS_WITH_SUPPORT",
+      "meaning": "ตรงหัว Statement (Level 2)"
+    },
+    {
+      "code": "DEMAND_LETTER_MISMATCH",
+      "rules": [
+        "PGS10-DMD-001"
+      ],
+      "control_status": "HOLD",
+      "meaning": "วันที่/ยอดในหนังสือบอกกล่าวไม่ตรงหน้าจอหรือไม่สอดคล้องกันเอง"
+    },
+    {
+      "code": "DEMAND_IDENTITY_UNCONFIRMED",
+      "rules": [
+        "PGS10-DMD-001"
+      ],
+      "control_status": "HOLD",
+      "meaning": "ยังไม่ยืนยันผู้กู้/Account/วงเงิน/ที่อยู่ในหนังสือ"
+    },
+    {
+      "code": "DEMAND_PRINCIPAL_MISMATCH",
+      "rules": [
+        "PGS10-DMD-002"
+      ],
+      "control_status": "HOLD",
+      "meaning": "เงินต้นบอกกล่าว ≠ Statement ณ วันบอกกล่าว"
+    },
+    {
+      "code": "ASOF_DEMAND_PRINCIPAL_REQUIRED",
+      "rules": [
+        "PGS10-DMD-002"
+      ],
+      "control_status": "HOLD",
+      "meaning": "ไม่มี Statement Principal ณ วันบอกกล่าวและไม่เท่า Statement ล่าสุด"
+    },
+    {
+      "code": "DEMAND_WAITING_PERIOD_NOT_MET",
+      "rules": [
+        "PGS10-DMD-003"
+      ],
+      "control_status": "HOLD",
+      "meaning": "ยังไม่พ้น 1 เดือนหลังหนังสือบอกกล่าว"
+    },
+    {
+      "code": "HISTORICAL_BALANCE_MISMATCH",
+      "rules": [
+        "PGS10-HIS-001"
+      ],
+      "control_status": "HOLD",
+      "meaning": "สภาพหนี้ ณ วันบอกกล่าวบนหน้าจอ (ต้น/ดอก/รวม) ไม่ตรงหนังสือบอกกล่าว — Blocking แม้ไม่กระทบ Claim Base"
+    },
+    {
+      "code": "POSTAL_EVIDENCE_MISSING",
+      "rules": [
+        "PGS10-PST-001"
+      ],
+      "control_status": "HOLD",
+      "meaning": "ใบตอบรับว่าง/ไม่มีวันที่/ลายเซ็น/ซองตีกลับ"
+    },
+    {
+      "code": "DELIVERY_PROOF_INCOMPLETE",
+      "rules": [
+        "PGS10-PST-001"
+      ],
+      "control_status": "HOLD",
+      "meaning": "หลักฐานส่งสำเร็จไม่ครบ"
+    },
+    {
+      "code": "RETURN_PROOF_INCOMPLETE",
+      "rules": [
+        "PGS10-PST-001"
+      ],
+      "control_status": "HOLD",
+      "meaning": "หลักฐานส่งไม่สำเร็จไม่ครบ"
+    },
+    {
+      "code": "POSTAL_TRACKING_MISMATCH",
+      "rules": [
+        "PGS10-PST-001"
+      ],
+      "control_status": "HOLD",
+      "meaning": "เลขไปรษณีย์ของใบตอบรับ/ซองไม่ใช่ชุดเดียวกัน"
+    },
+    {
+      "code": "ADDRESS_SOURCE_NOT_FOUND",
+      "rules": [
+        "PGS10-PST-001",
+        "PGS10-PST-002"
+      ],
+      "control_status": "HOLD",
+      "meaning": "หาแหล่งอ้างอิงที่อยู่ใน PDF ไม่พบ"
+    },
+    {
+      "code": "ADDRESS_NOT_IN_DOCUMENTS",
+      "rules": [
+        "PGS10-PST-002"
+      ],
+      "control_status": "HOLD",
+      "meaning": "ที่อยู่จัดส่งไม่ตรงเอกสารใด และไม่มีหลักฐานแจ้งเปลี่ยน"
+    },
+    {
+      "code": "ADDRESS_DIFFERS_FROM_LATEST",
+      "rules": [
+        "PGS10-PST-002"
+      ],
+      "control_status": "HOLD",
+      "meaning": "มีหลักฐานแจ้งเปลี่ยนที่อยู่ แต่จัดส่งไม่ตรงที่อยู่ล่าสุด"
+    },
+    {
+      "code": "CURRENT_PRINCIPAL_MISMATCH",
+      "rules": [
+        "PGS10-CUR-001"
+      ],
+      "control_status": "HOLD",
+      "meaning": "เงินต้นปัจจุบันไม่ตรง Statement ล่าสุด"
+    },
+    {
+      "code": "CURRENT_BALANCE_MISMATCH",
+      "rules": [
+        "PGS10-CUR-001"
+      ],
+      "control_status": "HOLD",
+      "meaning": "ดอกเบี้ย/รวมต่างเกิน tolerance โดยไม่มีเหตุ"
+    },
+    {
+      "code": "VARIANCE_PENDING_TOLERANCE_APPROVAL",
+      "rules": [
+        "PGS10-CUR-001"
+      ],
+      "control_status": "OBSERVATION_CANDIDATE",
+      "meaning": "ส่วนต่างเล็กน้อยแต่ยังไม่มี tolerance ที่อนุมัติ ห้าม auto-pass"
+    },
+    {
+      "code": "VARIANCE_WITHIN_APPROVED_TOLERANCE",
+      "rules": [
+        "PGS10-CUR-001"
+      ],
+      "control_status": "OBSERVATION",
+      "meaning": "ส่วนต่างอยู่ใน tolerance ที่อนุมัติ และเงินต้นตรง"
+    },
+    {
+      "code": "PAYMENT_AFTER_STATEMENT_CUTOFF",
+      "rules": [
+        "PGS10-STM-002"
+      ],
+      "control_status": "HOLD",
+      "meaning": "มีการชำระหลัง Statement cut-off ยังไม่มี Statement ใหม่"
+    },
+    {
+      "code": "CLAIM_FILING_WINDOW_NOT_MET",
+      "rules": [
+        "PGS10-CLM-001"
+      ],
+      "control_status": "HOLD",
+      "meaning": "ยื่นนอกช่วงปีที่ 2 ถึง 1 ปีหลัง LG ฉบับสุดท้ายสิ้นอายุ"
+    },
+    {
+      "code": "COVERAGE_RATIO_MISMATCH",
+      "rules": [
+        "PGS10-CLM-002"
+      ],
+      "control_status": "HOLD",
+      "meaning": "อัตราหน้าจอ ≠ อัตราตามกฎ"
+    },
+    {
+      "code": "NO_RULE_FOR_PRODUCT",
+      "rules": [
+        "PGS10-CLM-002"
+      ],
+      "control_status": "HOLD",
+      "meaning": "ไม่มีกฎ Coverage Ratio ที่ยืนยันสำหรับ Product นี้"
+    },
+    {
+      "code": "CLAIM_BASE_MISMATCH",
+      "rules": [
+        "PGS10-CLM-003"
+      ],
+      "control_status": "HOLD",
+      "meaning": "ฐานคำนวณหน้าจอ ≠ MIN(principal, guarantee)"
+    },
+    {
+      "code": "CLAIM_BASE_MODE_MISMATCH",
+      "rules": [
+        "PGS10-CLM-003"
+      ],
+      "control_status": "HOLD",
+      "meaning": "โหมดฐานคำนวณที่เลือกไม่ตรงกฎ"
+    },
+    {
+      "code": "CLAIM_AMOUNT_MISMATCH",
+      "rules": [
+        "PGS10-CLM-004"
+      ],
+      "control_status": "HOLD",
+      "meaning": "จำนวนเงินค่าประกันชดเชย/ยอดอนุมัติจ่ายหน้าจอ ≠ ที่คำนวณ"
+    },
+    {
+      "code": "PAID_PENDING_MISSING",
+      "rules": [
+        "PGS10-CAP-001"
+      ],
+      "control_status": "NOT_TESTABLE",
+      "meaning": "มี CLAIM MAX แต่ไม่มียอดจ่าย/รอจ่าย"
+    },
+    {
+      "code": "CAP_ARITHMETIC_MISMATCH",
+      "rules": [
+        "PGS10-CAP-001"
+      ],
+      "control_status": "HOLD",
+      "meaning": "คงเหลือจ่ายได้อีก/หลังอนุมัติไม่ตรงทุกสตางค์"
+    },
+    {
+      "code": "CLAIM_EXCEEDS_CAP",
+      "rules": [
+        "PGS10-CAP-001"
+      ],
+      "control_status": "HOLD",
+      "meaning": "Claim เกินวงเงินคงเหลือ"
+    },
+    {
+      "code": "TIMELINE_CONFLICT",
+      "rules": [
+        "PGS10-TIME-001"
+      ],
+      "control_status": "HOLD",
+      "meaning": "ลำดับเหตุการณ์ขัดกัน"
+    },
+    {
+      "code": "MISSING_INPUT",
+      "rules": [
+        "*"
+      ],
+      "control_status": "NOT_TESTABLE",
+      "meaning": "ขาดข้อมูลที่จำเป็น"
+    },
+    {
+      "code": "INVALID_INPUT",
+      "rules": [
+        "*"
+      ],
+      "control_status": "HOLD",
+      "meaning": "รูปแบบข้อมูลไม่ถูกต้อง"
+    },
+    {
+      "code": "UPSTREAM_NOT_COMPUTABLE",
+      "rules": [
+        "PGS10-CLM-004",
+        "PGS10-CAP-001"
+      ],
+      "control_status": "NOT_TESTABLE",
+      "meaning": "Control ต้นทางยังคำนวณไม่ได้"
+    },
+    {
+      "code": "RULE_CONFLICT_UNRESOLVED",
+      "rules": [
+        "*"
+      ],
+      "control_status": "HOLD",
+      "meaning": "กฎในเอกสารต่างเวอร์ชันขัดกันและตัดสินไม่ได้ ต้องรายงาน Conflict (L-10)"
+    }
+  ],
+  "fields": {
+    "pgs_phase": {
+      "meaning": "PGS ระยะของโครงการ",
+      "type": "enum:10|OTHER",
+      "source": "approval letter / LG / screen",
+      "used_by": [
+        "PGS10-ELIG-001"
+      ]
+    },
+    "pgs_revision": {
+      "meaning": "ปรับปรุงครั้งที่ของหลักเกณฑ์",
+      "type": "string",
+      "source": "screen / approval letter",
+      "allowed_value_for_this_ruleset": "5",
+      "used_by": [
+        "PGS10-ELIG-001"
+      ]
+    },
+    "product": {
+      "meaning": "รูปแบบ Product",
+      "type": "enum:SMALL_BIZ|START_UP|SMART_BIZ|SMART_ONE|SMART_GREEN|SMART_PLUS_TOPUP|NOT_PGS10",
+      "source": "approval letter / LG",
+      "notes": "SMALL_BIZ = SSMEs รูปแบบ 1; START_UP = รูปแบบ 2 (อนุมัติจากวงเงินตรงกัน — A-23)",
+      "used_by": [
+        "PGS10-ELIG-001",
+        "PGS10-CLM-002",
+        "PGS10-NPL-001"
+      ]
+    },
+    "loan_is_new_business": {
+      "meaning": "เป็นสินเชื่อใหม่เพื่อธุรกิจ",
+      "type": "boolean",
+      "source": "approval letter / contract",
+      "used_by": [
+        "PGS10-ELIG-001"
+      ]
+    },
+    "loan_is_hire_purchase_or_leasing": {
+      "meaning": "เป็นสินเชื่อเช่าซื้อ/ลิสซิ่ง (ข้อยกเว้นของโครงการ)",
+      "type": "boolean",
+      "source": "contract",
+      "used_by": [
+        "PGS10-ELIG-001"
+      ]
+    },
+    "total_exposure_per_borrower": {
+      "meaning": "วงเงินค้ำรวมภายใต้โครงการต่อราย (ทุกผู้ให้สินเชื่อ)",
+      "type": "money",
+      "source": "LG data / screen",
+      "unit": "THB",
+      "used_by": [
+        "PGS10-ELIG-001"
+      ]
+    },
+    "guarantee_amount_this_transaction": {
+      "meaning": "วงเงินค้ำประกันของรายการนี้",
+      "type": "money",
+      "source": "LG",
+      "unit": "THB",
+      "used_by": [
+        "PGS10-ELIG-001"
+      ]
+    },
+    "lg_no": {
+      "meaning": "เลขหนังสือค้ำประกัน",
+      "type": "string",
+      "source": "LG / screen",
+      "normalization": "ลบ '-', ช่องว่าง, format (67-026936 = 67026936); ห้ามแก้เลขจริง",
+      "used_by": [
+        "PGS10-ID-001"
+      ]
+    },
+    "borrower_name": {
+      "meaning": "ชื่อผู้กู้",
+      "type": "string",
+      "source": "approval letter / contract / statement / demand letter",
+      "normalization": "collapse whitespace เท่านั้น",
+      "used_by": [
+        "PGS10-ID-001",
+        "PGS10-DMD-001"
+      ]
+    },
+    "loan_account_no": {
+      "meaning": "เลขบัญชีสินเชื่อ",
+      "type": "string",
+      "source": "statement / contract",
+      "normalization": "ตัด format ได้; ต่างเฉพาะ Leading Zero = FORMAT_VARIANCE; เลขภายในต่าง = VERIFY_REFERENCE_MAPPING",
+      "used_by": [
+        "PGS10-ID-001",
+        "PGS10-DMD-001"
+      ]
+    },
+    "contract_no": {
+      "meaning": "เลขสัญญา (ถ้ามี)",
+      "type": "string",
+      "source": "contract",
+      "used_by": [
+        "PGS10-ID-001",
+        "PGS10-DEF-002"
+      ]
+    },
+    "lender_branch": {
+      "meaning": "ผู้ให้กู้ / สาขา",
+      "type": "string",
+      "source": "approval letter / LG",
+      "used_by": [
+        "PGS10-ID-001"
+      ]
+    },
+    "loan_limit": {
+      "meaning": "วงเงินสินเชื่อ",
+      "type": "money",
+      "source": "approval letter / screen",
+      "unit": "THB",
+      "used_by": [
+        "PGS10-ID-001",
+        "PGS10-DMD-001"
+      ]
+    },
+    "lg_issue_date": {
+      "meaning": "วันที่ออก LG",
+      "type": "date",
+      "source": "LG",
+      "used_by": [
+        "PGS10-ID-001",
+        "PGS10-CLM-001",
+        "PGS10-CLM-002",
+        "PGS10-NPL-001",
+        "PGS10-TIME-001",
+        "PGS10-LG-001"
+      ]
+    },
+    "final_lg_expiry_date": {
+      "meaning": "วันสิ้นอายุการค้ำประกันฉบับสุดท้าย",
+      "type": "date",
+      "source": "LG",
+      "used_by": [
+        "PGS10-CLM-001",
+        "PGS10-LG-001"
+      ]
+    },
+    "guarantee_fee_paid_continuously": {
+      "meaning": "ชำระค่าธรรมเนียมการค้ำประกันต่อเนื่องครบถ้วน",
+      "type": "boolean",
+      "source": "LG fee record",
+      "used_by": [
+        "PGS10-LG-001"
+      ]
+    },
+    "approval_date": {
+      "meaning": "วันที่แจ้งผลอนุมัติสินเชื่อ = วันที่ทำสัญญาที่ใช้เป็นฐานตรวจ",
+      "type": "date",
+      "source": "approval letter",
+      "used_by": [
+        "PGS10-CONTRACT-001",
+        "PGS10-TIME-001"
+      ]
+    },
+    "demand_contract_date": {
+      "meaning": "วันที่สัญญาที่อ้างในหนังสือบอกกล่าว",
+      "type": "date",
+      "source": "demand letter",
+      "used_by": [
+        "PGS10-CONTRACT-001"
+      ]
+    },
+    "approval_total_pages": {
+      "meaning": "จำนวนหน้าทั้งหมดของเอกสารอนุมัติ/สัญญา (X ใน '1 of X')",
+      "type": "integer",
+      "source": "approval document footer",
+      "used_by": [
+        "PGS10-DOC-001"
+      ]
+    },
+    "approval_document_pages_found": {
+      "meaning": "หมายเลข 'หน้าเอกสาร' ที่พบ",
+      "type": "integer[]",
+      "source": "approval document",
+      "notes": "หน้าเอกสาร ≠ หน้า PDF (L-13)",
+      "used_by": [
+        "PGS10-DOC-001"
+      ]
+    },
+    "visible_on_rendered_page": {
+      "meaning": "องค์ประกอบนี้มองเห็นจริงในภาพหน้าเอกสาร (ไม่ใช่แค่ใน Text Layer)",
+      "type": "boolean",
+      "source": "visual check",
+      "used_by": [
+        "PGS10-VIS-001",
+        "PGS10-DEF-002"
+      ]
+    },
+    "transactions": {
+      "meaning": "รายการใน Statement ทั้งหมดหลังจำแนก (array ของ transaction_date/transaction_type/transaction_amount)",
+      "type": "object[]",
+      "source": "statement",
+      "used_by": [
+        "PGS10-STM-001"
+      ]
+    },
+    "transaction_date": {
+      "meaning": "วันที่ของรายการใน Statement",
+      "type": "date",
+      "source": "statement",
+      "used_by": [
+        "PGS10-STM-001"
+      ]
+    },
+    "transaction_type": {
+      "meaning": "ประเภทรายการหลังจำแนก",
+      "type": "enum:PAYMENT|DRAWDOWN|INTEREST_ACCRUAL|FEE|ADJUSTMENT|REVERSAL|PRINCIPAL_ADJUSTMENT|UNKNOWN",
+      "source": "statement + bank transaction-code mapping table",
+      "notes": "PAYMENT = เงินรับชำระจริง (Cash Receipt); Code ของธนาคารต้องมาจากตาราง Mapping ไม่ Hardcode",
+      "used_by": [
+        "PGS10-STM-001"
+      ]
+    },
+    "transaction_amount": {
+      "meaning": "จำนวนเงินของรายการ",
+      "type": "money",
+      "source": "statement",
+      "unit": "THB",
+      "used_by": [
+        "PGS10-STM-001"
+      ]
+    },
+    "statement_cutoff_date": {
+      "meaning": "Statement ถึงวันที่",
+      "type": "date",
+      "source": "statement",
+      "used_by": [
+        "PGS10-STM-002"
+      ]
+    },
+    "later_payment_date": {
+      "meaning": "วันที่ชำระที่เอกสารอื่นระบุว่าเกิดหลัง cut-off",
+      "type": "date",
+      "source": "bank letter / other document",
+      "used_by": [
+        "PGS10-STM-002"
+      ]
+    },
+    "later_payment_amount": {
+      "meaning": "ยอดที่ชำระหลัง cut-off",
+      "type": "money",
+      "source": "bank letter",
+      "unit": "THB",
+      "used_by": [
+        "PGS10-STM-002"
+      ]
+    },
+    "last_actual_payment_date": {
+      "meaning": "วันรับชำระเงินจริงครั้งสุดท้าย = MAX(transaction_date WHERE transaction_type=PAYMENT)",
+      "type": "date",
+      "source": "DERIVED from statement",
+      "derived": true,
+      "used_by": [
+        "PGS10-STM-001",
+        "PGS10-DEF-001",
+        "PGS10-DEF-002",
+        "PGS10-TIME-001"
+      ]
+    },
+    "first_payment_date": {
+      "meaning": "วันรับชำระจริงครั้งแรก",
+      "type": "date",
+      "source": "DERIVED from statement",
+      "derived": true,
+      "used_by": [
+        "PGS10-TIME-001"
+      ]
+    },
+    "default_date": {
+      "meaning": "วันที่ผิดนัดชำระหนี้",
+      "type": "date",
+      "source": "screen",
+      "not_equal_to": "npl_date",
+      "notes": "ห้ามใช้แทน npl_date โดยไม่มี Business Mapping ที่อนุมัติ (A-01)",
+      "used_by": [
+        "PGS10-DEF-001",
+        "PGS10-DEF-002",
+        "PGS10-TIME-001"
+      ]
+    },
+    "npl_date": {
+      "meaning": "วันที่บัญชีมีสถานะ NPL ตามนิยาม PGS",
+      "type": "date",
+      "source": "FI data / approved mapping",
+      "not_equal_to": "default_date",
+      "status": "OPEN: ยังไม่มีแหล่งที่มา/Mapping ที่อนุมัติ",
+      "used_by": [
+        "PGS10-NPL-001"
+      ]
+    },
+    "exception_letter_present": {
+      "meaning": "มีหนังสือแจ้งยืนยันการชำระหลังวันผิดนัด",
+      "type": "boolean",
+      "source": "document set",
+      "used_by": [
+        "PGS10-DEF-002"
+      ]
+    },
+    "exception_confirmed_default_date": {
+      "meaning": "Default Date ที่ระบุในหนังสือยืนยัน",
+      "type": "date",
+      "source": "confirmation letter",
+      "used_by": [
+        "PGS10-DEF-002"
+      ]
+    },
+    "exception_states_payment_after_default": {
+      "meaning": "หนังสือระบุว่ามีการชำระหลังผิดนัด (วันที่/ยอด)",
+      "type": "boolean",
+      "source": "confirmation letter",
+      "used_by": [
+        "PGS10-DEF-002"
+      ]
+    },
+    "exception_states_default_unchanged": {
+      "meaning": "หนังสือยืนยันว่าการชำระนั้นไม่เปลี่ยน Default Date / ชำระไม่เป็นไปตามเงื่อนไข",
+      "type": "boolean",
+      "source": "confirmation letter",
+      "used_by": [
+        "PGS10-DEF-002"
+      ]
+    },
+    "exception_identifiers_link_to_case": {
+      "meaning": "Identifier ในหนังสือ (ผู้กู้/บัญชี/สัญญา/วันบอกกล่าว) ลิงก์กลับเคสได้",
+      "type": "boolean",
+      "source": "confirmation letter",
+      "used_by": [
+        "PGS10-DEF-002"
+      ]
+    },
+    "confirmation_visual_elements": {
+      "meaning": "ผลตรวจภาพ 12 รายการของหนังสือยืนยัน",
+      "type": "map<element,boolean>",
+      "source": "visual check",
+      "elements": [
+        "header",
+        "date",
+        "subject",
+        "recipient",
+        "debtor",
+        "account",
+        "default_date",
+        "post_default_payments",
+        "not_per_terms",
+        "confirm_default",
+        "signature",
+        "authority"
+      ],
+      "used_by": [
+        "PGS10-VIS-001",
+        "PGS10-DEF-002"
+      ]
+    },
+    "tracking_date_screen": {
+      "meaning": "วันที่ติดตามให้ชำระหนี้/ปรับปรุงโครงสร้างหนี้ (หน้าจอ)",
+      "type": "date",
+      "source": "screen",
+      "not_equal_to": "restructure_date",
+      "used_by": [
+        "PGS10-FUP-001",
+        "PGS10-TIME-001"
+      ]
+    },
+    "tracking_date_report": {
+      "meaning": "วันที่ติดตาม (รายงานติดตาม)",
+      "type": "date",
+      "source": "tracking report",
+      "used_by": [
+        "PGS10-FUP-001"
+      ]
+    },
+    "tracking_method": {
+      "meaning": "วิธีติดตาม",
+      "type": "string",
+      "source": "tracking report",
+      "used_by": [
+        "PGS10-FUP-001"
+      ]
+    },
+    "tracking_result": {
+      "meaning": "ผลติดตาม",
+      "type": "string",
+      "source": "tracking report",
+      "used_by": [
+        "PGS10-FUP-001"
+      ]
+    },
+    "restructure_route": {
+      "meaning": "เส้นทาง Restructure ที่ใช้",
+      "type": "enum:NORMAL_RESTRUCTURE_PATH|UNCONTACTABLE_7_MONTH_EXCEPTION|NOT_REQUIRED_AFTER_5Y",
+      "source": "reviewer decision + documents",
+      "used_by": [
+        "PGS10-RST-001",
+        "PGS10-RST-002"
+      ]
+    },
+    "restructure_date": {
+      "meaning": "วันที่ปรับโครงสร้างหนี้ (หน้าจอ)",
+      "type": "date",
+      "source": "screen",
+      "not_equal_to": "tracking_date_screen",
+      "notes": "หมายถึงได้ทั้ง signing/approval/effective/accounting-start ต้องแยกก่อนสรุป mismatch",
+      "used_by": [
+        "PGS10-RST-001",
+        "PGS10-RST-003"
+      ]
+    },
+    "restructure_doc_signing_date": {
+      "meaning": "วันที่ลงนาม",
+      "type": "date",
+      "source": "restructure agreement (Level 1)",
+      "used_by": [
+        "PGS10-RST-003"
+      ]
+    },
+    "restructure_doc_approval_date": {
+      "meaning": "วันที่อนุมัติ",
+      "type": "date",
+      "source": "restructure approval (Level 1)",
+      "used_by": [
+        "PGS10-RST-003"
+      ]
+    },
+    "restructure_doc_effective_date": {
+      "meaning": "วันที่มีผล",
+      "type": "date",
+      "source": "restructure agreement (Level 1)",
+      "used_by": [
+        "PGS10-RST-003"
+      ]
+    },
+    "restructure_stmt_header_date": {
+      "meaning": "วันที่รับความช่วยเหลือ/ปรับโครงสร้าง/เริ่มเงื่อนไขใหม่ ในหัว Statement ใบแรก",
+      "type": "date",
+      "source": "statement header (Level 2)",
+      "used_by": [
+        "PGS10-RST-003"
+      ]
+    },
+    "certified_tracking_report_present": {
+      "meaning": "มี Certified Tracking Report",
+      "type": "boolean",
+      "source": "tracking report",
+      "used_by": [
+        "PGS10-RST-002"
+      ]
+    },
+    "demand_or_termination_letter_count": {
+      "meaning": "จำนวนหนังสือบอกเลิก/บอกกล่าวให้ชำระหนี้ทั้งหมด",
+      "type": "integer",
+      "source": "demand / termination letters",
+      "used_by": [
+        "PGS10-RST-002",
+        "PGS10-DMD-001"
+      ]
+    },
+    "uncontactable_start_date": {
+      "meaning": "วันที่ติดต่อไม่ได้ / วันแรกที่ติดต่อได้แต่ตกลงไม่ได้",
+      "type": "date",
+      "source": "tracking report",
+      "status": "OPEN: ไม่มีฟิลด์บนหน้าจอ (A-10)",
+      "used_by": [
+        "PGS10-RST-002"
+      ]
+    },
+    "demand_date_screen": {
+      "meaning": "วันที่หนังสือบอกกล่าว (หน้าจอ)",
+      "type": "date",
+      "source": "screen",
+      "used_by": [
+        "PGS10-DMD-001",
+        "PGS10-DMD-003",
+        "PGS10-TIME-001"
+      ]
+    },
+    "demand_date_letter": {
+      "meaning": "วันที่หนังสือบอกกล่าว (ตัวหนังสือ)",
+      "type": "date",
+      "source": "demand letter",
+      "used_by": [
+        "PGS10-DMD-001"
+      ]
+    },
+    "demand_principal": {
+      "meaning": "เงินต้น ณ วันบอกกล่าว (ตามหนังสือ)",
+      "type": "money",
+      "source": "demand letter",
+      "unit": "THB",
+      "used_by": [
+        "PGS10-DMD-002",
+        "PGS10-HIS-001",
+        "PGS10-DMD-001"
+      ]
+    },
+    "demand_interest": {
+      "meaning": "ดอกเบี้ย ณ วันบอกกล่าว (ตามหนังสือ)",
+      "type": "money",
+      "source": "demand letter",
+      "unit": "THB",
+      "used_by": [
+        "PGS10-HIS-001",
+        "PGS10-DMD-001"
+      ]
+    },
+    "demand_total": {
+      "meaning": "ยอดรวม ณ วันบอกกล่าว (ตามหนังสือ)",
+      "type": "money",
+      "source": "demand letter",
+      "unit": "THB",
+      "used_by": [
+        "PGS10-HIS-001",
+        "PGS10-DMD-001"
+      ]
+    },
+    "principal_at_demand_date": {
+      "meaning": "เงินต้นตาม Statement ณ วันบอกกล่าว",
+      "type": "money",
+      "source": "Statement as of Demand Date",
+      "unit": "THB",
+      "not_equal_to": "current_principal",
+      "used_by": [
+        "PGS10-DMD-002"
+      ]
+    },
+    "screen_historical_principal": {
+      "meaning": "หน้าจอ 'สภาพหนี้ ณ วันฟ้อง/วันออกหนังสือบอกกล่าว/วันพิทักษ์ทรัพย์เด็ดขาด' — เงินต้น",
+      "type": "money",
+      "source": "screen",
+      "unit": "THB",
+      "not_equal_to": "current_principal",
+      "used_by": [
+        "PGS10-HIS-001"
+      ]
+    },
+    "screen_historical_interest": {
+      "meaning": "… ดอกเบี้ย",
+      "type": "money",
+      "source": "screen",
+      "unit": "THB",
+      "notes": "ห้ามนำ current interest มาใส่ซ้ำ",
+      "used_by": [
+        "PGS10-HIS-001"
+      ]
+    },
+    "screen_historical_total": {
+      "meaning": "… รวม",
+      "type": "money",
+      "source": "screen",
+      "unit": "THB",
+      "used_by": [
+        "PGS10-HIS-001"
+      ]
+    },
+    "historical_reference_event": {
+      "meaning": "เหตุการณ์อ้างอิงของ Historical Debt",
+      "type": "enum:DEMAND_LETTER|LAWSUIT|ABSOLUTE_RECEIVERSHIP",
+      "source": "screen",
+      "status": "มี Rule เฉพาะ DEMAND_LETTER (A-20)",
+      "used_by": [
+        "PGS10-HIS-001"
+      ]
+    },
+    "claim_eligibility_date": {
+      "meaning": "วันที่ใช้ตรวจ Demand waiting period",
+      "type": "date",
+      "source": "reviewer / claim application",
+      "status": "OPEN: ยังไม่นิยาม (A-21)",
+      "used_by": [
+        "PGS10-DMD-003"
+      ]
+    },
+    "postal_outcome": {
+      "meaning": "ผลการส่งไปรษณีย์",
+      "type": "enum:DELIVERED|RETURNED|NONE",
+      "source": "postal receipt / returned envelope",
+      "used_by": [
+        "PGS10-PST-001"
+      ]
+    },
+    "postal_sent_date": {
+      "meaning": "วันที่ส่งหนังสือ",
+      "type": "date",
+      "source": "postal receipt",
+      "used_by": [
+        "PGS10-TIME-001"
+      ]
+    },
+    "postal_received_date": {
+      "meaning": "วันที่ผู้รับลงนามรับ",
+      "type": "date",
+      "source": "postal receipt",
+      "used_by": [
+        "PGS10-PST-001"
+      ]
+    },
+    "postal_signature_type": {
+      "meaning": "ประเภทลายมือชื่อในใบตอบรับ",
+      "type": "enum:RECIPIENT|AUTHORIZED|PRINTED_NAME_ONLY|POSTAL_OFFICER_ONLY|NONE",
+      "source": "postal receipt",
+      "notes": "เฉพาะ RECIPIENT/AUTHORIZED นับเป็นหลักฐานรับ",
+      "used_by": [
+        "PGS10-PST-001"
+      ]
+    },
+    "returned_envelope_evidence": {
+      "meaning": "มีหน้าซองตีกลับ / RETURNED / คืนผู้ฝาก / Returned Mail ชัดเจน",
+      "type": "boolean",
+      "source": "returned envelope",
+      "used_by": [
+        "PGS10-PST-001"
+      ]
+    },
+    "postal_tracking_number": {
+      "meaning": "เลขไปรษณีย์ของใบตอบรับ/ซอง/Track & Trace",
+      "type": "string",
+      "source": "postal documents",
+      "used_by": [
+        "PGS10-PST-001"
+      ]
+    },
+    "postal_address": {
+      "meaning": "ที่อยู่ที่จัดส่งหนังสือบอกกล่าว",
+      "type": "address",
+      "source": "demand letter / envelope",
+      "used_by": [
+        "PGS10-PST-002"
+      ]
+    },
+    "documented_address_set": {
+      "meaning": "ชุดที่อยู่ที่อ้างอิงได้จากเอกสารใน PDF พร้อม source และ flag แจ้งเปลี่ยน",
+      "type": "address[]",
+      "source": "approval letter / contract / borrower docs / change-of-address docs",
+      "used_by": [
+        "PGS10-PST-002"
+      ]
+    },
+    "screen_current_principal": {
+      "meaning": "หน้าจอ 'สภาพหนี้ ณ ปัจจุบัน' — เงินต้น",
+      "type": "money",
+      "source": "screen",
+      "unit": "THB",
+      "used_by": [
+        "PGS10-CUR-001"
+      ]
+    },
+    "screen_current_interest": {
+      "meaning": "… ดอกเบี้ย",
+      "type": "money",
+      "source": "screen",
+      "unit": "THB",
+      "used_by": [
+        "PGS10-CUR-001"
+      ]
+    },
+    "screen_current_total": {
+      "meaning": "… รวม",
+      "type": "money",
+      "source": "screen",
+      "unit": "THB",
+      "used_by": [
+        "PGS10-CUR-001"
+      ]
+    },
+    "current_principal": {
+      "meaning": "เงินต้นตาม Statement ล่าสุด (SSOT)",
+      "type": "money",
+      "source": "latest statement",
+      "unit": "THB",
+      "not_equal_to": "principal_at_demand_date",
+      "used_by": [
+        "PGS10-CUR-001",
+        "PGS10-CLM-003"
+      ]
+    },
+    "current_interest": {
+      "meaning": "ดอกเบี้ยตาม Statement ล่าสุด (SSOT)",
+      "type": "money",
+      "source": "latest statement",
+      "unit": "THB",
+      "used_by": [
+        "PGS10-CUR-001"
+      ]
+    },
+    "current_other_amounts": {
+      "meaning": "ยอดอื่นที่นับรวมใน Total",
+      "type": "money",
+      "source": "latest statement",
+      "unit": "THB",
+      "status": "OPEN: ไม่นิยามองค์ประกอบ (A-24)",
+      "used_by": [
+        "PGS10-CUR-001"
+      ]
+    },
+    "current_total": {
+      "meaning": "Total ที่คำนวณ = principal + interest + other applicable amounts",
+      "type": "money",
+      "source": "DERIVED",
+      "unit": "THB",
+      "derived": true,
+      "used_by": [
+        "PGS10-CUR-001"
+      ]
+    },
+    "current_guarantee_obligation": {
+      "meaning": "ภาระค้ำประกันปัจจุบัน",
+      "type": "money",
+      "source": "LG / screen",
+      "unit": "THB",
+      "status": "OPEN: แหล่งที่มา (A-24)",
+      "used_by": [
+        "PGS10-CLM-003"
+      ]
+    },
+    "claim_base": {
+      "meaning": "MIN(current_principal, current_guarantee_obligation)",
+      "type": "money",
+      "source": "DERIVED",
+      "unit": "THB",
+      "derived": true,
+      "used_by": [
+        "PGS10-CLM-003",
+        "PGS10-CLM-004"
+      ]
+    },
+    "claim_base_mode": {
+      "meaning": "โหมดฐานคำนวณ",
+      "type": "enum:BY_PRINCIPAL|BY_GUARANTEE",
+      "source": "screen + DERIVED",
+      "notes": "BY_PRINCIPAL เมื่อ principal < guarantee; BY_GUARANTEE เมื่อ >=",
+      "used_by": [
+        "PGS10-CLM-003"
+      ]
+    },
+    "claim_date": {
+      "meaning": "วันที่ยื่นคำขอรับเงิน",
+      "type": "date",
+      "source": "claim application",
+      "used_by": [
+        "PGS10-CLM-001",
+        "PGS10-CLM-002",
+        "PGS10-TIME-001"
+      ]
+    },
+    "lg_age_years": {
+      "meaning": "อายุ LG ณ วันยื่น",
+      "type": "decimal",
+      "source": "DERIVED",
+      "derived": true,
+      "status": "OPEN: วิธีนับ (A-12)",
+      "used_by": [
+        "PGS10-CLM-002"
+      ]
+    },
+    "coverage_ratio": {
+      "meaning": "อัตราค่าประกันชดเชย",
+      "type": "percent (basis points)",
+      "source": "product_rule_matrix",
+      "used_by": [
+        "PGS10-CLM-002",
+        "PGS10-CLM-004"
+      ]
+    },
+    "screen_coverage_ratio": {
+      "meaning": "อัตราที่หน้าจอใช้",
+      "type": "percent (basis points)",
+      "source": "screen",
+      "used_by": [
+        "PGS10-CLM-002"
+      ]
+    },
+    "claim_amount": {
+      "meaning": "ค่าประกันชดเชย = round_half_up(claim_base × coverage_ratio, 2)",
+      "type": "money",
+      "source": "DERIVED",
+      "unit": "THB",
+      "derived": true,
+      "used_by": [
+        "PGS10-CLM-004",
+        "PGS10-CAP-001"
+      ]
+    },
+    "screen_claim_amount": {
+      "meaning": "จำนวนเงินค่าประกันชดเชย (หน้าจอ)",
+      "type": "money",
+      "source": "screen",
+      "unit": "THB",
+      "used_by": [
+        "PGS10-CLM-004"
+      ]
+    },
+    "screen_approved_payment": {
+      "meaning": "ยอดอนุมัติจ่าย (หน้าจอ)",
+      "type": "money",
+      "source": "screen",
+      "unit": "THB",
+      "used_by": [
+        "PGS10-CLM-004"
+      ]
+    },
+    "claim_max": {
+      "meaning": "CLAIM MAX ของ Package",
+      "type": "money",
+      "source": "screen / package ledger",
+      "unit": "THB",
+      "used_by": [
+        "PGS10-CAP-001"
+      ]
+    },
+    "paid_claims": {
+      "meaning": "ยอดจ่ายจริงสะสม",
+      "type": "money",
+      "source": "package ledger",
+      "unit": "THB",
+      "used_by": [
+        "PGS10-CAP-001"
+      ]
+    },
+    "pending_claims": {
+      "meaning": "ยอดรอจ่าย",
+      "type": "money",
+      "source": "package ledger",
+      "unit": "THB",
+      "used_by": [
+        "PGS10-CAP-001"
+      ]
+    },
+    "available_claim_capacity": {
+      "meaning": "claim_max − paid_claims − pending_claims",
+      "type": "money",
+      "source": "DERIVED",
+      "unit": "THB",
+      "derived": true,
+      "used_by": [
+        "PGS10-CAP-001"
+      ]
+    },
+    "carry_forward_balance": {
+      "meaning": "available_claim_capacity − claim_amount (คงเหลือหลังอนุมัติ)",
+      "type": "money",
+      "source": "DERIVED",
+      "unit": "THB",
+      "derived": true,
+      "used_by": [
+        "PGS10-CAP-001"
+      ]
+    },
+    "claim_submission_dates": {
+      "meaning": "วันที่ยื่นคำขอ / ธนาคารส่ง / เอกสารครบ / อนุมัติจ่าย",
+      "type": "date{}",
+      "source": "claim workflow",
+      "used_by": [
+        "PGS10-TIME-001"
+      ]
+    }
+  },
+  "config": {
+    "variance_tolerance": {
+      "meaning": "ส่วนต่างของ interest/total ที่ถือเป็น OBSERVATION_CANDIDATE",
+      "default": {
+        "approved": false,
+        "principal_satang": 0,
+        "interest_satang": 1
+      },
+      "note": "approved=false → ห้าม auto-pass (L-05)",
+      "approval_required_from": "Business Rule owner"
+    },
+    "fail_scope": {
+      "meaning": "ขอบเขตของ FAIL",
+      "default": "ELIGIBILITY_ONLY",
+      "options": [
+        "ELIGIBILITY_ONLY",
+        "EXTENDED_M39"
+      ]
+    },
+    "npl_seasoning_months": {
+      "default": {
+        "SMALL_BIZ": 6,
+        "SMEs": 9
+      },
+      "status": "OPEN (A-09)"
+    },
+    "enable_7m_exception": {
+      "default": false,
+      "months": 7,
+      "status": "OPEN (A-10)"
+    },
+    "lg_age_basis": {
+      "default": "CLAIM_DATE",
+      "options": [
+        "CLAIM_DATE",
+        "CLAIM_YEAR",
+        "ANNIVERSARY"
+      ],
+      "status": "OPEN (A-12)"
+    },
+    "date_arithmetic": {
+      "default": "CALENDAR_MONTH_CLAMP_END_OF_MONTH",
+      "status": "OPEN (A-12)"
+    },
+    "demand_waiting_months": {
+      "default": 1,
+      "basis": "DEMAND_LETTER_DATE",
+      "status": "OPEN (A-21)"
+    },
+    "product_rule_matrix": {
+      "SMALL_BIZ": {
+        "coverage_tiers": [
+          {
+            "max_lg_age_years": 5,
+            "ratio_bp": 7000
+          },
+          {
+            "max_lg_age_years": null,
+            "ratio_bp": 10000
+          }
+        ],
+        "status": "LOCKED"
+      },
+      "START_UP": {
+        "coverage_tiers": [
+          {
+            "max_lg_age_years": null,
+            "ratio_bp": 10000
+          }
+        ],
+        "status": "OFFICIAL (M§7), not locked in Rulebook"
+      },
+      "SMART_BIZ|SMART_ONE|SMART_GREEN|SMART_PLUS_TOPUP": {
+        "coverage_tiers": null,
+        "status": "OPEN (A-11)"
+      }
+    },
+    "ssme_exposure_limits_thb": {
+      "SMALL_BIZ": 200000,
+      "START_UP": 100000
+    },
+    "general_limits_thb": {
+      "min_guarantee_per_transaction": 10000,
+      "max_exposure_per_borrower": 40000000
+    },
+    "bank_transaction_code_map": {
+      "meaning": "ตาราง Mapping Transaction Code → transaction_type ต่อธนาคาร",
+      "default": {},
+      "status": "OPEN (R§32) — ห้าม Hardcode"
+    }
+  }
+}

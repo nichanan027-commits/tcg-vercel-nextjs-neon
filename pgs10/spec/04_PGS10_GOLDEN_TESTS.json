@@ -1,0 +1,2400 @@
+{
+  "spec_name": "PGS10 Golden Tests",
+  "spec_version": "1.0.0-DRAFT",
+  "frozen": false,
+  "basis": "Rulebook §30 (รายการเคส), ตัวเลขและตัวอย่างใน Rulebook/Master Audit, กฎที่ล็อกใน 02_PGS10_OPERATIONAL_AUDIT_RULES.md",
+  "how_to_read": {
+    "unit_cases": "กรณีทดสอบระดับ Control พร้อม input/expected. field ใน input ใช้ชื่อตาม 03_PGS10_DATA_DICTIONARY.json (บางเคสใช้ map ต่อเอกสาร เช่น {screen, statement} เพื่อสื่อสาร)",
+    "basis_values": {
+      "FROM_DOCUMENT": "ตัวเลข/พฤติกรรมระบุตรงในเอกสารต้นทาง",
+      "DERIVED_FROM_LOCKED_RULE": "ตัวเลขสมมติ แต่ผลคาดหวังตามกฎที่ล็อก",
+      "SYNTHETIC": "สมมติทั้งหมด"
+    },
+    "case_fixtures": "เคสจริงที่ Rulebook §30 ให้เฉพาะเลข LG + กลุ่มผลลัพธ์ — data_available=false: ยังไม่มีข้อมูลเคส ต้องเติม input จากเอกสารจริงก่อนรัน",
+    "dates": "ISO 8601 ค.ศ. (ดู conventions ใน Data Dictionary)",
+    "money": "สตริงทศนิยม 2 ตำแหน่ง (THB); coverage_ratio เป็น basis points",
+    "case_status_if_all_other_controls_pass": "ผลระดับเคสเมื่อ Control อื่นทั้งหมดผ่าน — ไม่ใช่ผลของเคสเต็ม"
+  },
+  "known_gaps": [
+    "UT-COV-004 ยังไม่มีค่าคาดหวัง (A-12)",
+    "UT-STATUS-001 รอยืนยัน A-08",
+    "Case fixtures 15 เคส (LG-only) รอ input จริง (A-26)",
+    "67-025162 ไม่ระบุว่า Observation คืออะไร"
+  ],
+  "unit_cases": [
+    {
+      "id": "UT-ELIG-001",
+      "title": "สินเชื่อเช่าซื้อ/ลิสซิ่ง ไม่เข้าเกณฑ์",
+      "source": "R§4, M§2",
+      "basis": "FROM_DOCUMENT",
+      "controls": [
+        "PGS10-ELIG-001"
+      ],
+      "input": {
+        "loan_is_hire_purchase_or_leasing": true,
+        "product": "SMALL_BIZ"
+      },
+      "expected": {
+        "controls": {
+          "PGS10-ELIG-001": {
+            "status": "FAIL",
+            "reason_code": "ELIGIBILITY_HIRE_PURCHASE_LEASING"
+          }
+        },
+        "case_status_if_all_other_controls_pass": "FAIL"
+      }
+    },
+    {
+      "id": "UT-ELIG-002",
+      "title": "ระบุ Product ไม่ได้ → HOLD",
+      "source": "R§4",
+      "basis": "FROM_DOCUMENT",
+      "controls": [
+        "PGS10-ELIG-001"
+      ],
+      "input": {
+        "product": null,
+        "pgs_phase": "10",
+        "pgs_revision": "5"
+      },
+      "expected": {
+        "controls": {
+          "PGS10-ELIG-001": {
+            "status": "HOLD",
+            "reason_code": "PRODUCT_UNKNOWN"
+          }
+        },
+        "case_status_if_all_other_controls_pass": "HOLD"
+      }
+    },
+    {
+      "id": "UT-ELIG-003",
+      "title": "Small Biz วงเงินรวมต่อรายเกิน 200,000 บาท",
+      "source": "R§4, M§2",
+      "basis": "FROM_DOCUMENT",
+      "controls": [
+        "PGS10-ELIG-001"
+      ],
+      "input": {
+        "product": "SMALL_BIZ",
+        "total_exposure_per_borrower": "200000.01"
+      },
+      "expected": {
+        "controls": {
+          "PGS10-ELIG-001": {
+            "status": "FAIL",
+            "reason_code": "ELIGIBILITY_EXPOSURE_LIMIT_EXCEEDED"
+          }
+        }
+      }
+    },
+    {
+      "id": "UT-ELIG-004",
+      "title": "Small Biz วงเงินรวมต่อรายเท่ากับ 200,000 พอดี → ไม่เกินเพดาน",
+      "source": "R§4",
+      "basis": "DERIVED_FROM_LOCKED_RULE",
+      "controls": [
+        "PGS10-ELIG-001"
+      ],
+      "input": {
+        "product": "SMALL_BIZ",
+        "total_exposure_per_borrower": "200000.00",
+        "pgs_phase": "10",
+        "pgs_revision": "5",
+        "loan_is_new_business": true,
+        "loan_is_hire_purchase_or_leasing": false
+      },
+      "expected": {
+        "controls": {
+          "PGS10-ELIG-001": {
+            "status": "PASS"
+          }
+        }
+      }
+    },
+    {
+      "id": "UT-ID-001",
+      "title": "LG format 67-026936 = 67026936",
+      "source": "R§5",
+      "basis": "FROM_DOCUMENT",
+      "controls": [
+        "PGS10-ID-001"
+      ],
+      "input": {
+        "lg_no": {
+          "screen": "67-026936",
+          "document": "67026936"
+        }
+      },
+      "expected": {
+        "controls": {
+          "PGS10-ID-001": {
+            "status": "PASS"
+          }
+        }
+      }
+    },
+    {
+      "id": "UT-ID-002",
+      "title": "LG format 67-004092 = 67004092",
+      "source": "M§8",
+      "basis": "FROM_DOCUMENT",
+      "controls": [
+        "PGS10-ID-001"
+      ],
+      "input": {
+        "lg_no": {
+          "screen": "67-004092",
+          "document": "67004092"
+        }
+      },
+      "expected": {
+        "controls": {
+          "PGS10-ID-001": {
+            "status": "PASS"
+          }
+        }
+      }
+    },
+    {
+      "id": "UT-ID-003",
+      "title": "เลขบัญชีต่างเฉพาะ Leading Zero (องค์ประกอบอื่นตรงหมด)",
+      "source": "R§5",
+      "basis": "FROM_DOCUMENT",
+      "controls": [
+        "PGS10-ID-001"
+      ],
+      "input": {
+        "loan_account_no": {
+          "screen": "366023002710",
+          "statement": "0366023002710"
+        }
+      },
+      "expected": {
+        "controls": {
+          "PGS10-ID-001": {
+            "status": "OBSERVATION",
+            "reason_code": "FORMAT_VARIANCE"
+          }
+        },
+        "case_status_if_all_other_controls_pass": "PASS_WITH_OBSERVATION"
+      }
+    },
+    {
+      "id": "UT-ID-004",
+      "title": "เลขบัญชีต่างที่ตัวเลขภายใน → ห้าม Normalize เอง",
+      "source": "R§5",
+      "basis": "FROM_DOCUMENT",
+      "controls": [
+        "PGS10-ID-001"
+      ],
+      "input": {
+        "loan_account_no": {
+          "screen": "208023002116",
+          "statement": "208023002135"
+        }
+      },
+      "expected": {
+        "controls": {
+          "PGS10-ID-001": {
+            "status": "HOLD",
+            "reason_code": "VERIFY_REFERENCE_MAPPING"
+          }
+        },
+        "case_status_if_all_other_controls_pass": "HOLD"
+      }
+    },
+    {
+      "id": "UT-ID-005",
+      "title": "เลขที่ต่างกัน 503023002695 vs 503023002676 → ต้อง Flag",
+      "source": "M§8",
+      "basis": "FROM_DOCUMENT",
+      "controls": [
+        "PGS10-ID-001"
+      ],
+      "input": {
+        "loan_account_no": {
+          "screen": "503023002695",
+          "statement": "503023002676"
+        }
+      },
+      "expected": {
+        "controls": {
+          "PGS10-ID-001": {
+            "status": "HOLD",
+            "reason_code": "VERIFY_REFERENCE_MAPPING"
+          }
+        },
+        "case_status_if_all_other_controls_pass": "HOLD"
+      },
+      "note": "M§8 บอกเพียง 'ต้อง Flag'; reason_code เลือก VERIFY_REFERENCE_MAPPING ตาม R§5 (A-06)"
+    },
+    {
+      "id": "UT-CTR-001",
+      "title": "วันที่อนุมัติ ≠ วันที่สัญญาที่อ้างในหนังสือบอกกล่าว",
+      "source": "R§6, M§9",
+      "basis": "DERIVED_FROM_LOCKED_RULE",
+      "controls": [
+        "PGS10-CONTRACT-001"
+      ],
+      "input": {
+        "approval_date": "2024-03-06",
+        "demand_contract_date": "2024-03-07"
+      },
+      "expected": {
+        "controls": {
+          "PGS10-CONTRACT-001": {
+            "status": "HOLD",
+            "reason_code": "CONTRACT_DATE_MISMATCH"
+          }
+        },
+        "case_status_if_all_other_controls_pass": "HOLD"
+      }
+    },
+    {
+      "id": "UT-CTR-002",
+      "title": "วันที่ตรงกัน",
+      "source": "R§6",
+      "basis": "DERIVED_FROM_LOCKED_RULE",
+      "controls": [
+        "PGS10-CONTRACT-001"
+      ],
+      "input": {
+        "approval_date": "2024-03-06",
+        "demand_contract_date": "2024-03-06"
+      },
+      "expected": {
+        "controls": {
+          "PGS10-CONTRACT-001": {
+            "status": "PASS"
+          }
+        }
+      }
+    },
+    {
+      "id": "UT-DOC-001",
+      "title": "1 of 10 → 10 of 10 ครบ แม้มีหน้า PDF ว่างคั่น (PDF หน้า 11 ว่าง)",
+      "source": "R§7",
+      "basis": "FROM_DOCUMENT",
+      "controls": [
+        "PGS10-DOC-001"
+      ],
+      "input": {
+        "approval_total_pages": 10,
+        "approval_document_pages_found": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10
+        ],
+        "pdf_blank_pages": [
+          11
+        ]
+      },
+      "expected": {
+        "controls": {
+          "PGS10-DOC-001": {
+            "status": "PASS"
+          }
+        }
+      }
+    },
+    {
+      "id": "UT-DOC-002",
+      "title": "ขาด 2 of 9 – 9 of 9",
+      "source": "R§7",
+      "basis": "FROM_DOCUMENT",
+      "controls": [
+        "PGS10-DOC-001"
+      ],
+      "input": {
+        "approval_total_pages": 9,
+        "approval_document_pages_found": [
+          1
+        ]
+      },
+      "expected": {
+        "controls": {
+          "PGS10-DOC-001": {
+            "status": "HOLD",
+            "reason_code": "DOCUMENT_PAGE_SEQUENCE_GAP"
+          }
+        },
+        "case_status_if_all_other_controls_pass": "HOLD"
+      }
+    },
+    {
+      "id": "UT-DOC-003",
+      "title": "พบเฉพาะหน้า 1 และ 9 (ลำดับกลางหาย)",
+      "source": "M§10",
+      "basis": "FROM_DOCUMENT",
+      "controls": [
+        "PGS10-DOC-001"
+      ],
+      "input": {
+        "approval_total_pages": 9,
+        "approval_document_pages_found": [
+          1,
+          9
+        ]
+      },
+      "expected": {
+        "controls": {
+          "PGS10-DOC-001": {
+            "status": "HOLD",
+            "reason_code": "DOCUMENT_PAGE_SEQUENCE_GAP"
+          }
+        },
+        "case_status_if_all_other_controls_pass": "HOLD"
+      }
+    },
+    {
+      "id": "UT-DOC-004",
+      "title": "1 of 9 แล้วหน้าถัดไปกลายเป็นเอกสารอื่น",
+      "source": "M§10",
+      "basis": "FROM_DOCUMENT",
+      "controls": [
+        "PGS10-DOC-001"
+      ],
+      "input": {
+        "approval_total_pages": 9,
+        "approval_document_pages_found": [
+          1
+        ],
+        "next_page_is_other_document": true
+      },
+      "expected": {
+        "controls": {
+          "PGS10-DOC-001": {
+            "status": "HOLD",
+            "reason_code": "DOCUMENT_TRUNCATED"
+          }
+        },
+        "case_status_if_all_other_controls_pass": "HOLD"
+      }
+    },
+    {
+      "id": "UT-VIS-001",
+      "title": "หนังสือยืนยันถูก Crop: ภาพเริ่มกลางตาราง (Text Layer อ่านหัวได้แต่ภาพไม่เห็น)",
+      "source": "R§8, M§15",
+      "basis": "FROM_DOCUMENT",
+      "controls": [
+        "PGS10-VIS-001"
+      ],
+      "input": {
+        "confirmation_visual_elements": {
+          "header": false,
+          "date": false,
+          "subject": false,
+          "recipient": false,
+          "debtor": false,
+          "account": false,
+          "default_date": false,
+          "post_default_payments": true,
+          "not_per_terms": true,
+          "confirm_default": true,
+          "signature": true,
+          "authority": true
+        },
+        "text_layer_reads_header": true
+      },
+      "expected": {
+        "controls": {
+          "PGS10-VIS-001": {
+            "status": "HOLD",
+            "reason_code": "CONFIRMATION_LETTER_VISUALLY_INCOMPLETE"
+          }
+        },
+        "case_status_if_all_other_controls_pass": "HOLD"
+      },
+      "note": "ต้องไม่ผ่านแม้ text_layer_reads_header=true (L-01)"
+    },
+    {
+      "id": "UT-VIS-002",
+      "title": "หนังสือยืนยันเห็นครบ 12 รายการ",
+      "source": "R§8",
+      "basis": "DERIVED_FROM_LOCKED_RULE",
+      "controls": [
+        "PGS10-VIS-001"
+      ],
+      "input": {
+        "confirmation_visual_elements": {
+          "header": true,
+          "date": true,
+          "subject": true,
+          "recipient": true,
+          "debtor": true,
+          "account": true,
+          "default_date": true,
+          "post_default_payments": true,
+          "not_per_terms": true,
+          "confirm_default": true,
+          "signature": true,
+          "authority": true
+        }
+      },
+      "expected": {
+        "controls": {
+          "PGS10-VIS-001": {
+            "status": "PASS"
+          }
+        }
+      }
+    },
+    {
+      "id": "UT-STM-001",
+      "title": "Last Actual Payment นับเฉพาะ PAYMENT (ไม่นับดอกเบี้ย/ปรับปรุง/Reversal)",
+      "source": "R§9",
+      "basis": "DERIVED_FROM_LOCKED_RULE",
+      "controls": [
+        "PGS10-STM-001"
+      ],
+      "input": {
+        "transactions": [
+          {
+            "transaction_date": "2025-01-20",
+            "transaction_type": "PAYMENT",
+            "transaction_amount": "2500.00"
+          },
+          {
+            "transaction_date": "2025-01-31",
+            "transaction_type": "INTEREST_ACCRUAL",
+            "transaction_amount": "398.12"
+          },
+          {
+            "transaction_date": "2025-02-01",
+            "transaction_type": "ADJUSTMENT",
+            "transaction_amount": "100.00"
+          },
+          {
+            "transaction_date": "2025-02-02",
+            "transaction_type": "REVERSAL",
+            "transaction_amount": "50.00"
+          }
+        ]
+      },
+      "expected": {
+        "controls": {
+          "PGS10-STM-001": {
+            "status": "PASS",
+            "last_actual_payment_date": "2025-01-20"
+          }
+        }
+      }
+    },
+    {
+      "id": "UT-STM-002",
+      "title": "มีรายการ UNKNOWN หลัง PAYMENT ล่าสุด → ไม่เดา",
+      "source": "R§9",
+      "basis": "DERIVED_FROM_LOCKED_RULE",
+      "controls": [
+        "PGS10-STM-001"
+      ],
+      "input": {
+        "transactions": [
+          {
+            "transaction_date": "2025-01-20",
+            "transaction_type": "PAYMENT",
+            "transaction_amount": "2500.00"
+          },
+          {
+            "transaction_date": "2025-01-31",
+            "transaction_type": "INTEREST_ACCRUAL",
+            "transaction_amount": "398.12"
+          },
+          {
+            "transaction_date": "2025-02-01",
+            "transaction_type": "ADJUSTMENT",
+            "transaction_amount": "100.00"
+          },
+          {
+            "transaction_date": "2025-02-02",
+            "transaction_type": "REVERSAL",
+            "transaction_amount": "50.00"
+          },
+          {
+            "transaction_date": "2025-02-08",
+            "transaction_type": "UNKNOWN",
+            "transaction_amount": "100.00"
+          }
+        ]
+      },
+      "expected": {
+        "controls": {
+          "PGS10-STM-001": {
+            "status": "HOLD",
+            "reason_code": "UNKNOWN_TRANSACTION_NEAR_DEFAULT"
+          }
+        },
+        "case_status_if_all_other_controls_pass": "HOLD"
+      },
+      "note": "ความหมายของ 'ใกล้วันผิดนัด' ยังไม่นิยาม (A-15)"
+    },
+    {
+      "id": "UT-DEF-001",
+      "title": "Last Payment 01/02, Default 05/02 → PASS",
+      "source": "M§13 (กรณี A)",
+      "basis": "FROM_DOCUMENT",
+      "controls": [
+        "PGS10-DEF-001"
+      ],
+      "input": {
+        "last_actual_payment_date": "2025-02-01",
+        "default_date": "2025-02-05"
+      },
+      "expected": {
+        "controls": {
+          "PGS10-DEF-001": {
+            "status": "PASS"
+          }
+        }
+      },
+      "note": "ปีเป็นค่าสมมติ; เอกสารต้นทางระบุเฉพาะวัน/เดือน"
+    },
+    {
+      "id": "UT-DEF-002",
+      "title": "Last Payment 01/02, Default 01/02 → PASS (>= ไม่ใช่ >)",
+      "source": "M§13 (กรณี B), R§10",
+      "basis": "FROM_DOCUMENT",
+      "controls": [
+        "PGS10-DEF-001"
+      ],
+      "input": {
+        "last_actual_payment_date": "2025-02-01",
+        "default_date": "2025-02-01"
+      },
+      "expected": {
+        "controls": {
+          "PGS10-DEF-001": {
+            "status": "PASS"
+          }
+        }
+      }
+    },
+    {
+      "id": "UT-DEF-003",
+      "title": "Default 01/02 ต่อมาชำระ 15/02 และไม่มีหนังสือยืนยัน → HOLD (ไม่ Fail ทันที)",
+      "source": "M§13 (กรณี C), R§11",
+      "basis": "FROM_DOCUMENT",
+      "controls": [
+        "PGS10-DEF-001",
+        "PGS10-DEF-002"
+      ],
+      "input": {
+        "last_actual_payment_date": "2025-02-15",
+        "default_date": "2025-02-01",
+        "exception_letter_present": false
+      },
+      "expected": {
+        "controls": {
+          "PGS10-DEF-001": {
+            "status": "HOLD",
+            "reason_code": "POST_DEFAULT_PAYMENT"
+          },
+          "PGS10-DEF-002": {
+            "status": "HOLD",
+            "reason_code": "EXCEPTION_LETTER_MISSING"
+          }
+        },
+        "case_status_if_all_other_controls_pass": "HOLD"
+      }
+    },
+    {
+      "id": "UT-DEF-004",
+      "title": "มีหนังสือยืนยันสมบูรณ์ ตรงหน้าจอ → PASS_WITH_SUPPORT",
+      "source": "R§11, M§14",
+      "basis": "DERIVED_FROM_LOCKED_RULE",
+      "controls": [
+        "PGS10-DEF-001",
+        "PGS10-DEF-002"
+      ],
+      "input": {
+        "last_actual_payment_date": "2025-02-15",
+        "default_date": "2025-02-01",
+        "exception_letter_present": true,
+        "exception_confirmed_default_date": "2025-02-01",
+        "exception_states_payment_after_default": true,
+        "exception_states_default_unchanged": true,
+        "exception_identifiers_link_to_case": true,
+        "confirmation_visual_elements": {
+          "header": true,
+          "date": true,
+          "subject": true,
+          "recipient": true,
+          "debtor": true,
+          "account": true,
+          "default_date": true,
+          "post_default_payments": true,
+          "not_per_terms": true,
+          "confirm_default": true,
+          "signature": true,
+          "authority": true
+        }
+      },
+      "expected": {
+        "controls": {
+          "PGS10-DEF-001": {
+            "status": "PASS_WITH_SUPPORT",
+            "reason_code": "POST_DEFAULT_PAYMENT_SUPPORTED"
+          },
+          "PGS10-DEF-002": {
+            "status": "PASS_WITH_SUPPORT",
+            "reason_code": "POST_DEFAULT_PAYMENT_SUPPORTED"
+          }
+        },
+        "case_status_if_all_other_controls_pass": "PASS_WITH_SUPPORT"
+      }
+    },
+    {
+      "id": "UT-DEF-005",
+      "title": "หนังสือยืนยันไม่สมบูรณ์ทางภาพ → HOLD (ไม่ใช่ FAIL; ไม่สรุปว่า Default ผิด)",
+      "source": "R§11, M§15, M§38",
+      "basis": "DERIVED_FROM_LOCKED_RULE",
+      "controls": [
+        "PGS10-DEF-002"
+      ],
+      "input": {
+        "last_actual_payment_date": "2025-02-15",
+        "default_date": "2025-02-01",
+        "exception_letter_present": true,
+        "exception_confirmed_default_date": "2025-02-01",
+        "confirmation_visual_elements": {
+          "header": false,
+          "date": false,
+          "subject": false,
+          "recipient": true,
+          "debtor": true,
+          "account": true,
+          "default_date": true,
+          "post_default_payments": true,
+          "not_per_terms": true,
+          "confirm_default": true,
+          "signature": true,
+          "authority": true
+        }
+      },
+      "expected": {
+        "controls": {
+          "PGS10-DEF-002": {
+            "status": "HOLD",
+            "reason_code": "CONFIRMATION_LETTER_VISUALLY_INCOMPLETE"
+          }
+        },
+        "case_status_if_all_other_controls_pass": "HOLD"
+      }
+    },
+    {
+      "id": "UT-DEF-006",
+      "title": "Default Date ในหนังสือ ≠ หน้าจอ",
+      "source": "R§11",
+      "basis": "DERIVED_FROM_LOCKED_RULE",
+      "controls": [
+        "PGS10-DEF-002"
+      ],
+      "input": {
+        "last_actual_payment_date": "2025-02-15",
+        "default_date": "2025-02-01",
+        "exception_letter_present": true,
+        "exception_confirmed_default_date": "2025-02-02",
+        "exception_states_payment_after_default": true,
+        "exception_states_default_unchanged": true,
+        "exception_identifiers_link_to_case": true,
+        "confirmation_visual_elements": {
+          "header": true,
+          "date": true,
+          "subject": true,
+          "recipient": true,
+          "debtor": true,
+          "account": true,
+          "default_date": true,
+          "post_default_payments": true,
+          "not_per_terms": true,
+          "confirm_default": true,
+          "signature": true,
+          "authority": true
+        }
+      },
+      "expected": {
+        "controls": {
+          "PGS10-DEF-002": {
+            "status": "HOLD",
+            "reason_code": "CONFIRMED_DEFAULT_DATE_MISMATCH"
+          }
+        },
+        "case_status_if_all_other_controls_pass": "HOLD"
+      }
+    },
+    {
+      "id": "UT-STM-003",
+      "title": "Statement ถึง 18/08/2569 แต่หนังสือธนาคารระบุชำระ 19/08/2569 = 2,000 บาท",
+      "source": "R§20",
+      "basis": "FROM_DOCUMENT",
+      "controls": [
+        "PGS10-STM-002"
+      ],
+      "input": {
+        "statement_cutoff_date": "2026-08-18",
+        "later_payment_date": "2026-08-19",
+        "later_payment_amount": "2000.00"
+      },
+      "expected": {
+        "controls": {
+          "PGS10-STM-002": {
+            "status": "HOLD",
+            "reason_code": "PAYMENT_AFTER_STATEMENT_CUTOFF"
+          }
+        },
+        "case_status_if_all_other_controls_pass": "HOLD"
+      },
+      "note": "ปี 2569 พ.ศ. = 2026 ค.ศ."
+    },
+    {
+      "id": "UT-FUP-001",
+      "title": "วันที่ติดตามหน้าจอ ≠ รายงานติดตาม",
+      "source": "R§12",
+      "basis": "DERIVED_FROM_LOCKED_RULE",
+      "controls": [
+        "PGS10-FUP-001"
+      ],
+      "input": {
+        "tracking_date_screen": "2025-02-15",
+        "tracking_date_report": "2025-02-16"
+      },
+      "expected": {
+        "controls": {
+          "PGS10-FUP-001": {
+            "status": "HOLD",
+            "reason_code": "TRACKING_DATE_MISMATCH"
+          }
+        },
+        "case_status_if_all_other_controls_pass": "HOLD"
+      }
+    },
+    {
+      "id": "UT-RST-001",
+      "title": "restructure_date = null ต้องไม่ผ่านอัตโนมัติ",
+      "source": "M§5",
+      "basis": "FROM_DOCUMENT",
+      "controls": [
+        "PGS10-RST-001"
+      ],
+      "input": {
+        "restructure_date": null,
+        "restructure_route": null,
+        "product": "SMALL_BIZ",
+        "claim_within_first_5_years": true
+      },
+      "expected": {
+        "controls": {
+          "PGS10-RST-001": {
+            "status": "HOLD",
+            "reason_code": "RESTRUCTURE_PATH_UNDETERMINED"
+          }
+        },
+        "case_status_if_all_other_controls_pass": "HOLD"
+      }
+    },
+    {
+      "id": "UT-RST-002",
+      "title": "วันที่หน้าจอ ≠ วันลงนาม แต่ตรงหัว Statement ใบแรก → ไม่สรุปว่าผิด",
+      "source": "R§13, M§18",
+      "basis": "DERIVED_FROM_LOCKED_RULE",
+      "controls": [
+        "PGS10-RST-003"
+      ],
+      "input": {
+        "restructure_date": "2025-05-01",
+        "restructure_doc_signing_date": "2025-04-25",
+        "restructure_stmt_header_date": "2025-05-01"
+      },
+      "expected": {
+        "controls": {
+          "PGS10-RST-003": {
+            "status": "PASS_WITH_SUPPORT",
+            "reason_code": "MATCHED_STATEMENT_HEADER"
+          }
+        },
+        "case_status_if_all_other_controls_pass": "PASS_WITH_SUPPORT"
+      }
+    },
+    {
+      "id": "UT-RST-003",
+      "title": "ไม่ตรงเอกสารและยังไม่ตรวจหัว Statement → HOLD ให้ตรวจก่อนสรุป",
+      "source": "R§13",
+      "basis": "DERIVED_FROM_LOCKED_RULE",
+      "controls": [
+        "PGS10-RST-003"
+      ],
+      "input": {
+        "restructure_date": "2025-05-01",
+        "restructure_doc_signing_date": "2025-04-25"
+      },
+      "expected": {
+        "controls": {
+          "PGS10-RST-003": {
+            "status": "HOLD",
+            "reason_code": "CHECK_STATEMENT_HEADER"
+          }
+        },
+        "case_status_if_all_other_controls_pass": "HOLD"
+      }
+    },
+    {
+      "id": "UT-NPL-001",
+      "title": "มีเฉพาะ default_date ไม่มี npl_date/Mapping → ห้ามตีความ Default = NPL",
+      "source": "M§4.1, M§43.1",
+      "basis": "FROM_DOCUMENT",
+      "controls": [
+        "PGS10-NPL-001"
+      ],
+      "input": {
+        "default_date": "2025-02-10",
+        "npl_date": null,
+        "lg_issue_date": "2024-03-07",
+        "product": "SMALL_BIZ"
+      },
+      "expected": {
+        "controls": {
+          "PGS10-NPL-001": {
+            "status": "NOT_TESTABLE",
+            "reason_code": "NPL_DATE_MAPPING_UNDEFINED"
+          }
+        },
+        "case_status_if_all_other_controls_pass": "HOLD"
+      }
+    },
+    {
+      "id": "UT-DMD-001",
+      "title": "Demand Principal เทียบ Statement ณ วันบอกกล่าว: มีการชำระหลังบอกกล่าว → ไม่ False Reject",
+      "source": "M§20",
+      "basis": "DERIVED_FROM_LOCKED_RULE",
+      "controls": [
+        "PGS10-DMD-002"
+      ],
+      "input": {
+        "demand_principal": "49164.00",
+        "principal_at_demand_date": "49164.00",
+        "current_principal": "45000.00"
+      },
+      "expected": {
+        "controls": {
+          "PGS10-DMD-002": {
+            "status": "PASS"
+          }
+        }
+      }
+    },
+    {
+      "id": "UT-DMD-002",
+      "title": "ไม่มี Statement ณ วันบอกกล่าว และ demand ≠ Statement ล่าสุด → ขอข้อมูลเพิ่ม (ไม่ Reject)",
+      "source": "M§20, U",
+      "basis": "DERIVED_FROM_LOCKED_RULE",
+      "controls": [
+        "PGS10-DMD-002"
+      ],
+      "input": {
+        "demand_principal": "49164.00",
+        "principal_at_demand_date": null,
+        "current_principal": "45000.00"
+      },
+      "expected": {
+        "controls": {
+          "PGS10-DMD-002": {
+            "status": "HOLD",
+            "reason_code": "ASOF_DEMAND_PRINCIPAL_REQUIRED"
+          }
+        },
+        "case_status_if_all_other_controls_pass": "HOLD"
+      }
+    },
+    {
+      "id": "UT-DMD-003",
+      "title": "Demand Principal ≠ Statement ณ วันบอกกล่าว",
+      "source": "R§15",
+      "basis": "DERIVED_FROM_LOCKED_RULE",
+      "controls": [
+        "PGS10-DMD-002"
+      ],
+      "input": {
+        "demand_principal": "49164.01",
+        "principal_at_demand_date": "49164.00"
+      },
+      "expected": {
+        "controls": {
+          "PGS10-DMD-002": {
+            "status": "HOLD",
+            "reason_code": "DEMAND_PRINCIPAL_MISMATCH"
+          }
+        },
+        "case_status_if_all_other_controls_pass": "HOLD"
+      }
+    },
+    {
+      "id": "UT-HIS-001",
+      "title": "Historical Interest/Total ใช้ยอดปัจจุบันแทน (เงินต้นผ่านแต่ Historical ผิด) → HOLD ไม่ใช่ Observation",
+      "source": "R§16, U",
+      "basis": "FROM_DOCUMENT",
+      "controls": [
+        "PGS10-DMD-002",
+        "PGS10-HIS-001"
+      ],
+      "input": {
+        "demand_principal": "90038.73",
+        "demand_interest": "59508.71",
+        "demand_total": "149547.44",
+        "principal_at_demand_date": "90038.73",
+        "screen_historical_principal": "90038.73",
+        "screen_historical_interest": "74975.64",
+        "screen_historical_total": "165014.37"
+      },
+      "expected": {
+        "controls": {
+          "PGS10-DMD-002": {
+            "status": "PASS"
+          },
+          "PGS10-HIS-001": {
+            "status": "HOLD",
+            "reason_code": "HISTORICAL_BALANCE_MISMATCH"
+          }
+        },
+        "case_status_if_all_other_controls_pass": "HOLD"
+      },
+      "note": "ต้องเป็น HOLD ไม่ว่า Claim Base จะกระทบหรือไม่ (L-03). Master Audit §27 ยังเขียนเป็น Observation ต้องแก้ (A-04)"
+    },
+    {
+      "id": "UT-HIS-002",
+      "title": "Historical ตรง Demand ทั้ง 3 ค่า",
+      "source": "R§16",
+      "basis": "DERIVED_FROM_LOCKED_RULE",
+      "controls": [
+        "PGS10-HIS-001"
+      ],
+      "input": {
+        "demand_principal": "90038.73",
+        "demand_interest": "59508.71",
+        "demand_total": "149547.44",
+        "screen_historical_principal": "90038.73",
+        "screen_historical_interest": "59508.71",
+        "screen_historical_total": "149547.44"
+      },
+      "expected": {
+        "controls": {
+          "PGS10-HIS-001": {
+            "status": "PASS"
+          }
+        }
+      }
+    },
+    {
+      "id": "UT-HIS-003",
+      "title": "Historical เงินต้นต่างแม้ดอกเบี้ย/รวมตรง → HOLD",
+      "source": "R§16",
+      "basis": "DERIVED_FROM_LOCKED_RULE",
+      "controls": [
+        "PGS10-HIS-001"
+      ],
+      "input": {
+        "demand_principal": "90038.73",
+        "demand_interest": "59508.71",
+        "demand_total": "149547.44",
+        "screen_historical_principal": "90038.72",
+        "screen_historical_interest": "59508.71",
+        "screen_historical_total": "149547.44"
+      },
+      "expected": {
+        "controls": {
+          "PGS10-HIS-001": {
+            "status": "HOLD",
+            "reason_code": "HISTORICAL_BALANCE_MISMATCH"
+          }
+        },
+        "case_status_if_all_other_controls_pass": "HOLD"
+      }
+    },
+    {
+      "id": "UT-ADDR-001",
+      "title": "ต. อ. จ. ม. = ตำบล อำเภอ จังหวัด หมู่ → ตรงกัน",
+      "source": "R§18, M§22",
+      "basis": "DERIVED_FROM_LOCKED_RULE",
+      "controls": [
+        "PGS10-PST-002"
+      ],
+      "input": {
+        "postal_address": {
+          "house": "12/3",
+          "moo": "4",
+          "tambon": "ต.บางตัวอย่าง",
+          "amphoe": "อ.เมือง",
+          "province": "จ.นนทบุรี",
+          "zip": "11000"
+        },
+        "documented_address_set": [
+          {
+            "source": "หนังสือแจ้งผลอนุมัติ",
+            "house": "12/3",
+            "moo": "หมู่ 4",
+            "tambon": "ตำบลบางตัวอย่าง",
+            "amphoe": "อำเภอเมือง",
+            "province": "นนทบุรี",
+            "zip": "11000",
+            "changed": false
+          }
+        ]
+      },
+      "expected": {
+        "controls": {
+          "PGS10-PST-002": {
+            "status": "PASS"
+          }
+        }
+      }
+    },
+    {
+      "id": "UT-ADDR-002",
+      "title": "บ้านเลขที่ 12/3 vs 12/4 → ห้าม fuzzy match",
+      "source": "R§18",
+      "basis": "DERIVED_FROM_LOCKED_RULE",
+      "controls": [
+        "PGS10-PST-002"
+      ],
+      "input": {
+        "postal_address": {
+          "house": "12/4",
+          "moo": "4",
+          "tambon": "ต.บางตัวอย่าง",
+          "amphoe": "อ.เมือง",
+          "province": "จ.นนทบุรี",
+          "zip": "11000"
+        },
+        "documented_address_set": [
+          {
+            "source": "หนังสือแจ้งผลอนุมัติ",
+            "house": "12/3",
+            "moo": "หมู่ 4",
+            "tambon": "ตำบลบางตัวอย่าง",
+            "amphoe": "อำเภอเมือง",
+            "province": "นนทบุรี",
+            "zip": "11000",
+            "changed": false
+          }
+        ]
+      },
+      "expected": {
+        "controls": {
+          "PGS10-PST-002": {
+            "status": "HOLD",
+            "reason_code": "ADDRESS_NOT_IN_DOCUMENTS"
+          }
+        },
+        "case_status_if_all_other_controls_pass": "HOLD"
+      }
+    },
+    {
+      "id": "UT-ADDR-003",
+      "title": "มีหลักฐานแจ้งเปลี่ยนที่อยู่ แต่จัดส่งที่อยู่เดิม → ต้องใช้ที่อยู่ล่าสุด",
+      "source": "R§18",
+      "basis": "DERIVED_FROM_LOCKED_RULE",
+      "controls": [
+        "PGS10-PST-002"
+      ],
+      "input": {
+        "postal_address": {
+          "house": "12/3",
+          "moo": "4",
+          "tambon": "ต.บางตัวอย่าง",
+          "amphoe": "อ.เมือง",
+          "province": "จ.นนทบุรี",
+          "zip": "11000"
+        },
+        "documented_address_set": [
+          {
+            "source": "หนังสือแจ้งผลอนุมัติ",
+            "house": "12/3",
+            "moo": "หมู่ 4",
+            "tambon": "ตำบลบางตัวอย่าง",
+            "amphoe": "อำเภอเมือง",
+            "province": "นนทบุรี",
+            "zip": "11000",
+            "changed": false
+          },
+          {
+            "source": "หนังสือแจ้งเปลี่ยนที่อยู่",
+            "house": "99",
+            "moo": "",
+            "tambon": "ตำบลใหม่",
+            "amphoe": "อำเภอใหม่",
+            "province": "ปทุมธานี",
+            "zip": "12000",
+            "changed": true
+          }
+        ]
+      },
+      "expected": {
+        "controls": {
+          "PGS10-PST-002": {
+            "status": "HOLD",
+            "reason_code": "ADDRESS_DIFFERS_FROM_LATEST"
+          }
+        },
+        "case_status_if_all_other_controls_pass": "HOLD"
+      },
+      "note": "วันที่มีผลของการเปลี่ยนที่อยู่เทียบวันส่งหนังสือ ยังไม่นิยาม (A-18)"
+    },
+    {
+      "id": "UT-ADDR-004",
+      "title": "หาแหล่งอ้างอิงที่อยู่ใน PDF ไม่พบ",
+      "source": "M§22",
+      "basis": "DERIVED_FROM_LOCKED_RULE",
+      "controls": [
+        "PGS10-PST-002"
+      ],
+      "input": {
+        "postal_address": {
+          "house": "12/3",
+          "moo": "4",
+          "tambon": "ต.บางตัวอย่าง",
+          "amphoe": "อ.เมือง",
+          "province": "จ.นนทบุรี",
+          "zip": "11000"
+        },
+        "documented_address_set": []
+      },
+      "expected": {
+        "controls": {
+          "PGS10-PST-002": {
+            "status": "HOLD",
+            "reason_code": "ADDRESS_SOURCE_NOT_FOUND"
+          }
+        },
+        "case_status_if_all_other_controls_pass": "HOLD"
+      }
+    },
+    {
+      "id": "UT-PST-001",
+      "title": "ส่งสำเร็จ: วันที่รับ + ลายมือชื่อผู้รับ + ที่อยู่ Traceable",
+      "source": "R§17, M§21",
+      "basis": "DERIVED_FROM_LOCKED_RULE",
+      "controls": [
+        "PGS10-PST-001"
+      ],
+      "input": {
+        "postal_outcome": "DELIVERED",
+        "postal_received_date": "2025-07-16",
+        "postal_signature_type": "RECIPIENT",
+        "address_match": true
+      },
+      "expected": {
+        "controls": {
+          "PGS10-PST-001": {
+            "status": "PASS"
+          }
+        }
+      }
+    },
+    {
+      "id": "UT-PST-002",
+      "title": "ส่งไม่สำเร็จ: ซองตีกลับ/คืนผู้ฝาก + ที่อยู่ Traceable (ไม่ต้องมีลายเซ็นผู้รับ)",
+      "source": "R§17, M§21",
+      "basis": "DERIVED_FROM_LOCKED_RULE",
+      "controls": [
+        "PGS10-PST-001"
+      ],
+      "input": {
+        "postal_outcome": "RETURNED",
+        "returned_envelope_evidence": true,
+        "address_match": true
+      },
+      "expected": {
+        "controls": {
+          "PGS10-PST-001": {
+            "status": "PASS"
+          }
+        }
+      }
+    },
+    {
+      "id": "UT-PST-003",
+      "title": "มีเฉพาะชื่อผู้รับแบบตัวบรรจง",
+      "source": "M§21",
+      "basis": "FROM_DOCUMENT",
+      "controls": [
+        "PGS10-PST-001"
+      ],
+      "input": {
+        "postal_outcome": "DELIVERED",
+        "postal_received_date": "2025-07-16",
+        "postal_signature_type": "PRINTED_NAME_ONLY",
+        "address_match": true
+      },
+      "expected": {
+        "controls": {
+          "PGS10-PST-001": {
+            "status": "HOLD",
+            "reason_code": "DELIVERY_PROOF_INCOMPLETE"
+          }
+        },
+        "case_status_if_all_other_controls_pass": "HOLD"
+      }
+    },
+    {
+      "id": "UT-PST-004",
+      "title": "มีเฉพาะลายมือชื่อเจ้าหน้าที่ไปรษณีย์",
+      "source": "M§21",
+      "basis": "FROM_DOCUMENT",
+      "controls": [
+        "PGS10-PST-001"
+      ],
+      "input": {
+        "postal_outcome": "DELIVERED",
+        "postal_received_date": "2025-07-16",
+        "postal_signature_type": "POSTAL_OFFICER_ONLY",
+        "address_match": true
+      },
+      "expected": {
+        "controls": {
+          "PGS10-PST-001": {
+            "status": "HOLD",
+            "reason_code": "DELIVERY_PROOF_INCOMPLETE"
+          }
+        },
+        "case_status_if_all_other_controls_pass": "HOLD"
+      }
+    },
+    {
+      "id": "UT-PST-005",
+      "title": "ใบตอบรับว่าง ไม่มีวันที่ ไม่มีลายเซ็น ไม่มีซองตีกลับ",
+      "source": "R§17",
+      "basis": "FROM_DOCUMENT",
+      "controls": [
+        "PGS10-PST-001"
+      ],
+      "input": {
+        "postal_outcome": "NONE"
+      },
+      "expected": {
+        "controls": {
+          "PGS10-PST-001": {
+            "status": "HOLD",
+            "reason_code": "POSTAL_EVIDENCE_MISSING"
+          }
+        },
+        "case_status_if_all_other_controls_pass": "HOLD"
+      }
+    },
+    {
+      "id": "UT-PST-006",
+      "title": "มีหลักฐานส่งแต่ Address Source ไม่ได้",
+      "source": "R§17",
+      "basis": "FROM_DOCUMENT",
+      "controls": [
+        "PGS10-PST-001"
+      ],
+      "input": {
+        "postal_outcome": "DELIVERED",
+        "postal_received_date": "2025-07-16",
+        "postal_signature_type": "RECIPIENT",
+        "address_match": false
+      },
+      "expected": {
+        "controls": {
+          "PGS10-PST-001": {
+            "status": "HOLD",
+            "reason_code": "ADDRESS_SOURCE_NOT_FOUND"
+          }
+        },
+        "case_status_if_all_other_controls_pass": "HOLD"
+      }
+    },
+    {
+      "id": "UT-CUR-001",
+      "title": "ดอกเบี้ยต่าง 0.01 (31,628.49 vs 31,628.50), tolerance ยังไม่อนุมัติ → OBSERVATION_CANDIDATE ห้าม auto-pass",
+      "source": "M§26, M§Internal, V, U",
+      "basis": "FROM_DOCUMENT",
+      "controls": [
+        "PGS10-CUR-001"
+      ],
+      "input": {
+        "current_principal": "49164.00",
+        "screen_current_principal": "49164.00",
+        "current_interest": "31628.49",
+        "screen_current_interest": "31628.50",
+        "current_other_amounts": "0.00",
+        "screen_current_total": "80792.50"
+      },
+      "expected": {
+        "controls": {
+          "PGS10-CUR-001": {
+            "status": "OBSERVATION_CANDIDATE",
+            "reason_code": "VARIANCE_PENDING_TOLERANCE_APPROVAL"
+          }
+        },
+        "case_status_if_all_other_controls_pass": "HOLD"
+      },
+      "note": "ระบบต้องแสดง VARIANCE=0.01 ห้ามแก้ค่าเป็น 31,628.49 แล้วบอกผ่าน",
+      "config": {
+        "variance_tolerance": {
+          "approved": false,
+          "interest_satang": 1
+        }
+      }
+    },
+    {
+      "id": "UT-CUR-002",
+      "title": "เหมือน UT-CUR-001 แต่ tolerance ที่อนุมัติ = 0.01 และเงินต้นตรง",
+      "source": "R§19, M§26",
+      "basis": "DERIVED_FROM_LOCKED_RULE",
+      "controls": [
+        "PGS10-CUR-001"
+      ],
+      "input": {
+        "current_principal": "49164.00",
+        "screen_current_principal": "49164.00",
+        "current_interest": "31628.49",
+        "screen_current_interest": "31628.50",
+        "current_other_amounts": "0.00",
+        "screen_current_total": "80792.50"
+      },
+      "expected": {
+        "controls": {
+          "PGS10-CUR-001": {
+            "status": "OBSERVATION",
+            "reason_code": "VARIANCE_WITHIN_APPROVED_TOLERANCE"
+          }
+        },
+        "case_status_if_all_other_controls_pass": "PASS_WITH_OBSERVATION"
+      },
+      "config": {
+        "variance_tolerance": {
+          "approved": true,
+          "interest_satang": 1
+        }
+      }
+    },
+    {
+      "id": "UT-CUR-003",
+      "title": "เงินต้นต่าง 0.01 → ต้อง Exact (principal_tolerance = 0.00)",
+      "source": "R§19, M§26",
+      "basis": "DERIVED_FROM_LOCKED_RULE",
+      "controls": [
+        "PGS10-CUR-001"
+      ],
+      "input": {
+        "current_principal": "49164.00",
+        "screen_current_principal": "49164.01",
+        "current_interest": "31628.49",
+        "screen_current_interest": "31628.49",
+        "current_other_amounts": "0.00",
+        "screen_current_total": "80792.50"
+      },
+      "expected": {
+        "controls": {
+          "PGS10-CUR-001": {
+            "status": "HOLD",
+            "reason_code": "CURRENT_PRINCIPAL_MISMATCH"
+          }
+        },
+        "case_status_if_all_other_controls_pass": "HOLD"
+      },
+      "config": {
+        "variance_tolerance": {
+          "approved": true,
+          "interest_satang": 1
+        }
+      }
+    },
+    {
+      "id": "UT-CUR-004",
+      "title": "ดอกเบี้ยต่าง 0.02 เกิน tolerance 0.01 → HOLD",
+      "source": "R§19",
+      "basis": "DERIVED_FROM_LOCKED_RULE",
+      "controls": [
+        "PGS10-CUR-001"
+      ],
+      "input": {
+        "current_principal": "49164.00",
+        "screen_current_principal": "49164.00",
+        "current_interest": "31628.49",
+        "screen_current_interest": "31628.51",
+        "current_other_amounts": "0.00",
+        "screen_current_total": "80792.51"
+      },
+      "expected": {
+        "controls": {
+          "PGS10-CUR-001": {
+            "status": "HOLD",
+            "reason_code": "CURRENT_BALANCE_MISMATCH"
+          }
+        },
+        "case_status_if_all_other_controls_pass": "HOLD"
+      },
+      "config": {
+        "variance_tolerance": {
+          "approved": true,
+          "interest_satang": 1
+        }
+      }
+    },
+    {
+      "id": "UT-BASE-001",
+      "title": "Principal 49,988.18 < Guarantee 50,000 → ใช้ 49,988.18 (BY_PRINCIPAL)",
+      "source": "R§21",
+      "basis": "FROM_DOCUMENT",
+      "controls": [
+        "PGS10-CLM-003"
+      ],
+      "input": {
+        "current_principal": "49988.18",
+        "current_guarantee_obligation": "50000.00"
+      },
+      "expected": {
+        "controls": {
+          "PGS10-CLM-003": {
+            "status": "PASS",
+            "claim_base": "49988.18",
+            "claim_base_mode": "BY_PRINCIPAL"
+          }
+        }
+      }
+    },
+    {
+      "id": "UT-BASE-002",
+      "title": "Principal 80,000 = Guarantee 80,000 → ใช้ 80,000 (BY_GUARANTEE)",
+      "source": "R§21",
+      "basis": "FROM_DOCUMENT",
+      "controls": [
+        "PGS10-CLM-003"
+      ],
+      "input": {
+        "current_principal": "80000.00",
+        "current_guarantee_obligation": "80000.00"
+      },
+      "expected": {
+        "controls": {
+          "PGS10-CLM-003": {
+            "status": "PASS",
+            "claim_base": "80000.00",
+            "claim_base_mode": "BY_GUARANTEE"
+          }
+        }
+      }
+    },
+    {
+      "id": "UT-COV-001",
+      "title": "Small Biz อายุ LG ≤ 5 ปี → 70%",
+      "source": "R§22",
+      "basis": "DERIVED_FROM_LOCKED_RULE",
+      "controls": [
+        "PGS10-CLM-002"
+      ],
+      "input": {
+        "product": "SMALL_BIZ",
+        "lg_issue_date": "2024-03-07",
+        "claim_date": "2025-09-15",
+        "screen_coverage_ratio": "7000bp"
+      },
+      "expected": {
+        "controls": {
+          "PGS10-CLM-002": {
+            "status": "PASS",
+            "coverage_ratio_bp": 7000
+          }
+        }
+      }
+    },
+    {
+      "id": "UT-COV-002",
+      "title": "Small Biz อายุ LG > 5 ปี (เกินชัดเจน) → 100%",
+      "source": "R§22",
+      "basis": "DERIVED_FROM_LOCKED_RULE",
+      "controls": [
+        "PGS10-CLM-002"
+      ],
+      "input": {
+        "product": "SMALL_BIZ",
+        "lg_issue_date": "2018-03-07",
+        "claim_date": "2025-09-15",
+        "screen_coverage_ratio": "7000bp"
+      },
+      "expected": {
+        "controls": {
+          "PGS10-CLM-002": {
+            "status": "HOLD",
+            "reason_code": "COVERAGE_RATIO_MISMATCH",
+            "coverage_ratio_bp": 10000
+          }
+        },
+        "case_status_if_all_other_controls_pass": "HOLD"
+      }
+    },
+    {
+      "id": "UT-COV-003",
+      "title": "Product ที่ไม่มีกฎ ratio ที่ยืนยัน → ห้าม Hardcode 70%",
+      "source": "R§22, R§32",
+      "basis": "FROM_DOCUMENT",
+      "controls": [
+        "PGS10-CLM-002"
+      ],
+      "input": {
+        "product": "SMART_BIZ",
+        "lg_issue_date": "2024-03-07",
+        "claim_date": "2025-09-15"
+      },
+      "expected": {
+        "controls": {
+          "PGS10-CLM-002": {
+            "status": "HOLD",
+            "reason_code": "NO_RULE_FOR_PRODUCT"
+          }
+        },
+        "case_status_if_all_other_controls_pass": "HOLD"
+      }
+    },
+    {
+      "id": "UT-COV-004",
+      "title": "ขอบเขตอายุ LG เท่ากับ 5 ปีพอดี",
+      "source": "R§32",
+      "basis": "SYNTHETIC",
+      "controls": [
+        "PGS10-CLM-002"
+      ],
+      "input": {
+        "product": "SMALL_BIZ",
+        "lg_issue_date": "2020-03-07",
+        "claim_date": "2025-03-07"
+      },
+      "expected": {
+        "controls": {}
+      },
+      "note": "ไม่ Assert ผลลัพธ์ — วิธีนับอายุ LG ยังไม่ยืนยัน (A-12); Test นี้ต้องมีค่าคาดหวังก่อน Freeze"
+    },
+    {
+      "id": "UT-CALC-001",
+      "title": "66,477.40 × 70% = 46,534.180 → 46,534.18 (ROUND_HALF_UP, Decimal)",
+      "source": "R§23",
+      "basis": "FROM_DOCUMENT",
+      "controls": [
+        "PGS10-CLM-004"
+      ],
+      "input": {
+        "claim_base": "66477.40",
+        "coverage_ratio": "7000bp"
+      },
+      "expected": {
+        "controls": {
+          "PGS10-CLM-004": {
+            "status": "PASS",
+            "claim_amount": "46534.18"
+          }
+        }
+      }
+    },
+    {
+      "id": "UT-CALC-002",
+      "title": "49,164.00 × 70% = 34,414.80 (ต้องคำนวณใหม่เอง ไม่เชื่อหน้าจอ)",
+      "source": "M§29",
+      "basis": "FROM_DOCUMENT",
+      "controls": [
+        "PGS10-CLM-004"
+      ],
+      "input": {
+        "claim_base": "49164.00",
+        "coverage_ratio": "7000bp",
+        "screen_claim_amount": "34414.80",
+        "screen_approved_payment": "34414.80"
+      },
+      "expected": {
+        "controls": {
+          "PGS10-CLM-004": {
+            "status": "PASS",
+            "claim_amount": "34414.80"
+          }
+        }
+      }
+    },
+    {
+      "id": "UT-CALC-003",
+      "title": "ยอดอนุมัติจ่ายหน้าจอ ≠ ที่คำนวณ",
+      "source": "R§23",
+      "basis": "DERIVED_FROM_LOCKED_RULE",
+      "controls": [
+        "PGS10-CLM-004"
+      ],
+      "input": {
+        "claim_base": "49164.00",
+        "coverage_ratio": "7000bp",
+        "screen_claim_amount": "34414.80",
+        "screen_approved_payment": "34414.81"
+      },
+      "expected": {
+        "controls": {
+          "PGS10-CLM-004": {
+            "status": "HOLD",
+            "reason_code": "CLAIM_AMOUNT_MISMATCH"
+          }
+        },
+        "case_status_if_all_other_controls_pass": "HOLD"
+      }
+    },
+    {
+      "id": "UT-CAP-001",
+      "title": "CLAIM MAX − จ่ายจริง − รอจ่าย, แล้วหัก Claim รายนี้ ต้องตรงทุกสตางค์",
+      "source": "R§24, M§30",
+      "basis": "SYNTHETIC",
+      "controls": [
+        "PGS10-CAP-001"
+      ],
+      "input": {
+        "claim_max": "10000000.00",
+        "paid_claims": "3000000.00",
+        "pending_claims": "500000.00",
+        "claim_amount": "34414.80"
+      },
+      "expected": {
+        "controls": {
+          "PGS10-CAP-001": {
+            "status": "PASS",
+            "available_claim_capacity": "6500000.00",
+            "carry_forward_balance": "6465585.20"
+          }
+        }
+      }
+    },
+    {
+      "id": "UT-CAP-002",
+      "title": "มีเพียง CLAIM MAX ไม่มี paid/pending → NOT_TESTABLE ไม่เดา",
+      "source": "R§24",
+      "basis": "FROM_DOCUMENT",
+      "controls": [
+        "PGS10-CAP-001"
+      ],
+      "input": {
+        "claim_max": "10000000.00"
+      },
+      "expected": {
+        "controls": {
+          "PGS10-CAP-001": {
+            "status": "NOT_TESTABLE",
+            "reason_code": "PAID_PENDING_MISSING"
+          }
+        },
+        "case_status_if_all_other_controls_pass": "HOLD"
+      }
+    },
+    {
+      "id": "UT-TIME-001",
+      "title": "Default → Later Payment ได้เมื่อมี Exception Letter ที่ใช้ได้",
+      "source": "R§25",
+      "basis": "DERIVED_FROM_LOCKED_RULE",
+      "controls": [
+        "PGS10-TIME-001",
+        "PGS10-DEF-002"
+      ],
+      "input": {
+        "default_date": "2025-02-01",
+        "last_actual_payment_date": "2025-02-15",
+        "demand_date_screen": "2025-07-14",
+        "claim_date": "2025-09-15",
+        "exception_status": "PASS_WITH_SUPPORT"
+      },
+      "expected": {
+        "controls": {
+          "PGS10-TIME-001": {
+            "status": "PASS"
+          }
+        }
+      }
+    },
+    {
+      "id": "UT-TIME-002",
+      "title": "Demand Letter ลงวันที่ก่อน Default → ขัดกัน",
+      "source": "R§25",
+      "basis": "DERIVED_FROM_LOCKED_RULE",
+      "controls": [
+        "PGS10-TIME-001"
+      ],
+      "input": {
+        "default_date": "2025-02-10",
+        "demand_date_screen": "2025-01-01"
+      },
+      "expected": {
+        "controls": {
+          "PGS10-TIME-001": {
+            "status": "HOLD",
+            "reason_code": "TIMELINE_CONFLICT"
+          }
+        },
+        "case_status_if_all_other_controls_pass": "HOLD"
+      }
+    },
+    {
+      "id": "UT-LG-001",
+      "title": "อายุ LG เกิน 10 ปี",
+      "source": "M§2, POL-LG-001",
+      "basis": "SYNTHETIC",
+      "controls": [
+        "PGS10-LG-001"
+      ],
+      "input": {
+        "lg_issue_date": "2014-03-07",
+        "final_lg_expiry_date": "2024-03-08"
+      },
+      "expected": {
+        "controls": {
+          "PGS10-LG-001": {
+            "status": "HOLD",
+            "reason_code": "LG_TENOR_EXCEEDED"
+          }
+        },
+        "case_status_if_all_other_controls_pass": "HOLD"
+      },
+      "note": "Logic ของ LG-001 ถอดจากนโยบาย (A-27); วิธีนับปี A-12"
+    },
+    {
+      "id": "UT-CLM-001",
+      "title": "ยื่นก่อนปีที่ 2 ของอายุ LG",
+      "source": "M§25",
+      "basis": "SYNTHETIC",
+      "controls": [
+        "PGS10-CLM-001"
+      ],
+      "input": {
+        "lg_issue_date": "2024-03-07",
+        "final_lg_expiry_date": "2029-03-07",
+        "claim_date": "2025-03-06"
+      },
+      "expected": {
+        "controls": {
+          "PGS10-CLM-001": {
+            "status": "HOLD",
+            "reason_code": "CLAIM_FILING_WINDOW_NOT_MET"
+          }
+        },
+        "case_status_if_all_other_controls_pass": "HOLD"
+      },
+      "note": "วิธีนับวัน = config (A-12)"
+    },
+    {
+      "id": "UT-CLM-002",
+      "title": "ยื่นภายในช่วงที่อนุญาต",
+      "source": "M§25",
+      "basis": "SYNTHETIC",
+      "controls": [
+        "PGS10-CLM-001"
+      ],
+      "input": {
+        "lg_issue_date": "2024-03-07",
+        "final_lg_expiry_date": "2029-03-07",
+        "claim_date": "2026-08-19"
+      },
+      "expected": {
+        "controls": {
+          "PGS10-CLM-001": {
+            "status": "PASS"
+          }
+        }
+      }
+    },
+    {
+      "id": "UT-CLM-003",
+      "title": "ยื่นหลังสิ้นอายุ LG ฉบับสุดท้ายเกิน 1 ปี",
+      "source": "M§25",
+      "basis": "SYNTHETIC",
+      "controls": [
+        "PGS10-CLM-001"
+      ],
+      "input": {
+        "lg_issue_date": "2018-03-07",
+        "final_lg_expiry_date": "2023-03-07",
+        "claim_date": "2024-04-01"
+      },
+      "expected": {
+        "controls": {
+          "PGS10-CLM-001": {
+            "status": "HOLD",
+            "reason_code": "CLAIM_FILING_WINDOW_NOT_MET"
+          }
+        },
+        "case_status_if_all_other_controls_pass": "HOLD"
+      }
+    },
+    {
+      "id": "UT-DMD-004",
+      "title": "เงินต้น + ดอกเบี้ย ≠ ยอดรวมในหนังสือบอกกล่าว",
+      "source": "R§14",
+      "basis": "SYNTHETIC",
+      "controls": [
+        "PGS10-DMD-001"
+      ],
+      "input": {
+        "demand_principal": "90038.73",
+        "demand_interest": "59508.71",
+        "demand_total": "149547.45",
+        "demand_date_screen": "2025-07-14",
+        "demand_date_letter": "2025-07-14"
+      },
+      "expected": {
+        "controls": {
+          "PGS10-DMD-001": {
+            "status": "HOLD",
+            "reason_code": "DEMAND_LETTER_MISMATCH"
+          }
+        },
+        "case_status_if_all_other_controls_pass": "HOLD"
+      }
+    },
+    {
+      "id": "UT-DMD-005",
+      "title": "วันที่หนังสือบอกกล่าวหน้าจอ ≠ ตัวหนังสือ",
+      "source": "R§14, M§19",
+      "basis": "SYNTHETIC",
+      "controls": [
+        "PGS10-DMD-001"
+      ],
+      "input": {
+        "demand_principal": "90038.73",
+        "demand_interest": "59508.71",
+        "demand_total": "149547.44",
+        "demand_date_screen": "2025-07-14",
+        "demand_date_letter": "2025-07-15"
+      },
+      "expected": {
+        "controls": {
+          "PGS10-DMD-001": {
+            "status": "HOLD",
+            "reason_code": "DEMAND_LETTER_MISMATCH"
+          }
+        },
+        "case_status_if_all_other_controls_pass": "HOLD"
+      }
+    },
+    {
+      "id": "UT-DMD-006",
+      "title": "claim_eligibility_date ไม่ถึง demand_date + 1 เดือน",
+      "source": "M§24",
+      "basis": "SYNTHETIC",
+      "controls": [
+        "PGS10-DMD-003"
+      ],
+      "input": {
+        "demand_date_screen": "2025-07-14",
+        "claim_eligibility_date": "2025-08-13"
+      },
+      "expected": {
+        "controls": {
+          "PGS10-DMD-003": {
+            "status": "HOLD",
+            "reason_code": "DEMAND_WAITING_PERIOD_NOT_MET"
+          }
+        },
+        "case_status_if_all_other_controls_pass": "HOLD"
+      },
+      "note": "วันตั้งต้น/วิธีนับเดือน OPEN (A-21) — ค่าเริ่มต้น: วันที่ในหนังสือ + 1 เดือนปฏิทิน"
+    },
+    {
+      "id": "UT-DMD-007",
+      "title": "claim_eligibility_date เกิน demand_date + 1 เดือน",
+      "source": "M§24",
+      "basis": "SYNTHETIC",
+      "controls": [
+        "PGS10-DMD-003"
+      ],
+      "input": {
+        "demand_date_screen": "2025-07-14",
+        "claim_eligibility_date": "2025-08-20"
+      },
+      "expected": {
+        "controls": {
+          "PGS10-DMD-003": {
+            "status": "PASS"
+          }
+        }
+      }
+    },
+    {
+      "id": "UT-RST-004",
+      "title": "เลือกเส้นทาง 7 เดือน แต่ config ปิดอยู่",
+      "source": "M§5, R§32",
+      "basis": "SYNTHETIC",
+      "controls": [
+        "PGS10-RST-002"
+      ],
+      "input": {
+        "restructure_route": "UNCONTACTABLE_7_MONTH_EXCEPTION",
+        "uncontactable_start_date": "2024-06-01",
+        "certified_tracking_report_present": true,
+        "demand_or_termination_letter_count": 1,
+        "claim_date": "2025-03-01"
+      },
+      "expected": {
+        "controls": {
+          "PGS10-RST-002": {
+            "status": "HOLD",
+            "reason_code": "EXCEPTION_ROUTE_NOT_CONFIGURED"
+          }
+        },
+        "case_status_if_all_other_controls_pass": "HOLD"
+      },
+      "config": {
+        "enable_7m_exception": false
+      }
+    },
+    {
+      "id": "UT-RST-005",
+      "title": "เส้นทาง 7 เดือนเปิดใช้ ครบเงื่อนไข",
+      "source": "M§5",
+      "basis": "SYNTHETIC",
+      "controls": [
+        "PGS10-RST-002"
+      ],
+      "input": {
+        "restructure_route": "UNCONTACTABLE_7_MONTH_EXCEPTION",
+        "uncontactable_start_date": "2024-06-01",
+        "certified_tracking_report_present": true,
+        "demand_or_termination_letter_count": 1,
+        "claim_date": "2025-01-15"
+      },
+      "expected": {
+        "controls": {
+          "PGS10-RST-002": {
+            "status": "PASS_WITH_SUPPORT"
+          }
+        },
+        "case_status_if_all_other_controls_pass": "PASS_WITH_SUPPORT"
+      },
+      "note": "ตัวอย่างผ่านนี้ไม่มี reason_code เฉพาะในแคตตาล็อก (ผ่านด้วยเอกสารรองรับ)",
+      "config": {
+        "enable_7m_exception": true
+      }
+    },
+    {
+      "id": "UT-RST-006",
+      "title": "เส้นทาง 7 เดือนเปิดใช้ แต่ยังไม่พ้น 7 เดือน",
+      "source": "M§5",
+      "basis": "SYNTHETIC",
+      "controls": [
+        "PGS10-RST-002"
+      ],
+      "input": {
+        "restructure_route": "UNCONTACTABLE_7_MONTH_EXCEPTION",
+        "uncontactable_start_date": "2024-12-01",
+        "certified_tracking_report_present": true,
+        "demand_or_termination_letter_count": 1,
+        "claim_date": "2025-03-01"
+      },
+      "expected": {
+        "controls": {
+          "PGS10-RST-002": {
+            "status": "HOLD",
+            "reason_code": "UNCONTACTABLE_EXCEPTION_NOT_MET"
+          }
+        },
+        "case_status_if_all_other_controls_pass": "HOLD"
+      },
+      "config": {
+        "enable_7m_exception": true
+      }
+    },
+    {
+      "id": "UT-STATUS-001",
+      "title": "มีทั้ง Observation และ Support → PASS_WITH_OBSERVATION",
+      "source": "A-08",
+      "basis": "SYNTHETIC",
+      "controls": [
+        "CASE"
+      ],
+      "input": {
+        "controls": {
+          "PGS10-ID-001": "OBSERVATION",
+          "PGS10-DEF-002": "PASS_WITH_SUPPORT"
+        }
+      },
+      "expected": {
+        "controls": {},
+        "case_status_if_all_other_controls_pass": "PASS_WITH_OBSERVATION"
+      },
+      "note": "Assert ที่ระดับเคส: ต้องยืนยัน A-08 ก่อน Freeze"
+    },
+    {
+      "id": "UT-STATUS-002",
+      "title": "OBSERVATION_CANDIDATE ที่ยังไม่รับรอง → เคสเป็น HOLD",
+      "source": "U",
+      "basis": "DERIVED_FROM_LOCKED_RULE",
+      "controls": [
+        "CASE"
+      ],
+      "input": {
+        "controls": {
+          "PGS10-CUR-001": "OBSERVATION_CANDIDATE"
+        }
+      },
+      "expected": {
+        "controls": {},
+        "case_status_if_all_other_controls_pass": "HOLD"
+      }
+    },
+    {
+      "id": "UT-STATUS-003",
+      "title": "FAIL ชนะ HOLD",
+      "source": "R§26",
+      "basis": "DERIVED_FROM_LOCKED_RULE",
+      "controls": [
+        "CASE"
+      ],
+      "input": {
+        "controls": {
+          "PGS10-ELIG-001": "FAIL",
+          "PGS10-DOC-001": "HOLD"
+        }
+      },
+      "expected": {
+        "controls": {},
+        "case_status_if_all_other_controls_pass": "FAIL"
+      }
+    }
+  ],
+  "case_fixtures": [
+    {
+      "lg": "66-021663",
+      "data_available": false,
+      "groups": [
+        "HISTORICAL_BALANCE_MISMATCH",
+        "INCOMPLETE_DEFAULT_CONFIRMATION"
+      ],
+      "source": "R§30",
+      "expected_case_status": "HOLD",
+      "expected_controls": {
+        "PGS10-HIS-001": {
+          "status": "HOLD",
+          "reason_code": "HISTORICAL_BALANCE_MISMATCH"
+        },
+        "PGS10-VIS-001": {
+          "status": "HOLD",
+          "reason_code": "CONFIRMATION_LETTER_VISUALLY_INCOMPLETE"
+        }
+      },
+      "note": "เคสอยู่หลายกลุ่มใน R§30 → คาดหวังทุก Control ที่แท็ก (A-25)"
+    },
+    {
+      "lg": "66-029105",
+      "data_available": false,
+      "groups": [
+        "POSTAL_SUCCESS",
+        "HISTORICAL_BALANCE_MISMATCH"
+      ],
+      "source": "R§30",
+      "expected_case_status": "HOLD",
+      "expected_controls": {
+        "PGS10-PST-001": {
+          "status": "PASS"
+        },
+        "PGS10-HIS-001": {
+          "status": "HOLD",
+          "reason_code": "HISTORICAL_BALANCE_MISMATCH"
+        }
+      },
+      "note": "เคสอยู่หลายกลุ่มใน R§30 → คาดหวังทุก Control ที่แท็ก (A-25)"
+    },
+    {
+      "lg": "66-044366",
+      "data_available": false,
+      "groups": [
+        "LATER_PAYMENT_AFTER_STATEMENT_CUTOFF"
+      ],
+      "source": "R§30",
+      "expected_case_status": "HOLD",
+      "expected_controls": {
+        "PGS10-STM-002": {
+          "status": "HOLD",
+          "reason_code": "PAYMENT_AFTER_STATEMENT_CUTOFF"
+        }
+      }
+    },
+    {
+      "lg": "66-045431",
+      "data_available": false,
+      "groups": [
+        "MISSING_CONTRACT_PAGES"
+      ],
+      "source": "R§30",
+      "expected_case_status": "HOLD",
+      "expected_controls": {
+        "PGS10-DOC-001": {
+          "status": "HOLD",
+          "reason_code": "DOCUMENT_PAGE_SEQUENCE_GAP"
+        }
+      }
+    },
+    {
+      "lg": "66-047662",
+      "data_available": false,
+      "groups": [
+        "HISTORICAL_BALANCE_MISMATCH",
+        "INCOMPLETE_DEFAULT_CONFIRMATION"
+      ],
+      "source": "R§30",
+      "expected_case_status": "HOLD",
+      "expected_controls": {
+        "PGS10-HIS-001": {
+          "status": "HOLD",
+          "reason_code": "HISTORICAL_BALANCE_MISMATCH"
+        },
+        "PGS10-VIS-001": {
+          "status": "HOLD",
+          "reason_code": "CONFIRMATION_LETTER_VISUALLY_INCOMPLETE"
+        }
+      },
+      "note": "เคสอยู่หลายกลุ่มใน R§30 → คาดหวังทุก Control ที่แท็ก (A-25)"
+    },
+    {
+      "lg": "66-067410",
+      "data_available": false,
+      "groups": [
+        "MISSING_CONTRACT_PAGES",
+        "HISTORICAL_BALANCE_MISMATCH"
+      ],
+      "source": "R§30",
+      "expected_case_status": "HOLD",
+      "expected_controls": {
+        "PGS10-DOC-001": {
+          "status": "HOLD",
+          "reason_code": "DOCUMENT_PAGE_SEQUENCE_GAP"
+        },
+        "PGS10-HIS-001": {
+          "status": "HOLD",
+          "reason_code": "HISTORICAL_BALANCE_MISMATCH"
+        }
+      },
+      "note": "เคสอยู่หลายกลุ่มใน R§30 → คาดหวังทุก Control ที่แท็ก (A-25)"
+    },
+    {
+      "lg": "66-073840",
+      "data_available": false,
+      "groups": [
+        "POSTAL_RETURN",
+        "HISTORICAL_BALANCE_MISMATCH"
+      ],
+      "source": "R§30",
+      "expected_case_status": "HOLD",
+      "expected_controls": {
+        "PGS10-PST-001": {
+          "status": "PASS"
+        },
+        "PGS10-HIS-001": {
+          "status": "HOLD",
+          "reason_code": "HISTORICAL_BALANCE_MISMATCH"
+        }
+      },
+      "note": "เคสอยู่หลายกลุ่มใน R§30 → คาดหวังทุก Control ที่แท็ก (A-25)"
+    },
+    {
+      "lg": "66-076705",
+      "data_available": false,
+      "groups": [
+        "HISTORICAL_BALANCE_MISMATCH"
+      ],
+      "source": "R§30",
+      "expected_case_status": "HOLD",
+      "expected_controls": {
+        "PGS10-HIS-001": {
+          "status": "HOLD",
+          "reason_code": "HISTORICAL_BALANCE_MISMATCH"
+        }
+      }
+    },
+    {
+      "lg": "66-098079",
+      "data_available": false,
+      "groups": [
+        "HISTORICAL_BALANCE_MISMATCH"
+      ],
+      "source": "R§30",
+      "expected_case_status": "HOLD",
+      "expected_controls": {
+        "PGS10-HIS-001": {
+          "status": "HOLD",
+          "reason_code": "HISTORICAL_BALANCE_MISMATCH"
+        }
+      }
+    },
+    {
+      "lg": "66-100217",
+      "data_available": false,
+      "groups": [
+        "PASS_OBSERVATION"
+      ],
+      "source": "R§30",
+      "expected_case_status": "PASS_WITH_OBSERVATION",
+      "expected_controls": {
+        "PGS10-ID-001": {
+          "status": "OBSERVATION",
+          "reason_code": "FORMAT_VARIANCE"
+        }
+      },
+      "note": "R§30 จัดเป็น 'PASS / Observation'; case status ขึ้นกับว่า Control อื่นผ่านครบ (ไม่มีข้อมูล)",
+      "expected_case_status_note": "ถ้า Control อื่นผ่านครบ"
+    },
+    {
+      "lg": "67-005985",
+      "data_available": false,
+      "groups": [
+        "HISTORICAL_BALANCE_MISMATCH"
+      ],
+      "source": "R§30",
+      "expected_case_status": "HOLD",
+      "expected_controls": {
+        "PGS10-HIS-001": {
+          "status": "HOLD",
+          "reason_code": "HISTORICAL_BALANCE_MISMATCH"
+        }
+      }
+    },
+    {
+      "lg": "67-023862",
+      "data_available": false,
+      "groups": [
+        "HISTORICAL_BALANCE_MISMATCH",
+        "INCOMPLETE_DEFAULT_CONFIRMATION"
+      ],
+      "source": "R§30",
+      "expected_case_status": "HOLD",
+      "expected_controls": {
+        "PGS10-HIS-001": {
+          "status": "HOLD",
+          "reason_code": "HISTORICAL_BALANCE_MISMATCH"
+        },
+        "PGS10-VIS-001": {
+          "status": "HOLD",
+          "reason_code": "CONFIRMATION_LETTER_VISUALLY_INCOMPLETE"
+        }
+      },
+      "note": "เคสอยู่หลายกลุ่มใน R§30 → คาดหวังทุก Control ที่แท็ก (A-25)"
+    },
+    {
+      "lg": "67-026936",
+      "data_available": false,
+      "groups": [
+        "HISTORICAL_BALANCE_MISMATCH",
+        "INCOMPLETE_DEFAULT_CONFIRMATION"
+      ],
+      "source": "R§30",
+      "expected_case_status": "HOLD",
+      "expected_controls": {
+        "PGS10-HIS-001": {
+          "status": "HOLD",
+          "reason_code": "HISTORICAL_BALANCE_MISMATCH"
+        },
+        "PGS10-VIS-001": {
+          "status": "HOLD",
+          "reason_code": "CONFIRMATION_LETTER_VISUALLY_INCOMPLETE"
+        }
+      },
+      "note": "เคสอยู่หลายกลุ่มใน R§30 → คาดหวังทุก Control ที่แท็ก (A-25)"
+    },
+    {
+      "lg": "67-035527",
+      "data_available": false,
+      "groups": [
+        "PASS_OBSERVATION"
+      ],
+      "source": "R§30",
+      "expected_case_status": "HOLD",
+      "expected_controls": {
+        "PGS10-DEF-002": {
+          "status": "PASS_WITH_SUPPORT",
+          "reason_code": "POST_DEFAULT_PAYMENT_SUPPORTED"
+        },
+        "PGS10-CUR-001": {
+          "status": "OBSERVATION_CANDIDATE",
+          "reason_code": "VARIANCE_PENDING_TOLERANCE_APPROVAL"
+        }
+      },
+      "note": "R§30 จัดเป็น 'PASS / Observation' (ยึดกฎ 0.01 แบบเดิม). ภายใต้กฎล่าสุด (A-03) เคสเป็น HOLD จนกว่า tolerance จะอนุมัติ; ถ้าอนุมัติแล้ว → PASS_WITH_OBSERVATION",
+      "expected_case_status_if_tolerance_approved": "PASS_WITH_OBSERVATION"
+    },
+    {
+      "lg": "67-037131",
+      "data_available": false,
+      "groups": [
+        "POSTAL_RETURN",
+        "HISTORICAL_BALANCE_MISMATCH"
+      ],
+      "source": "R§30",
+      "expected_case_status": "HOLD",
+      "expected_controls": {
+        "PGS10-PST-001": {
+          "status": "PASS"
+        },
+        "PGS10-HIS-001": {
+          "status": "HOLD",
+          "reason_code": "HISTORICAL_BALANCE_MISMATCH"
+        }
+      },
+      "note": "เคสอยู่หลายกลุ่มใน R§30 → คาดหวังทุก Control ที่แท็ก (A-25)"
+    },
+    {
+      "lg": "67-036222",
+      "data_available": "PARTIAL",
+      "source": "M§(ตัวอย่างการทำงานจริง) — ตัวอย่างสาธิต ไม่ใช่ผลตรวจที่ยืนยันแล้ว",
+      "groups": [
+        "ILLUSTRATIVE"
+      ],
+      "input": {
+        "default_date": "2025-07-01",
+        "last_actual_payment_date": "2025-08-20",
+        "claim_base": "49164.00",
+        "coverage_ratio": "7000bp"
+      },
+      "expected_case_status": "HOLD",
+      "expected_controls": {
+        "PGS10-DEF-001": {
+          "status": "HOLD",
+          "reason_code": "POST_DEFAULT_PAYMENT"
+        },
+        "PGS10-VIS-001": {
+          "status": "HOLD",
+          "reason_code": "CONFIRMATION_LETTER_VISUALLY_INCOMPLETE"
+        },
+        "PGS10-CLM-004": {
+          "status": "PASS",
+          "claim_amount": "34414.80"
+        }
+      },
+      "note": "หนังสือยืนยันเห็นเฉพาะรายการชำระ/คำยืนยัน/ลายเซ็น ขาดหัว/วันที่/เรื่อง/ผู้รับ. 'วันที่ผิดนัด 01/07/2568' และ 'ชำระ 20/08/2568' ตามตัวอย่าง (แปลงเป็น ค.ศ.)"
+    },
+    {
+      "lg": "67-025162",
+      "data_available": "PARTIAL",
+      "source": "M§(หน้าตาระบบ) — ตัวอย่างสาธิต",
+      "groups": [
+        "ILLUSTRATIVE"
+      ],
+      "input": {
+        "approval_date": "2024-03-06",
+        "lg_issue_date": "2024-03-07",
+        "last_actual_payment_date": "2025-01-20",
+        "default_date": "2025-02-10",
+        "tracking_date_screen": "2025-02-10",
+        "demand_date_screen": "2025-07-14",
+        "postal_received_date": "2025-07-16",
+        "claim_date": "2026-08-19",
+        "claim_amount": "41509.31"
+      },
+      "expected_case_status": "PASS_WITH_OBSERVATION",
+      "expected_controls": {
+        "PGS10-TIME-001": {
+          "status": "PASS"
+        },
+        "PGS10-DEF-001": {
+          "status": "PASS"
+        }
+      },
+      "note": "ตัวอย่างระบุ '18 PASS · 1 OBSERVATION' โดยไม่บอกว่า Observation คือเรื่องใด → ไม่ Assert; ใช้ตรวจ Timeline ได้เท่านั้น. (M§ระบุวันที่ 19/08/69 = 2026-08-19 ตามที่เขียนใน Timeline ตัวอย่าง)"
+    }
+  ]
+}

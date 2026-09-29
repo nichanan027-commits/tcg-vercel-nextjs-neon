@@ -12,7 +12,24 @@ Rule Engine สำหรับตรวจคำขอรับเงินค�
 | `app.js`, `index.html`, `style.css` | หน้ากรอกข้อมูล + แสดงผล 22 Controls |
 | `engine.test.js` | 25 เทสต์ครอบทุก Control |
 
-## Controls → Rule ID
+## Spec ชุด v1.0-DRAFT (`pgs10/spec/`) — ยังไม่ Freeze
+
+| ไฟล์ | เนื้อหา |
+|---|---|
+| `01_PGS10_POLICY_RULEBOOK.md` | นโยบายโครงการ (Eligibility, NPL, Restructure, Demand, Filing Window, Coverage, Claim Max) พร้อมป้าย OFFICIAL / LOCKED / OPEN |
+| `02_PGS10_OPERATIONAL_AUDIT_RULES.md` | กฎที่ล็อก L-01…L-14, 28 Controls, รูปแบบผลลัพธ์ (5 Case State + reason_code), **ภาคผนวก A: ทะเบียน Conflict/Ambiguity 28 รายการ** |
+| `03_PGS10_DATA_DICTIONARY.json` | ฟิลด์, Reason Code 77 ตัว, Config ที่ห้าม Hardcode |
+| `04_PGS10_GOLDEN_TESTS.json` | 78 unit cases + 17 fixtures (15 เคส LG-only รอข้อมูลจริง) |
+
+**Rule Engine ในโฟลเดอร์นี้ยังเป็นรุ่นก่อน Spec และยังไม่ได้ปรับ** (รอ Freeze). ส่วนที่ต่างจาก Spec:
+- 0.01 บาท: โค้ดถือเป็น `OBSERVATION` ทันที → Spec: `OBSERVATION_CANDIDATE` ห้าม auto-pass จนอนุมัติ tolerance (A-03)
+- Control 12: โค้ดเทียบ Statement ล่าสุดเป็นค่าเริ่มต้น → Spec: Statement ณ วันบอกกล่าว (A-02)
+- Status: โค้ดใช้ 10 สถานะ + case 4 ค่า → Spec: Case 5 State + `reason_code` (A-06)
+- Rule ID: โค้ดใช้ `PGS10-RST-001` สำหรับวันที่ปรับโครงสร้าง → Spec ใช้ `RST-003` (A-13)
+- ยังไม่มี Control: `LG-001`, `NPL-001`, `RST-001/002`, `DMD-003`, `CLM-001`
+- Historical Debt mismatch = HOLD: โค้ดทำถูกแล้ว (reason ยังเป็น `HISTORICAL_BALANCE_MISMATCH` ตรงกับ Spec)
+
+## Controls → Rule ID (ตามโค้ดปัจจุบัน)
 
 | # | Rule ID | # | Rule ID |
 |---|---|---|---|
