@@ -1,0 +1,718 @@
+{
+  "meta": {
+    "spec_version": "1.2.0-RECONCILIATION",
+    "frozen": false,
+    "status": "RECONCILIATION_DRAFT — ไม่ใช่ Spec Candidate และไม่ใช่การ Freeze",
+    "decision_baseline": "DEC-01..DEC-14 (Rule_Reconciliation_Report §2)",
+    "inputs": [
+      "draft spec v1.0.0-DRAFT (pgs10/spec)",
+      "Deployment Pack v1.1.0",
+      "Rulebook (22 Controls)",
+      "Master Audit",
+      "คำตัดสินของผู้ใช้"
+    ],
+    "artifact": "Canonical_Rule_ID_Map",
+    "policy": "Master Audit §41 IDs เป็น Canonical (DEC-14); ไม่ Renumber; ID เก่าต้องอ้างเป็น '<id>@<version>' เท่านั้น"
+  },
+  "canonical_rules": [
+    {
+      "id": "PGS10-ELIG-001",
+      "name": "Project / Product Eligibility",
+      "kind": "POLICY",
+      "requirement": "REQUIRED_HARD",
+      "applicable_when": "เสมอ",
+      "upstream": "R#1, M§2",
+      "id_origin": "M§41/R",
+      "legacy_aliases": [
+        {
+          "alias": "PGS10-POL-001",
+          "version": "v1.1.0",
+          "note": "Program/version applicability"
+        },
+        {
+          "alias": "PGS10-POL-003",
+          "version": "v1.1.0",
+          "note": "Product-specific limit"
+        }
+      ]
+    },
+    {
+      "id": "PGS10-ID-001",
+      "name": "Identity Integrity",
+      "kind": "OPERATIONAL",
+      "requirement": "REQUIRED_HARD",
+      "applicable_when": "เสมอ",
+      "upstream": "R#2, M§8",
+      "id_origin": "M§41/R",
+      "legacy_aliases": [
+        {
+          "alias": "PGS10-ID-001",
+          "version": "v1.1.0",
+          "note": "Identity"
+        }
+      ]
+    },
+    {
+      "id": "PGS10-DOC-001",
+      "name": "Approval / Contract Page Completeness",
+      "kind": "OPERATIONAL",
+      "requirement": "REQUIRED_HARD",
+      "applicable_when": "เสมอ (มีเอกสารอนุมัติ/สัญญา)",
+      "upstream": "R#4, M§10",
+      "id_origin": "M§41/R",
+      "legacy_aliases": [
+        {
+          "alias": "PGS10-DOC-001",
+          "version": "v1.1.0",
+          "note": "Page completeness"
+        }
+      ]
+    },
+    {
+      "id": "PGS10-VIS-001",
+      "name": "Confirmation Letter Visual Completeness",
+      "kind": "OPERATIONAL",
+      "requirement": "CONDITIONAL",
+      "applicable_when": "DEF-002 ต้องใช้หนังสือยืนยัน (default < last payment) หรือมีหนังสือยืนยันในเคส",
+      "upstream": "R#5, M§15, M§41",
+      "id_origin": "M§41/R",
+      "legacy_aliases": [
+        {
+          "alias": "PGS10-VIS-001",
+          "version": "v1.1.0",
+          "note": "Confirmation visual completeness"
+        },
+        {
+          "alias": "PGS10-VIS-001",
+          "version": "draft1.0",
+          "note": "D รวมเอกสาร Critical ทุกชนิด"
+        }
+      ]
+    },
+    {
+      "id": "PGS10-VIS-002",
+      "name": "Critical Evidence Visual Authority",
+      "kind": "OPERATIONAL",
+      "requirement": "CONDITIONAL",
+      "applicable_when": "มีเอกสาร Critical ในเคส",
+      "upstream": "M§37",
+      "id_origin": "ใหม่ในชุด Reconciliation (ไม่อยู่ใน M§41)",
+      "legacy_aliases": [
+        {
+          "alias": "PGS10-VIS-002",
+          "version": "v1.1.0",
+          "note": "Visual evidence authority"
+        },
+        {
+          "alias": "PGS10-VIS-001",
+          "version": "draft1.0",
+          "note": "D รวมเอกสาร Critical ทุกชนิด"
+        }
+      ]
+    },
+    {
+      "id": "PGS10-CONTRACT-001",
+      "name": "Contract / Approval Date",
+      "kind": "OPERATIONAL",
+      "requirement": "REQUIRED_HARD",
+      "applicable_when": "เสมอ; ฐานวันที่ทำสัญญาใช้ได้เฉพาะ Thai Credit revolving-loan",
+      "upstream": "R#3, M§9",
+      "id_origin": "M§41/R",
+      "legacy_aliases": [
+        {
+          "alias": "PGS10-CON-001",
+          "version": "v1.1.0",
+          "note": "Contract date (Thai Credit)"
+        }
+      ]
+    },
+    {
+      "id": "PGS10-LG-001",
+      "name": "Guarantee Validity",
+      "kind": "POLICY",
+      "requirement": "REQUIRED_HARD",
+      "applicable_when": "เสมอ",
+      "upstream": "M§41 (ชื่อเท่านั้น)",
+      "id_origin": "M§41/R",
+      "legacy_aliases": [
+        {
+          "alias": "PGS10-POL-002",
+          "version": "v1.1.0",
+          "note": "Guarantee term"
+        }
+      ]
+    },
+    {
+      "id": "PGS10-NPL-001",
+      "name": "NPL Date & Seasoning",
+      "kind": "POLICY",
+      "requirement": "REQUIRED_HARD",
+      "applicable_when": "เสมอ",
+      "upstream": "M§3.1, M§4.1",
+      "id_origin": "M§41/R",
+      "legacy_aliases": [
+        {
+          "alias": "PGS10-NPL-001",
+          "version": "v1.1.0",
+          "note": "NPL date is distinct field (รวมเป็นส่วนหนึ่ง)"
+        },
+        {
+          "alias": "PGS10-NPL-002",
+          "version": "v1.1.0",
+          "note": "Product seasoning (รวม)"
+        }
+      ]
+    },
+    {
+      "id": "PGS10-TXN-001",
+      "name": "Transaction Classification",
+      "kind": "OPERATIONAL",
+      "requirement": "REQUIRED_HARD",
+      "applicable_when": "เสมอ (มี Statement)",
+      "upstream": "R#6, M§11",
+      "id_origin": "ใหม่ในชุด Reconciliation (ไม่อยู่ใน M§41)",
+      "legacy_aliases": [
+        {
+          "alias": "PGS10-STM-001",
+          "version": "v1.1.0",
+          "note": "Bank-specific transaction mapping"
+        },
+        {
+          "alias": "PGS10-STM-001",
+          "version": "draft1.0",
+          "note": "D รวม classification + last payment"
+        }
+      ]
+    },
+    {
+      "id": "PGS10-STM-001",
+      "name": "Last Actual Payment",
+      "kind": "OPERATIONAL",
+      "requirement": "REQUIRED_HARD",
+      "applicable_when": "เสมอ",
+      "upstream": "R#6, M§12",
+      "id_origin": "M§41/R",
+      "legacy_aliases": [
+        {
+          "alias": "PGS10-STM-002",
+          "version": "v1.1.0",
+          "note": "Last Actual Payment"
+        },
+        {
+          "alias": "PGS10-STM-001",
+          "version": "draft1.0",
+          "note": "D รวม classification + last payment"
+        }
+      ]
+    },
+    {
+      "id": "PGS10-STM-002",
+      "name": "Statement Cut-off vs Later Payments",
+      "kind": "OPERATIONAL",
+      "requirement": "REQUIRED_HARD",
+      "applicable_when": "เสมอ",
+      "upstream": "R#17",
+      "id_origin": "ใหม่ในชุด Reconciliation (ไม่อยู่ใน M§41)",
+      "legacy_aliases": []
+    },
+    {
+      "id": "PGS10-DEF-001",
+      "name": "Default Date ≥ Last Actual Payment",
+      "kind": "OPERATIONAL",
+      "requirement": "REQUIRED_HARD",
+      "applicable_when": "เสมอ",
+      "upstream": "R#7, M§13",
+      "id_origin": "M§41/R",
+      "legacy_aliases": [
+        {
+          "alias": "PGS10-DEF-001",
+          "version": "v1.1.0",
+          "note": "Default chronology"
+        }
+      ]
+    },
+    {
+      "id": "PGS10-DEF-002",
+      "name": "Post-Default Payment Exception",
+      "kind": "OPERATIONAL",
+      "requirement": "CONDITIONAL",
+      "applicable_when": "default_date < last_actual_payment_date",
+      "upstream": "R#8, M§14, M§16",
+      "id_origin": "M§41/R",
+      "legacy_aliases": [
+        {
+          "alias": "PGS10-DEF-002",
+          "version": "v1.1.0",
+          "note": "Post-default exception"
+        }
+      ]
+    },
+    {
+      "id": "PGS10-FUP-001",
+      "name": "Follow-up / Tracking Evidence",
+      "kind": "OPERATIONAL",
+      "requirement": "REQUIRED_HARD",
+      "applicable_when": "เสมอ",
+      "upstream": "R#9, M§17",
+      "id_origin": "M§41/R",
+      "legacy_aliases": [
+        {
+          "alias": "PGS10-FUP-001",
+          "version": "v1.1.0",
+          "note": "Tracking date"
+        }
+      ]
+    },
+    {
+      "id": "PGS10-RST-001",
+      "name": "Restructure Requirement / Route",
+      "kind": "POLICY",
+      "requirement": "CONDITIONAL",
+      "applicable_when": "Small Biz/Start up ภายใน 5 ปีแรกของ LG (เงื่อนไข (ค))",
+      "upstream": "M§4.2, M§5, M§6",
+      "id_origin": "M§41/R",
+      "legacy_aliases": [
+        {
+          "alias": "PGS10-RST-001",
+          "version": "v1.1.0",
+          "note": "Normal restructure path"
+        }
+      ]
+    },
+    {
+      "id": "PGS10-RST-002",
+      "name": "Uncontactable / Unable-to-agree Exception",
+      "kind": "POLICY",
+      "requirement": "CONDITIONAL",
+      "applicable_when": "route = UNCONTACTABLE_EXCEPTION_PATH",
+      "upstream": "M§5, R§32",
+      "id_origin": "M§41/R",
+      "legacy_aliases": [
+        {
+          "alias": "PGS10-RST-002",
+          "version": "v1.1.0",
+          "note": "Uncontactable exception"
+        },
+        {
+          "alias": "PGS10-RST-OP-002",
+          "version": "v1.1.0",
+          "note": "No-restructure exception evidence"
+        }
+      ]
+    },
+    {
+      "id": "PGS10-RST-003",
+      "name": "Restructure Date Evidence",
+      "kind": "OPERATIONAL",
+      "requirement": "CONDITIONAL",
+      "applicable_when": "มีการปรับโครงสร้างหนี้",
+      "upstream": "R#10, M§18",
+      "id_origin": "ใหม่ในชุด Reconciliation (ไม่อยู่ใน M§41)",
+      "legacy_aliases": [
+        {
+          "alias": "PGS10-RST-OP-001",
+          "version": "v1.1.0",
+          "note": "Restructure date semantics"
+        }
+      ]
+    },
+    {
+      "id": "PGS10-DMD-001",
+      "name": "Demand Letter Identity & Existence",
+      "kind": "OPERATIONAL",
+      "requirement": "REQUIRED_HARD",
+      "applicable_when": "เสมอ",
+      "upstream": "R#11, M§19",
+      "id_origin": "M§41/R",
+      "legacy_aliases": [
+        {
+          "alias": "PGS10-DMD-POL-001",
+          "version": "v1.1.0",
+          "note": "Demand/termination evidence exists"
+        },
+        {
+          "alias": "PGS10-DMD-001",
+          "version": "v1.1.0",
+          "note": "Demand identity"
+        }
+      ]
+    },
+    {
+      "id": "PGS10-DMD-002",
+      "name": "Demand Principal as of Demand Date",
+      "kind": "OPERATIONAL",
+      "requirement": "REQUIRED_HARD",
+      "applicable_when": "เสมอ",
+      "upstream": "R#12, M§19-20",
+      "id_origin": "M§41/R",
+      "legacy_aliases": [
+        {
+          "alias": "PGS10-DMD-002",
+          "version": "v1.1.0",
+          "note": "Demand principal as-of"
+        }
+      ]
+    },
+    {
+      "id": "PGS10-DMD-003",
+      "name": "Demand Waiting Period",
+      "kind": "POLICY",
+      "requirement": "CONDITIONAL",
+      "applicable_when": "ไม่ใช่เส้นทางล้มละลาย",
+      "upstream": "M§24",
+      "id_origin": "M§41/R",
+      "legacy_aliases": [
+        {
+          "alias": "PGS10-DMD-POL-002",
+          "version": "v1.1.0",
+          "note": "Demand waiting period"
+        }
+      ]
+    },
+    {
+      "id": "PGS10-HIS-001",
+      "name": "Historical Debt Snapshot",
+      "kind": "OPERATIONAL",
+      "requirement": "REQUIRED_HARD",
+      "applicable_when": "เสมอ (Reference Event = Demand)",
+      "upstream": "R#13, M§27",
+      "id_origin": "M§41/R",
+      "legacy_aliases": [
+        {
+          "alias": "PGS10-HIS-001",
+          "version": "v1.1.0",
+          "note": "Historical snapshot"
+        }
+      ]
+    },
+    {
+      "id": "PGS10-PST-001",
+      "name": "Postal Delivery Evidence",
+      "kind": "OPERATIONAL",
+      "requirement": "REQUIRED_HARD",
+      "applicable_when": "เสมอ",
+      "upstream": "R#14, M§21",
+      "id_origin": "M§41/R",
+      "legacy_aliases": [
+        {
+          "alias": "PGS10-PST-001",
+          "version": "v1.1.0",
+          "note": "Postal success branch"
+        },
+        {
+          "alias": "PGS10-PST-002",
+          "version": "v1.1.0",
+          "note": "Postal returned-mail branch"
+        },
+        {
+          "alias": "PGS10-PST-001",
+          "version": "draft1.0",
+          "note": "D รวม linkage ไว้ใน PST-001"
+        }
+      ]
+    },
+    {
+      "id": "PGS10-PST-002",
+      "name": "Address Match",
+      "kind": "OPERATIONAL",
+      "requirement": "REQUIRED_HARD",
+      "applicable_when": "เสมอ",
+      "upstream": "R#15, M§22",
+      "id_origin": "M§41/R",
+      "legacy_aliases": [
+        {
+          "alias": "PGS10-PST-003",
+          "version": "v1.1.0",
+          "note": "Address source set"
+        }
+      ]
+    },
+    {
+      "id": "PGS10-PST-003",
+      "name": "Postal Linkage",
+      "kind": "OPERATIONAL",
+      "requirement": "CONDITIONAL",
+      "applicable_when": "มี tracking number/barcode",
+      "upstream": "M§23",
+      "id_origin": "ใหม่ในชุด Reconciliation (ไม่อยู่ใน M§41)",
+      "legacy_aliases": [
+        {
+          "alias": "PGS10-PST-004",
+          "version": "v1.1.0",
+          "note": "Postal linkage"
+        },
+        {
+          "alias": "PGS10-PST-001",
+          "version": "draft1.0",
+          "note": "D รวม linkage ไว้ใน PST-001"
+        }
+      ]
+    },
+    {
+      "id": "PGS10-CUR-001",
+      "name": "Current Principal",
+      "kind": "OPERATIONAL",
+      "requirement": "REQUIRED_HARD",
+      "applicable_when": "เสมอ",
+      "upstream": "R#16, M§26",
+      "id_origin": "M§41/R",
+      "legacy_aliases": [
+        {
+          "alias": "PGS10-CUR-001",
+          "version": "v1.1.0",
+          "note": "Current principal"
+        },
+        {
+          "alias": "PGS10-CUR-001",
+          "version": "draft1.0",
+          "note": "D รวม principal + interest/total"
+        }
+      ]
+    },
+    {
+      "id": "PGS10-CUR-002",
+      "name": "Current Interest / Total",
+      "kind": "OPERATIONAL",
+      "requirement": "REQUIRED_HARD",
+      "applicable_when": "เสมอ",
+      "upstream": "R#16, M§26",
+      "id_origin": "ใหม่ในชุด Reconciliation (ไม่อยู่ใน M§41)",
+      "legacy_aliases": [
+        {
+          "alias": "PGS10-CUR-002",
+          "version": "v1.1.0",
+          "note": "Current interest/total"
+        },
+        {
+          "alias": "PGS10-CUR-001",
+          "version": "draft1.0",
+          "note": "D รวม principal + interest/total"
+        }
+      ]
+    },
+    {
+      "id": "PGS10-CLM-001",
+      "name": "Claim Filing Window",
+      "kind": "POLICY",
+      "requirement": "REQUIRED_HARD",
+      "applicable_when": "เสมอ",
+      "upstream": "M§25",
+      "id_origin": "M§41/R",
+      "legacy_aliases": [
+        {
+          "alias": "PGS10-CLM-POL-001",
+          "version": "v1.1.0",
+          "note": "Filing window"
+        }
+      ]
+    },
+    {
+      "id": "PGS10-CLM-002",
+      "name": "Coverage Ratio",
+      "kind": "POLICY",
+      "requirement": "REQUIRED_HARD",
+      "applicable_when": "เสมอ",
+      "upstream": "R#19, M§7",
+      "id_origin": "M§41/R",
+      "legacy_aliases": [
+        {
+          "alias": "PGS10-COV-001",
+          "version": "v1.1.0",
+          "note": "Coverage"
+        },
+        {
+          "alias": "PGS10-CLM-002",
+          "version": "v1.1.0",
+          "note": "Coverage lookup"
+        }
+      ]
+    },
+    {
+      "id": "PGS10-CLM-003",
+      "name": "Claim Base",
+      "kind": "POLICY",
+      "requirement": "REQUIRED_HARD",
+      "applicable_when": "เสมอ",
+      "upstream": "R#18, M§28",
+      "id_origin": "M§41/R",
+      "legacy_aliases": [
+        {
+          "alias": "PGS10-CLM-POL-002",
+          "version": "v1.1.0",
+          "note": "Claim base"
+        },
+        {
+          "alias": "PGS10-CLM-001",
+          "version": "v1.1.0",
+          "note": "Claim base"
+        }
+      ]
+    },
+    {
+      "id": "PGS10-CLM-004",
+      "name": "Claim Calculation",
+      "kind": "POLICY",
+      "requirement": "REQUIRED_HARD",
+      "applicable_when": "เสมอ",
+      "upstream": "R#20, M§29",
+      "id_origin": "M§41/R",
+      "legacy_aliases": [
+        {
+          "alias": "PGS10-CLM-POL-003",
+          "version": "v1.1.0",
+          "note": "Claim calculation"
+        },
+        {
+          "alias": "PGS10-CLM-003",
+          "version": "v1.1.0",
+          "note": "Recalculation"
+        }
+      ]
+    },
+    {
+      "id": "PGS10-CAP-001",
+      "name": "CLAIM MAX / Package Capacity",
+      "kind": "POLICY",
+      "requirement": "REQUIRED_HARD",
+      "applicable_when": "เสมอ (เสนอ — ขอยืนยัน)",
+      "upstream": "R#21, M§30-32",
+      "id_origin": "M§41/R",
+      "legacy_aliases": [
+        {
+          "alias": "PGS10-CAP-001",
+          "version": "v1.1.0",
+          "note": "Package arithmetic"
+        },
+        {
+          "alias": "PGS10-CAP-OP-001",
+          "version": "v1.1.0",
+          "note": "Arithmetic integrity"
+        }
+      ]
+    },
+    {
+      "id": "PGS10-TIME-001",
+      "name": "Timeline Integrity",
+      "kind": "OPERATIONAL",
+      "requirement": "REQUIRED_HARD",
+      "applicable_when": "เสมอ",
+      "upstream": "R#22, M§36",
+      "id_origin": "M§41/R",
+      "legacy_aliases": [
+        {
+          "alias": "PGS10-TIME-001",
+          "version": "v1.1.0",
+          "note": "Chronology"
+        }
+      ]
+    }
+  ],
+  "alias_index": {
+    "PGS10-POL-001@v1.1.0": "PGS10-ELIG-001",
+    "PGS10-POL-002@v1.1.0": "PGS10-LG-001",
+    "PGS10-POL-003@v1.1.0": "PGS10-ELIG-001",
+    "PGS10-NPL-001@v1.1.0": "PGS10-NPL-001",
+    "PGS10-NPL-002@v1.1.0": "PGS10-NPL-001",
+    "PGS10-RST-001@v1.1.0": "PGS10-RST-001",
+    "PGS10-RST-002@v1.1.0": "PGS10-RST-002",
+    "PGS10-DMD-POL-001@v1.1.0": "PGS10-DMD-001",
+    "PGS10-DMD-POL-002@v1.1.0": "PGS10-DMD-003",
+    "PGS10-CLM-POL-001@v1.1.0": "PGS10-CLM-001",
+    "PGS10-COV-001@v1.1.0": "PGS10-CLM-002",
+    "PGS10-CLM-POL-002@v1.1.0": "PGS10-CLM-003",
+    "PGS10-CLM-POL-003@v1.1.0": "PGS10-CLM-004",
+    "PGS10-CAP-001@v1.1.0": "PGS10-CAP-001",
+    "PGS10-ID-001@v1.1.0": "PGS10-ID-001",
+    "PGS10-DOC-001@v1.1.0": "PGS10-DOC-001",
+    "PGS10-CON-001@v1.1.0": "PGS10-CONTRACT-001",
+    "PGS10-STM-001@v1.1.0": "PGS10-TXN-001",
+    "PGS10-STM-002@v1.1.0": "PGS10-STM-001",
+    "PGS10-DEF-001@v1.1.0": "PGS10-DEF-001",
+    "PGS10-DEF-002@v1.1.0": "PGS10-DEF-002",
+    "PGS10-VIS-001@v1.1.0": "PGS10-VIS-001",
+    "PGS10-FUP-001@v1.1.0": "PGS10-FUP-001",
+    "PGS10-RST-OP-001@v1.1.0": "PGS10-RST-003",
+    "PGS10-RST-OP-002@v1.1.0": "PGS10-RST-002",
+    "PGS10-DMD-001@v1.1.0": "PGS10-DMD-001",
+    "PGS10-DMD-002@v1.1.0": "PGS10-DMD-002",
+    "PGS10-HIS-001@v1.1.0": "PGS10-HIS-001",
+    "PGS10-PST-001@v1.1.0": "PGS10-PST-001",
+    "PGS10-PST-002@v1.1.0": "PGS10-PST-001",
+    "PGS10-PST-003@v1.1.0": "PGS10-PST-002",
+    "PGS10-PST-004@v1.1.0": "PGS10-PST-003",
+    "PGS10-CUR-001@v1.1.0": "PGS10-CUR-001",
+    "PGS10-CUR-002@v1.1.0": "PGS10-CUR-002",
+    "PGS10-CLM-001@v1.1.0": "PGS10-CLM-003",
+    "PGS10-CLM-002@v1.1.0": "PGS10-CLM-002",
+    "PGS10-CLM-003@v1.1.0": "PGS10-CLM-004",
+    "PGS10-CAP-OP-001@v1.1.0": "PGS10-CAP-001",
+    "PGS10-TIME-001@v1.1.0": "PGS10-TIME-001",
+    "PGS10-VIS-002@v1.1.0": "PGS10-VIS-002",
+    "PGS10-STM-001@draft1.0": "PGS10-TXN-001 + PGS10-STM-001",
+    "PGS10-VIS-001@draft1.0": "PGS10-VIS-001 + PGS10-VIS-002",
+    "PGS10-CUR-001@draft1.0": "PGS10-CUR-001 + PGS10-CUR-002",
+    "PGS10-PST-001@draft1.0": "PGS10-PST-001 + PGS10-PST-003"
+  },
+  "same_id_different_meaning_hazards": [
+    {
+      "legacy_id": "PGS10-STM-001@v1.1.0",
+      "legacy_meaning": "Bank-specific transaction mapping",
+      "same_string_now_means": "Last Actual Payment",
+      "maps_to": "PGS10-TXN-001"
+    },
+    {
+      "legacy_id": "PGS10-STM-002@v1.1.0",
+      "legacy_meaning": "Last Actual Payment",
+      "same_string_now_means": "Statement Cut-off vs Later Payments",
+      "maps_to": "PGS10-STM-001"
+    },
+    {
+      "legacy_id": "PGS10-PST-002@v1.1.0",
+      "legacy_meaning": "Postal returned-mail branch",
+      "same_string_now_means": "Address Match",
+      "maps_to": "PGS10-PST-001"
+    },
+    {
+      "legacy_id": "PGS10-PST-003@v1.1.0",
+      "legacy_meaning": "Address source set",
+      "same_string_now_means": "Postal Linkage",
+      "maps_to": "PGS10-PST-002"
+    },
+    {
+      "legacy_id": "PGS10-CLM-001@v1.1.0",
+      "legacy_meaning": "Claim base",
+      "same_string_now_means": "Claim Filing Window",
+      "maps_to": "PGS10-CLM-003"
+    },
+    {
+      "legacy_id": "PGS10-CLM-003@v1.1.0",
+      "legacy_meaning": "Recalculation",
+      "same_string_now_means": "Claim Base",
+      "maps_to": "PGS10-CLM-004"
+    },
+    {
+      "legacy_id": "PGS10-STM-001@draft1.0",
+      "legacy_meaning": "D รวม classification + last payment",
+      "same_string_now_means": "Last Actual Payment",
+      "maps_to": "PGS10-TXN-001 + PGS10-STM-001"
+    },
+    {
+      "legacy_id": "PGS10-VIS-001@draft1.0",
+      "legacy_meaning": "D รวมเอกสาร Critical ทุกชนิด",
+      "same_string_now_means": "Confirmation Letter Visual Completeness",
+      "maps_to": "PGS10-VIS-001 + PGS10-VIS-002"
+    },
+    {
+      "legacy_id": "PGS10-CUR-001@draft1.0",
+      "legacy_meaning": "D รวม principal + interest/total",
+      "same_string_now_means": "Current Principal",
+      "maps_to": "PGS10-CUR-001 + PGS10-CUR-002"
+    },
+    {
+      "legacy_id": "PGS10-PST-001@draft1.0",
+      "legacy_meaning": "D รวม linkage ไว้ใน PST-001",
+      "same_string_now_means": "Postal Delivery Evidence",
+      "maps_to": "PGS10-PST-001 + PGS10-PST-003"
+    }
+  ]
+}

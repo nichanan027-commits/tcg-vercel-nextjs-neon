@@ -1,0 +1,1095 @@
+{
+  "meta": {
+    "spec_version": "1.2.0-RECONCILIATION",
+    "frozen": false,
+    "status": "RECONCILIATION_DRAFT — ไม่ใช่ Spec Candidate และไม่ใช่การ Freeze",
+    "decision_baseline": "DEC-01..DEC-14 (Rule_Reconciliation_Report §2)",
+    "inputs": [
+      "draft spec v1.0.0-DRAFT (pgs10/spec)",
+      "Deployment Pack v1.1.0",
+      "Rulebook (22 Controls)",
+      "Master Audit",
+      "คำตัดสินของผู้ใช้"
+    ],
+    "artifact": "Canonical_Reason_Code_Catalogue",
+    "rules": "reason_code เป็นคำอธิบายเงื่อนไข ไม่ใช่สถานะ: ห้ามขึ้นต้น HOLD_/FAIL_ (DEC-05). ชื่อใน Pack v1.1.0 คงไว้เมื่อความหมายตรงกัน มิฉะนั้นใช้ชื่อของ Draft."
+  },
+  "case_status_values": [
+    "PASS",
+    "PASS_WITH_SUPPORT",
+    "PASS_WITH_OBSERVATION",
+    "HOLD",
+    "FAIL"
+  ],
+  "control_status_values": [
+    "PASS",
+    "PASS_WITH_SUPPORT",
+    "OBSERVATION",
+    "HOLD",
+    "FAIL",
+    "NOT_APPLICABLE",
+    "NOT_TESTABLE"
+  ],
+  "review_flags": [
+    "OBSERVATION_CANDIDATE"
+  ],
+  "case_level_flags": [
+    "support_used"
+  ],
+  "forbidden_reason_code_patterns": [
+    "^HOLD_",
+    "^FAIL_",
+    "^PASS_WITH_DOCUMENTARY"
+  ],
+  "reason_codes": [
+    {
+      "code": "INVALID_INPUT",
+      "rules": [
+        "*"
+      ],
+      "control_status": "HOLD",
+      "meaning": "รูปแบบข้อมูลไม่ถูกต้อง",
+      "aliases": [],
+      "detail_codes": [],
+      "review_flag": null,
+      "proposed": false
+    },
+    {
+      "code": "MISSING_INPUT",
+      "rules": [
+        "*"
+      ],
+      "control_status": "NOT_TESTABLE",
+      "meaning": "ขาดข้อมูลที่จำเป็น",
+      "aliases": [],
+      "detail_codes": [],
+      "review_flag": null,
+      "proposed": false
+    },
+    {
+      "code": "RULE_VERSION_CONFLICT",
+      "rules": [
+        "*"
+      ],
+      "control_status": "HOLD",
+      "meaning": "กฎ/Effective Date ขัดกันและตัดสินไม่ได้ ต้องรายงาน Conflict",
+      "aliases": [
+        "RULE_CONFLICT_UNRESOLVED"
+      ],
+      "detail_codes": [],
+      "review_flag": null,
+      "proposed": false
+    },
+    {
+      "code": "CLAIM_EXCEEDS_CAP",
+      "rules": [
+        "PGS10-CAP-001"
+      ],
+      "control_status": "HOLD",
+      "meaning": "Claim เกินวงเงินคงเหลือ",
+      "aliases": [],
+      "detail_codes": [],
+      "review_flag": null,
+      "proposed": false
+    },
+    {
+      "code": "CLAIM_MAX_ARITHMETIC_MISMATCH",
+      "rules": [
+        "PGS10-CAP-001"
+      ],
+      "control_status": "HOLD",
+      "meaning": "คงเหลือจ่ายได้อีก/หลังอนุมัติไม่ตรงทุกสตางค์",
+      "aliases": [
+        "CAP_ARITHMETIC_MISMATCH",
+        "HOLD_CLAIM_MAX_ARITHMETIC"
+      ],
+      "detail_codes": [],
+      "review_flag": null,
+      "proposed": false
+    },
+    {
+      "code": "PACKAGE_DEFINITION_REQUIRED",
+      "rules": [
+        "PGS10-CAP-001"
+      ],
+      "control_status": "HOLD",
+      "meaning": "นิยาม Claim Max / รอบ Package / Carry-forward ของแหล่งข้อมูลไม่ชัด",
+      "aliases": [
+        "HOLD_PACKAGE_DEFINITION_REQUIRED"
+      ],
+      "detail_codes": [],
+      "review_flag": null,
+      "proposed": true
+    },
+    {
+      "code": "PAID_PENDING_MISSING",
+      "rules": [
+        "PGS10-CAP-001"
+      ],
+      "control_status": "NOT_TESTABLE",
+      "meaning": "มี CLAIM MAX แต่ไม่มียอดจ่าย/รอจ่าย",
+      "aliases": [],
+      "detail_codes": [],
+      "review_flag": null,
+      "proposed": false
+    },
+    {
+      "code": "CLAIM_FILING_WINDOW_NOT_MET",
+      "rules": [
+        "PGS10-CLM-001"
+      ],
+      "control_status": "HOLD",
+      "meaning": "ยื่นนอกช่วงที่อนุญาต",
+      "aliases": [],
+      "detail_codes": [],
+      "review_flag": null,
+      "proposed": false
+    },
+    {
+      "code": "COVERAGE_RATIO_MISMATCH",
+      "rules": [
+        "PGS10-CLM-002"
+      ],
+      "control_status": "HOLD",
+      "meaning": "อัตราหน้าจอ ≠ อัตราตามกฎ",
+      "aliases": [],
+      "detail_codes": [],
+      "review_flag": null,
+      "proposed": false
+    },
+    {
+      "code": "NO_RULE_FOR_PRODUCT",
+      "rules": [
+        "PGS10-CLM-002"
+      ],
+      "control_status": "HOLD",
+      "meaning": "ไม่มีกฎ Coverage ที่ยืนยันสำหรับ Product นี้",
+      "aliases": [],
+      "detail_codes": [],
+      "review_flag": null,
+      "proposed": false
+    },
+    {
+      "code": "CLAIM_BASE_MISMATCH",
+      "rules": [
+        "PGS10-CLM-003"
+      ],
+      "control_status": "HOLD",
+      "meaning": "ฐานคำนวณหน้าจอ ≠ MIN(principal, guarantee)",
+      "aliases": [],
+      "detail_codes": [],
+      "review_flag": null,
+      "proposed": false
+    },
+    {
+      "code": "CLAIM_BASE_MODE_MISMATCH",
+      "rules": [
+        "PGS10-CLM-003"
+      ],
+      "control_status": "HOLD",
+      "meaning": "โหมดฐานคำนวณไม่ตรงกฎ",
+      "aliases": [],
+      "detail_codes": [],
+      "review_flag": null,
+      "proposed": false
+    },
+    {
+      "code": "CLAIM_CALCULATION_MISMATCH",
+      "rules": [
+        "PGS10-CLM-004"
+      ],
+      "control_status": "HOLD",
+      "meaning": "จำนวนเงินค่าประกันชดเชย/ยอดอนุมัติจ่ายหน้าจอ ≠ ที่คำนวณ",
+      "aliases": [
+        "CLAIM_AMOUNT_MISMATCH"
+      ],
+      "detail_codes": [],
+      "review_flag": null,
+      "proposed": false
+    },
+    {
+      "code": "UPSTREAM_NOT_COMPUTABLE",
+      "rules": [
+        "PGS10-CLM-004",
+        "PGS10-CAP-001"
+      ],
+      "control_status": "NOT_TESTABLE",
+      "meaning": "Control ต้นทางยังคำนวณไม่ได้",
+      "aliases": [],
+      "detail_codes": [],
+      "review_flag": null,
+      "proposed": false
+    },
+    {
+      "code": "CONTRACT_DATE_BASIS_UNDEFINED",
+      "rules": [
+        "PGS10-CONTRACT-001"
+      ],
+      "control_status": "HOLD",
+      "meaning": "FI/Product นี้ยังไม่มีกฎกำหนดวันที่ทำสัญญา (กฎ Approval=Contract ใช้เฉพาะ Thai Credit revolving-loan — DEC-10)",
+      "aliases": [],
+      "detail_codes": [],
+      "review_flag": null,
+      "proposed": true
+    },
+    {
+      "code": "CONTRACT_DATE_MISMATCH",
+      "rules": [
+        "PGS10-CONTRACT-001"
+      ],
+      "control_status": "HOLD",
+      "meaning": "วันที่อนุมัติ ≠ วันที่สัญญาที่อ้างในหนังสือบอกกล่าว",
+      "aliases": [
+        "HOLD_CONTRACT_DATE_MISMATCH"
+      ],
+      "detail_codes": [],
+      "review_flag": null,
+      "proposed": false
+    },
+    {
+      "code": "CURRENT_PRINCIPAL_MISMATCH",
+      "rules": [
+        "PGS10-CUR-001"
+      ],
+      "control_status": "HOLD",
+      "meaning": "เงินต้นปัจจุบันไม่ตรง Statement ล่าสุด (tolerance = 0)",
+      "aliases": [],
+      "detail_codes": [],
+      "review_flag": null,
+      "proposed": false
+    },
+    {
+      "code": "CURRENT_BALANCE_MISMATCH",
+      "rules": [
+        "PGS10-CUR-002"
+      ],
+      "control_status": "HOLD",
+      "meaning": "ดอกเบี้ย/รวมต่างเกินเกณฑ์ที่ใช้ได้",
+      "aliases": [],
+      "detail_codes": [],
+      "review_flag": null,
+      "proposed": false
+    },
+    {
+      "code": "NUMERIC_VARIANCE",
+      "rules": [
+        "PGS10-CUR-002"
+      ],
+      "control_status": "HOLD",
+      "meaning": "ส่วนต่างจำนวนเงินเล็กน้อยที่ tolerance ยังปิดอยู่ (DEC-09)",
+      "aliases": [
+        "VARIANCE_PENDING_TOLERANCE_APPROVAL",
+        "ROUNDING_TOLERANCE_NOT_APPROVED"
+      ],
+      "detail_codes": [],
+      "review_flag": "OBSERVATION_CANDIDATE",
+      "proposed": false
+    },
+    {
+      "code": "VARIANCE_WITHIN_APPROVED_TOLERANCE",
+      "rules": [
+        "PGS10-CUR-002"
+      ],
+      "control_status": "OBSERVATION",
+      "meaning": "ส่วนต่างอยู่ใน tolerance ที่อนุมัติ (เปิด Config แล้ว/มี reviewer override) และเงินต้นตรง",
+      "aliases": [],
+      "detail_codes": [],
+      "review_flag": null,
+      "proposed": false
+    },
+    {
+      "code": "POST_DEFAULT_PAYMENT",
+      "rules": [
+        "PGS10-DEF-001"
+      ],
+      "control_status": "HOLD",
+      "meaning": "default_date < last_actual_payment_date → เข้า DEF-002 (สถานะตามผล DEF-002)",
+      "aliases": [],
+      "detail_codes": [],
+      "review_flag": null,
+      "proposed": false
+    },
+    {
+      "code": "POST_DEFAULT_PAYMENT_SUPPORTED",
+      "rules": [
+        "PGS10-DEF-001",
+        "PGS10-DEF-002"
+      ],
+      "control_status": "PASS_WITH_SUPPORT",
+      "meaning": "มีการชำระหลังผิดนัดและหนังสือยืนยันสมบูรณ์ ตรงหน้าจอ",
+      "aliases": [],
+      "detail_codes": [],
+      "review_flag": null,
+      "proposed": false
+    },
+    {
+      "code": "CONFIRMATION_CONTENT_INCOMPLETE",
+      "rules": [
+        "PGS10-DEF-002"
+      ],
+      "control_status": "HOLD",
+      "meaning": "หนังสือไม่ระบุสาระที่ต้องมี",
+      "aliases": [],
+      "detail_codes": [],
+      "review_flag": null,
+      "proposed": false
+    },
+    {
+      "code": "CONFIRMED_DEFAULT_DATE_MISMATCH",
+      "rules": [
+        "PGS10-DEF-002"
+      ],
+      "control_status": "HOLD",
+      "meaning": "Default Date ในหนังสือ ≠ หน้าจอ",
+      "aliases": [],
+      "detail_codes": [],
+      "review_flag": null,
+      "proposed": false
+    },
+    {
+      "code": "IDENTIFIER_LINKAGE_UNRESOLVED",
+      "rules": [
+        "PGS10-DEF-002",
+        "PGS10-ID-001"
+      ],
+      "control_status": "HOLD",
+      "meaning": "Identifier ในหนังสือ/เอกสารไม่ลิงก์กลับเคสได้",
+      "aliases": [
+        "CONFIRMATION_IDENTIFIER_UNLINKED"
+      ],
+      "detail_codes": [],
+      "review_flag": null,
+      "proposed": false
+    },
+    {
+      "code": "POST_DEFAULT_SUPPORT_MISSING",
+      "rules": [
+        "PGS10-DEF-002"
+      ],
+      "control_status": "HOLD",
+      "meaning": "ไม่มีหนังสือยืนยันการชำระหลังวันผิดนัด",
+      "aliases": [
+        "EXCEPTION_LETTER_MISSING",
+        "HOLD_POST_DEFAULT_SUPPORT_MISSING"
+      ],
+      "detail_codes": [],
+      "review_flag": null,
+      "proposed": false
+    },
+    {
+      "code": "DEMAND_IDENTITY_UNCONFIRMED",
+      "rules": [
+        "PGS10-DMD-001"
+      ],
+      "control_status": "HOLD",
+      "meaning": "ยังไม่ยืนยันผู้กู้/Account/วงเงิน/ที่อยู่ในหนังสือ",
+      "aliases": [],
+      "detail_codes": [],
+      "review_flag": null,
+      "proposed": false
+    },
+    {
+      "code": "DEMAND_LETTER_MISMATCH",
+      "rules": [
+        "PGS10-DMD-001"
+      ],
+      "control_status": "HOLD",
+      "meaning": "วันที่/ยอดในหนังสือบอกกล่าวไม่ตรงหน้าจอหรือไม่สอดคล้องกันเอง",
+      "aliases": [],
+      "detail_codes": [],
+      "review_flag": null,
+      "proposed": false
+    },
+    {
+      "code": "DEMAND_PRINCIPAL_MISMATCH",
+      "rules": [
+        "PGS10-DMD-002"
+      ],
+      "control_status": "HOLD",
+      "meaning": "เงินต้นบอกกล่าว ≠ Statement ณ วันบอกกล่าว (พิสูจน์ได้ว่าต่าง)",
+      "aliases": [],
+      "detail_codes": [],
+      "review_flag": null,
+      "proposed": false
+    },
+    {
+      "code": "DEMAND_PRINCIPAL_UNRECONCILED",
+      "rules": [
+        "PGS10-DMD-002"
+      ],
+      "control_status": "HOLD",
+      "meaning": "พิสูจน์ยอด ณ วันบอกกล่าวไม่ได้ (ไม่มี as-of และ Latest Statement ใช้แทนไม่ได้)",
+      "aliases": [
+        "ASOF_DEMAND_PRINCIPAL_REQUIRED",
+        "HOLD_DEMAND_PRINCIPAL_UNRECONCILED"
+      ],
+      "detail_codes": [],
+      "review_flag": null,
+      "proposed": false
+    },
+    {
+      "code": "DEMAND_WAITING_PERIOD_NOT_MET",
+      "rules": [
+        "PGS10-DMD-003"
+      ],
+      "control_status": "HOLD",
+      "meaning": "ยังไม่พ้นระยะรอหลังหนังสือบอกกล่าว",
+      "aliases": [],
+      "detail_codes": [],
+      "review_flag": null,
+      "proposed": false
+    },
+    {
+      "code": "APPROVAL_DOCUMENT_INCOMPLETE",
+      "rules": [
+        "PGS10-DOC-001"
+      ],
+      "control_status": "HOLD",
+      "meaning": "เอกสารอนุมัติ/สัญญาไม่ครบ",
+      "aliases": [
+        "DOCUMENT_PAGE_SEQUENCE_GAP",
+        "DOCUMENT_TRUNCATED",
+        "DOCUMENT_PAGE_UNREADABLE"
+      ],
+      "detail_codes": [
+        "PAGE_SEQUENCE_GAP",
+        "DOCUMENT_TRUNCATED",
+        "PAGE_UNREADABLE"
+      ],
+      "review_flag": null,
+      "proposed": false
+    },
+    {
+      "code": "ELIGIBILITY_EXPOSURE_LIMIT_EXCEEDED",
+      "rules": [
+        "PGS10-ELIG-001"
+      ],
+      "control_status": "FAIL",
+      "meaning": "วงเงินรวมต่อรายเกินเพดาน",
+      "aliases": [],
+      "detail_codes": [],
+      "review_flag": null,
+      "proposed": false
+    },
+    {
+      "code": "ELIGIBILITY_GUARANTEE_BELOW_MINIMUM",
+      "rules": [
+        "PGS10-ELIG-001"
+      ],
+      "control_status": "FAIL",
+      "meaning": "วงเงินค้ำต่อครั้งต่ำกว่า 10,000 บาท",
+      "aliases": [],
+      "detail_codes": [],
+      "review_flag": null,
+      "proposed": false
+    },
+    {
+      "code": "ELIGIBILITY_HIRE_PURCHASE_LEASING",
+      "rules": [
+        "PGS10-ELIG-001"
+      ],
+      "control_status": "FAIL",
+      "meaning": "เป็นสินเชื่อเช่าซื้อ/ลิสซิ่ง",
+      "aliases": [],
+      "detail_codes": [],
+      "review_flag": null,
+      "proposed": false
+    },
+    {
+      "code": "ELIGIBILITY_NOT_BUSINESS_PURPOSE",
+      "rules": [
+        "PGS10-ELIG-001"
+      ],
+      "control_status": "FAIL",
+      "meaning": "สินเชื่อไม่ใช่เพื่อวัตถุประสงค์ธุรกิจ (DEC-12)",
+      "aliases": [],
+      "detail_codes": [],
+      "review_flag": null,
+      "proposed": true
+    },
+    {
+      "code": "ELIGIBILITY_NOT_NEW_BUSINESS_LOAN",
+      "rules": [
+        "PGS10-ELIG-001"
+      ],
+      "control_status": "FAIL",
+      "meaning": "ไม่ใช่สินเชื่อใหม่",
+      "aliases": [],
+      "detail_codes": [],
+      "review_flag": null,
+      "proposed": false
+    },
+    {
+      "code": "ELIGIBILITY_NOT_PGS10",
+      "rules": [
+        "PGS10-ELIG-001"
+      ],
+      "control_status": "FAIL",
+      "meaning": "ไม่ใช่ PGS ระยะที่ 10",
+      "aliases": [],
+      "detail_codes": [],
+      "review_flag": null,
+      "proposed": false
+    },
+    {
+      "code": "ELIGIBILITY_PRODUCT_EXCLUDED",
+      "rules": [
+        "PGS10-ELIG-001"
+      ],
+      "control_status": "FAIL",
+      "meaning": "Product ไม่อยู่ในกลุ่มที่เข้าเกณฑ์",
+      "aliases": [],
+      "detail_codes": [],
+      "review_flag": null,
+      "proposed": false
+    },
+    {
+      "code": "ELIGIBILITY_UNCONFIRMED",
+      "rules": [
+        "PGS10-ELIG-001"
+      ],
+      "control_status": "HOLD",
+      "meaning": "ยังไม่ยืนยันคุณสมบัติบางข้อ",
+      "aliases": [],
+      "detail_codes": [],
+      "review_flag": null,
+      "proposed": false
+    },
+    {
+      "code": "PGS_REVISION_MISMATCH",
+      "rules": [
+        "PGS10-ELIG-001"
+      ],
+      "control_status": "HOLD",
+      "meaning": "รุ่นปรับปรุงไม่ใช่ครั้งที่ 5",
+      "aliases": [],
+      "detail_codes": [],
+      "review_flag": null,
+      "proposed": false
+    },
+    {
+      "code": "PRODUCT_UNKNOWN",
+      "rules": [
+        "PGS10-ELIG-001"
+      ],
+      "control_status": "HOLD",
+      "meaning": "ระบุ Product ไม่ได้",
+      "aliases": [],
+      "detail_codes": [],
+      "review_flag": null,
+      "proposed": false
+    },
+    {
+      "code": "TRACKING_EVIDENCE_INCOMPLETE",
+      "rules": [
+        "PGS10-FUP-001"
+      ],
+      "control_status": "HOLD",
+      "meaning": "ขาดวิธี/ผลติดตาม",
+      "aliases": [],
+      "detail_codes": [],
+      "review_flag": null,
+      "proposed": false
+    },
+    {
+      "code": "TRACKING_EVIDENCE_MISMATCH",
+      "rules": [
+        "PGS10-FUP-001"
+      ],
+      "control_status": "HOLD",
+      "meaning": "วันที่/ผู้กู้/LG ในรายงานติดตามไม่ตรงหน้าจอ",
+      "aliases": [
+        "TRACKING_DATE_MISMATCH",
+        "HOLD_TRACKING_EVIDENCE_MISMATCH"
+      ],
+      "detail_codes": [],
+      "review_flag": null,
+      "proposed": false
+    },
+    {
+      "code": "TRACKING_REPORT_MISSING",
+      "rules": [
+        "PGS10-FUP-001"
+      ],
+      "control_status": "HOLD",
+      "meaning": "ไม่มีรายงานติดตาม",
+      "aliases": [],
+      "detail_codes": [],
+      "review_flag": null,
+      "proposed": false
+    },
+    {
+      "code": "HISTORICAL_BALANCE_MISMATCH",
+      "rules": [
+        "PGS10-HIS-001"
+      ],
+      "control_status": "HOLD",
+      "meaning": "สภาพหนี้ ณ วันอ้างอิงบนหน้าจอ (ต้น/ดอก/รวม) ไม่ตรงหนังสือบอกกล่าว — Blocking แม้ไม่กระทบ Claim Base (DEC-07)",
+      "aliases": [],
+      "detail_codes": [],
+      "review_flag": null,
+      "proposed": false
+    },
+    {
+      "code": "FORMAT_VARIANCE",
+      "rules": [
+        "PGS10-ID-001"
+      ],
+      "control_status": "OBSERVATION",
+      "meaning": "ต่างเฉพาะรูปแบบ (Leading Zero) องค์ประกอบอื่นตรงหมด",
+      "aliases": [],
+      "detail_codes": [],
+      "review_flag": null,
+      "proposed": false
+    },
+    {
+      "code": "IDENTITY_MISMATCH",
+      "rules": [
+        "PGS10-ID-001"
+      ],
+      "control_status": "HOLD",
+      "meaning": "LG/ชื่อ/วงเงิน/วันที่ LG ไม่ตรงกันข้ามเอกสาร (ห้ามแก้เลขเอง — DEC-03)",
+      "aliases": [],
+      "detail_codes": [],
+      "review_flag": null,
+      "proposed": false
+    },
+    {
+      "code": "VERIFY_REFERENCE_MAPPING",
+      "rules": [
+        "PGS10-ID-001"
+      ],
+      "control_status": "HOLD",
+      "meaning": "เลขบัญชี/สัญญาต่างที่ตัวเลขภายใน ต้องพิสูจน์ Mapping",
+      "aliases": [],
+      "detail_codes": [],
+      "review_flag": null,
+      "proposed": false
+    },
+    {
+      "code": "LG_DATA_MISSING",
+      "rules": [
+        "PGS10-LG-001"
+      ],
+      "control_status": "HOLD",
+      "meaning": "ขาดข้อมูล LG",
+      "aliases": [],
+      "detail_codes": [],
+      "review_flag": null,
+      "proposed": false
+    },
+    {
+      "code": "LG_FEE_NOT_CONTINUOUS",
+      "rules": [
+        "PGS10-LG-001"
+      ],
+      "control_status": "HOLD",
+      "meaning": "ชำระค่าธรรมเนียมค้ำประกันไม่ต่อเนื่อง",
+      "aliases": [],
+      "detail_codes": [],
+      "review_flag": null,
+      "proposed": false
+    },
+    {
+      "code": "LG_TENOR_EXCEEDED",
+      "rules": [
+        "PGS10-LG-001"
+      ],
+      "control_status": "HOLD",
+      "meaning": "อายุ LG เกิน 10 ปี",
+      "aliases": [],
+      "detail_codes": [],
+      "review_flag": null,
+      "proposed": false
+    },
+    {
+      "code": "NPL_DATE_MISSING",
+      "rules": [
+        "PGS10-NPL-001"
+      ],
+      "control_status": "HOLD",
+      "meaning": "ไม่มี npl_date จากข้อมูล FI (ห้าม derive จาก default_date)",
+      "aliases": [
+        "NPL_DATE_MAPPING_UNDEFINED",
+        "NPL_MAPPING_REQUIRED",
+        "HOLD_NPL_MAPPING_REQUIRED"
+      ],
+      "detail_codes": [],
+      "review_flag": null,
+      "proposed": false
+    },
+    {
+      "code": "NPL_SEASONING_NOT_MET",
+      "rules": [
+        "PGS10-NPL-001"
+      ],
+      "control_status": "HOLD",
+      "meaning": "npl_date ยังไม่พ้นระยะ seasoning",
+      "aliases": [],
+      "detail_codes": [],
+      "review_flag": null,
+      "proposed": false
+    },
+    {
+      "code": "POSTAL_ACK_INCOMPLETE",
+      "rules": [
+        "PGS10-PST-001"
+      ],
+      "control_status": "HOLD",
+      "meaning": "หลักฐานส่งสำเร็จไม่ครบ (วันที่รับ/ลายมือชื่อผู้รับ/ผู้รับแทน)",
+      "aliases": [
+        "DELIVERY_PROOF_INCOMPLETE"
+      ],
+      "detail_codes": [],
+      "review_flag": null,
+      "proposed": false
+    },
+    {
+      "code": "POSTAL_ADDRESS_UNVERIFIED",
+      "rules": [
+        "PGS10-PST-001",
+        "PGS10-PST-002"
+      ],
+      "control_status": "HOLD",
+      "meaning": "ที่อยู่จัดส่งอ้างอิงกลับเอกสารใน PDF ไม่ได้",
+      "aliases": [
+        "ADDRESS_SOURCE_NOT_FOUND",
+        "HOLD_POSTAL_ADDRESS_UNVERIFIED"
+      ],
+      "detail_codes": [],
+      "review_flag": null,
+      "proposed": false
+    },
+    {
+      "code": "POSTAL_EVIDENCE_MISSING",
+      "rules": [
+        "PGS10-PST-001"
+      ],
+      "control_status": "HOLD",
+      "meaning": "ใบตอบรับว่าง/ไม่มีหลักฐานส่ง/ซองตีกลับ",
+      "aliases": [],
+      "detail_codes": [],
+      "review_flag": null,
+      "proposed": false
+    },
+    {
+      "code": "POSTAL_RETURN_INCOMPLETE",
+      "rules": [
+        "PGS10-PST-001"
+      ],
+      "control_status": "HOLD",
+      "meaning": "หลักฐานส่งไม่สำเร็จไม่ครบ (ซองตีกลับ/คืนผู้ฝาก)",
+      "aliases": [
+        "RETURN_PROOF_INCOMPLETE"
+      ],
+      "detail_codes": [],
+      "review_flag": null,
+      "proposed": false
+    },
+    {
+      "code": "ADDRESS_DIFFERS_FROM_LATEST",
+      "rules": [
+        "PGS10-PST-002"
+      ],
+      "control_status": "HOLD",
+      "meaning": "มีหลักฐานแจ้งเปลี่ยนที่อยู่ แต่จัดส่งไม่ตรงที่อยู่ล่าสุด",
+      "aliases": [],
+      "detail_codes": [],
+      "review_flag": null,
+      "proposed": false
+    },
+    {
+      "code": "ADDRESS_NOT_IN_DOCUMENTS",
+      "rules": [
+        "PGS10-PST-002"
+      ],
+      "control_status": "HOLD",
+      "meaning": "ที่อยู่จัดส่งไม่ตรงเอกสารใดและไม่มีหลักฐานแจ้งเปลี่ยน",
+      "aliases": [],
+      "detail_codes": [],
+      "review_flag": null,
+      "proposed": false
+    },
+    {
+      "code": "POSTAL_LINKAGE_UNRESOLVED",
+      "rules": [
+        "PGS10-PST-003"
+      ],
+      "control_status": "HOLD",
+      "meaning": "ใบตอบรับ/ซองไม่ใช่ชิ้นเดียวกับที่ส่ง หรือพิสูจน์ไม่ได้",
+      "aliases": [
+        "POSTAL_TRACKING_MISMATCH"
+      ],
+      "detail_codes": [],
+      "review_flag": null,
+      "proposed": false
+    },
+    {
+      "code": "RESTRUCTURE_PATH_UNDETERMINED",
+      "rules": [
+        "PGS10-RST-001"
+      ],
+      "control_status": "HOLD",
+      "meaning": "ยังไม่ระบุเส้นทาง Restructure (restructure_date=null ไม่ผ่านอัตโนมัติ)",
+      "aliases": [],
+      "detail_codes": [],
+      "review_flag": null,
+      "proposed": false
+    },
+    {
+      "code": "RESTRUCTURE_REQUIREMENT_NOT_MET",
+      "rules": [
+        "PGS10-RST-001"
+      ],
+      "control_status": "HOLD",
+      "meaning": "เส้นทางปกติยังไม่ครบเงื่อนไข",
+      "aliases": [],
+      "detail_codes": [],
+      "review_flag": null,
+      "proposed": false
+    },
+    {
+      "code": "EXCEPTION_ROUTE_NOT_CONFIGURED",
+      "rules": [
+        "PGS10-RST-002"
+      ],
+      "control_status": "HOLD",
+      "meaning": "เลือกเส้นทางยกเว้นแต่ Config ปิดอยู่",
+      "aliases": [],
+      "detail_codes": [],
+      "review_flag": null,
+      "proposed": false
+    },
+    {
+      "code": "TRACKING_REPORT_NOT_CERTIFIED",
+      "rules": [
+        "PGS10-RST-002"
+      ],
+      "control_status": "HOLD",
+      "meaning": "รายงานติดตามไม่ใช่ Certified",
+      "aliases": [],
+      "detail_codes": [],
+      "review_flag": null,
+      "proposed": false
+    },
+    {
+      "code": "UNCONTACTABLE_EXCEPTION_NOT_MET",
+      "rules": [
+        "PGS10-RST-002"
+      ],
+      "control_status": "HOLD",
+      "meaning": "เส้นทางยกเว้นยังไม่ครบเงื่อนไข",
+      "aliases": [],
+      "detail_codes": [],
+      "review_flag": null,
+      "proposed": false
+    },
+    {
+      "code": "MATCHED_STATEMENT_HEADER",
+      "rules": [
+        "PGS10-RST-003"
+      ],
+      "control_status": "PASS_WITH_SUPPORT",
+      "meaning": "ตรงหัว Statement (Level 2)",
+      "aliases": [],
+      "detail_codes": [],
+      "review_flag": null,
+      "proposed": false
+    },
+    {
+      "code": "RESTRUCTURE_DATE_MISMATCH",
+      "rules": [
+        "PGS10-RST-003"
+      ],
+      "control_status": "HOLD",
+      "meaning": "ไม่ตรงทั้งเอกสารและหัว Statement",
+      "aliases": [],
+      "detail_codes": [],
+      "review_flag": null,
+      "proposed": false
+    },
+    {
+      "code": "RESTRUCTURE_DATE_SEMANTICS_UNRESOLVED",
+      "rules": [
+        "PGS10-RST-003"
+      ],
+      "control_status": "HOLD",
+      "meaning": "ความหมายของวันที่ (ลงนาม/อนุมัติ/มีผล/เริ่มบัญชี) ยังไม่ถูกแยก ต้องตรวจหัว Statement",
+      "aliases": [
+        "CHECK_STATEMENT_HEADER",
+        "HOLD_RESTRUCTURE_DATE_SEMANTICS"
+      ],
+      "detail_codes": [],
+      "review_flag": null,
+      "proposed": false
+    },
+    {
+      "code": "RESTRUCTURE_EVIDENCE_MISSING",
+      "rules": [
+        "PGS10-RST-003"
+      ],
+      "control_status": "HOLD",
+      "meaning": "ไม่มีเอกสารปรับโครงสร้าง/หัว Statement",
+      "aliases": [],
+      "detail_codes": [],
+      "review_flag": null,
+      "proposed": false
+    },
+    {
+      "code": "NO_PAYMENT_FOUND",
+      "rules": [
+        "PGS10-STM-001"
+      ],
+      "control_status": "OBSERVATION",
+      "meaning": "ไม่พบรายการรับชำระจริงใน Statement",
+      "aliases": [],
+      "detail_codes": [],
+      "review_flag": null,
+      "proposed": false
+    },
+    {
+      "code": "UNKNOWN_TRANSACTION_NEAR_DEFAULT",
+      "rules": [
+        "PGS10-STM-001"
+      ],
+      "control_status": "HOLD",
+      "meaning": "มีรายการ UNKNOWN ที่อาจเป็นเงินรับจริง ไม่เดา",
+      "aliases": [],
+      "detail_codes": [],
+      "review_flag": null,
+      "proposed": false
+    },
+    {
+      "code": "PAYMENT_AFTER_STATEMENT_CUTOFF",
+      "rules": [
+        "PGS10-STM-002"
+      ],
+      "control_status": "HOLD",
+      "meaning": "มีการชำระหลัง Statement cut-off และยังไม่มี Statement ใหม่ (Regression 66-044366)",
+      "aliases": [],
+      "detail_codes": [],
+      "review_flag": null,
+      "proposed": false
+    },
+    {
+      "code": "TIMELINE_CONFLICT",
+      "rules": [
+        "PGS10-TIME-001"
+      ],
+      "control_status": "HOLD",
+      "meaning": "ลำดับเหตุการณ์ขัดกัน",
+      "aliases": [],
+      "detail_codes": [],
+      "review_flag": null,
+      "proposed": false
+    },
+    {
+      "code": "STATEMENT_MISSING",
+      "rules": [
+        "PGS10-TXN-001",
+        "PGS10-STM-001"
+      ],
+      "control_status": "NOT_TESTABLE",
+      "meaning": "ไม่มี Statement",
+      "aliases": [],
+      "detail_codes": [],
+      "review_flag": null,
+      "proposed": false
+    },
+    {
+      "code": "TRANSACTION_CODE_UNMAPPED",
+      "rules": [
+        "PGS10-TXN-001"
+      ],
+      "control_status": "HOLD",
+      "meaning": "Transaction code ที่อาจกระทบ Last Payment/Principal ไม่มี Mapping ที่อนุมัติ (DEC-02)",
+      "aliases": [
+        "HOLD_TRANSACTION_CODE_UNMAPPED"
+      ],
+      "detail_codes": [],
+      "review_flag": null,
+      "proposed": false
+    },
+    {
+      "code": "CONFIRMATION_LETTER_VISUALLY_INCOMPLETE",
+      "rules": [
+        "PGS10-VIS-001",
+        "PGS10-DEF-002"
+      ],
+      "control_status": "HOLD",
+      "meaning": "หนังสือยืนยันการชำระหลังผิดนัดไม่สมบูรณ์ทางภาพ",
+      "aliases": [],
+      "detail_codes": [],
+      "review_flag": null,
+      "proposed": false
+    },
+    {
+      "code": "VISUAL_RECHECK_REQUIRED",
+      "rules": [
+        "PGS10-VIS-001",
+        "PGS10-VIS-002"
+      ],
+      "control_status": "NOT_TESTABLE",
+      "meaning": "ยังไม่มีภาพต้นฉบับให้ตรวจ/Render ใหม่ตามกฎ Visual Completeness",
+      "aliases": [
+        "VISUAL_CHECK_PENDING"
+      ],
+      "detail_codes": [],
+      "review_flag": null,
+      "proposed": false
+    },
+    {
+      "code": "DOCUMENT_VISUALLY_INCOMPLETE",
+      "rules": [
+        "PGS10-VIS-002"
+      ],
+      "control_status": "HOLD",
+      "meaning": "Critical Document อื่นไม่ครบในภาพจริง",
+      "aliases": [],
+      "detail_codes": [],
+      "review_flag": null,
+      "proposed": false
+    }
+  ],
+  "alias_index": {
+    "ADDRESS_SOURCE_NOT_FOUND": "POSTAL_ADDRESS_UNVERIFIED",
+    "ASOF_DEMAND_PRINCIPAL_REQUIRED": "DEMAND_PRINCIPAL_UNRECONCILED",
+    "CAP_ARITHMETIC_MISMATCH": "CLAIM_MAX_ARITHMETIC_MISMATCH",
+    "CHECK_STATEMENT_HEADER": "RESTRUCTURE_DATE_SEMANTICS_UNRESOLVED",
+    "CLAIM_AMOUNT_MISMATCH": "CLAIM_CALCULATION_MISMATCH",
+    "CONFIRMATION_IDENTIFIER_UNLINKED": "IDENTIFIER_LINKAGE_UNRESOLVED",
+    "DELIVERY_PROOF_INCOMPLETE": "POSTAL_ACK_INCOMPLETE",
+    "DOCUMENT_PAGE_SEQUENCE_GAP": "APPROVAL_DOCUMENT_INCOMPLETE",
+    "DOCUMENT_PAGE_UNREADABLE": "APPROVAL_DOCUMENT_INCOMPLETE",
+    "DOCUMENT_TRUNCATED": "APPROVAL_DOCUMENT_INCOMPLETE",
+    "EXCEPTION_LETTER_MISSING": "POST_DEFAULT_SUPPORT_MISSING",
+    "HOLD_CLAIM_MAX_ARITHMETIC": "CLAIM_MAX_ARITHMETIC_MISMATCH",
+    "HOLD_CONTRACT_DATE_MISMATCH": "CONTRACT_DATE_MISMATCH",
+    "HOLD_DEMAND_PRINCIPAL_UNRECONCILED": "DEMAND_PRINCIPAL_UNRECONCILED",
+    "HOLD_NPL_MAPPING_REQUIRED": "NPL_DATE_MISSING",
+    "HOLD_PACKAGE_DEFINITION_REQUIRED": "PACKAGE_DEFINITION_REQUIRED",
+    "HOLD_POSTAL_ADDRESS_UNVERIFIED": "POSTAL_ADDRESS_UNVERIFIED",
+    "HOLD_POST_DEFAULT_SUPPORT_MISSING": "POST_DEFAULT_SUPPORT_MISSING",
+    "HOLD_RESTRUCTURE_DATE_SEMANTICS": "RESTRUCTURE_DATE_SEMANTICS_UNRESOLVED",
+    "HOLD_TRACKING_EVIDENCE_MISMATCH": "TRACKING_EVIDENCE_MISMATCH",
+    "HOLD_TRANSACTION_CODE_UNMAPPED": "TRANSACTION_CODE_UNMAPPED",
+    "NPL_DATE_MAPPING_UNDEFINED": "NPL_DATE_MISSING",
+    "NPL_MAPPING_REQUIRED": "NPL_DATE_MISSING",
+    "POSTAL_TRACKING_MISMATCH": "POSTAL_LINKAGE_UNRESOLVED",
+    "RETURN_PROOF_INCOMPLETE": "POSTAL_RETURN_INCOMPLETE",
+    "ROUNDING_TOLERANCE_NOT_APPROVED": "NUMERIC_VARIANCE",
+    "RULE_CONFLICT_UNRESOLVED": "RULE_VERSION_CONFLICT",
+    "TRACKING_DATE_MISMATCH": "TRACKING_EVIDENCE_MISMATCH",
+    "VARIANCE_PENDING_TOLERANCE_APPROVAL": "NUMERIC_VARIANCE",
+    "VISUAL_CHECK_PENDING": "VISUAL_RECHECK_REQUIRED"
+  },
+  "retired_names": {
+    "HOLD_DATA_MISMATCH": "สถานะเดิมของ R§26 — ใช้ HOLD + reason_code *_MISMATCH",
+    "HOLD_MISSING_DOCUMENT": "สถานะเดิมของ R§26 — ใช้ HOLD + reason_code *_MISSING",
+    "HOLD_INCOMPLETE_DOCUMENT": "สถานะเดิมของ R§26 — ใช้ HOLD + reason_code *_INCOMPLETE",
+    "HOLD_NEED_CLARIFICATION": "สถานะเดิมของ R§26 — ใช้ HOLD + reason_code เฉพาะ",
+    "FAIL_ELIGIBILITY": "สถานะเดิมของ R§26 — ใช้ FAIL + reason_code ELIGIBILITY_*",
+    "PASS_WITH_DOCUMENTARY_SUPPORT": "ชื่อเดิมของ R§26 → PASS_WITH_SUPPORT",
+    "OBSERVATION_CANDIDATE (control_status)": "ย้ายเป็น review_flag (DEC-09)"
+  }
+}

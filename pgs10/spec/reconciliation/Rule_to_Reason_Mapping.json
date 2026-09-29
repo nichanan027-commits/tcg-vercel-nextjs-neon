@@ -1,0 +1,747 @@
+{
+  "meta": {
+    "spec_version": "1.2.0-RECONCILIATION",
+    "frozen": false,
+    "status": "RECONCILIATION_DRAFT — ไม่ใช่ Spec Candidate และไม่ใช่การ Freeze",
+    "decision_baseline": "DEC-01..DEC-14 (Rule_Reconciliation_Report §2)",
+    "inputs": [
+      "draft spec v1.0.0-DRAFT (pgs10/spec)",
+      "Deployment Pack v1.1.0",
+      "Rulebook (22 Controls)",
+      "Master Audit",
+      "คำตัดสินของผู้ใช้"
+    ],
+    "artifact": "Rule_to_Reason_Mapping"
+  },
+  "generic_reason_codes_any_rule": [
+    {
+      "code": "RULE_VERSION_CONFLICT",
+      "control_status": "HOLD",
+      "case_effect": "case HOLD"
+    },
+    {
+      "code": "MISSING_INPUT",
+      "control_status": "NOT_TESTABLE",
+      "case_effect": "REQUIRED_HARD → case HOLD; CONDITIONAL ที่ไม่ applicable/OPTIONAL → ไม่กระทบ"
+    },
+    {
+      "code": "INVALID_INPUT",
+      "control_status": "HOLD",
+      "case_effect": "case HOLD"
+    }
+  ],
+  "rules": [
+    {
+      "rule_id": "PGS10-ELIG-001",
+      "name": "Project / Product Eligibility",
+      "requirement": "REQUIRED_HARD",
+      "applicable_when": "เสมอ",
+      "control_status_when_ok": "PASS",
+      "reason_codes": [
+        {
+          "code": "ELIGIBILITY_EXPOSURE_LIMIT_EXCEEDED",
+          "control_status": "FAIL",
+          "case_effect": "case FAIL"
+        },
+        {
+          "code": "ELIGIBILITY_GUARANTEE_BELOW_MINIMUM",
+          "control_status": "FAIL",
+          "case_effect": "case FAIL"
+        },
+        {
+          "code": "ELIGIBILITY_HIRE_PURCHASE_LEASING",
+          "control_status": "FAIL",
+          "case_effect": "case FAIL"
+        },
+        {
+          "code": "ELIGIBILITY_NOT_BUSINESS_PURPOSE",
+          "control_status": "FAIL",
+          "case_effect": "case FAIL",
+          "proposed_new": true
+        },
+        {
+          "code": "ELIGIBILITY_NOT_NEW_BUSINESS_LOAN",
+          "control_status": "FAIL",
+          "case_effect": "case FAIL"
+        },
+        {
+          "code": "ELIGIBILITY_NOT_PGS10",
+          "control_status": "FAIL",
+          "case_effect": "case FAIL"
+        },
+        {
+          "code": "ELIGIBILITY_PRODUCT_EXCLUDED",
+          "control_status": "FAIL",
+          "case_effect": "case FAIL"
+        },
+        {
+          "code": "ELIGIBILITY_UNCONFIRMED",
+          "control_status": "HOLD",
+          "case_effect": "case HOLD"
+        },
+        {
+          "code": "PGS_REVISION_MISMATCH",
+          "control_status": "HOLD",
+          "case_effect": "case HOLD"
+        },
+        {
+          "code": "PRODUCT_UNKNOWN",
+          "control_status": "HOLD",
+          "case_effect": "case HOLD"
+        }
+      ]
+    },
+    {
+      "rule_id": "PGS10-ID-001",
+      "name": "Identity Integrity",
+      "requirement": "REQUIRED_HARD",
+      "applicable_when": "เสมอ",
+      "control_status_when_ok": "PASS",
+      "reason_codes": [
+        {
+          "code": "FORMAT_VARIANCE",
+          "control_status": "OBSERVATION",
+          "case_effect": "case PASS_WITH_OBSERVATION (ถ้าไม่มี HOLD/FAIL)"
+        },
+        {
+          "code": "IDENTIFIER_LINKAGE_UNRESOLVED",
+          "control_status": "HOLD",
+          "case_effect": "case HOLD"
+        },
+        {
+          "code": "IDENTITY_MISMATCH",
+          "control_status": "HOLD",
+          "case_effect": "case HOLD"
+        },
+        {
+          "code": "VERIFY_REFERENCE_MAPPING",
+          "control_status": "HOLD",
+          "case_effect": "case HOLD"
+        }
+      ]
+    },
+    {
+      "rule_id": "PGS10-DOC-001",
+      "name": "Approval / Contract Page Completeness",
+      "requirement": "REQUIRED_HARD",
+      "applicable_when": "เสมอ (มีเอกสารอนุมัติ/สัญญา)",
+      "control_status_when_ok": "PASS",
+      "reason_codes": [
+        {
+          "code": "APPROVAL_DOCUMENT_INCOMPLETE",
+          "control_status": "HOLD",
+          "case_effect": "case HOLD",
+          "detail_codes": [
+            "PAGE_SEQUENCE_GAP",
+            "DOCUMENT_TRUNCATED",
+            "PAGE_UNREADABLE"
+          ]
+        }
+      ]
+    },
+    {
+      "rule_id": "PGS10-VIS-001",
+      "name": "Confirmation Letter Visual Completeness",
+      "requirement": "CONDITIONAL",
+      "applicable_when": "DEF-002 ต้องใช้หนังสือยืนยัน (default < last payment) หรือมีหนังสือยืนยันในเคส",
+      "control_status_when_ok": "NOT_APPLICABLE",
+      "reason_codes": [
+        {
+          "code": "CONFIRMATION_LETTER_VISUALLY_INCOMPLETE",
+          "control_status": "HOLD",
+          "case_effect": "case HOLD"
+        },
+        {
+          "code": "VISUAL_RECHECK_REQUIRED",
+          "control_status": "NOT_TESTABLE",
+          "case_effect": "REQUIRED_HARD → case HOLD; CONDITIONAL ที่ไม่ applicable/OPTIONAL → ไม่กระทบ"
+        }
+      ]
+    },
+    {
+      "rule_id": "PGS10-VIS-002",
+      "name": "Critical Evidence Visual Authority",
+      "requirement": "CONDITIONAL",
+      "applicable_when": "มีเอกสาร Critical ในเคส",
+      "control_status_when_ok": "NOT_APPLICABLE",
+      "reason_codes": [
+        {
+          "code": "DOCUMENT_VISUALLY_INCOMPLETE",
+          "control_status": "HOLD",
+          "case_effect": "case HOLD"
+        },
+        {
+          "code": "VISUAL_RECHECK_REQUIRED",
+          "control_status": "NOT_TESTABLE",
+          "case_effect": "REQUIRED_HARD → case HOLD; CONDITIONAL ที่ไม่ applicable/OPTIONAL → ไม่กระทบ"
+        }
+      ]
+    },
+    {
+      "rule_id": "PGS10-CONTRACT-001",
+      "name": "Contract / Approval Date",
+      "requirement": "REQUIRED_HARD",
+      "applicable_when": "เสมอ; ฐานวันที่ทำสัญญาใช้ได้เฉพาะ Thai Credit revolving-loan",
+      "control_status_when_ok": "PASS",
+      "reason_codes": [
+        {
+          "code": "CONTRACT_DATE_BASIS_UNDEFINED",
+          "control_status": "HOLD",
+          "case_effect": "case HOLD",
+          "proposed_new": true
+        },
+        {
+          "code": "CONTRACT_DATE_MISMATCH",
+          "control_status": "HOLD",
+          "case_effect": "case HOLD"
+        }
+      ]
+    },
+    {
+      "rule_id": "PGS10-LG-001",
+      "name": "Guarantee Validity",
+      "requirement": "REQUIRED_HARD",
+      "applicable_when": "เสมอ",
+      "control_status_when_ok": "PASS",
+      "reason_codes": [
+        {
+          "code": "LG_DATA_MISSING",
+          "control_status": "HOLD",
+          "case_effect": "case HOLD"
+        },
+        {
+          "code": "LG_FEE_NOT_CONTINUOUS",
+          "control_status": "HOLD",
+          "case_effect": "case HOLD"
+        },
+        {
+          "code": "LG_TENOR_EXCEEDED",
+          "control_status": "HOLD",
+          "case_effect": "case HOLD"
+        }
+      ]
+    },
+    {
+      "rule_id": "PGS10-NPL-001",
+      "name": "NPL Date & Seasoning",
+      "requirement": "REQUIRED_HARD",
+      "applicable_when": "เสมอ",
+      "control_status_when_ok": "PASS",
+      "reason_codes": [
+        {
+          "code": "NPL_DATE_MISSING",
+          "control_status": "HOLD",
+          "case_effect": "case HOLD"
+        },
+        {
+          "code": "NPL_SEASONING_NOT_MET",
+          "control_status": "HOLD",
+          "case_effect": "case HOLD"
+        }
+      ]
+    },
+    {
+      "rule_id": "PGS10-TXN-001",
+      "name": "Transaction Classification",
+      "requirement": "REQUIRED_HARD",
+      "applicable_when": "เสมอ (มี Statement)",
+      "control_status_when_ok": "PASS",
+      "reason_codes": [
+        {
+          "code": "STATEMENT_MISSING",
+          "control_status": "NOT_TESTABLE",
+          "case_effect": "REQUIRED_HARD → case HOLD; CONDITIONAL ที่ไม่ applicable/OPTIONAL → ไม่กระทบ"
+        },
+        {
+          "code": "TRANSACTION_CODE_UNMAPPED",
+          "control_status": "HOLD",
+          "case_effect": "case HOLD"
+        }
+      ]
+    },
+    {
+      "rule_id": "PGS10-STM-001",
+      "name": "Last Actual Payment",
+      "requirement": "REQUIRED_HARD",
+      "applicable_when": "เสมอ",
+      "control_status_when_ok": "PASS",
+      "reason_codes": [
+        {
+          "code": "NO_PAYMENT_FOUND",
+          "control_status": "OBSERVATION",
+          "case_effect": "case PASS_WITH_OBSERVATION (ถ้าไม่มี HOLD/FAIL)"
+        },
+        {
+          "code": "STATEMENT_MISSING",
+          "control_status": "NOT_TESTABLE",
+          "case_effect": "REQUIRED_HARD → case HOLD; CONDITIONAL ที่ไม่ applicable/OPTIONAL → ไม่กระทบ"
+        },
+        {
+          "code": "UNKNOWN_TRANSACTION_NEAR_DEFAULT",
+          "control_status": "HOLD",
+          "case_effect": "case HOLD"
+        }
+      ]
+    },
+    {
+      "rule_id": "PGS10-STM-002",
+      "name": "Statement Cut-off vs Later Payments",
+      "requirement": "REQUIRED_HARD",
+      "applicable_when": "เสมอ",
+      "control_status_when_ok": "PASS",
+      "reason_codes": [
+        {
+          "code": "PAYMENT_AFTER_STATEMENT_CUTOFF",
+          "control_status": "HOLD",
+          "case_effect": "case HOLD"
+        }
+      ]
+    },
+    {
+      "rule_id": "PGS10-DEF-001",
+      "name": "Default Date ≥ Last Actual Payment",
+      "requirement": "REQUIRED_HARD",
+      "applicable_when": "เสมอ",
+      "control_status_when_ok": "PASS",
+      "reason_codes": [
+        {
+          "code": "POST_DEFAULT_PAYMENT",
+          "control_status": "HOLD",
+          "case_effect": "case HOLD"
+        },
+        {
+          "code": "POST_DEFAULT_PAYMENT_SUPPORTED",
+          "control_status": "PASS_WITH_SUPPORT",
+          "case_effect": "case PASS_WITH_SUPPORT; ถ้ามี OBSERVATION ด้วย → PASS_WITH_OBSERVATION + support_used=true"
+        }
+      ]
+    },
+    {
+      "rule_id": "PGS10-DEF-002",
+      "name": "Post-Default Payment Exception",
+      "requirement": "CONDITIONAL",
+      "applicable_when": "default_date < last_actual_payment_date",
+      "control_status_when_ok": "NOT_APPLICABLE",
+      "reason_codes": [
+        {
+          "code": "CONFIRMATION_CONTENT_INCOMPLETE",
+          "control_status": "HOLD",
+          "case_effect": "case HOLD"
+        },
+        {
+          "code": "CONFIRMATION_LETTER_VISUALLY_INCOMPLETE",
+          "control_status": "HOLD",
+          "case_effect": "case HOLD"
+        },
+        {
+          "code": "CONFIRMED_DEFAULT_DATE_MISMATCH",
+          "control_status": "HOLD",
+          "case_effect": "case HOLD"
+        },
+        {
+          "code": "IDENTIFIER_LINKAGE_UNRESOLVED",
+          "control_status": "HOLD",
+          "case_effect": "case HOLD"
+        },
+        {
+          "code": "POST_DEFAULT_PAYMENT_SUPPORTED",
+          "control_status": "PASS_WITH_SUPPORT",
+          "case_effect": "case PASS_WITH_SUPPORT; ถ้ามี OBSERVATION ด้วย → PASS_WITH_OBSERVATION + support_used=true"
+        },
+        {
+          "code": "POST_DEFAULT_SUPPORT_MISSING",
+          "control_status": "HOLD",
+          "case_effect": "case HOLD"
+        }
+      ]
+    },
+    {
+      "rule_id": "PGS10-FUP-001",
+      "name": "Follow-up / Tracking Evidence",
+      "requirement": "REQUIRED_HARD",
+      "applicable_when": "เสมอ",
+      "control_status_when_ok": "PASS",
+      "reason_codes": [
+        {
+          "code": "TRACKING_EVIDENCE_INCOMPLETE",
+          "control_status": "HOLD",
+          "case_effect": "case HOLD"
+        },
+        {
+          "code": "TRACKING_EVIDENCE_MISMATCH",
+          "control_status": "HOLD",
+          "case_effect": "case HOLD"
+        },
+        {
+          "code": "TRACKING_REPORT_MISSING",
+          "control_status": "HOLD",
+          "case_effect": "case HOLD"
+        }
+      ]
+    },
+    {
+      "rule_id": "PGS10-RST-001",
+      "name": "Restructure Requirement / Route",
+      "requirement": "CONDITIONAL",
+      "applicable_when": "Small Biz/Start up ภายใน 5 ปีแรกของ LG (เงื่อนไข (ค))",
+      "control_status_when_ok": "NOT_APPLICABLE",
+      "reason_codes": [
+        {
+          "code": "RESTRUCTURE_PATH_UNDETERMINED",
+          "control_status": "HOLD",
+          "case_effect": "case HOLD"
+        },
+        {
+          "code": "RESTRUCTURE_REQUIREMENT_NOT_MET",
+          "control_status": "HOLD",
+          "case_effect": "case HOLD"
+        }
+      ]
+    },
+    {
+      "rule_id": "PGS10-RST-002",
+      "name": "Uncontactable / Unable-to-agree Exception",
+      "requirement": "CONDITIONAL",
+      "applicable_when": "route = UNCONTACTABLE_EXCEPTION_PATH",
+      "control_status_when_ok": "NOT_APPLICABLE",
+      "reason_codes": [
+        {
+          "code": "EXCEPTION_ROUTE_NOT_CONFIGURED",
+          "control_status": "HOLD",
+          "case_effect": "case HOLD"
+        },
+        {
+          "code": "TRACKING_REPORT_NOT_CERTIFIED",
+          "control_status": "HOLD",
+          "case_effect": "case HOLD"
+        },
+        {
+          "code": "UNCONTACTABLE_EXCEPTION_NOT_MET",
+          "control_status": "HOLD",
+          "case_effect": "case HOLD"
+        }
+      ]
+    },
+    {
+      "rule_id": "PGS10-RST-003",
+      "name": "Restructure Date Evidence",
+      "requirement": "CONDITIONAL",
+      "applicable_when": "มีการปรับโครงสร้างหนี้",
+      "control_status_when_ok": "NOT_APPLICABLE",
+      "reason_codes": [
+        {
+          "code": "MATCHED_STATEMENT_HEADER",
+          "control_status": "PASS_WITH_SUPPORT",
+          "case_effect": "case PASS_WITH_SUPPORT; ถ้ามี OBSERVATION ด้วย → PASS_WITH_OBSERVATION + support_used=true"
+        },
+        {
+          "code": "RESTRUCTURE_DATE_MISMATCH",
+          "control_status": "HOLD",
+          "case_effect": "case HOLD"
+        },
+        {
+          "code": "RESTRUCTURE_DATE_SEMANTICS_UNRESOLVED",
+          "control_status": "HOLD",
+          "case_effect": "case HOLD"
+        },
+        {
+          "code": "RESTRUCTURE_EVIDENCE_MISSING",
+          "control_status": "HOLD",
+          "case_effect": "case HOLD"
+        }
+      ]
+    },
+    {
+      "rule_id": "PGS10-DMD-001",
+      "name": "Demand Letter Identity & Existence",
+      "requirement": "REQUIRED_HARD",
+      "applicable_when": "เสมอ",
+      "control_status_when_ok": "PASS",
+      "reason_codes": [
+        {
+          "code": "DEMAND_IDENTITY_UNCONFIRMED",
+          "control_status": "HOLD",
+          "case_effect": "case HOLD"
+        },
+        {
+          "code": "DEMAND_LETTER_MISMATCH",
+          "control_status": "HOLD",
+          "case_effect": "case HOLD"
+        }
+      ]
+    },
+    {
+      "rule_id": "PGS10-DMD-002",
+      "name": "Demand Principal as of Demand Date",
+      "requirement": "REQUIRED_HARD",
+      "applicable_when": "เสมอ",
+      "control_status_when_ok": "PASS",
+      "reason_codes": [
+        {
+          "code": "DEMAND_PRINCIPAL_MISMATCH",
+          "control_status": "HOLD",
+          "case_effect": "case HOLD"
+        },
+        {
+          "code": "DEMAND_PRINCIPAL_UNRECONCILED",
+          "control_status": "HOLD",
+          "case_effect": "case HOLD"
+        }
+      ]
+    },
+    {
+      "rule_id": "PGS10-DMD-003",
+      "name": "Demand Waiting Period",
+      "requirement": "CONDITIONAL",
+      "applicable_when": "ไม่ใช่เส้นทางล้มละลาย",
+      "control_status_when_ok": "NOT_APPLICABLE",
+      "reason_codes": [
+        {
+          "code": "DEMAND_WAITING_PERIOD_NOT_MET",
+          "control_status": "HOLD",
+          "case_effect": "case HOLD"
+        }
+      ]
+    },
+    {
+      "rule_id": "PGS10-HIS-001",
+      "name": "Historical Debt Snapshot",
+      "requirement": "REQUIRED_HARD",
+      "applicable_when": "เสมอ (Reference Event = Demand)",
+      "control_status_when_ok": "PASS",
+      "reason_codes": [
+        {
+          "code": "HISTORICAL_BALANCE_MISMATCH",
+          "control_status": "HOLD",
+          "case_effect": "case HOLD"
+        }
+      ]
+    },
+    {
+      "rule_id": "PGS10-PST-001",
+      "name": "Postal Delivery Evidence",
+      "requirement": "REQUIRED_HARD",
+      "applicable_when": "เสมอ",
+      "control_status_when_ok": "PASS",
+      "reason_codes": [
+        {
+          "code": "POSTAL_ACK_INCOMPLETE",
+          "control_status": "HOLD",
+          "case_effect": "case HOLD"
+        },
+        {
+          "code": "POSTAL_ADDRESS_UNVERIFIED",
+          "control_status": "HOLD",
+          "case_effect": "case HOLD"
+        },
+        {
+          "code": "POSTAL_EVIDENCE_MISSING",
+          "control_status": "HOLD",
+          "case_effect": "case HOLD"
+        },
+        {
+          "code": "POSTAL_RETURN_INCOMPLETE",
+          "control_status": "HOLD",
+          "case_effect": "case HOLD"
+        }
+      ]
+    },
+    {
+      "rule_id": "PGS10-PST-002",
+      "name": "Address Match",
+      "requirement": "REQUIRED_HARD",
+      "applicable_when": "เสมอ",
+      "control_status_when_ok": "PASS",
+      "reason_codes": [
+        {
+          "code": "ADDRESS_DIFFERS_FROM_LATEST",
+          "control_status": "HOLD",
+          "case_effect": "case HOLD"
+        },
+        {
+          "code": "ADDRESS_NOT_IN_DOCUMENTS",
+          "control_status": "HOLD",
+          "case_effect": "case HOLD"
+        },
+        {
+          "code": "POSTAL_ADDRESS_UNVERIFIED",
+          "control_status": "HOLD",
+          "case_effect": "case HOLD"
+        }
+      ]
+    },
+    {
+      "rule_id": "PGS10-PST-003",
+      "name": "Postal Linkage",
+      "requirement": "CONDITIONAL",
+      "applicable_when": "มี tracking number/barcode",
+      "control_status_when_ok": "NOT_APPLICABLE",
+      "reason_codes": [
+        {
+          "code": "POSTAL_LINKAGE_UNRESOLVED",
+          "control_status": "HOLD",
+          "case_effect": "case HOLD"
+        }
+      ]
+    },
+    {
+      "rule_id": "PGS10-CUR-001",
+      "name": "Current Principal",
+      "requirement": "REQUIRED_HARD",
+      "applicable_when": "เสมอ",
+      "control_status_when_ok": "PASS",
+      "reason_codes": [
+        {
+          "code": "CURRENT_PRINCIPAL_MISMATCH",
+          "control_status": "HOLD",
+          "case_effect": "case HOLD"
+        }
+      ]
+    },
+    {
+      "rule_id": "PGS10-CUR-002",
+      "name": "Current Interest / Total",
+      "requirement": "REQUIRED_HARD",
+      "applicable_when": "เสมอ",
+      "control_status_when_ok": "PASS",
+      "reason_codes": [
+        {
+          "code": "CURRENT_BALANCE_MISMATCH",
+          "control_status": "HOLD",
+          "case_effect": "case HOLD"
+        },
+        {
+          "code": "NUMERIC_VARIANCE",
+          "control_status": "HOLD",
+          "case_effect": "case HOLD",
+          "review_flag": "OBSERVATION_CANDIDATE"
+        },
+        {
+          "code": "VARIANCE_WITHIN_APPROVED_TOLERANCE",
+          "control_status": "OBSERVATION",
+          "case_effect": "case PASS_WITH_OBSERVATION (ถ้าไม่มี HOLD/FAIL)"
+        }
+      ]
+    },
+    {
+      "rule_id": "PGS10-CLM-001",
+      "name": "Claim Filing Window",
+      "requirement": "REQUIRED_HARD",
+      "applicable_when": "เสมอ",
+      "control_status_when_ok": "PASS",
+      "reason_codes": [
+        {
+          "code": "CLAIM_FILING_WINDOW_NOT_MET",
+          "control_status": "HOLD",
+          "case_effect": "case HOLD"
+        }
+      ]
+    },
+    {
+      "rule_id": "PGS10-CLM-002",
+      "name": "Coverage Ratio",
+      "requirement": "REQUIRED_HARD",
+      "applicable_when": "เสมอ",
+      "control_status_when_ok": "PASS",
+      "reason_codes": [
+        {
+          "code": "COVERAGE_RATIO_MISMATCH",
+          "control_status": "HOLD",
+          "case_effect": "case HOLD"
+        },
+        {
+          "code": "NO_RULE_FOR_PRODUCT",
+          "control_status": "HOLD",
+          "case_effect": "case HOLD"
+        }
+      ]
+    },
+    {
+      "rule_id": "PGS10-CLM-003",
+      "name": "Claim Base",
+      "requirement": "REQUIRED_HARD",
+      "applicable_when": "เสมอ",
+      "control_status_when_ok": "PASS",
+      "reason_codes": [
+        {
+          "code": "CLAIM_BASE_MISMATCH",
+          "control_status": "HOLD",
+          "case_effect": "case HOLD"
+        },
+        {
+          "code": "CLAIM_BASE_MODE_MISMATCH",
+          "control_status": "HOLD",
+          "case_effect": "case HOLD"
+        }
+      ]
+    },
+    {
+      "rule_id": "PGS10-CLM-004",
+      "name": "Claim Calculation",
+      "requirement": "REQUIRED_HARD",
+      "applicable_when": "เสมอ",
+      "control_status_when_ok": "PASS",
+      "reason_codes": [
+        {
+          "code": "CLAIM_CALCULATION_MISMATCH",
+          "control_status": "HOLD",
+          "case_effect": "case HOLD"
+        },
+        {
+          "code": "UPSTREAM_NOT_COMPUTABLE",
+          "control_status": "NOT_TESTABLE",
+          "case_effect": "REQUIRED_HARD → case HOLD; CONDITIONAL ที่ไม่ applicable/OPTIONAL → ไม่กระทบ"
+        }
+      ]
+    },
+    {
+      "rule_id": "PGS10-CAP-001",
+      "name": "CLAIM MAX / Package Capacity",
+      "requirement": "REQUIRED_HARD",
+      "applicable_when": "เสมอ (เสนอ — ขอยืนยัน)",
+      "control_status_when_ok": "PASS",
+      "reason_codes": [
+        {
+          "code": "CLAIM_EXCEEDS_CAP",
+          "control_status": "HOLD",
+          "case_effect": "case HOLD"
+        },
+        {
+          "code": "CLAIM_MAX_ARITHMETIC_MISMATCH",
+          "control_status": "HOLD",
+          "case_effect": "case HOLD"
+        },
+        {
+          "code": "PACKAGE_DEFINITION_REQUIRED",
+          "control_status": "HOLD",
+          "case_effect": "case HOLD",
+          "proposed_new": true
+        },
+        {
+          "code": "PAID_PENDING_MISSING",
+          "control_status": "NOT_TESTABLE",
+          "case_effect": "REQUIRED_HARD → case HOLD; CONDITIONAL ที่ไม่ applicable/OPTIONAL → ไม่กระทบ"
+        },
+        {
+          "code": "UPSTREAM_NOT_COMPUTABLE",
+          "control_status": "NOT_TESTABLE",
+          "case_effect": "REQUIRED_HARD → case HOLD; CONDITIONAL ที่ไม่ applicable/OPTIONAL → ไม่กระทบ"
+        }
+      ]
+    },
+    {
+      "rule_id": "PGS10-TIME-001",
+      "name": "Timeline Integrity",
+      "requirement": "REQUIRED_HARD",
+      "applicable_when": "เสมอ",
+      "control_status_when_ok": "PASS",
+      "reason_codes": [
+        {
+          "code": "TIMELINE_CONFLICT",
+          "control_status": "HOLD",
+          "case_effect": "case HOLD"
+        }
+      ]
+    }
+  ]
+}
