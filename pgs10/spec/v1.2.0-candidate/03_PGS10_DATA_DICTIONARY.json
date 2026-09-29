@@ -1,0 +1,1333 @@
+{
+  "metadata": {
+    "ruleset_version": "1.2.0-candidate",
+    "status": "SPEC_CANDIDATE_NOT_FROZEN",
+    "frozen": false,
+    "engine_changes_allowed": false,
+    "basis": "Reconciliation r2 (DEC-01..DEC-28) + Deployment Pack v1.1.0 + Draft v1.0",
+    "freeze_blockers": [
+      "A-30"
+    ],
+    "freeze_gate": "รัน `node check_freeze_gate.js` — 5 ข้อต้องผ่านทั้งหมด และ freeze_blockers ต้องว่าง",
+    "artifact": "03_PGS10_DATA_DICTIONARY",
+    "source_precedence": [
+      "P0 หลักเกณฑ์ PGS 10 ทางการ",
+      "P0' Operational Hard Controls ที่ล็อก",
+      "P1 เอกสารต้นฉบับของเคส",
+      "P2 หน้าจอระบบ",
+      "P3 OCR/Text Layer (ค้นหา/ช่วยอ่านเท่านั้น)"
+    ]
+  },
+  "conventions": {
+    "dates": "เก็บภายในเป็น ISO 8601 ปี ค.ศ.; ทุกวันที่ที่รับเข้าเก็บ {iso, calendar: BE|CE, original_text}; พ.ศ. = ค.ศ. + 543; ห้ามเก็บปี พ.ศ. ในสตริง ISO (M§29 ตัวอย่างผิด)",
+    "money": "Decimal เก็บเป็นจำนวนเต็มสตางค์; ห้าม Floating Point",
+    "rounding": "ROUND_HALF_UP ที่ 2 ตำแหน่ง ทำครั้งเดียวที่ปลายสูตร",
+    "percent": "basis points (70% = 7000)",
+    "identifier_rule": "เก็บ raw_value และ normalized_value; ห้ามแก้ค่าต้นทาง; ห้าม auto-correct/merge เลข LG/บัญชี",
+    "calendar_months": "add_calendar_months ตาม PRM-028 (ค่าเริ่มต้น clamp สิ้นเดือน, ไม่นับวันตั้งต้น; OPEN → Safe-Hold)"
+  },
+  "provenance_schema": {
+    "description": "ทุกฟิลด์ที่อ่านจากเอกสารต้องเก็บ",
+    "fields": [
+      "value",
+      "normalized_value",
+      "source_document",
+      "source_page",
+      "page_type(document_page|pdf_page)",
+      "document_type",
+      "visible_on_rendered_page",
+      "bounding_box",
+      "extraction_method",
+      "confidence",
+      "rule_used"
+    ]
+  },
+  "enums": {
+    "case_status": [
+      "PASS",
+      "PASS_WITH_SUPPORT",
+      "PASS_WITH_OBSERVATION",
+      "HOLD",
+      "FAIL"
+    ],
+    "control_status": [
+      "PASS",
+      "PASS_WITH_SUPPORT",
+      "OBSERVATION",
+      "HOLD",
+      "FAIL",
+      "NOT_APPLICABLE",
+      "NOT_TESTABLE"
+    ],
+    "review_flag": [
+      "OBSERVATION_CANDIDATE",
+      "FORMAT_NORMALIZED"
+    ],
+    "review_stage": [
+      "PRE_REVIEW",
+      "FINAL_APPROVAL"
+    ],
+    "requirement": [
+      "REQUIRED_HARD",
+      "CONDITIONAL",
+      "OPTIONAL"
+    ],
+    "transaction_type": [
+      "PAYMENT",
+      "DRAWDOWN",
+      "INTEREST_ACCRUAL",
+      "FEE",
+      "ADJUSTMENT",
+      "REVERSAL",
+      "PRINCIPAL_ADJUSTMENT",
+      "UNKNOWN"
+    ],
+    "source_status": [
+      "OFFICIAL",
+      "LOCKED",
+      "OPERATIONAL_LOCKED_SCOPED",
+      "APPROVED_OPERATIONAL",
+      "PROPOSED_CONFIG_DISABLED",
+      "ASSUMPTION",
+      "OPEN",
+      "UNVERIFIED_UNTIL_SOURCE",
+      "REFERENCE"
+    ],
+    "transaction_code_evidence_status": [
+      "EVIDENCE_SUPPORTED_BANK_SPECIFIC",
+      "UNVERIFIED_UNTIL_SOURCE"
+    ],
+    "document_type": [
+      "APPROVAL_LETTER_OR_CONTRACT",
+      "LG",
+      "STATEMENT",
+      "RESTRUCTURE_REPORT",
+      "DEMAND_LETTER",
+      "POSTAL_RECEIPT",
+      "RETURNED_ENVELOPE",
+      "POST_DEFAULT_CONFIRMATION_LETTER",
+      "RESTRUCTURE_AGREEMENT",
+      "TRACKING_REPORT",
+      "ADDRESS_EVIDENCE",
+      "OTHER"
+    ]
+  },
+  "status_rules": {
+    "reason_code_is_separate": true,
+    "forbidden_reason_code_patterns": [
+      "^HOLD_",
+      "^FAIL_",
+      "^PASS_"
+    ],
+    "case_status_precedence": [
+      "FAIL",
+      "HOLD",
+      "PASS_WITH_OBSERVATION",
+      "PASS_WITH_SUPPORT",
+      "PASS"
+    ]
+  },
+  "fields": {
+    "address_match": {
+      "meaning": "ที่อยู่จัดส่งอ้างอิงกลับเอกสารใน PDF ได้ (ผลของ PST-002)",
+      "type": "boolean",
+      "source": "DERIVED",
+      "derived": true,
+      "used_by": [
+        "PGS10-PST-001"
+      ]
+    },
+    "approval_date": {
+      "meaning": "วันที่แจ้งผลอนุมัติสินเชื่อ = วันที่ทำสัญญาที่ใช้เป็นฐานตรวจ",
+      "type": "date",
+      "source": "approval letter",
+      "used_by": [
+        "PGS10-CONTRACT-001",
+        "PGS10-TIME-001"
+      ]
+    },
+    "approval_document_pages_found": {
+      "meaning": "หมายเลข 'หน้าเอกสาร' ที่พบ",
+      "type": "integer[]",
+      "source": "approval document",
+      "notes": "หน้าเอกสาร ≠ หน้า PDF (L-13)",
+      "used_by": [
+        "PGS10-DOC-001"
+      ]
+    },
+    "approval_next_page_is_other_document": {
+      "meaning": "หน้าถัดจากหน้า 1 ของเอกสารอนุมัติเป็นเอกสารอื่น",
+      "type": "boolean",
+      "source": "approval document",
+      "used_by": [
+        "PGS10-DOC-001"
+      ]
+    },
+    "approval_pages_unreadable": {
+      "meaning": "มีหน้าที่ควรมีแต่ Crop/เสีย/อ่านไม่ได้",
+      "type": "boolean",
+      "source": "visual check",
+      "used_by": [
+        "PGS10-DOC-001"
+      ]
+    },
+    "approval_total_pages": {
+      "meaning": "จำนวนหน้าทั้งหมดของเอกสารอนุมัติ/สัญญา (X ใน '1 of X')",
+      "type": "integer",
+      "source": "approval document footer",
+      "used_by": [
+        "PGS10-DOC-001"
+      ]
+    },
+    "available_claim_capacity": {
+      "meaning": "claim_max − paid_claims − pending_claims",
+      "type": "money",
+      "source": "DERIVED",
+      "unit": "THB",
+      "derived": true,
+      "used_by": [
+        "PGS10-CAP-001"
+      ]
+    },
+    "bank_id": {
+      "meaning": "รหัสธนาคารของ Statement (ใช้เลือกตาราง transaction code)",
+      "type": "string",
+      "source": "statement",
+      "used_by": [
+        "PGS10-TXN-001"
+      ]
+    },
+    "bank_submission_date": {
+      "meaning": "วันที่ธนาคารส่งคำขอ",
+      "type": "date",
+      "source": "claim workflow",
+      "used_by": [
+        "PGS10-TIME-001"
+      ]
+    },
+    "borrower_name": {
+      "meaning": "ชื่อผู้กู้",
+      "type": "string",
+      "source": "approval letter / contract / statement / demand letter",
+      "normalization": "collapse whitespace เท่านั้น",
+      "used_by": [
+        "PGS10-ID-001"
+      ]
+    },
+    "carry_forward_balance": {
+      "meaning": "available_claim_capacity − claim_amount (คงเหลือหลังอนุมัติ)",
+      "type": "money",
+      "source": "DERIVED",
+      "unit": "THB",
+      "derived": true,
+      "used_by": [
+        "PGS10-CAP-001"
+      ]
+    },
+    "certified_tracking_report_present": {
+      "meaning": "มี Certified Tracking Report",
+      "type": "boolean",
+      "source": "tracking report",
+      "used_by": [
+        "PGS10-RST-002"
+      ]
+    },
+    "claim_amount": {
+      "meaning": "ค่าประกันชดเชย = round_half_up(claim_base × coverage_ratio, 2)",
+      "type": "money",
+      "source": "DERIVED",
+      "unit": "THB",
+      "derived": true,
+      "used_by": [
+        "PGS10-CAP-001",
+        "PGS10-CLM-004"
+      ]
+    },
+    "claim_base": {
+      "meaning": "MIN(current_principal, current_guarantee_obligation)",
+      "type": "money",
+      "source": "DERIVED",
+      "unit": "THB",
+      "derived": true,
+      "used_by": [
+        "PGS10-CLM-003",
+        "PGS10-CLM-004"
+      ]
+    },
+    "claim_base_mode": {
+      "meaning": "โหมดฐานคำนวณ",
+      "type": "enum:BY_PRINCIPAL|BY_GUARANTEE",
+      "source": "screen + DERIVED",
+      "notes": "BY_PRINCIPAL เมื่อ principal < guarantee; BY_GUARANTEE เมื่อ >=",
+      "used_by": [
+        "PGS10-CLM-003"
+      ]
+    },
+    "claim_eligibility_date": {
+      "meaning": "วันที่ใช้ตรวจ Demand waiting period",
+      "type": "date",
+      "source": "reviewer / claim application",
+      "status": "OPEN: ยังไม่นิยาม (A-21)",
+      "used_by": [
+        "PGS10-DMD-003"
+      ]
+    },
+    "claim_max": {
+      "meaning": "CLAIM MAX ของ Package",
+      "type": "money",
+      "source": "screen / package ledger",
+      "unit": "THB",
+      "used_by": [
+        "PGS10-CAP-001"
+      ]
+    },
+    "claim_path": {
+      "meaning": "path เงื่อนไขการขอรับเงิน (PRM-052)",
+      "type": "enum:SMART_LE_5Y|SMART_GT_5Y|SMALL_BIZ_LE_5Y|SMALL_BIZ_GT_5Y|START_UP_ALL",
+      "source": "DERIVED",
+      "derived": true,
+      "used_by": [
+        "PGS10-RST-001"
+      ]
+    },
+    "claim_submission_date": {
+      "meaning": "วันที่ยื่นคำขอรับเงิน",
+      "type": "date",
+      "source": "claim application",
+      "aliases": [
+        "claim_date"
+      ],
+      "used_by": [
+        "PGS10-CLM-001",
+        "PGS10-CLM-002",
+        "PGS10-RST-001",
+        "PGS10-RST-002",
+        "PGS10-TIME-001"
+      ]
+    },
+    "complete_documents_date": {
+      "meaning": "วันที่เอกสารครบ",
+      "type": "date",
+      "source": "claim workflow",
+      "used_by": [
+        "PGS10-TIME-001"
+      ]
+    },
+    "confirmation_letter_pages_found": {
+      "meaning": "หมายเลขหน้าของหนังสือยืนยันที่พบ",
+      "type": "integer[]",
+      "source": "confirmation letter",
+      "used_by": [
+        "PGS10-VIS-001"
+      ]
+    },
+    "confirmation_letter_total_pages": {
+      "meaning": "จำนวนหน้าของหนังสือยืนยัน",
+      "type": "integer",
+      "source": "confirmation letter",
+      "used_by": [
+        "PGS10-VIS-001"
+      ]
+    },
+    "confirmation_visual_elements": {
+      "meaning": "ผลตรวจภาพ 11 Atomic elements ของหนังสือยืนยัน (ต้อง 'เห็นจริงในภาพ' ไม่ใช่ใน Text Layer)",
+      "type": "map<element,boolean>",
+      "source": "visual check",
+      "elements": [
+        "header",
+        "letter_date",
+        "subject",
+        "recipient",
+        "borrower_reference",
+        "original_default_date",
+        "post_default_payment_date_amount",
+        "partial_or_not_per_terms",
+        "original_default_date_unchanged",
+        "signature",
+        "signatory_name_authority"
+      ],
+      "element_labels": {
+        "header": "Header / ชื่อหรือเครื่องหมาย FI",
+        "letter_date": "วันที่หนังสือ",
+        "subject": "เรื่อง",
+        "recipient": "ผู้รับ",
+        "borrower_reference": "ผู้กู้ + Account/LG/Case Reference",
+        "original_default_date": "Original Default Date",
+        "post_default_payment_date_amount": "Post-default Payment วันที่ + จำนวน",
+        "partial_or_not_per_terms": "ข้อความว่าชำระบางส่วน/ไม่เป็นไปตามเงื่อนไข",
+        "original_default_date_unchanged": "ข้อความยืนยันว่า Original Default Date ยังคงเดิม",
+        "signature": "ลายเซ็น",
+        "signatory_name_authority": "ชื่อ + ตำแหน่ง/อำนาจผู้ลงนาม"
+      },
+      "multi_page_document_continuity": "REQUIRED",
+      "used_by": [
+        "PGS10-DEF-002",
+        "PGS10-VIS-001"
+      ]
+    },
+    "contract_no": {
+      "meaning": "เลขสัญญา (ถ้ามี)",
+      "type": "string",
+      "source": "contract",
+      "used_by": [
+        "PGS10-ID-001"
+      ]
+    },
+    "coverage_ratio": {
+      "meaning": "อัตราค่าประกันชดเชย",
+      "type": "percent (basis points)",
+      "source": "product_rule_matrix",
+      "used_by": [
+        "PGS10-CLM-002",
+        "PGS10-CLM-004"
+      ]
+    },
+    "critical_document_visual_check": {
+      "meaning": "ผลตรวจภาพจริงของ Critical Document อื่น",
+      "type": "map<document_type,boolean>",
+      "source": "visual check",
+      "used_by": [
+        "PGS10-VIS-002"
+      ]
+    },
+    "current_guarantee_obligation": {
+      "meaning": "ภาระค้ำประกันปัจจุบัน",
+      "type": "money",
+      "source": "LG / screen",
+      "unit": "THB",
+      "status": "OPEN: แหล่งที่มา (A-24)",
+      "used_by": [
+        "PGS10-CLM-003"
+      ]
+    },
+    "current_interest": {
+      "meaning": "ดอกเบี้ยตาม Statement ล่าสุด (SSOT)",
+      "type": "money",
+      "source": "latest statement",
+      "unit": "THB",
+      "used_by": [
+        "PGS10-CUR-002"
+      ]
+    },
+    "current_other_amounts": {
+      "meaning": "ยอดอื่นที่นับรวมใน Total",
+      "type": "money",
+      "source": "latest statement",
+      "unit": "THB",
+      "status": "OPEN: ไม่นิยามองค์ประกอบ (A-24)",
+      "used_by": [
+        "PGS10-CUR-002"
+      ]
+    },
+    "current_principal": {
+      "meaning": "เงินต้นตาม Statement ล่าสุด (SSOT)",
+      "type": "money",
+      "source": "latest statement",
+      "unit": "THB",
+      "not_equal_to": "principal_at_demand_date",
+      "used_by": [
+        "PGS10-CLM-003",
+        "PGS10-CUR-001",
+        "PGS10-DMD-002"
+      ]
+    },
+    "current_total": {
+      "meaning": "Total ที่คำนวณ = principal + interest + other applicable amounts",
+      "type": "money",
+      "source": "DERIVED",
+      "unit": "THB",
+      "derived": true,
+      "used_by": [
+        "PGS10-CUR-002"
+      ]
+    },
+    "def_002_control_status": {
+      "meaning": "ผล control_status ของ DEF-002 (ใช้ใน TIME-001 เพื่ออนุญาต Default → Later Payment)",
+      "type": "enum(control_status)",
+      "source": "DERIVED",
+      "derived": true,
+      "used_by": [
+        "PGS10-TIME-001"
+      ]
+    },
+    "default_date": {
+      "meaning": "วันที่ผิดนัดชำระหนี้",
+      "type": "date",
+      "source": "screen",
+      "not_equal_to": "npl_date",
+      "notes": "ห้ามใช้แทน npl_date โดยไม่มี Business Mapping ที่อนุมัติ (A-01)",
+      "used_by": [
+        "PGS10-CLM-002",
+        "PGS10-DEF-001",
+        "PGS10-DEF-002",
+        "PGS10-NPL-001",
+        "PGS10-TIME-001"
+      ]
+    },
+    "demand_contract_date": {
+      "meaning": "วันที่สัญญาที่อ้างในหนังสือบอกกล่าว",
+      "type": "date",
+      "source": "demand letter",
+      "used_by": [
+        "PGS10-CONTRACT-001"
+      ]
+    },
+    "demand_date_letter": {
+      "meaning": "วันที่หนังสือบอกกล่าว (ตัวหนังสือ)",
+      "type": "date",
+      "source": "demand letter",
+      "used_by": [
+        "PGS10-CLM-002",
+        "PGS10-DMD-001",
+        "PGS10-DMD-002",
+        "PGS10-DMD-003"
+      ]
+    },
+    "demand_date_screen": {
+      "meaning": "วันที่หนังสือบอกกล่าว (หน้าจอ)",
+      "type": "date",
+      "source": "screen",
+      "used_by": [
+        "PGS10-DMD-001",
+        "PGS10-TIME-001"
+      ]
+    },
+    "demand_interest": {
+      "meaning": "ดอกเบี้ย ณ วันบอกกล่าว (ตามหนังสือ)",
+      "type": "money",
+      "source": "demand letter",
+      "unit": "THB",
+      "used_by": [
+        "PGS10-DMD-001",
+        "PGS10-HIS-001"
+      ]
+    },
+    "demand_or_termination_letter_count": {
+      "meaning": "จำนวนหนังสือบอกเลิก/บอกกล่าวให้ชำระหนี้ทั้งหมด",
+      "type": "integer",
+      "source": "demand / termination letters",
+      "used_by": [
+        "PGS10-DMD-001",
+        "PGS10-RST-002"
+      ]
+    },
+    "demand_principal": {
+      "meaning": "เงินต้น ณ วันบอกกล่าว (ตามหนังสือ)",
+      "type": "money",
+      "source": "demand letter",
+      "unit": "THB",
+      "used_by": [
+        "PGS10-DMD-001",
+        "PGS10-DMD-002",
+        "PGS10-HIS-001"
+      ]
+    },
+    "demand_principal_derivation_basis": {
+      "meaning": "วิธีได้มาซึ่ง principal_as_of_demand_date",
+      "type": "enum:DIRECT_SNAPSHOT|DERIVED_AS_OF_DEMAND|NONE",
+      "source": "DERIVED",
+      "derived": true,
+      "used_by": [
+        "PGS10-DMD-002"
+      ]
+    },
+    "demand_total": {
+      "meaning": "ยอดรวม ณ วันบอกกล่าว (ตามหนังสือ)",
+      "type": "money",
+      "source": "demand letter",
+      "unit": "THB",
+      "used_by": [
+        "PGS10-DMD-001",
+        "PGS10-HIS-001"
+      ]
+    },
+    "documented_address_set": {
+      "meaning": "ชุดที่อยู่ที่อ้างอิงได้จากเอกสารใน PDF พร้อม source และ flag แจ้งเปลี่ยน",
+      "type": "address[]",
+      "source": "approval letter / contract / borrower docs / change-of-address docs",
+      "used_by": [
+        "PGS10-PST-002"
+      ]
+    },
+    "exception_confirmed_default_date": {
+      "meaning": "Default Date ที่ระบุในหนังสือยืนยัน",
+      "type": "date",
+      "source": "confirmation letter",
+      "used_by": [
+        "PGS10-DEF-002"
+      ]
+    },
+    "exception_identifiers_link_to_case": {
+      "meaning": "Identifier ในหนังสือ (ผู้กู้/บัญชี/สัญญา/วันบอกกล่าว) ลิงก์กลับเคสได้",
+      "type": "boolean",
+      "source": "confirmation letter",
+      "used_by": [
+        "PGS10-DEF-002"
+      ]
+    },
+    "exception_letter_present": {
+      "meaning": "มีหนังสือแจ้งยืนยันการชำระหลังวันผิดนัด",
+      "type": "boolean",
+      "source": "document set",
+      "used_by": [
+        "PGS10-DEF-002",
+        "PGS10-VIS-001"
+      ]
+    },
+    "exception_maturity_date": {
+      "meaning": "add_calendar_months(exception_start_date, 7)",
+      "type": "date",
+      "source": "DERIVED",
+      "derived": true,
+      "used_by": [
+        "PGS10-RST-002"
+      ]
+    },
+    "exception_start_date": {
+      "meaning": "first_uncontactable_date OR first_contacted_restructure_failed_date",
+      "type": "date",
+      "source": "DERIVED",
+      "derived": true,
+      "used_by": [
+        "PGS10-RST-002"
+      ]
+    },
+    "exception_states_default_unchanged": {
+      "meaning": "หนังสือยืนยันว่าการชำระนั้นไม่เปลี่ยน Default Date / ชำระไม่เป็นไปตามเงื่อนไข",
+      "type": "boolean",
+      "source": "confirmation letter",
+      "used_by": [
+        "PGS10-DEF-002"
+      ]
+    },
+    "exception_states_payment_after_default": {
+      "meaning": "หนังสือระบุว่ามีการชำระหลังผิดนัด (วันที่/ยอด)",
+      "type": "boolean",
+      "source": "confirmation letter",
+      "used_by": [
+        "PGS10-DEF-002"
+      ]
+    },
+    "fi_id": {
+      "meaning": "รหัสผู้ให้สินเชื่อ (FI)",
+      "type": "string",
+      "source": "case form",
+      "notes": "ใช้กำหนดว่ากฎ Contract Date ใช้ได้หรือไม่ (THAI_CREDIT)",
+      "used_by": [
+        "PGS10-CONTRACT-001"
+      ]
+    },
+    "final_lg_expiry_date": {
+      "meaning": "วันสิ้นอายุการค้ำประกันฉบับสุดท้าย",
+      "type": "date",
+      "source": "LG",
+      "used_by": [
+        "PGS10-CLM-001",
+        "PGS10-LG-001"
+      ]
+    },
+    "first_contacted_restructure_failed_date": {
+      "meaning": "วันแรกที่ติดต่อได้แต่ตกลงปรับเงื่อนไข/โครงสร้างไม่ได้",
+      "type": "date",
+      "source": "tracking report",
+      "used_by": [
+        "PGS10-RST-002"
+      ]
+    },
+    "first_payment_date": {
+      "meaning": "วันรับชำระจริงครั้งแรก",
+      "type": "date",
+      "source": "DERIVED from statement",
+      "derived": true,
+      "used_by": [
+        "PGS10-TIME-001"
+      ]
+    },
+    "first_uncontactable_date": {
+      "meaning": "วันแรกที่ติดต่อผู้ขอสินเชื่อไม่ได้",
+      "type": "date",
+      "source": "tracking report",
+      "used_by": [
+        "PGS10-RST-002"
+      ]
+    },
+    "guarantee_amount_this_transaction": {
+      "meaning": "วงเงินค้ำประกันของรายการนี้",
+      "type": "money",
+      "source": "LG",
+      "unit": "THB",
+      "used_by": [
+        "PGS10-ELIG-001"
+      ]
+    },
+    "guarantee_effective_date": {
+      "meaning": "วันที่ บสย. ค้ำประกัน (Guarantee effective date) — แยกจาก lg_issue_date",
+      "type": "date",
+      "source": "LG / ข้อมูลการค้ำประกัน",
+      "not_equal_by_default": "lg_issue_date",
+      "status": "OPEN: Mapping ↔ lg_issue_date ยังไม่อนุมัติ (A-30, Freeze Blocker)",
+      "used_by": [
+        "PGS10-NPL-001"
+      ]
+    },
+    "guarantee_fee_paid_continuously": {
+      "meaning": "ชำระค่าธรรมเนียมการค้ำประกันต่อเนื่องครบถ้วน",
+      "type": "boolean",
+      "source": "LG fee record",
+      "used_by": [
+        "PGS10-LG-001"
+      ]
+    },
+    "historical_reference_event": {
+      "meaning": "เหตุการณ์อ้างอิงของ Historical Debt",
+      "type": "enum:DEMAND_LETTER|LAWSUIT|ABSOLUTE_RECEIVERSHIP",
+      "source": "screen",
+      "status": "มี Rule เฉพาะ DEMAND_LETTER (A-20)",
+      "used_by": [
+        "PGS10-HIS-001"
+      ]
+    },
+    "last_actual_payment_date": {
+      "meaning": "วันรับชำระเงินจริงครั้งสุดท้าย = MAX(transaction_date WHERE transaction_type=PAYMENT)",
+      "type": "date",
+      "source": "DERIVED from statement",
+      "derived": true,
+      "used_by": [
+        "PGS10-DEF-001",
+        "PGS10-DEF-002",
+        "PGS10-RST-001",
+        "PGS10-STM-001"
+      ]
+    },
+    "later_payment_amount": {
+      "meaning": "ยอดที่ชำระหลัง cut-off",
+      "type": "money",
+      "source": "bank letter",
+      "unit": "THB",
+      "used_by": [
+        "PGS10-STM-002"
+      ]
+    },
+    "later_payment_date": {
+      "meaning": "วันที่ชำระที่เอกสารอื่นระบุว่าเกิดหลัง cut-off",
+      "type": "date",
+      "source": "bank letter / other document",
+      "used_by": [
+        "PGS10-STM-002"
+      ]
+    },
+    "later_statement_covers": {
+      "meaning": "มี Statement ใหม่ครอบคลุมการชำระหลัง cut-off",
+      "type": "boolean",
+      "source": "statement",
+      "used_by": [
+        "PGS10-STM-002"
+      ]
+    },
+    "lender_branch": {
+      "meaning": "ผู้ให้กู้ / สาขา",
+      "type": "string",
+      "source": "approval letter / LG",
+      "used_by": [
+        "PGS10-ID-001"
+      ]
+    },
+    "lg_issue_date": {
+      "meaning": "วันที่ออก LG",
+      "type": "date",
+      "source": "LG",
+      "used_by": [
+        "PGS10-CLM-001",
+        "PGS10-CLM-002",
+        "PGS10-ID-001",
+        "PGS10-LG-001",
+        "PGS10-NPL-001",
+        "PGS10-TIME-001"
+      ]
+    },
+    "lg_no": {
+      "meaning": "เลขหนังสือค้ำประกัน",
+      "type": "string",
+      "source": "LG / screen",
+      "normalization": "ตัด '-' ช่องว่าง format และแปลงเลขไทย→อารบิก (FORMAT_NORMALIZED); ห้ามแก้เลขจริง ห้าม auto-correct/merge (DEC-03)",
+      "used_by": [
+        "PGS10-ID-001",
+        "PGS10-LG-001"
+      ]
+    },
+    "loan_account_no": {
+      "meaning": "เลขบัญชีสินเชื่อ",
+      "type": "string",
+      "source": "statement / contract",
+      "normalization": "ต่างเฉพาะ Leading Zero → PASS + review_flag FORMAT_NORMALIZED (field นี้ประกาศไว้ใน PRM-050); ตัวเลขภายในต่าง → VERIFY_REFERENCE_MAPPING; เก็บ raw_value และ normalized_value",
+      "used_by": [
+        "PGS10-ID-001"
+      ]
+    },
+    "loan_is_hire_purchase_or_leasing": {
+      "meaning": "เป็นสินเชื่อเช่าซื้อ/ลิสซิ่ง (ข้อยกเว้นของโครงการ)",
+      "type": "boolean",
+      "source": "contract",
+      "used_by": [
+        "PGS10-ELIG-001"
+      ]
+    },
+    "loan_is_new_business": {
+      "meaning": "เป็นสินเชื่อใหม่เพื่อธุรกิจ",
+      "type": "boolean",
+      "source": "approval letter / contract",
+      "used_by": [
+        "PGS10-ELIG-001"
+      ]
+    },
+    "loan_limit": {
+      "meaning": "วงเงินสินเชื่อ",
+      "type": "money",
+      "source": "approval letter / screen",
+      "unit": "THB",
+      "used_by": [
+        "PGS10-ID-001"
+      ]
+    },
+    "loan_purpose_business": {
+      "meaning": "สินเชื่อเพื่อวัตถุประสงค์ธุรกิจ",
+      "type": "boolean",
+      "source": "approval letter / contract",
+      "status": "ASSUMPTION (PRM-008)",
+      "used_by": [
+        "PGS10-ELIG-001"
+      ]
+    },
+    "normalized_value": {
+      "meaning": "ค่าหลัง normalize",
+      "type": "any",
+      "source": "provenance",
+      "used_by": []
+    },
+    "npl_date": {
+      "meaning": "วันที่บัญชีมีสถานะ NPL ตามนิยาม PGS",
+      "type": "date",
+      "source": "FI data / approved mapping",
+      "not_equal_to": "default_date",
+      "status": "OPEN: ยังไม่มีแหล่งที่มา/Mapping ที่อนุมัติ",
+      "used_by": [
+        "PGS10-CLM-002",
+        "PGS10-NPL-001"
+      ]
+    },
+    "paid_claims": {
+      "meaning": "ยอดจ่ายจริงสะสม",
+      "type": "money",
+      "source": "package ledger",
+      "unit": "THB",
+      "used_by": [
+        "PGS10-CAP-001"
+      ]
+    },
+    "payment_approval_date": {
+      "meaning": "วันที่อนุมัติจ่าย",
+      "type": "date",
+      "source": "claim workflow",
+      "used_by": [
+        "PGS10-TIME-001"
+      ]
+    },
+    "pdf_blank_pages": {
+      "meaning": "หน้า PDF ที่ว่าง (ไม่ใช่หน้าเอกสาร)",
+      "type": "integer[]",
+      "source": "PDF",
+      "used_by": [
+        "PGS10-DOC-001"
+      ]
+    },
+    "pending_claims": {
+      "meaning": "ยอดรอจ่าย",
+      "type": "money",
+      "source": "package ledger",
+      "unit": "THB",
+      "used_by": [
+        "PGS10-CAP-001"
+      ]
+    },
+    "pgs_phase": {
+      "meaning": "PGS ระยะของโครงการ",
+      "type": "enum:10|OTHER",
+      "source": "approval letter / LG / screen",
+      "used_by": [
+        "PGS10-ELIG-001"
+      ]
+    },
+    "pgs_revision": {
+      "meaning": "ปรับปรุงครั้งที่ของหลักเกณฑ์",
+      "type": "string",
+      "source": "screen / approval letter",
+      "allowed_value_for_this_ruleset": "5",
+      "used_by": [
+        "PGS10-ELIG-001"
+      ]
+    },
+    "postal_address": {
+      "meaning": "ที่อยู่ที่จัดส่งหนังสือบอกกล่าว",
+      "type": "address",
+      "source": "demand letter / envelope",
+      "used_by": [
+        "PGS10-PST-002"
+      ]
+    },
+    "postal_outcome": {
+      "meaning": "ผลการส่งไปรษณีย์",
+      "type": "enum:DELIVERED|RETURNED|NONE",
+      "source": "postal receipt / returned envelope",
+      "used_by": [
+        "PGS10-PST-001"
+      ]
+    },
+    "postal_received_date": {
+      "meaning": "วันที่ผู้รับลงนามรับ",
+      "type": "date",
+      "source": "postal receipt",
+      "used_by": [
+        "PGS10-DMD-003",
+        "PGS10-PST-001",
+        "PGS10-TIME-001"
+      ]
+    },
+    "postal_sent_date": {
+      "meaning": "วันที่ส่งหนังสือ",
+      "type": "date",
+      "source": "postal receipt",
+      "used_by": [
+        "PGS10-TIME-001"
+      ]
+    },
+    "postal_signature_type": {
+      "meaning": "ประเภทลายมือชื่อในใบตอบรับ",
+      "type": "enum:RECIPIENT|AUTHORIZED|PRINTED_NAME_ONLY|POSTAL_OFFICER_ONLY|NONE",
+      "source": "postal receipt",
+      "notes": "เฉพาะ RECIPIENT/AUTHORIZED นับเป็นหลักฐานรับ",
+      "used_by": [
+        "PGS10-PST-001"
+      ]
+    },
+    "postal_tracking_number_ack": {
+      "meaning": "เลขไปรษณีย์บนใบตอบรับ",
+      "type": "string",
+      "source": "postal acknowledgement",
+      "used_by": [
+        "PGS10-PST-003"
+      ]
+    },
+    "postal_tracking_number_dispatch": {
+      "meaning": "เลขไปรษณีย์ของชิ้นที่ส่งออก",
+      "type": "string",
+      "source": "dispatch record / Track & Trace",
+      "used_by": [
+        "PGS10-PST-003"
+      ]
+    },
+    "postal_tracking_number_envelope": {
+      "meaning": "เลขไปรษณีย์บนซองตีกลับ",
+      "type": "string",
+      "source": "returned envelope",
+      "used_by": [
+        "PGS10-PST-003"
+      ]
+    },
+    "principal_affecting_txn_after_demand": {
+      "meaning": "มีรายการกระทบเงินต้นหลัง Demand Date",
+      "type": "boolean",
+      "source": "statement",
+      "derived": true,
+      "used_by": [
+        "PGS10-DMD-002"
+      ]
+    },
+    "principal_as_of_demand_date": {
+      "meaning": "เงินต้นตาม Statement ณ วันบอกกล่าว",
+      "type": "money",
+      "source": "Statement as of Demand Date",
+      "unit": "THB",
+      "not_equal_to": "current_principal",
+      "aliases": [
+        "principal_at_demand_date"
+      ],
+      "used_by": [
+        "PGS10-DMD-002"
+      ]
+    },
+    "principal_as_of_demand_reconstructable": {
+      "meaning": "เงินต้น ณ Demand Date reconstruct ย้อนกลับได้แน่นอน",
+      "type": "boolean",
+      "source": "statement",
+      "derived": true,
+      "used_by": [
+        "PGS10-DMD-002"
+      ]
+    },
+    "product": {
+      "meaning": "รูปแบบ Product",
+      "type": "enum:SMALL_BIZ|START_UP|SMART_BIZ|SMART_ONE|SMART_GREEN|SMART_PLUS_TOPUP|NOT_PGS10",
+      "source": "approval letter / LG",
+      "notes": "SMALL_BIZ = SSMEs รูปแบบ 1; START_UP = รูปแบบ 2 (อนุมัติจากวงเงินตรงกัน — A-23)",
+      "used_by": [
+        "PGS10-CLM-002",
+        "PGS10-ELIG-001",
+        "PGS10-NPL-001",
+        "PGS10-RST-001"
+      ]
+    },
+    "product_family": {
+      "meaning": "ประเภทผลิตภัณฑ์สินเชื่อ",
+      "type": "enum:revolving_loan|term_loan|other",
+      "source": "approval letter / contract",
+      "used_by": [
+        "PGS10-CONTRACT-001"
+      ]
+    },
+    "raw_value": {
+      "meaning": "ค่าที่อ่านได้ก่อน normalize (เก็บคู่กับ normalized_value เสมอ)",
+      "type": "any",
+      "source": "provenance",
+      "used_by": []
+    },
+    "restructure_date": {
+      "meaning": "วันที่ปรับโครงสร้างหนี้ (หน้าจอ)",
+      "type": "date",
+      "source": "screen",
+      "not_equal_to": "tracking_date_screen",
+      "notes": "หมายถึงได้ทั้ง signing/approval/effective/accounting-start ต้องแยกก่อนสรุป mismatch",
+      "used_by": [
+        "PGS10-RST-001",
+        "PGS10-RST-003"
+      ]
+    },
+    "restructure_doc_approval_date": {
+      "meaning": "วันที่อนุมัติ",
+      "type": "date",
+      "source": "restructure approval (Level 1)",
+      "used_by": [
+        "PGS10-RST-003"
+      ]
+    },
+    "restructure_doc_effective_date": {
+      "meaning": "วันที่มีผล",
+      "type": "date",
+      "source": "restructure agreement (Level 1)",
+      "used_by": [
+        "PGS10-RST-003"
+      ]
+    },
+    "restructure_doc_signing_date": {
+      "meaning": "วันที่ลงนาม",
+      "type": "date",
+      "source": "restructure agreement (Level 1)",
+      "used_by": [
+        "PGS10-RST-001",
+        "PGS10-RST-003"
+      ]
+    },
+    "restructure_route": {
+      "meaning": "เส้นทาง Restructure ที่ใช้",
+      "type": "enum:NORMAL_RESTRUCTURE_PATH|UNCONTACTABLE_EXCEPTION_PATH|NOT_REQUIRED",
+      "source": "reviewer decision + documents",
+      "used_by": [
+        "PGS10-RST-001",
+        "PGS10-RST-002"
+      ]
+    },
+    "restructure_stmt_header_date": {
+      "meaning": "วันที่รับความช่วยเหลือ/ปรับโครงสร้าง/เริ่มเงื่อนไขใหม่ ในหัว Statement ใบแรก",
+      "type": "date",
+      "source": "statement header (Level 2)",
+      "used_by": [
+        "PGS10-RST-003"
+      ]
+    },
+    "returned_envelope_evidence": {
+      "meaning": "มีหน้าซองตีกลับ / RETURNED / คืนผู้ฝาก / Returned Mail ชัดเจน",
+      "type": "boolean",
+      "source": "returned envelope",
+      "used_by": [
+        "PGS10-PST-001"
+      ]
+    },
+    "review_flag": {
+      "meaning": "ธงให้ผู้ตรวจดู (ไม่ใช่สถานะ)",
+      "type": "enum:OBSERVATION_CANDIDATE|FORMAT_NORMALIZED|null",
+      "source": "engine output",
+      "used_by": []
+    },
+    "review_stage": {
+      "meaning": "ขั้นของการตรวจ",
+      "type": "enum:PRE_REVIEW|FINAL_APPROVAL",
+      "source": "workflow",
+      "used_by": [
+        "PGS10-CAP-001"
+      ]
+    },
+    "screen_approved_payment": {
+      "meaning": "ยอดอนุมัติจ่าย (หน้าจอ)",
+      "type": "money",
+      "source": "screen",
+      "unit": "THB",
+      "used_by": [
+        "PGS10-CLM-004"
+      ]
+    },
+    "screen_available_capacity": {
+      "meaning": "คงเหลือจ่ายได้อีก (หน้าจอ)",
+      "type": "money",
+      "source": "screen",
+      "unit": "THB",
+      "used_by": [
+        "PGS10-CAP-001"
+      ]
+    },
+    "screen_carry_forward_balance": {
+      "meaning": "คงเหลือหลังอนุมัติ (หน้าจอ)",
+      "type": "money",
+      "source": "screen",
+      "unit": "THB",
+      "used_by": [
+        "PGS10-CAP-001"
+      ]
+    },
+    "screen_claim_amount": {
+      "meaning": "จำนวนเงินค่าประกันชดเชย (หน้าจอ)",
+      "type": "money",
+      "source": "screen",
+      "unit": "THB",
+      "used_by": [
+        "PGS10-CLM-004"
+      ]
+    },
+    "screen_claim_base": {
+      "meaning": "ฐานคำนวณ (หน้าจอ)",
+      "type": "money",
+      "source": "screen",
+      "unit": "THB",
+      "used_by": [
+        "PGS10-CLM-003"
+      ]
+    },
+    "screen_claim_base_mode": {
+      "meaning": "โหมดฐานคำนวณที่หน้าจอเลือก",
+      "type": "enum:BY_PRINCIPAL|BY_GUARANTEE",
+      "source": "screen",
+      "used_by": [
+        "PGS10-CLM-003"
+      ]
+    },
+    "screen_coverage_ratio": {
+      "meaning": "อัตราที่หน้าจอใช้",
+      "type": "percent (basis points)",
+      "source": "screen",
+      "used_by": [
+        "PGS10-CLM-002"
+      ]
+    },
+    "screen_current_interest": {
+      "meaning": "… ดอกเบี้ย",
+      "type": "money",
+      "source": "screen",
+      "unit": "THB",
+      "used_by": [
+        "PGS10-CUR-002"
+      ]
+    },
+    "screen_current_principal": {
+      "meaning": "หน้าจอ 'สภาพหนี้ ณ ปัจจุบัน' — เงินต้น",
+      "type": "money",
+      "source": "screen",
+      "unit": "THB",
+      "used_by": [
+        "PGS10-CUR-001"
+      ]
+    },
+    "screen_current_total": {
+      "meaning": "… รวม",
+      "type": "money",
+      "source": "screen",
+      "unit": "THB",
+      "used_by": [
+        "PGS10-CUR-002"
+      ]
+    },
+    "screen_historical_interest": {
+      "meaning": "… ดอกเบี้ย",
+      "type": "money",
+      "source": "screen",
+      "unit": "THB",
+      "notes": "ห้ามนำ current interest มาใส่ซ้ำ",
+      "used_by": [
+        "PGS10-HIS-001"
+      ]
+    },
+    "screen_historical_principal": {
+      "meaning": "หน้าจอ 'สภาพหนี้ ณ วันฟ้อง/วันออกหนังสือบอกกล่าว/วันพิทักษ์ทรัพย์เด็ดขาด' — เงินต้น",
+      "type": "money",
+      "source": "screen",
+      "unit": "THB",
+      "not_equal_to": "current_principal",
+      "used_by": [
+        "PGS10-HIS-001"
+      ]
+    },
+    "screen_historical_total": {
+      "meaning": "… รวม",
+      "type": "money",
+      "source": "screen",
+      "unit": "THB",
+      "used_by": [
+        "PGS10-HIS-001"
+      ]
+    },
+    "statement_cutoff_date": {
+      "meaning": "Statement ถึงวันที่",
+      "type": "date",
+      "source": "statement",
+      "used_by": [
+        "PGS10-STM-002"
+      ]
+    },
+    "statement_has_gap": {
+      "meaning": "ช่วงรายการของ Statement มี gap",
+      "type": "boolean",
+      "source": "statement",
+      "used_by": [
+        "PGS10-DMD-002"
+      ]
+    },
+    "statement_period_end": {
+      "meaning": "Statement ครอบคลุมถึง",
+      "type": "date",
+      "source": "statement",
+      "used_by": [
+        "PGS10-DMD-002"
+      ]
+    },
+    "statement_period_start": {
+      "meaning": "Statement เริ่มครอบคลุมตั้งแต่",
+      "type": "date",
+      "source": "statement",
+      "used_by": [
+        "PGS10-DMD-002"
+      ]
+    },
+    "support_used": {
+      "meaning": "เคสผ่านโดยใช้ Documentary Support อย่างน้อยหนึ่ง Control",
+      "type": "boolean",
+      "source": "engine output",
+      "used_by": []
+    },
+    "text_layer_reads_header": {
+      "meaning": "Text Layer อ่านส่วนหัวได้ (ไม่ใช้เป็นหลักฐาน)",
+      "type": "boolean",
+      "source": "OCR/Text Layer",
+      "notes": "P3 — ไม่ทดแทนภาพจริง",
+      "used_by": [
+        "PGS10-VIS-001"
+      ]
+    },
+    "tolerance_enabled": {
+      "meaning": "เปิด tolerance (config; ค่าเริ่มต้น false)",
+      "type": "boolean",
+      "source": "governance config",
+      "default": false,
+      "used_by": [
+        "PGS10-CUR-002"
+      ]
+    },
+    "total_exposure_per_borrower": {
+      "meaning": "วงเงินค้ำรวมภายใต้โครงการต่อราย (ทุกผู้ให้สินเชื่อ)",
+      "type": "money",
+      "source": "LG data / screen",
+      "unit": "THB",
+      "used_by": [
+        "PGS10-ELIG-001"
+      ]
+    },
+    "tracking_date_report": {
+      "meaning": "วันที่ติดตาม (รายงานติดตาม)",
+      "type": "date",
+      "source": "tracking report",
+      "used_by": [
+        "PGS10-FUP-001"
+      ]
+    },
+    "tracking_date_screen": {
+      "meaning": "วันที่ติดตามให้ชำระหนี้/ปรับปรุงโครงสร้างหนี้ (หน้าจอ)",
+      "type": "date",
+      "source": "screen",
+      "not_equal_to": "restructure_date",
+      "used_by": [
+        "PGS10-FUP-001",
+        "PGS10-TIME-001"
+      ]
+    },
+    "tracking_method": {
+      "meaning": "วิธีติดตาม",
+      "type": "string",
+      "source": "tracking report",
+      "used_by": [
+        "PGS10-FUP-001"
+      ]
+    },
+    "tracking_result": {
+      "meaning": "ผลติดตาม",
+      "type": "string",
+      "source": "tracking report",
+      "used_by": [
+        "PGS10-FUP-001"
+      ]
+    },
+    "transaction_amount": {
+      "meaning": "จำนวนเงินของรายการ",
+      "type": "money",
+      "source": "statement",
+      "unit": "THB",
+      "used_by": []
+    },
+    "transaction_date": {
+      "meaning": "วันที่ของรายการใน Statement",
+      "type": "date",
+      "source": "statement",
+      "used_by": []
+    },
+    "transaction_type": {
+      "meaning": "ประเภทรายการหลังจำแนก",
+      "type": "enum:PAYMENT|DRAWDOWN|INTEREST_ACCRUAL|FEE|ADJUSTMENT|REVERSAL|PRINCIPAL_ADJUSTMENT|UNKNOWN",
+      "source": "statement + bank transaction-code mapping table",
+      "notes": "PAYMENT = เงินรับชำระจริง (Cash Receipt); Code ของธนาคารต้องมาจากตาราง Mapping ไม่ Hardcode",
+      "used_by": []
+    },
+    "transactions": {
+      "meaning": "รายการใน Statement ทั้งหมดหลังจำแนก (array ของ transaction_date/transaction_type/transaction_amount)",
+      "type": "object[]",
+      "source": "statement",
+      "item_schema": {
+        "transaction_date": "date",
+        "transaction_type": "enum(transaction_types)",
+        "transaction_code": "string|null",
+        "transaction_amount": "money"
+      },
+      "used_by": [
+        "PGS10-STM-001",
+        "PGS10-TXN-001"
+      ]
+    },
+    "uncontactable_start_date": {
+      "meaning": "วันที่ติดต่อไม่ได้ / วันแรกที่ติดต่อได้แต่ตกลงไม่ได้",
+      "type": "date",
+      "source": "tracking report",
+      "status": "OPEN: ไม่มีฟิลด์บนหน้าจอ (A-10)",
+      "used_by": []
+    },
+    "visible_on_rendered_page": {
+      "meaning": "องค์ประกอบนี้มองเห็นจริงในภาพหน้าเอกสาร (ไม่ใช่แค่ใน Text Layer)",
+      "type": "boolean",
+      "source": "visual check",
+      "used_by": []
+    }
+  }
+}

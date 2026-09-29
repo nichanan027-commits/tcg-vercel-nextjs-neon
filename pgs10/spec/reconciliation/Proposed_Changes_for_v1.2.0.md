@@ -1,13 +1,13 @@
-# Proposed Changes for v1.2.0 (ข้อเสนอ — ยังไม่ดำเนินการ)
+# Proposed Changes for v1.2.0 (r2 — Candidate สร้างแล้วที่ `pgs10/spec/v1.2.0-candidate/` ส่วน Engine ยังไม่แก้)
 
-**เวอร์ชัน:** 1.2.0-RECONCILIATION · **ไม่ใช่ Spec Candidate** · ไม่มีการแก้ไฟล์ Spec/Engine/Tests · รอ Review ของ Reconciliation ก่อน
+**เวอร์ชัน:** 1.2.0-RECONCILIATION-r2 · **ไม่ใช่ Spec Candidate** · ไม่มีการแก้ไฟล์ Spec/Engine/Tests · รอ Review ของ Reconciliation ก่อน
 
 ## 0. ฐานของ v1.2.0
 
 - โครงไฟล์ = Pack v1.1.0 (5 ไฟล์) เพราะเป็นที่ ChatGPT/Claude/Backend ใช้อยู่
 - เนื้อหา = P + ส่วนที่ D เติมกลับ + ผล DEC-01…14
 - ทุกไฟล์ใส่ `ruleset_version: 1.2.0-candidate`, `frozen: false` จนผ่าน Freeze Gate
-- ใช้ Rule ID Canonical (32 รายการ) และ reason code Canonical (79 ตัว) ตามไฟล์ Reconciliation
+- ใช้ Rule ID Canonical (32 รายการ) และ reason code Canonical (83 ตัว) ตามไฟล์ Reconciliation
 
 ## 1. `01_PGS10_POLICY_RULEBOOK.md`
 
@@ -35,7 +35,7 @@
 
 ## 3. `03_PGS10_DATA_DICTIONARY.json`
 
-1. แทน `reason_codes` (18) ด้วย Canonical catalogue (79) + `alias_index`
+1. แทน `reason_codes` (18) ด้วย Canonical catalogue (83) + `alias_index`
 2. **เพิ่มฟิลด์:** `fi_id`, `bank_id`, `npl_date`(คง) + `npl_anchor_date`, `later_payment_date/amount`, `statement_cutoff_date`, `later_statement_covers`, `loan_purpose_business`, `loan_is_new_business`, `loan_is_hp_leasing`, `postal_sent_date`, `confirmation_visual_elements{12}`, `support_used`, `review_flag`, `control_status`, `requirement`
 3. **Transaction map** เป็นตาราง (`bank_id, code, semantic_type, effective_from, effective_to, evidence_source, approval_status, approved_by`) — ไม่ใช่ object ตาม code; 6921/6680 = `UNVERIFIED_UNTIL_SOURCE` (ถอด 6921 ออกจาก mapping ของ P)
 4. **Conventions:** วันที่ ISO CE + `calendar` (BE|CE) + `original_text`; เงิน = integer satang; ROUND_HALF_UP; percent = basis points
@@ -44,7 +44,7 @@
 
 ## 4. `04_PGS10_GOLDEN_TESTS.json`
 
-ตาม `Golden_Test_Gap_Report.md`: schema ใหม่, แปลง GT-001…013, เพิ่ม T-01…T-34, นำ unit cases ตัวเลขของ D กลับ (reason ที่เปลี่ยนชื่อแล้ว), `evidence_ref` บังคับ, ไม่ Assert ที่ไม่มีหลักฐาน
+ตาม `Golden_Test_Gap_Report.md`: schema ใหม่, แปลง GT-001…013, เพิ่ม T-01…T-42, นำ unit cases ตัวเลขของ D กลับ (reason ที่เปลี่ยนชื่อแล้ว), `evidence_ref` บังคับ, ไม่ Assert ที่ไม่มีหลักฐาน
 
 ## 5. ผลกระทบต่อ Rule Engine (เมื่อได้รับอนุมัติเท่านั้น — ตอนนี้ **ไม่แก้**)
 
@@ -65,25 +65,13 @@
 
 ## 6. Freeze Gate Checklist
 
-ต้องปิดก่อนเรียก Spec Candidate ว่า Freeze (13 รายการ):
+ต้องปิดก่อนเรียก Spec Candidate ว่า Freeze (1 รายการ; นอกจากนี้ต้องผ่าน Freeze Gate 5 ข้อ — สคริปต์ `check_freeze_gate.js` ในโฟลเดอร์ Candidate):
 
 | ID | ประเด็น | สถานะ | ผลที่ใช้ตอนนี้ |
 |---|---|---|---|
-| A-04 | Historical mismatch = HOLD | RESOLVED_PENDING_SOURCE_EDIT | HOLD HISTORICAL_BALANCE_MISMATCH. ต้องแก้ถ้อยคำ Master Audit §27 ให้ตรง (ยังเป็นงานค้าง) |
-| A-07 | ขอบเขตของ FAIL | OPEN | R: เฉพาะ Eligibility/แก้ไม่ได้; M§39 และ P: FAIL เมื่อคนละบุคคล/NPL/Coverage/Claim ผิด — ยังไม่มีคำตัดสิน (PRM-045) |
-| A-10 | 7-month exception ขอบเขต + วันเริ่มนับ | OPEN | route ชื่อ UNCONTACTABLE_EXCEPTION_PATH (ไม่ผูก 7); เดือนเป็นพารามิเตอร์ OPEN; ปิดไว้ (PRM-018/019) |
-| A-11 | Coverage Ratio นอก Small Biz | OPEN | Small Biz/Start up มี; Smart* → HOLD NO_RULE_FOR_PRODUCT (PRM-026b) |
-| A-12 | วิธีนับอายุ LG / วิธีนับเดือน-ปี | PARTIAL | ขอบเขต '5 ปีพอดี = 70%' ปิดแล้ว; วันอ้างอิงอายุ (สมมติ claim_date) และ calendar arithmetic ยัง OPEN (PRM-027/028) |
-| A-14 | Transaction taxonomy + นิยาม Payment | PARTIAL | types = union (รวม REVERSAL, PRINCIPAL_ADJUSTMENT); code map ต่อ bank_id. ยังไม่ชัด: เงินรับที่ตัดดอกเบี้ยอย่างเดียวนับเป็น PAYMENT หรือไม่ |
-| A-16 | รายการภาพหนังสือยืนยัน 12 vs 10 | OPEN | เสนอ 12 (ชุดใหญ่ รวม 'ข้อความว่าชำระไม่เป็นไปตามเงื่อนไข') — PRM-037 |
-| A-21 | Demand waiting / Filing window นับจากวันใด | OPEN | PRM-021/022/023; วิธีนับ PRM-028 |
-| A-23 | Start up = รูปแบบ 2; เงื่อนไข Claim ของ Start up | PARTIAL | Start up = รูปแบบ 2 และใช้ (ข) ยืนยันแล้ว; ชุดเงื่อนไข Claim ที่เหลือของ Start up (สมมติเหมือน Small Biz: (ข)+(ค)+(จ)+(ฉ) / หลัง 5 ปี (ง)+(จ)+(ฉ)) ยังไม่ระบุ |
-| A-26 | ตัวเลขเคสจริงสำหรับ FULL_CASE ไม่มี | OPEN | FULL_CASE ต้องมี Evidence Package ครบ — ยังไม่มี |
-| A-30 | NPL anchor date | OPEN | สมมติ = lg_issue_date; ต้องยืนยันว่าเป็นวันเดียวกับ 'วันที่ บสย. ค้ำประกัน' (PRM-013) |
-| A-33 | Transaction code evidence | PARTIAL | 5 codes EVIDENCE_SUPPORTED_BANK_SPECIFIC; 6921/6680 UNVERIFIED; ยังขาด effective_from/to และ evidence doc/page และ approval |
-| A-38 | P: PASS_WITH_OBSERVATION 'เฉพาะหลัง reviewer อนุมัติ' vs FORMAT_VARIANCE อัตโนมัติ | OPEN | Observation ชนิดใดอัตโนมัติ (FORMAT_VARIANCE, NO_PAYMENT_FOUND) และชนิดใดต้อง reviewer (NUMERIC_VARIANCE) — Q-01 |
+| A-30 | NPL anchor date | OPEN | แยก guarantee_effective_date / lg_issue_date; ห้ามอนุมาน; ต้องให้ Business Owner ยืนยัน Mapping → APPROVED_OPERATIONAL. ระหว่างนี้ NPL-001 = Safe-Hold HOLD NPL_ANCHOR_DATE_UNDEFINED. **Freeze Blocker เดียวที่เหลือ** |
 
-นอกจากนี้ต้องมี: (1) evidence ref ของ DEC-01/02/03 (2) แก้ Master Audit ตามรายการใน Conflict_Register (3) เจ้าของ Business Rule อนุมัติ Q-01…Q-04 (4) ตรวจ Golden Tests ใหม่ผ่านสคริปต์ consistency
+นอกจากนี้ต้องมี: (1) evidence ref ของ DEC-01/02/03 (2) แก้ Master Audit ตามรายการใน Conflict_Register (3) เจ้าของ Business Rule ยืนยัน A-30 และตอบ Q-05…Q-07 (4) ตรวจ Golden Tests ใหม่ผ่านสคริปต์ consistency
 
 ## 7. ลำดับขั้นที่เสนอ
 

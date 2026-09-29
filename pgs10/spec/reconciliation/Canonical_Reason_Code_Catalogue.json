@@ -1,6 +1,6 @@
 {
   "meta": {
-    "spec_version": "1.2.0-RECONCILIATION",
+    "spec_version": "1.2.0-RECONCILIATION-r2",
     "frozen": false,
     "status": "RECONCILIATION_DRAFT — ไม่ใช่ Spec Candidate และไม่ใช่การ Freeze",
     "decision_baseline": "DEC-01..DEC-14 (Rule_Reconciliation_Report §2)",
@@ -31,7 +31,8 @@
     "NOT_TESTABLE"
   ],
   "review_flags": [
-    "OBSERVATION_CANDIDATE"
+    "OBSERVATION_CANDIDATE",
+    "FORMAT_NORMALIZED"
   ],
   "case_level_flags": [
     "support_used"
@@ -52,7 +53,8 @@
       "aliases": [],
       "detail_codes": [],
       "review_flag": null,
-      "proposed": false
+      "proposed": false,
+      "owner_status": "CANDIDATE"
     },
     {
       "code": "MISSING_INPUT",
@@ -64,7 +66,21 @@
       "aliases": [],
       "detail_codes": [],
       "review_flag": null,
-      "proposed": false
+      "proposed": false,
+      "owner_status": "CANDIDATE"
+    },
+    {
+      "code": "POLICY_PARAMETER_UNRESOLVED",
+      "rules": [
+        "*"
+      ],
+      "control_status": "HOLD",
+      "meaning": "ผลขึ้นกับพารามิเตอร์นโยบายที่ยัง OPEN และ candidate ให้ผลต่างกัน (ระบุ PRM-xxx ใน detail_code)",
+      "aliases": [],
+      "detail_codes": [],
+      "review_flag": null,
+      "proposed": true,
+      "owner_status": "PROPOSED_BY_CLAUDE"
     },
     {
       "code": "RULE_VERSION_CONFLICT",
@@ -78,7 +94,8 @@
       ],
       "detail_codes": [],
       "review_flag": null,
-      "proposed": false
+      "proposed": false,
+      "owner_status": "CANDIDATE"
     },
     {
       "code": "CLAIM_EXCEEDS_CAP",
@@ -90,7 +107,8 @@
       "aliases": [],
       "detail_codes": [],
       "review_flag": null,
-      "proposed": false
+      "proposed": false,
+      "owner_status": "CANDIDATE"
     },
     {
       "code": "CLAIM_MAX_ARITHMETIC_MISMATCH",
@@ -105,33 +123,28 @@
       ],
       "detail_codes": [],
       "review_flag": null,
-      "proposed": false
+      "proposed": false,
+      "owner_status": "CANDIDATE"
     },
     {
       "code": "PACKAGE_DEFINITION_REQUIRED",
       "rules": [
         "PGS10-CAP-001"
       ],
-      "control_status": "HOLD",
-      "meaning": "นิยาม Claim Max / รอบ Package / Carry-forward ของแหล่งข้อมูลไม่ชัด",
-      "aliases": [
-        "HOLD_PACKAGE_DEFINITION_REQUIRED"
-      ],
-      "detail_codes": [],
-      "review_flag": null,
-      "proposed": true
-    },
-    {
-      "code": "PAID_PENDING_MISSING",
-      "rules": [
-        "PGS10-CAP-001"
-      ],
       "control_status": "NOT_TESTABLE",
-      "meaning": "มี CLAIM MAX แต่ไม่มียอดจ่าย/รอจ่าย",
-      "aliases": [],
-      "detail_codes": [],
+      "meaning": "ข้อมูล/นิยาม Package (Claim Max, paid, pending, รอบ, carry-forward) ไม่ครบ. FINAL_APPROVAL → case HOLD; PRE_REVIEW → ไม่กระทบเคส",
+      "aliases": [
+        "HOLD_PACKAGE_DEFINITION_REQUIRED",
+        "PAID_PENDING_MISSING"
+      ],
+      "detail_codes": [
+        "PAID_PENDING_MISSING",
+        "CLAIM_MAX_UNDEFINED",
+        "ROUND_UNDEFINED"
+      ],
       "review_flag": null,
-      "proposed": false
+      "proposed": false,
+      "owner_status": "APPROVED_BY_OWNER"
     },
     {
       "code": "CLAIM_FILING_WINDOW_NOT_MET",
@@ -143,7 +156,21 @@
       "aliases": [],
       "detail_codes": [],
       "review_flag": null,
-      "proposed": false
+      "proposed": false,
+      "owner_status": "CANDIDATE"
+    },
+    {
+      "code": "COVERAGE_AGE_BASIS_UNDEFINED",
+      "rules": [
+        "PGS10-CLM-002"
+      ],
+      "control_status": "HOLD",
+      "meaning": "coverage_age_basis ยัง OPEN และ Tier ต่างกันตาม candidate event",
+      "aliases": [],
+      "detail_codes": [],
+      "review_flag": null,
+      "proposed": true,
+      "owner_status": "PROPOSED_BY_CLAUDE"
     },
     {
       "code": "COVERAGE_RATIO_MISMATCH",
@@ -155,7 +182,8 @@
       "aliases": [],
       "detail_codes": [],
       "review_flag": null,
-      "proposed": false
+      "proposed": false,
+      "owner_status": "CANDIDATE"
     },
     {
       "code": "NO_RULE_FOR_PRODUCT",
@@ -167,7 +195,8 @@
       "aliases": [],
       "detail_codes": [],
       "review_flag": null,
-      "proposed": false
+      "proposed": false,
+      "owner_status": "CANDIDATE"
     },
     {
       "code": "CLAIM_BASE_MISMATCH",
@@ -179,7 +208,8 @@
       "aliases": [],
       "detail_codes": [],
       "review_flag": null,
-      "proposed": false
+      "proposed": false,
+      "owner_status": "CANDIDATE"
     },
     {
       "code": "CLAIM_BASE_MODE_MISMATCH",
@@ -191,7 +221,8 @@
       "aliases": [],
       "detail_codes": [],
       "review_flag": null,
-      "proposed": false
+      "proposed": false,
+      "owner_status": "CANDIDATE"
     },
     {
       "code": "CLAIM_CALCULATION_MISMATCH",
@@ -205,7 +236,8 @@
       ],
       "detail_codes": [],
       "review_flag": null,
-      "proposed": false
+      "proposed": false,
+      "owner_status": "CANDIDATE"
     },
     {
       "code": "UPSTREAM_NOT_COMPUTABLE",
@@ -218,7 +250,8 @@
       "aliases": [],
       "detail_codes": [],
       "review_flag": null,
-      "proposed": false
+      "proposed": false,
+      "owner_status": "CANDIDATE"
     },
     {
       "code": "CONTRACT_DATE_BASIS_UNDEFINED",
@@ -230,7 +263,8 @@
       "aliases": [],
       "detail_codes": [],
       "review_flag": null,
-      "proposed": true
+      "proposed": false,
+      "owner_status": "APPROVED_BY_OWNER"
     },
     {
       "code": "CONTRACT_DATE_MISMATCH",
@@ -244,7 +278,8 @@
       ],
       "detail_codes": [],
       "review_flag": null,
-      "proposed": false
+      "proposed": false,
+      "owner_status": "CANDIDATE"
     },
     {
       "code": "CURRENT_PRINCIPAL_MISMATCH",
@@ -256,7 +291,8 @@
       "aliases": [],
       "detail_codes": [],
       "review_flag": null,
-      "proposed": false
+      "proposed": false,
+      "owner_status": "CANDIDATE"
     },
     {
       "code": "CURRENT_BALANCE_MISMATCH",
@@ -268,7 +304,8 @@
       "aliases": [],
       "detail_codes": [],
       "review_flag": null,
-      "proposed": false
+      "proposed": false,
+      "owner_status": "CANDIDATE"
     },
     {
       "code": "NUMERIC_VARIANCE",
@@ -283,7 +320,8 @@
       ],
       "detail_codes": [],
       "review_flag": "OBSERVATION_CANDIDATE",
-      "proposed": false
+      "proposed": false,
+      "owner_status": "APPROVED_BY_OWNER"
     },
     {
       "code": "VARIANCE_WITHIN_APPROVED_TOLERANCE",
@@ -295,7 +333,8 @@
       "aliases": [],
       "detail_codes": [],
       "review_flag": null,
-      "proposed": false
+      "proposed": false,
+      "owner_status": "CANDIDATE"
     },
     {
       "code": "POST_DEFAULT_PAYMENT",
@@ -307,7 +346,8 @@
       "aliases": [],
       "detail_codes": [],
       "review_flag": null,
-      "proposed": false
+      "proposed": false,
+      "owner_status": "CANDIDATE"
     },
     {
       "code": "POST_DEFAULT_PAYMENT_SUPPORTED",
@@ -320,7 +360,8 @@
       "aliases": [],
       "detail_codes": [],
       "review_flag": null,
-      "proposed": false
+      "proposed": false,
+      "owner_status": "CANDIDATE"
     },
     {
       "code": "CONFIRMATION_CONTENT_INCOMPLETE",
@@ -332,7 +373,8 @@
       "aliases": [],
       "detail_codes": [],
       "review_flag": null,
-      "proposed": false
+      "proposed": false,
+      "owner_status": "CANDIDATE"
     },
     {
       "code": "CONFIRMED_DEFAULT_DATE_MISMATCH",
@@ -344,7 +386,8 @@
       "aliases": [],
       "detail_codes": [],
       "review_flag": null,
-      "proposed": false
+      "proposed": false,
+      "owner_status": "CANDIDATE"
     },
     {
       "code": "IDENTIFIER_LINKAGE_UNRESOLVED",
@@ -359,7 +402,8 @@
       ],
       "detail_codes": [],
       "review_flag": null,
-      "proposed": false
+      "proposed": false,
+      "owner_status": "CANDIDATE"
     },
     {
       "code": "POST_DEFAULT_SUPPORT_MISSING",
@@ -374,7 +418,8 @@
       ],
       "detail_codes": [],
       "review_flag": null,
-      "proposed": false
+      "proposed": false,
+      "owner_status": "CANDIDATE"
     },
     {
       "code": "DEMAND_IDENTITY_UNCONFIRMED",
@@ -386,7 +431,8 @@
       "aliases": [],
       "detail_codes": [],
       "review_flag": null,
-      "proposed": false
+      "proposed": false,
+      "owner_status": "CANDIDATE"
     },
     {
       "code": "DEMAND_LETTER_MISMATCH",
@@ -398,7 +444,25 @@
       "aliases": [],
       "detail_codes": [],
       "review_flag": null,
-      "proposed": false
+      "proposed": false,
+      "owner_status": "CANDIDATE"
+    },
+    {
+      "code": "DEMAND_PRINCIPAL_AS_OF_DATE_UNVERIFIED",
+      "rules": [
+        "PGS10-DMD-002"
+      ],
+      "control_status": "HOLD",
+      "meaning": "พิสูจน์เงินต้น ณ วันบอกกล่าวไม่ได้ (ไม่มี Snapshot และ derive ไม่ได้: Statement ไม่ครอบคลุม/มี gap/มีรายการกระทบเงินต้นหลัง demand ที่ reconstruct ไม่ได้)",
+      "aliases": [
+        "DEMAND_PRINCIPAL_UNRECONCILED",
+        "ASOF_DEMAND_PRINCIPAL_REQUIRED",
+        "HOLD_DEMAND_PRINCIPAL_UNRECONCILED"
+      ],
+      "detail_codes": [],
+      "review_flag": null,
+      "proposed": false,
+      "owner_status": "APPROVED_BY_OWNER"
     },
     {
       "code": "DEMAND_PRINCIPAL_MISMATCH",
@@ -410,22 +474,21 @@
       "aliases": [],
       "detail_codes": [],
       "review_flag": null,
-      "proposed": false
+      "proposed": false,
+      "owner_status": "CANDIDATE"
     },
     {
-      "code": "DEMAND_PRINCIPAL_UNRECONCILED",
+      "code": "DERIVED_AS_OF_DEMAND",
       "rules": [
         "PGS10-DMD-002"
       ],
-      "control_status": "HOLD",
-      "meaning": "พิสูจน์ยอด ณ วันบอกกล่าวไม่ได้ (ไม่มี as-of และ Latest Statement ใช้แทนไม่ได้)",
-      "aliases": [
-        "ASOF_DEMAND_PRINCIPAL_REQUIRED",
-        "HOLD_DEMAND_PRINCIPAL_UNRECONCILED"
-      ],
+      "control_status": "PASS_WITH_SUPPORT",
+      "meaning": "derive เงินต้น ณ วันบอกกล่าวจาก Statement/Ledger ได้ครบตามเงื่อนไข (ครอบคลุม ไม่มี gap ไม่มีรายการกระทบเงินต้นหลัง demand หรือ reconstruct ได้)",
+      "aliases": [],
       "detail_codes": [],
       "review_flag": null,
-      "proposed": false
+      "proposed": false,
+      "owner_status": "APPROVED_BY_OWNER"
     },
     {
       "code": "DEMAND_WAITING_PERIOD_NOT_MET",
@@ -437,7 +500,8 @@
       "aliases": [],
       "detail_codes": [],
       "review_flag": null,
-      "proposed": false
+      "proposed": false,
+      "owner_status": "CANDIDATE"
     },
     {
       "code": "APPROVAL_DOCUMENT_INCOMPLETE",
@@ -457,7 +521,8 @@
         "PAGE_UNREADABLE"
       ],
       "review_flag": null,
-      "proposed": false
+      "proposed": false,
+      "owner_status": "CANDIDATE"
     },
     {
       "code": "ELIGIBILITY_EXPOSURE_LIMIT_EXCEEDED",
@@ -469,7 +534,8 @@
       "aliases": [],
       "detail_codes": [],
       "review_flag": null,
-      "proposed": false
+      "proposed": false,
+      "owner_status": "CANDIDATE"
     },
     {
       "code": "ELIGIBILITY_GUARANTEE_BELOW_MINIMUM",
@@ -481,19 +547,8 @@
       "aliases": [],
       "detail_codes": [],
       "review_flag": null,
-      "proposed": false
-    },
-    {
-      "code": "ELIGIBILITY_HIRE_PURCHASE_LEASING",
-      "rules": [
-        "PGS10-ELIG-001"
-      ],
-      "control_status": "FAIL",
-      "meaning": "เป็นสินเชื่อเช่าซื้อ/ลิสซิ่ง",
-      "aliases": [],
-      "detail_codes": [],
-      "review_flag": null,
-      "proposed": false
+      "proposed": false,
+      "owner_status": "CANDIDATE"
     },
     {
       "code": "ELIGIBILITY_NOT_BUSINESS_PURPOSE",
@@ -505,7 +560,8 @@
       "aliases": [],
       "detail_codes": [],
       "review_flag": null,
-      "proposed": true
+      "proposed": false,
+      "owner_status": "APPROVED_BY_OWNER"
     },
     {
       "code": "ELIGIBILITY_NOT_NEW_BUSINESS_LOAN",
@@ -517,7 +573,8 @@
       "aliases": [],
       "detail_codes": [],
       "review_flag": null,
-      "proposed": false
+      "proposed": false,
+      "owner_status": "CANDIDATE"
     },
     {
       "code": "ELIGIBILITY_NOT_PGS10",
@@ -529,7 +586,8 @@
       "aliases": [],
       "detail_codes": [],
       "review_flag": null,
-      "proposed": false
+      "proposed": false,
+      "owner_status": "CANDIDATE"
     },
     {
       "code": "ELIGIBILITY_PRODUCT_EXCLUDED",
@@ -541,7 +599,23 @@
       "aliases": [],
       "detail_codes": [],
       "review_flag": null,
-      "proposed": false
+      "proposed": false,
+      "owner_status": "CANDIDATE"
+    },
+    {
+      "code": "ELIGIBILITY_PROHIBITED_CREDIT_TYPE",
+      "rules": [
+        "PGS10-ELIG-001"
+      ],
+      "control_status": "FAIL",
+      "meaning": "สินเชื่อเป็นประเภทที่นโยบายไม่อนุญาต (Hire Purchase / Leasing) — แยกจาก NOT_BUSINESS_PURPOSE",
+      "aliases": [
+        "ELIGIBILITY_HIRE_PURCHASE_LEASING"
+      ],
+      "detail_codes": [],
+      "review_flag": null,
+      "proposed": false,
+      "owner_status": "APPROVED_BY_OWNER"
     },
     {
       "code": "ELIGIBILITY_UNCONFIRMED",
@@ -553,7 +627,8 @@
       "aliases": [],
       "detail_codes": [],
       "review_flag": null,
-      "proposed": false
+      "proposed": false,
+      "owner_status": "CANDIDATE"
     },
     {
       "code": "PGS_REVISION_MISMATCH",
@@ -565,7 +640,8 @@
       "aliases": [],
       "detail_codes": [],
       "review_flag": null,
-      "proposed": false
+      "proposed": false,
+      "owner_status": "CANDIDATE"
     },
     {
       "code": "PRODUCT_UNKNOWN",
@@ -577,7 +653,8 @@
       "aliases": [],
       "detail_codes": [],
       "review_flag": null,
-      "proposed": false
+      "proposed": false,
+      "owner_status": "CANDIDATE"
     },
     {
       "code": "TRACKING_EVIDENCE_INCOMPLETE",
@@ -589,7 +666,8 @@
       "aliases": [],
       "detail_codes": [],
       "review_flag": null,
-      "proposed": false
+      "proposed": false,
+      "owner_status": "CANDIDATE"
     },
     {
       "code": "TRACKING_EVIDENCE_MISMATCH",
@@ -604,7 +682,8 @@
       ],
       "detail_codes": [],
       "review_flag": null,
-      "proposed": false
+      "proposed": false,
+      "owner_status": "CANDIDATE"
     },
     {
       "code": "TRACKING_REPORT_MISSING",
@@ -616,7 +695,8 @@
       "aliases": [],
       "detail_codes": [],
       "review_flag": null,
-      "proposed": false
+      "proposed": false,
+      "owner_status": "CANDIDATE"
     },
     {
       "code": "HISTORICAL_BALANCE_MISMATCH",
@@ -628,19 +708,21 @@
       "aliases": [],
       "detail_codes": [],
       "review_flag": null,
-      "proposed": false
+      "proposed": false,
+      "owner_status": "CANDIDATE"
     },
     {
       "code": "FORMAT_VARIANCE",
       "rules": [
         "PGS10-ID-001"
       ],
-      "control_status": "OBSERVATION",
-      "meaning": "ต่างเฉพาะรูปแบบ (Leading Zero) องค์ประกอบอื่นตรงหมด",
+      "control_status": "PASS",
+      "meaning": "ต่างเฉพาะรูปแบบที่ไม่มีนัยเชิงความหมาย (field-specific: LG, ตัวเลขไทย/อารบิก, Leading Zero เฉพาะ field ที่ประกาศ) — เก็บ raw_value และ normalized_value; เคสเป็น PASS_WITH_OBSERVATION",
       "aliases": [],
       "detail_codes": [],
-      "review_flag": null,
-      "proposed": false
+      "review_flag": "FORMAT_NORMALIZED",
+      "proposed": false,
+      "owner_status": "APPROVED_BY_OWNER"
     },
     {
       "code": "IDENTITY_MISMATCH",
@@ -652,7 +734,8 @@
       "aliases": [],
       "detail_codes": [],
       "review_flag": null,
-      "proposed": false
+      "proposed": false,
+      "owner_status": "CANDIDATE"
     },
     {
       "code": "VERIFY_REFERENCE_MAPPING",
@@ -664,7 +747,8 @@
       "aliases": [],
       "detail_codes": [],
       "review_flag": null,
-      "proposed": false
+      "proposed": false,
+      "owner_status": "CANDIDATE"
     },
     {
       "code": "LG_DATA_MISSING",
@@ -676,7 +760,8 @@
       "aliases": [],
       "detail_codes": [],
       "review_flag": null,
-      "proposed": false
+      "proposed": false,
+      "owner_status": "CANDIDATE"
     },
     {
       "code": "LG_FEE_NOT_CONTINUOUS",
@@ -688,7 +773,8 @@
       "aliases": [],
       "detail_codes": [],
       "review_flag": null,
-      "proposed": false
+      "proposed": false,
+      "owner_status": "CANDIDATE"
     },
     {
       "code": "LG_TENOR_EXCEEDED",
@@ -700,7 +786,21 @@
       "aliases": [],
       "detail_codes": [],
       "review_flag": null,
-      "proposed": false
+      "proposed": false,
+      "owner_status": "CANDIDATE"
+    },
+    {
+      "code": "NPL_ANCHOR_DATE_UNDEFINED",
+      "rules": [
+        "PGS10-NPL-001"
+      ],
+      "control_status": "HOLD",
+      "meaning": "ยังไม่มี Mapping ที่อนุมัติระหว่าง guarantee_effective_date กับ lg_issue_date (A-30) จึงคำนวณ NPL seasoning ไม่ได้",
+      "aliases": [],
+      "detail_codes": [],
+      "review_flag": null,
+      "proposed": true,
+      "owner_status": "PROPOSED_BY_CLAUDE"
     },
     {
       "code": "NPL_DATE_MISSING",
@@ -716,7 +816,8 @@
       ],
       "detail_codes": [],
       "review_flag": null,
-      "proposed": false
+      "proposed": false,
+      "owner_status": "APPROVED_BY_OWNER"
     },
     {
       "code": "NPL_SEASONING_NOT_MET",
@@ -728,7 +829,8 @@
       "aliases": [],
       "detail_codes": [],
       "review_flag": null,
-      "proposed": false
+      "proposed": false,
+      "owner_status": "CANDIDATE"
     },
     {
       "code": "POSTAL_ACK_INCOMPLETE",
@@ -742,7 +844,8 @@
       ],
       "detail_codes": [],
       "review_flag": null,
-      "proposed": false
+      "proposed": false,
+      "owner_status": "CANDIDATE"
     },
     {
       "code": "POSTAL_ADDRESS_UNVERIFIED",
@@ -758,7 +861,8 @@
       ],
       "detail_codes": [],
       "review_flag": null,
-      "proposed": false
+      "proposed": false,
+      "owner_status": "CANDIDATE"
     },
     {
       "code": "POSTAL_EVIDENCE_MISSING",
@@ -770,7 +874,8 @@
       "aliases": [],
       "detail_codes": [],
       "review_flag": null,
-      "proposed": false
+      "proposed": false,
+      "owner_status": "CANDIDATE"
     },
     {
       "code": "POSTAL_RETURN_INCOMPLETE",
@@ -784,7 +889,8 @@
       ],
       "detail_codes": [],
       "review_flag": null,
-      "proposed": false
+      "proposed": false,
+      "owner_status": "CANDIDATE"
     },
     {
       "code": "ADDRESS_DIFFERS_FROM_LATEST",
@@ -796,7 +902,8 @@
       "aliases": [],
       "detail_codes": [],
       "review_flag": null,
-      "proposed": false
+      "proposed": false,
+      "owner_status": "CANDIDATE"
     },
     {
       "code": "ADDRESS_NOT_IN_DOCUMENTS",
@@ -808,7 +915,8 @@
       "aliases": [],
       "detail_codes": [],
       "review_flag": null,
-      "proposed": false
+      "proposed": false,
+      "owner_status": "CANDIDATE"
     },
     {
       "code": "POSTAL_LINKAGE_UNRESOLVED",
@@ -822,7 +930,8 @@
       ],
       "detail_codes": [],
       "review_flag": null,
-      "proposed": false
+      "proposed": false,
+      "owner_status": "CANDIDATE"
     },
     {
       "code": "RESTRUCTURE_PATH_UNDETERMINED",
@@ -834,7 +943,8 @@
       "aliases": [],
       "detail_codes": [],
       "review_flag": null,
-      "proposed": false
+      "proposed": false,
+      "owner_status": "CANDIDATE"
     },
     {
       "code": "RESTRUCTURE_REQUIREMENT_NOT_MET",
@@ -846,7 +956,8 @@
       "aliases": [],
       "detail_codes": [],
       "review_flag": null,
-      "proposed": false
+      "proposed": false,
+      "owner_status": "CANDIDATE"
     },
     {
       "code": "EXCEPTION_ROUTE_NOT_CONFIGURED",
@@ -858,7 +969,8 @@
       "aliases": [],
       "detail_codes": [],
       "review_flag": null,
-      "proposed": false
+      "proposed": false,
+      "owner_status": "CANDIDATE"
     },
     {
       "code": "TRACKING_REPORT_NOT_CERTIFIED",
@@ -870,7 +982,21 @@
       "aliases": [],
       "detail_codes": [],
       "review_flag": null,
-      "proposed": false
+      "proposed": false,
+      "owner_status": "CANDIDATE"
+    },
+    {
+      "code": "UNCONTACTABLE_EXCEPTION_MATURED",
+      "rules": [
+        "PGS10-RST-002"
+      ],
+      "control_status": "PASS_WITH_SUPPORT",
+      "meaning": "ครบเงื่อนไขทางออก: maturity (start + 7 เดือนปฏิทิน) + Certified Tracking Report + หนังสือบอกกล่าว/บอกเลิก ≥ 1",
+      "aliases": [],
+      "detail_codes": [],
+      "review_flag": null,
+      "proposed": true,
+      "owner_status": "PROPOSED_BY_CLAUDE"
     },
     {
       "code": "UNCONTACTABLE_EXCEPTION_NOT_MET",
@@ -882,7 +1008,8 @@
       "aliases": [],
       "detail_codes": [],
       "review_flag": null,
-      "proposed": false
+      "proposed": false,
+      "owner_status": "CANDIDATE"
     },
     {
       "code": "MATCHED_STATEMENT_HEADER",
@@ -894,7 +1021,8 @@
       "aliases": [],
       "detail_codes": [],
       "review_flag": null,
-      "proposed": false
+      "proposed": false,
+      "owner_status": "CANDIDATE"
     },
     {
       "code": "RESTRUCTURE_DATE_MISMATCH",
@@ -906,7 +1034,8 @@
       "aliases": [],
       "detail_codes": [],
       "review_flag": null,
-      "proposed": false
+      "proposed": false,
+      "owner_status": "CANDIDATE"
     },
     {
       "code": "RESTRUCTURE_DATE_SEMANTICS_UNRESOLVED",
@@ -921,7 +1050,8 @@
       ],
       "detail_codes": [],
       "review_flag": null,
-      "proposed": false
+      "proposed": false,
+      "owner_status": "CANDIDATE"
     },
     {
       "code": "RESTRUCTURE_EVIDENCE_MISSING",
@@ -933,19 +1063,21 @@
       "aliases": [],
       "detail_codes": [],
       "review_flag": null,
-      "proposed": false
+      "proposed": false,
+      "owner_status": "CANDIDATE"
     },
     {
       "code": "NO_PAYMENT_FOUND",
       "rules": [
         "PGS10-STM-001"
       ],
-      "control_status": "OBSERVATION",
-      "meaning": "ไม่พบรายการรับชำระจริงใน Statement",
+      "control_status": "HOLD",
+      "meaning": "ไม่พบรายการรับชำระจริงใน Statement — ไม่ใช่ format normalization จึงไม่ Auto-pass ต้องให้ผู้ตรวจยืนยัน",
       "aliases": [],
       "detail_codes": [],
       "review_flag": null,
-      "proposed": false
+      "proposed": false,
+      "owner_status": "CANDIDATE"
     },
     {
       "code": "UNKNOWN_TRANSACTION_NEAR_DEFAULT",
@@ -957,7 +1089,8 @@
       "aliases": [],
       "detail_codes": [],
       "review_flag": null,
-      "proposed": false
+      "proposed": false,
+      "owner_status": "CANDIDATE"
     },
     {
       "code": "PAYMENT_AFTER_STATEMENT_CUTOFF",
@@ -969,7 +1102,8 @@
       "aliases": [],
       "detail_codes": [],
       "review_flag": null,
-      "proposed": false
+      "proposed": false,
+      "owner_status": "CANDIDATE"
     },
     {
       "code": "TIMELINE_CONFLICT",
@@ -981,7 +1115,8 @@
       "aliases": [],
       "detail_codes": [],
       "review_flag": null,
-      "proposed": false
+      "proposed": false,
+      "owner_status": "CANDIDATE"
     },
     {
       "code": "STATEMENT_MISSING",
@@ -994,7 +1129,8 @@
       "aliases": [],
       "detail_codes": [],
       "review_flag": null,
-      "proposed": false
+      "proposed": false,
+      "owner_status": "CANDIDATE"
     },
     {
       "code": "TRANSACTION_CODE_UNMAPPED",
@@ -1008,7 +1144,8 @@
       ],
       "detail_codes": [],
       "review_flag": null,
-      "proposed": false
+      "proposed": false,
+      "owner_status": "APPROVED_BY_OWNER"
     },
     {
       "code": "CONFIRMATION_LETTER_VISUALLY_INCOMPLETE",
@@ -1021,7 +1158,8 @@
       "aliases": [],
       "detail_codes": [],
       "review_flag": null,
-      "proposed": false
+      "proposed": false,
+      "owner_status": "CANDIDATE"
     },
     {
       "code": "VISUAL_RECHECK_REQUIRED",
@@ -1036,7 +1174,8 @@
       ],
       "detail_codes": [],
       "review_flag": null,
-      "proposed": false
+      "proposed": false,
+      "owner_status": "CANDIDATE"
     },
     {
       "code": "DOCUMENT_VISUALLY_INCOMPLETE",
@@ -1048,24 +1187,27 @@
       "aliases": [],
       "detail_codes": [],
       "review_flag": null,
-      "proposed": false
+      "proposed": false,
+      "owner_status": "CANDIDATE"
     }
   ],
   "alias_index": {
     "ADDRESS_SOURCE_NOT_FOUND": "POSTAL_ADDRESS_UNVERIFIED",
-    "ASOF_DEMAND_PRINCIPAL_REQUIRED": "DEMAND_PRINCIPAL_UNRECONCILED",
+    "ASOF_DEMAND_PRINCIPAL_REQUIRED": "DEMAND_PRINCIPAL_AS_OF_DATE_UNVERIFIED",
     "CAP_ARITHMETIC_MISMATCH": "CLAIM_MAX_ARITHMETIC_MISMATCH",
     "CHECK_STATEMENT_HEADER": "RESTRUCTURE_DATE_SEMANTICS_UNRESOLVED",
     "CLAIM_AMOUNT_MISMATCH": "CLAIM_CALCULATION_MISMATCH",
     "CONFIRMATION_IDENTIFIER_UNLINKED": "IDENTIFIER_LINKAGE_UNRESOLVED",
     "DELIVERY_PROOF_INCOMPLETE": "POSTAL_ACK_INCOMPLETE",
+    "DEMAND_PRINCIPAL_UNRECONCILED": "DEMAND_PRINCIPAL_AS_OF_DATE_UNVERIFIED",
     "DOCUMENT_PAGE_SEQUENCE_GAP": "APPROVAL_DOCUMENT_INCOMPLETE",
     "DOCUMENT_PAGE_UNREADABLE": "APPROVAL_DOCUMENT_INCOMPLETE",
     "DOCUMENT_TRUNCATED": "APPROVAL_DOCUMENT_INCOMPLETE",
+    "ELIGIBILITY_HIRE_PURCHASE_LEASING": "ELIGIBILITY_PROHIBITED_CREDIT_TYPE",
     "EXCEPTION_LETTER_MISSING": "POST_DEFAULT_SUPPORT_MISSING",
     "HOLD_CLAIM_MAX_ARITHMETIC": "CLAIM_MAX_ARITHMETIC_MISMATCH",
     "HOLD_CONTRACT_DATE_MISMATCH": "CONTRACT_DATE_MISMATCH",
-    "HOLD_DEMAND_PRINCIPAL_UNRECONCILED": "DEMAND_PRINCIPAL_UNRECONCILED",
+    "HOLD_DEMAND_PRINCIPAL_UNRECONCILED": "DEMAND_PRINCIPAL_AS_OF_DATE_UNVERIFIED",
     "HOLD_NPL_MAPPING_REQUIRED": "NPL_DATE_MISSING",
     "HOLD_PACKAGE_DEFINITION_REQUIRED": "PACKAGE_DEFINITION_REQUIRED",
     "HOLD_POSTAL_ADDRESS_UNVERIFIED": "POSTAL_ADDRESS_UNVERIFIED",
@@ -1075,6 +1217,7 @@
     "HOLD_TRANSACTION_CODE_UNMAPPED": "TRANSACTION_CODE_UNMAPPED",
     "NPL_DATE_MAPPING_UNDEFINED": "NPL_DATE_MISSING",
     "NPL_MAPPING_REQUIRED": "NPL_DATE_MISSING",
+    "PAID_PENDING_MISSING": "PACKAGE_DEFINITION_REQUIRED",
     "POSTAL_TRACKING_MISMATCH": "POSTAL_LINKAGE_UNRESOLVED",
     "RETURN_PROOF_INCOMPLETE": "POSTAL_RETURN_INCOMPLETE",
     "ROUNDING_TOLERANCE_NOT_APPROVED": "NUMERIC_VARIANCE",
@@ -1090,6 +1233,7 @@
     "HOLD_NEED_CLARIFICATION": "สถานะเดิมของ R§26 — ใช้ HOLD + reason_code เฉพาะ",
     "FAIL_ELIGIBILITY": "สถานะเดิมของ R§26 — ใช้ FAIL + reason_code ELIGIBILITY_*",
     "PASS_WITH_DOCUMENTARY_SUPPORT": "ชื่อเดิมของ R§26 → PASS_WITH_SUPPORT",
-    "OBSERVATION_CANDIDATE (control_status)": "ย้ายเป็น review_flag (DEC-09)"
+    "OBSERVATION_CANDIDATE (control_status)": "ย้ายเป็น review_flag (DEC-09)",
+    "FORMAT_VARIANCE as control_status OBSERVATION": "DEC-15: ปัจจุบัน control_status=PASS + review_flag=FORMAT_NORMALIZED"
   }
 }

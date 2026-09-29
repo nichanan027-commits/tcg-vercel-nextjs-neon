@@ -1,6 +1,6 @@
 {
   "meta": {
-    "spec_version": "1.2.0-RECONCILIATION",
+    "spec_version": "1.2.0-RECONCILIATION-r2",
     "frozen": false,
     "status": "RECONCILIATION_DRAFT — ไม่ใช่ Spec Candidate และไม่ใช่การ Freeze",
     "decision_baseline": "DEC-01..DEC-14 (Rule_Reconciliation_Report §2)",
@@ -28,6 +28,11 @@
       "code": "INVALID_INPUT",
       "control_status": "HOLD",
       "case_effect": "case HOLD"
+    },
+    {
+      "code": "POLICY_PARAMETER_UNRESOLVED",
+      "control_status": "HOLD",
+      "case_effect": "case HOLD"
     }
   ],
   "rules": [
@@ -49,15 +54,9 @@
           "case_effect": "case FAIL"
         },
         {
-          "code": "ELIGIBILITY_HIRE_PURCHASE_LEASING",
-          "control_status": "FAIL",
-          "case_effect": "case FAIL"
-        },
-        {
           "code": "ELIGIBILITY_NOT_BUSINESS_PURPOSE",
           "control_status": "FAIL",
-          "case_effect": "case FAIL",
-          "proposed_new": true
+          "case_effect": "case FAIL"
         },
         {
           "code": "ELIGIBILITY_NOT_NEW_BUSINESS_LOAN",
@@ -71,6 +70,11 @@
         },
         {
           "code": "ELIGIBILITY_PRODUCT_EXCLUDED",
+          "control_status": "FAIL",
+          "case_effect": "case FAIL"
+        },
+        {
+          "code": "ELIGIBILITY_PROHIBITED_CREDIT_TYPE",
           "control_status": "FAIL",
           "case_effect": "case FAIL"
         },
@@ -100,8 +104,9 @@
       "reason_codes": [
         {
           "code": "FORMAT_VARIANCE",
-          "control_status": "OBSERVATION",
-          "case_effect": "case PASS_WITH_OBSERVATION (ถ้าไม่มี HOLD/FAIL)"
+          "control_status": "PASS",
+          "case_effect": "ไม่ขวางเคส (review_flag FORMAT_NORMALIZED → case PASS_WITH_OBSERVATION)",
+          "review_flag": "FORMAT_NORMALIZED"
         },
         {
           "code": "IDENTIFIER_LINKAGE_UNRESOLVED",
@@ -187,8 +192,7 @@
         {
           "code": "CONTRACT_DATE_BASIS_UNDEFINED",
           "control_status": "HOLD",
-          "case_effect": "case HOLD",
-          "proposed_new": true
+          "case_effect": "case HOLD"
         },
         {
           "code": "CONTRACT_DATE_MISMATCH",
@@ -229,6 +233,12 @@
       "control_status_when_ok": "PASS",
       "reason_codes": [
         {
+          "code": "NPL_ANCHOR_DATE_UNDEFINED",
+          "control_status": "HOLD",
+          "case_effect": "case HOLD",
+          "proposed_new": true
+        },
+        {
           "code": "NPL_DATE_MISSING",
           "control_status": "HOLD",
           "case_effect": "case HOLD"
@@ -268,8 +278,8 @@
       "reason_codes": [
         {
           "code": "NO_PAYMENT_FOUND",
-          "control_status": "OBSERVATION",
-          "case_effect": "case PASS_WITH_OBSERVATION (ถ้าไม่มี HOLD/FAIL)"
+          "control_status": "HOLD",
+          "case_effect": "case HOLD"
         },
         {
           "code": "STATEMENT_MISSING",
@@ -383,7 +393,7 @@
       "rule_id": "PGS10-RST-001",
       "name": "Restructure Requirement / Route",
       "requirement": "CONDITIONAL",
-      "applicable_when": "Small Biz/Start up ภายใน 5 ปีแรกของ LG (เงื่อนไข (ค))",
+      "applicable_when": "path ที่มีเงื่อนไข (ค): SMEs ≤ 5 ปี และ Small Biz ≤ 5 ปี. Start up → NOT_APPLICABLE (DEC-24)",
       "control_status_when_ok": "NOT_APPLICABLE",
       "reason_codes": [
         {
@@ -402,7 +412,7 @@
       "rule_id": "PGS10-RST-002",
       "name": "Uncontactable / Unable-to-agree Exception",
       "requirement": "CONDITIONAL",
-      "applicable_when": "route = UNCONTACTABLE_EXCEPTION_PATH",
+      "applicable_when": "route=UNCONTACTABLE_EXCEPTION_PATH (ใช้ได้เฉพาะ path ที่มี (ค) = กรณี 1 และ 3 — DEC-20)",
       "control_status_when_ok": "NOT_APPLICABLE",
       "reason_codes": [
         {
@@ -414,6 +424,12 @@
           "code": "TRACKING_REPORT_NOT_CERTIFIED",
           "control_status": "HOLD",
           "case_effect": "case HOLD"
+        },
+        {
+          "code": "UNCONTACTABLE_EXCEPTION_MATURED",
+          "control_status": "PASS_WITH_SUPPORT",
+          "case_effect": "case PASS_WITH_SUPPORT; ถ้ามี OBSERVATION ด้วย → PASS_WITH_OBSERVATION + support_used=true",
+          "proposed_new": true
         },
         {
           "code": "UNCONTACTABLE_EXCEPTION_NOT_MET",
@@ -478,14 +494,19 @@
       "control_status_when_ok": "PASS",
       "reason_codes": [
         {
+          "code": "DEMAND_PRINCIPAL_AS_OF_DATE_UNVERIFIED",
+          "control_status": "HOLD",
+          "case_effect": "case HOLD"
+        },
+        {
           "code": "DEMAND_PRINCIPAL_MISMATCH",
           "control_status": "HOLD",
           "case_effect": "case HOLD"
         },
         {
-          "code": "DEMAND_PRINCIPAL_UNRECONCILED",
-          "control_status": "HOLD",
-          "case_effect": "case HOLD"
+          "code": "DERIVED_AS_OF_DEMAND",
+          "control_status": "PASS_WITH_SUPPORT",
+          "case_effect": "case PASS_WITH_SUPPORT; ถ้ามี OBSERVATION ด้วย → PASS_WITH_OBSERVATION + support_used=true"
         }
       ]
     },
@@ -645,6 +666,12 @@
       "control_status_when_ok": "PASS",
       "reason_codes": [
         {
+          "code": "COVERAGE_AGE_BASIS_UNDEFINED",
+          "control_status": "HOLD",
+          "case_effect": "case HOLD",
+          "proposed_new": true
+        },
+        {
           "code": "COVERAGE_RATIO_MISMATCH",
           "control_status": "HOLD",
           "case_effect": "case HOLD"
@@ -698,7 +725,7 @@
       "rule_id": "PGS10-CAP-001",
       "name": "CLAIM MAX / Package Capacity",
       "requirement": "REQUIRED_HARD",
-      "applicable_when": "เสมอ (เสนอ — ขอยืนยัน)",
+      "applicable_when": "FINAL_APPROVAL (PRE_REVIEW: NOT_TESTABLE ได้และไม่กระทบเคส)",
       "control_status_when_ok": "PASS",
       "reason_codes": [
         {
@@ -713,14 +740,13 @@
         },
         {
           "code": "PACKAGE_DEFINITION_REQUIRED",
-          "control_status": "HOLD",
-          "case_effect": "case HOLD",
-          "proposed_new": true
-        },
-        {
-          "code": "PAID_PENDING_MISSING",
           "control_status": "NOT_TESTABLE",
-          "case_effect": "REQUIRED_HARD → case HOLD; CONDITIONAL ที่ไม่ applicable/OPTIONAL → ไม่กระทบ"
+          "case_effect": "REQUIRED_HARD → case HOLD; CONDITIONAL ที่ไม่ applicable/OPTIONAL → ไม่กระทบ",
+          "detail_codes": [
+            "PAID_PENDING_MISSING",
+            "CLAIM_MAX_UNDEFINED",
+            "ROUND_UNDEFINED"
+          ]
         },
         {
           "code": "UPSTREAM_NOT_COMPUTABLE",

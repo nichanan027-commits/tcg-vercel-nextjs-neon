@@ -1,17 +1,15 @@
 {
-  "meta": {
-    "spec_version": "1.2.0-RECONCILIATION-r2",
+  "metadata": {
+    "ruleset_version": "1.2.0-candidate",
+    "status": "SPEC_CANDIDATE_NOT_FROZEN",
     "frozen": false,
-    "status": "RECONCILIATION_DRAFT — ไม่ใช่ Spec Candidate และไม่ใช่การ Freeze",
-    "decision_baseline": "DEC-01..DEC-14 (Rule_Reconciliation_Report §2)",
-    "inputs": [
-      "draft spec v1.0.0-DRAFT (pgs10/spec)",
-      "Deployment Pack v1.1.0",
-      "Rulebook (22 Controls)",
-      "Master Audit",
-      "คำตัดสินของผู้ใช้"
+    "engine_changes_allowed": false,
+    "basis": "Reconciliation r2 (DEC-01..DEC-28) + Deployment Pack v1.1.0 + Draft v1.0",
+    "freeze_blockers": [
+      "A-30"
     ],
-    "artifact": "Policy_Parameter_Table",
+    "freeze_gate": "รัน `node check_freeze_gate.js` — 5 ข้อต้องผ่านทั้งหมด และ freeze_blockers ต้องว่าง",
+    "artifact": "06_PGS10_POLICY_PARAMETERS",
     "source_status_values": {
       "OFFICIAL": "ระบุว่ามาจากหลักเกณฑ์ทางการ — ต้องเทียบต้นฉบับก่อน Freeze (session นี้ไม่มีต้นฉบับ)",
       "LOCKED": "ผู้ใช้ล็อกแล้ว",
@@ -21,7 +19,7 @@
       "UNVERIFIED_UNTIL_SOURCE": "ห้ามใช้จนกว่าจะมีเอกสารอ้างอิง",
       "REFERENCE": "ข้อมูลประกอบ ไม่ใช่ Control"
     },
-    "principle": "พารามิเตอร์ทั้งหมดเป็น Rule Table/Config — ค่าที่ hardcode_allowed=false ห้ามฝังในโค้ด"
+    "principle": "OPEN/ASSUMPTION/UNVERIFIED ทุกรายการต้องมี safe_hold (reason_code ใน catalogue) — ตรวจโดย check_freeze_gate.js ข้อ 4"
   },
   "parameters": [
     {

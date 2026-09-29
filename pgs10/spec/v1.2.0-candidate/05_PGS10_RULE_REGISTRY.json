@@ -1,0 +1,3072 @@
+{
+  "metadata": {
+    "ruleset_version": "1.2.0-candidate",
+    "status": "SPEC_CANDIDATE_NOT_FROZEN",
+    "frozen": false,
+    "engine_changes_allowed": false,
+    "basis": "Reconciliation r2 (DEC-01..DEC-28) + Deployment Pack v1.1.0 + Draft v1.0",
+    "freeze_blockers": [
+      "A-30"
+    ],
+    "freeze_gate": "รัน `node check_freeze_gate.js` — 5 ข้อต้องผ่านทั้งหมด และ freeze_blockers ต้องว่าง",
+    "artifact": "05_PGS10_RULE_REGISTRY",
+    "id_policy": "Master Audit §41 IDs เป็น Canonical (DEC-14); ไม่ Renumber; ID เก่าต้องอ้างเป็น '<id>@<version>' เท่านั้น"
+  },
+  "case_status_values": [
+    "PASS",
+    "PASS_WITH_SUPPORT",
+    "PASS_WITH_OBSERVATION",
+    "HOLD",
+    "FAIL"
+  ],
+  "control_status_values": [
+    "PASS",
+    "PASS_WITH_SUPPORT",
+    "OBSERVATION",
+    "HOLD",
+    "FAIL",
+    "NOT_APPLICABLE",
+    "NOT_TESTABLE"
+  ],
+  "review_flags": [
+    "OBSERVATION_CANDIDATE",
+    "FORMAT_NORMALIZED"
+  ],
+  "stage_values": [
+    "PRE_REVIEW",
+    "FINAL_APPROVAL"
+  ],
+  "aggregation": {
+    "order": [
+      {
+        "if": "any control_status == FAIL",
+        "case_status": "FAIL"
+      },
+      {
+        "if": "any control_status == HOLD OR any control_status == NOT_TESTABLE for a control whose requirement_by_stage[review_stage] == REQUIRED_HARD",
+        "case_status": "HOLD"
+      },
+      {
+        "if": "any control_status == OBSERVATION OR any review_flag == FORMAT_NORMALIZED",
+        "case_status": "PASS_WITH_OBSERVATION",
+        "support_used": "true if any control_status == PASS_WITH_SUPPORT"
+      },
+      {
+        "if": "any control_status == PASS_WITH_SUPPORT",
+        "case_status": "PASS_WITH_SUPPORT",
+        "support_used": true
+      },
+      {
+        "else": true,
+        "case_status": "PASS"
+      }
+    ],
+    "notes": [
+      "NOT_TESTABLE ของ Control ที่ OPTIONAL ใน stage นั้น หรือ NOT_APPLICABLE ไม่กระทบสถานะเคส (DEC-06, DEC-17)",
+      "review_flag OBSERVATION_CANDIDATE อยู่กับ Control ที่ HOLD (tolerance ปิด) — เคสเป็น HOLD จนเปิด Config หรือมี reviewer override (DEC-09)",
+      "HOLD ≠ FAIL; FAIL = Proven Policy Ineligibility ที่แก้ด้วยเอกสารเพิ่มไม่ได้ (DEC-19)"
+    ]
+  },
+  "rules": [
+    {
+      "id": "PGS10-ELIG-001",
+      "name": "Project / Product Eligibility",
+      "kind": "POLICY",
+      "requirement": "REQUIRED_HARD",
+      "requirement_by_stage": {
+        "PRE_REVIEW": "REQUIRED_HARD",
+        "FINAL_APPROVAL": "REQUIRED_HARD"
+      },
+      "applicable_when": "เสมอ",
+      "inputs": [
+        "pgs_phase",
+        "pgs_revision",
+        "product",
+        "loan_is_new_business",
+        "loan_purpose_business",
+        "loan_is_hire_purchase_or_leasing",
+        "total_exposure_per_borrower",
+        "guarantee_amount_this_transaction"
+      ],
+      "parameters": [
+        "PRM-001",
+        "PRM-002",
+        "PRM-003",
+        "PRM-004",
+        "PRM-005",
+        "PRM-007",
+        "PRM-008",
+        "PRM-009"
+      ],
+      "safe_hold": [
+        {
+          "parameter": "PRM-008",
+          "source_status": "ASSUMPTION",
+          "behavior": "ยังไม่ทราบวัตถุประสงค์ธุรกิจ → HOLD",
+          "reason_code": "ELIGIBILITY_UNCONFIRMED"
+        }
+      ],
+      "evidence": "LG, หนังสืออนุมัติ/สัญญา, ข้อมูลวงเงินรวมต่อราย",
+      "upstream_sources": "R#1, M§2",
+      "decisions": [
+        "DEC-12",
+        "DEC-19",
+        "DEC-27"
+      ],
+      "reasons": [
+        {
+          "code": "ELIGIBILITY_EXPOSURE_LIMIT_EXCEEDED",
+          "control_status": "FAIL"
+        },
+        {
+          "code": "ELIGIBILITY_GUARANTEE_BELOW_MINIMUM",
+          "control_status": "FAIL"
+        },
+        {
+          "code": "ELIGIBILITY_NOT_BUSINESS_PURPOSE",
+          "control_status": "FAIL"
+        },
+        {
+          "code": "ELIGIBILITY_NOT_NEW_BUSINESS_LOAN",
+          "control_status": "FAIL"
+        },
+        {
+          "code": "ELIGIBILITY_NOT_PGS10",
+          "control_status": "FAIL"
+        },
+        {
+          "code": "ELIGIBILITY_PRODUCT_EXCLUDED",
+          "control_status": "FAIL"
+        },
+        {
+          "code": "ELIGIBILITY_PROHIBITED_CREDIT_TYPE",
+          "control_status": "FAIL"
+        },
+        {
+          "code": "ELIGIBILITY_UNCONFIRMED",
+          "control_status": "HOLD"
+        },
+        {
+          "code": "PGS_REVISION_MISMATCH",
+          "control_status": "HOLD"
+        },
+        {
+          "code": "PRODUCT_UNKNOWN",
+          "control_status": "HOLD"
+        }
+      ],
+      "legacy_aliases": [
+        {
+          "alias": "PGS10-POL-001",
+          "version": "v1.1.0",
+          "note": "Program/version applicability"
+        },
+        {
+          "alias": "PGS10-POL-003",
+          "version": "v1.1.0",
+          "note": "Product-specific limit"
+        }
+      ]
+    },
+    {
+      "id": "PGS10-ID-001",
+      "name": "Identity Integrity",
+      "kind": "OPERATIONAL",
+      "requirement": "REQUIRED_HARD",
+      "requirement_by_stage": {
+        "PRE_REVIEW": "REQUIRED_HARD",
+        "FINAL_APPROVAL": "REQUIRED_HARD"
+      },
+      "applicable_when": "เสมอ",
+      "inputs": [
+        "lg_no",
+        "borrower_name",
+        "loan_account_no",
+        "contract_no",
+        "lender_branch",
+        "loan_limit",
+        "lg_issue_date"
+      ],
+      "parameters": [
+        "PRM-041",
+        "PRM-049",
+        "PRM-050"
+      ],
+      "safe_hold": [
+        {
+          "parameter": "PRM-050",
+          "source_status": "OPERATIONAL_LOCKED_SCOPED",
+          "behavior": "field ที่ไม่ประกาศ → ต่าง Leading Zero = HOLD",
+          "reason_code": "VERIFY_REFERENCE_MAPPING"
+        }
+      ],
+      "evidence": "ทุกเอกสารที่เทียบ (บันทึก raw_value และ normalized_value)",
+      "upstream_sources": "R#2, M§8",
+      "decisions": [
+        "DEC-03",
+        "DEC-12",
+        "DEC-15"
+      ],
+      "reasons": [
+        {
+          "code": "FORMAT_VARIANCE",
+          "control_status": "PASS",
+          "review_flag": "FORMAT_NORMALIZED"
+        },
+        {
+          "code": "IDENTIFIER_LINKAGE_UNRESOLVED",
+          "control_status": "HOLD"
+        },
+        {
+          "code": "IDENTITY_MISMATCH",
+          "control_status": "HOLD"
+        },
+        {
+          "code": "VERIFY_REFERENCE_MAPPING",
+          "control_status": "HOLD"
+        }
+      ],
+      "legacy_aliases": [
+        {
+          "alias": "PGS10-ID-001",
+          "version": "v1.1.0",
+          "note": "Identity"
+        }
+      ]
+    },
+    {
+      "id": "PGS10-DOC-001",
+      "name": "Approval / Contract Page Completeness",
+      "kind": "OPERATIONAL",
+      "requirement": "REQUIRED_HARD",
+      "requirement_by_stage": {
+        "PRE_REVIEW": "REQUIRED_HARD",
+        "FINAL_APPROVAL": "REQUIRED_HARD"
+      },
+      "applicable_when": "เสมอ (มีเอกสารอนุมัติ/สัญญา)",
+      "inputs": [
+        "approval_total_pages",
+        "approval_document_pages_found",
+        "approval_next_page_is_other_document",
+        "approval_pages_unreadable",
+        "pdf_blank_pages"
+      ],
+      "parameters": [],
+      "safe_hold": [],
+      "evidence": "หนังสืออนุมัติ/สัญญา (หน้าเอกสาร n of X)",
+      "upstream_sources": "R#4, M§10",
+      "decisions": [],
+      "reasons": [
+        {
+          "code": "APPROVAL_DOCUMENT_INCOMPLETE",
+          "control_status": "HOLD",
+          "detail_codes": [
+            "PAGE_SEQUENCE_GAP",
+            "DOCUMENT_TRUNCATED",
+            "PAGE_UNREADABLE"
+          ]
+        }
+      ],
+      "legacy_aliases": [
+        {
+          "alias": "PGS10-DOC-001",
+          "version": "v1.1.0",
+          "note": "Page completeness"
+        }
+      ]
+    },
+    {
+      "id": "PGS10-VIS-001",
+      "name": "Confirmation Letter Visual Completeness",
+      "kind": "OPERATIONAL",
+      "requirement": "CONDITIONAL",
+      "requirement_by_stage": {
+        "PRE_REVIEW": "CONDITIONAL",
+        "FINAL_APPROVAL": "CONDITIONAL"
+      },
+      "applicable_when": "DEF-002 ต้องใช้หนังสือยืนยัน (default < last payment) หรือมีหนังสือยืนยันในเคส",
+      "inputs": [
+        "exception_letter_present",
+        "confirmation_visual_elements",
+        "confirmation_letter_total_pages",
+        "confirmation_letter_pages_found",
+        "text_layer_reads_header"
+      ],
+      "parameters": [
+        "PRM-037",
+        "PRM-037b"
+      ],
+      "safe_hold": [],
+      "evidence": "ภาพหน้าเอกสาร (Rendered Page) ของหนังสือยืนยัน",
+      "upstream_sources": "R#5, M§15, M§41",
+      "decisions": [
+        "DEC-13",
+        "DEC-23"
+      ],
+      "reasons": [
+        {
+          "code": "CONFIRMATION_LETTER_VISUALLY_INCOMPLETE",
+          "control_status": "HOLD"
+        },
+        {
+          "code": "VISUAL_RECHECK_REQUIRED",
+          "control_status": "NOT_TESTABLE"
+        }
+      ],
+      "legacy_aliases": [
+        {
+          "alias": "PGS10-VIS-001",
+          "version": "v1.1.0",
+          "note": "Confirmation visual completeness"
+        },
+        {
+          "alias": "PGS10-VIS-001",
+          "version": "draft1.0",
+          "note": "D รวมเอกสาร Critical ทุกชนิด"
+        }
+      ]
+    },
+    {
+      "id": "PGS10-VIS-002",
+      "name": "Critical Evidence Visual Authority",
+      "kind": "OPERATIONAL",
+      "requirement": "CONDITIONAL",
+      "requirement_by_stage": {
+        "PRE_REVIEW": "CONDITIONAL",
+        "FINAL_APPROVAL": "CONDITIONAL"
+      },
+      "applicable_when": "มีเอกสาร Critical ในเคส",
+      "inputs": [
+        "critical_document_visual_check"
+      ],
+      "parameters": [
+        "PRM-038"
+      ],
+      "safe_hold": [
+        {
+          "parameter": "PRM-038",
+          "source_status": "OPEN",
+          "behavior": "ใช้ 7 ประเภทของ M§37 เป็น Critical ทั้งหมด (superset)",
+          "reason_code": "DOCUMENT_VISUALLY_INCOMPLETE"
+        }
+      ],
+      "evidence": "ภาพหน้าเอกสาร Critical",
+      "upstream_sources": "M§37",
+      "decisions": [
+        "DEC-14"
+      ],
+      "reasons": [
+        {
+          "code": "DOCUMENT_VISUALLY_INCOMPLETE",
+          "control_status": "HOLD"
+        },
+        {
+          "code": "VISUAL_RECHECK_REQUIRED",
+          "control_status": "NOT_TESTABLE"
+        }
+      ],
+      "legacy_aliases": [
+        {
+          "alias": "PGS10-VIS-002",
+          "version": "v1.1.0",
+          "note": "Visual evidence authority"
+        },
+        {
+          "alias": "PGS10-VIS-001",
+          "version": "draft1.0",
+          "note": "D รวมเอกสาร Critical ทุกชนิด"
+        }
+      ]
+    },
+    {
+      "id": "PGS10-CONTRACT-001",
+      "name": "Contract / Approval Date",
+      "kind": "OPERATIONAL",
+      "requirement": "REQUIRED_HARD",
+      "requirement_by_stage": {
+        "PRE_REVIEW": "REQUIRED_HARD",
+        "FINAL_APPROVAL": "REQUIRED_HARD"
+      },
+      "applicable_when": "เสมอ; ฐานวันที่ทำสัญญาใช้ได้เฉพาะ Thai Credit revolving-loan",
+      "inputs": [
+        "fi_id",
+        "product_family",
+        "approval_date",
+        "demand_contract_date"
+      ],
+      "parameters": [
+        "PRM-036"
+      ],
+      "safe_hold": [],
+      "evidence": "หนังสือแจ้งผลอนุมัติ + หนังสือบอกกล่าว",
+      "upstream_sources": "R#3, M§9",
+      "decisions": [
+        "DEC-10"
+      ],
+      "reasons": [
+        {
+          "code": "CONTRACT_DATE_BASIS_UNDEFINED",
+          "control_status": "HOLD"
+        },
+        {
+          "code": "CONTRACT_DATE_MISMATCH",
+          "control_status": "HOLD"
+        }
+      ],
+      "legacy_aliases": [
+        {
+          "alias": "PGS10-CON-001",
+          "version": "v1.1.0",
+          "note": "Contract date (Thai Credit)"
+        }
+      ]
+    },
+    {
+      "id": "PGS10-LG-001",
+      "name": "Guarantee Validity",
+      "kind": "POLICY",
+      "requirement": "REQUIRED_HARD",
+      "requirement_by_stage": {
+        "PRE_REVIEW": "REQUIRED_HARD",
+        "FINAL_APPROVAL": "REQUIRED_HARD"
+      },
+      "applicable_when": "เสมอ",
+      "inputs": [
+        "lg_no",
+        "lg_issue_date",
+        "final_lg_expiry_date",
+        "guarantee_fee_paid_continuously"
+      ],
+      "parameters": [
+        "PRM-006"
+      ],
+      "safe_hold": [],
+      "evidence": "LG",
+      "upstream_sources": "M§41 (ชื่อเท่านั้น)",
+      "decisions": [],
+      "reasons": [
+        {
+          "code": "LG_DATA_MISSING",
+          "control_status": "HOLD"
+        },
+        {
+          "code": "LG_FEE_NOT_CONTINUOUS",
+          "control_status": "HOLD"
+        },
+        {
+          "code": "LG_TENOR_EXCEEDED",
+          "control_status": "HOLD"
+        }
+      ],
+      "legacy_aliases": [
+        {
+          "alias": "PGS10-POL-002",
+          "version": "v1.1.0",
+          "note": "Guarantee term"
+        }
+      ]
+    },
+    {
+      "id": "PGS10-NPL-001",
+      "name": "NPL Date & Seasoning",
+      "kind": "POLICY",
+      "requirement": "REQUIRED_HARD",
+      "requirement_by_stage": {
+        "PRE_REVIEW": "REQUIRED_HARD",
+        "FINAL_APPROVAL": "REQUIRED_HARD"
+      },
+      "applicable_when": "เสมอ",
+      "inputs": [
+        "product",
+        "npl_date",
+        "guarantee_effective_date",
+        "lg_issue_date",
+        "default_date"
+      ],
+      "parameters": [
+        "PRM-010",
+        "PRM-011",
+        "PRM-012",
+        "PRM-013",
+        "PRM-014"
+      ],
+      "safe_hold": [
+        {
+          "parameter": "PRM-013",
+          "source_status": "OPEN",
+          "behavior": "ไม่มี guarantee_effective_date ที่ระบุตรงและไม่มี Mapping ที่อนุมัติ → NPL-001 = HOLD",
+          "reason_code": "NPL_ANCHOR_DATE_UNDEFINED"
+        }
+      ],
+      "evidence": "ข้อมูล FI (npl_date), LG/ข้อมูลวันที่ค้ำประกัน",
+      "upstream_sources": "M§3.1, M§4.1",
+      "decisions": [
+        "DEC-01",
+        "DEC-25"
+      ],
+      "reasons": [
+        {
+          "code": "NPL_ANCHOR_DATE_UNDEFINED",
+          "control_status": "HOLD"
+        },
+        {
+          "code": "NPL_DATE_MISSING",
+          "control_status": "HOLD"
+        },
+        {
+          "code": "NPL_SEASONING_NOT_MET",
+          "control_status": "HOLD"
+        }
+      ],
+      "legacy_aliases": [
+        {
+          "alias": "PGS10-NPL-001",
+          "version": "v1.1.0",
+          "note": "NPL date is distinct field (รวมเป็นส่วนหนึ่ง)"
+        },
+        {
+          "alias": "PGS10-NPL-002",
+          "version": "v1.1.0",
+          "note": "Product seasoning (รวม)"
+        }
+      ]
+    },
+    {
+      "id": "PGS10-TXN-001",
+      "name": "Transaction Classification",
+      "kind": "OPERATIONAL",
+      "requirement": "REQUIRED_HARD",
+      "requirement_by_stage": {
+        "PRE_REVIEW": "REQUIRED_HARD",
+        "FINAL_APPROVAL": "REQUIRED_HARD"
+      },
+      "applicable_when": "เสมอ (มี Statement)",
+      "inputs": [
+        "bank_id",
+        "transactions"
+      ],
+      "parameters": [],
+      "safe_hold": [],
+      "evidence": "Statement + ตาราง bank transaction code",
+      "upstream_sources": "R#6, M§11",
+      "decisions": [
+        "DEC-02",
+        "DEC-12",
+        "DEC-14"
+      ],
+      "reasons": [
+        {
+          "code": "STATEMENT_MISSING",
+          "control_status": "NOT_TESTABLE"
+        },
+        {
+          "code": "TRANSACTION_CODE_UNMAPPED",
+          "control_status": "HOLD"
+        }
+      ],
+      "legacy_aliases": [
+        {
+          "alias": "PGS10-STM-001",
+          "version": "v1.1.0",
+          "note": "Bank-specific transaction mapping"
+        },
+        {
+          "alias": "PGS10-STM-001",
+          "version": "draft1.0",
+          "note": "D รวม classification + last payment"
+        }
+      ]
+    },
+    {
+      "id": "PGS10-STM-001",
+      "name": "Last Actual Payment",
+      "kind": "OPERATIONAL",
+      "requirement": "REQUIRED_HARD",
+      "requirement_by_stage": {
+        "PRE_REVIEW": "REQUIRED_HARD",
+        "FINAL_APPROVAL": "REQUIRED_HARD"
+      },
+      "applicable_when": "เสมอ",
+      "inputs": [
+        "transactions",
+        "last_actual_payment_date"
+      ],
+      "parameters": [
+        "PRM-042"
+      ],
+      "safe_hold": [
+        {
+          "parameter": "PRM-042",
+          "source_status": "OPEN",
+          "behavior": "UNKNOWN ใด ๆ หลัง PAYMENT ล่าสุด → HOLD",
+          "reason_code": "UNKNOWN_TRANSACTION_NEAR_DEFAULT"
+        }
+      ],
+      "evidence": "Statement",
+      "upstream_sources": "R#6, M§12",
+      "decisions": [
+        "DEC-14"
+      ],
+      "reasons": [
+        {
+          "code": "NO_PAYMENT_FOUND",
+          "control_status": "HOLD"
+        },
+        {
+          "code": "STATEMENT_MISSING",
+          "control_status": "NOT_TESTABLE"
+        },
+        {
+          "code": "UNKNOWN_TRANSACTION_NEAR_DEFAULT",
+          "control_status": "HOLD"
+        }
+      ],
+      "legacy_aliases": [
+        {
+          "alias": "PGS10-STM-002",
+          "version": "v1.1.0",
+          "note": "Last Actual Payment"
+        },
+        {
+          "alias": "PGS10-STM-001",
+          "version": "draft1.0",
+          "note": "D รวม classification + last payment"
+        }
+      ]
+    },
+    {
+      "id": "PGS10-STM-002",
+      "name": "Statement Cut-off vs Later Payments",
+      "kind": "OPERATIONAL",
+      "requirement": "REQUIRED_HARD",
+      "requirement_by_stage": {
+        "PRE_REVIEW": "REQUIRED_HARD",
+        "FINAL_APPROVAL": "REQUIRED_HARD"
+      },
+      "applicable_when": "เสมอ",
+      "inputs": [
+        "statement_cutoff_date",
+        "later_payment_date",
+        "later_payment_amount",
+        "later_statement_covers"
+      ],
+      "parameters": [],
+      "safe_hold": [],
+      "evidence": "Statement + หนังสือธนาคารที่ระบุการชำระหลัง cut-off",
+      "upstream_sources": "R#17",
+      "decisions": [
+        "DEC-12"
+      ],
+      "reasons": [
+        {
+          "code": "PAYMENT_AFTER_STATEMENT_CUTOFF",
+          "control_status": "HOLD"
+        }
+      ],
+      "legacy_aliases": []
+    },
+    {
+      "id": "PGS10-DEF-001",
+      "name": "Default Date ≥ Last Actual Payment",
+      "kind": "OPERATIONAL",
+      "requirement": "REQUIRED_HARD",
+      "requirement_by_stage": {
+        "PRE_REVIEW": "REQUIRED_HARD",
+        "FINAL_APPROVAL": "REQUIRED_HARD"
+      },
+      "applicable_when": "เสมอ",
+      "inputs": [
+        "default_date",
+        "last_actual_payment_date"
+      ],
+      "parameters": [],
+      "safe_hold": [],
+      "evidence": "Statement + หน้าจอ",
+      "upstream_sources": "R#7, M§13",
+      "decisions": [],
+      "reasons": [
+        {
+          "code": "POST_DEFAULT_PAYMENT",
+          "control_status": "HOLD"
+        },
+        {
+          "code": "POST_DEFAULT_PAYMENT_SUPPORTED",
+          "control_status": "PASS_WITH_SUPPORT"
+        }
+      ],
+      "legacy_aliases": [
+        {
+          "alias": "PGS10-DEF-001",
+          "version": "v1.1.0",
+          "note": "Default chronology"
+        }
+      ]
+    },
+    {
+      "id": "PGS10-DEF-002",
+      "name": "Post-Default Payment Exception",
+      "kind": "OPERATIONAL",
+      "requirement": "CONDITIONAL",
+      "requirement_by_stage": {
+        "PRE_REVIEW": "CONDITIONAL",
+        "FINAL_APPROVAL": "CONDITIONAL"
+      },
+      "applicable_when": "default_date < last_actual_payment_date",
+      "inputs": [
+        "default_date",
+        "last_actual_payment_date",
+        "exception_letter_present",
+        "exception_confirmed_default_date",
+        "exception_states_payment_after_default",
+        "exception_states_default_unchanged",
+        "exception_identifiers_link_to_case",
+        "confirmation_visual_elements"
+      ],
+      "parameters": [],
+      "safe_hold": [],
+      "evidence": "หนังสือยืนยันการชำระหลังวันผิดนัด (ภาพจริง) + Statement + หน้าจอ",
+      "upstream_sources": "R#8, M§14, M§16",
+      "decisions": [
+        "DEC-04",
+        "DEC-13"
+      ],
+      "reasons": [
+        {
+          "code": "CONFIRMATION_CONTENT_INCOMPLETE",
+          "control_status": "HOLD"
+        },
+        {
+          "code": "CONFIRMATION_LETTER_VISUALLY_INCOMPLETE",
+          "control_status": "HOLD"
+        },
+        {
+          "code": "CONFIRMED_DEFAULT_DATE_MISMATCH",
+          "control_status": "HOLD"
+        },
+        {
+          "code": "IDENTIFIER_LINKAGE_UNRESOLVED",
+          "control_status": "HOLD"
+        },
+        {
+          "code": "POST_DEFAULT_PAYMENT_SUPPORTED",
+          "control_status": "PASS_WITH_SUPPORT"
+        },
+        {
+          "code": "POST_DEFAULT_SUPPORT_MISSING",
+          "control_status": "HOLD"
+        }
+      ],
+      "legacy_aliases": [
+        {
+          "alias": "PGS10-DEF-002",
+          "version": "v1.1.0",
+          "note": "Post-default exception"
+        }
+      ]
+    },
+    {
+      "id": "PGS10-FUP-001",
+      "name": "Follow-up / Tracking Evidence",
+      "kind": "OPERATIONAL",
+      "requirement": "REQUIRED_HARD",
+      "requirement_by_stage": {
+        "PRE_REVIEW": "REQUIRED_HARD",
+        "FINAL_APPROVAL": "REQUIRED_HARD"
+      },
+      "applicable_when": "เสมอ",
+      "inputs": [
+        "tracking_date_screen",
+        "tracking_date_report",
+        "tracking_method",
+        "tracking_result"
+      ],
+      "parameters": [],
+      "safe_hold": [],
+      "evidence": "รายงานติดตามหนี้",
+      "upstream_sources": "R#9, M§17",
+      "decisions": [],
+      "reasons": [
+        {
+          "code": "TRACKING_EVIDENCE_INCOMPLETE",
+          "control_status": "HOLD"
+        },
+        {
+          "code": "TRACKING_EVIDENCE_MISMATCH",
+          "control_status": "HOLD"
+        },
+        {
+          "code": "TRACKING_REPORT_MISSING",
+          "control_status": "HOLD"
+        }
+      ],
+      "legacy_aliases": [
+        {
+          "alias": "PGS10-FUP-001",
+          "version": "v1.1.0",
+          "note": "Tracking date"
+        }
+      ]
+    },
+    {
+      "id": "PGS10-RST-001",
+      "name": "Restructure Requirement / Route",
+      "kind": "POLICY",
+      "requirement": "CONDITIONAL",
+      "requirement_by_stage": {
+        "PRE_REVIEW": "CONDITIONAL",
+        "FINAL_APPROVAL": "CONDITIONAL"
+      },
+      "applicable_when": "path ที่มีเงื่อนไข (ค): SMEs ≤ 5 ปี และ Small Biz ≤ 5 ปี. Start up → NOT_APPLICABLE (DEC-24)",
+      "inputs": [
+        "product",
+        "claim_path",
+        "restructure_route",
+        "restructure_date",
+        "restructure_doc_signing_date",
+        "last_actual_payment_date",
+        "claim_submission_date"
+      ],
+      "parameters": [
+        "PRM-015",
+        "PRM-016",
+        "PRM-017",
+        "PRM-052"
+      ],
+      "safe_hold": [],
+      "evidence": "เอกสารปรับโครงสร้าง / รายงานติดตาม",
+      "upstream_sources": "M§4.2, M§5, M§6",
+      "decisions": [
+        "DEC-20",
+        "DEC-24"
+      ],
+      "reasons": [
+        {
+          "code": "RESTRUCTURE_PATH_UNDETERMINED",
+          "control_status": "HOLD"
+        },
+        {
+          "code": "RESTRUCTURE_REQUIREMENT_NOT_MET",
+          "control_status": "HOLD"
+        }
+      ],
+      "legacy_aliases": [
+        {
+          "alias": "PGS10-RST-001",
+          "version": "v1.1.0",
+          "note": "Normal restructure path"
+        }
+      ]
+    },
+    {
+      "id": "PGS10-RST-002",
+      "name": "Uncontactable / Unable-to-agree Exception",
+      "kind": "POLICY",
+      "requirement": "CONDITIONAL",
+      "requirement_by_stage": {
+        "PRE_REVIEW": "CONDITIONAL",
+        "FINAL_APPROVAL": "CONDITIONAL"
+      },
+      "applicable_when": "route=UNCONTACTABLE_EXCEPTION_PATH (ใช้ได้เฉพาะ path ที่มี (ค) = กรณี 1 และ 3 — DEC-20)",
+      "inputs": [
+        "restructure_route",
+        "first_uncontactable_date",
+        "first_contacted_restructure_failed_date",
+        "exception_start_date",
+        "exception_maturity_date",
+        "certified_tracking_report_present",
+        "demand_or_termination_letter_count",
+        "claim_submission_date"
+      ],
+      "parameters": [
+        "PRM-018",
+        "PRM-019"
+      ],
+      "safe_hold": [],
+      "evidence": "Certified Tracking Report + หนังสือบอกกล่าว/บอกเลิก",
+      "upstream_sources": "M§5, R§32",
+      "decisions": [
+        "DEC-20"
+      ],
+      "reasons": [
+        {
+          "code": "EXCEPTION_ROUTE_NOT_CONFIGURED",
+          "control_status": "HOLD"
+        },
+        {
+          "code": "TRACKING_REPORT_NOT_CERTIFIED",
+          "control_status": "HOLD"
+        },
+        {
+          "code": "UNCONTACTABLE_EXCEPTION_MATURED",
+          "control_status": "PASS_WITH_SUPPORT"
+        },
+        {
+          "code": "UNCONTACTABLE_EXCEPTION_NOT_MET",
+          "control_status": "HOLD"
+        }
+      ],
+      "legacy_aliases": [
+        {
+          "alias": "PGS10-RST-002",
+          "version": "v1.1.0",
+          "note": "Uncontactable exception"
+        },
+        {
+          "alias": "PGS10-RST-OP-002",
+          "version": "v1.1.0",
+          "note": "No-restructure exception evidence"
+        }
+      ]
+    },
+    {
+      "id": "PGS10-RST-003",
+      "name": "Restructure Date Evidence",
+      "kind": "OPERATIONAL",
+      "requirement": "CONDITIONAL",
+      "requirement_by_stage": {
+        "PRE_REVIEW": "CONDITIONAL",
+        "FINAL_APPROVAL": "CONDITIONAL"
+      },
+      "applicable_when": "มีการปรับโครงสร้างหนี้",
+      "inputs": [
+        "restructure_date",
+        "restructure_doc_signing_date",
+        "restructure_doc_approval_date",
+        "restructure_doc_effective_date",
+        "restructure_stmt_header_date"
+      ],
+      "parameters": [],
+      "safe_hold": [],
+      "evidence": "สัญญา/ข้อตกลง/หนังสืออนุมัติปรับโครงสร้าง + หัว Statement ใบแรก",
+      "upstream_sources": "R#10, M§18",
+      "decisions": [
+        "DEC-14"
+      ],
+      "reasons": [
+        {
+          "code": "MATCHED_STATEMENT_HEADER",
+          "control_status": "PASS_WITH_SUPPORT"
+        },
+        {
+          "code": "RESTRUCTURE_DATE_MISMATCH",
+          "control_status": "HOLD"
+        },
+        {
+          "code": "RESTRUCTURE_DATE_SEMANTICS_UNRESOLVED",
+          "control_status": "HOLD"
+        },
+        {
+          "code": "RESTRUCTURE_EVIDENCE_MISSING",
+          "control_status": "HOLD"
+        }
+      ],
+      "legacy_aliases": [
+        {
+          "alias": "PGS10-RST-OP-001",
+          "version": "v1.1.0",
+          "note": "Restructure date semantics"
+        }
+      ]
+    },
+    {
+      "id": "PGS10-DMD-001",
+      "name": "Demand Letter Identity & Existence",
+      "kind": "OPERATIONAL",
+      "requirement": "REQUIRED_HARD",
+      "requirement_by_stage": {
+        "PRE_REVIEW": "REQUIRED_HARD",
+        "FINAL_APPROVAL": "REQUIRED_HARD"
+      },
+      "applicable_when": "เสมอ",
+      "inputs": [
+        "demand_date_screen",
+        "demand_date_letter",
+        "demand_principal",
+        "demand_interest",
+        "demand_total",
+        "demand_or_termination_letter_count"
+      ],
+      "parameters": [],
+      "safe_hold": [],
+      "evidence": "หนังสือบอกกล่าว",
+      "upstream_sources": "R#11, M§19",
+      "decisions": [],
+      "reasons": [
+        {
+          "code": "DEMAND_IDENTITY_UNCONFIRMED",
+          "control_status": "HOLD"
+        },
+        {
+          "code": "DEMAND_LETTER_MISMATCH",
+          "control_status": "HOLD"
+        }
+      ],
+      "legacy_aliases": [
+        {
+          "alias": "PGS10-DMD-POL-001",
+          "version": "v1.1.0",
+          "note": "Demand/termination evidence exists"
+        },
+        {
+          "alias": "PGS10-DMD-001",
+          "version": "v1.1.0",
+          "note": "Demand identity"
+        }
+      ]
+    },
+    {
+      "id": "PGS10-DMD-002",
+      "name": "Demand Principal as of Demand Date",
+      "kind": "OPERATIONAL",
+      "requirement": "REQUIRED_HARD",
+      "requirement_by_stage": {
+        "PRE_REVIEW": "REQUIRED_HARD",
+        "FINAL_APPROVAL": "REQUIRED_HARD"
+      },
+      "applicable_when": "เสมอ",
+      "inputs": [
+        "demand_principal",
+        "principal_as_of_demand_date",
+        "demand_principal_derivation_basis",
+        "statement_period_start",
+        "statement_period_end",
+        "statement_has_gap",
+        "principal_affecting_txn_after_demand",
+        "principal_as_of_demand_reconstructable",
+        "demand_date_letter",
+        "current_principal"
+      ],
+      "parameters": [
+        "PRM-053"
+      ],
+      "safe_hold": [],
+      "evidence": "หนังสือบอกกล่าว + Statement/Ledger ที่ครอบคลุม Demand Date",
+      "upstream_sources": "R#12, M§19-20",
+      "decisions": [
+        "DEC-08",
+        "DEC-16"
+      ],
+      "reasons": [
+        {
+          "code": "DEMAND_PRINCIPAL_AS_OF_DATE_UNVERIFIED",
+          "control_status": "HOLD"
+        },
+        {
+          "code": "DEMAND_PRINCIPAL_MISMATCH",
+          "control_status": "HOLD"
+        },
+        {
+          "code": "DERIVED_AS_OF_DEMAND",
+          "control_status": "PASS_WITH_SUPPORT"
+        }
+      ],
+      "legacy_aliases": [
+        {
+          "alias": "PGS10-DMD-002",
+          "version": "v1.1.0",
+          "note": "Demand principal as-of"
+        }
+      ]
+    },
+    {
+      "id": "PGS10-DMD-003",
+      "name": "Demand Waiting Period",
+      "kind": "POLICY",
+      "requirement": "CONDITIONAL",
+      "requirement_by_stage": {
+        "PRE_REVIEW": "CONDITIONAL",
+        "FINAL_APPROVAL": "CONDITIONAL"
+      },
+      "applicable_when": "ไม่ใช่เส้นทางล้มละลาย",
+      "inputs": [
+        "demand_date_letter",
+        "postal_received_date",
+        "claim_eligibility_date"
+      ],
+      "parameters": [
+        "PRM-020",
+        "PRM-021",
+        "PRM-028"
+      ],
+      "safe_hold": [
+        {
+          "parameter": "PRM-021",
+          "source_status": "OPEN",
+          "behavior": "ผ่านต่อเมื่อระยะรอครบตามทุก candidate reference (วันที่ในหนังสือ, วันที่ผู้รับลงนามรับ); ต่างกัน → HOLD",
+          "reason_code": "DEMAND_WAITING_PERIOD_NOT_MET"
+        },
+        {
+          "parameter": "PRM-028",
+          "source_status": "OPEN",
+          "behavior": "ใช้ CALENDAR_MONTH_CLAMP_END_OF_MONTH (ไม่นับวันตั้งต้น); ถ้าผลต่างกันเมื่อเปลี่ยนเป็นวิธีอื่น (นับรวมวัน/ rollover) → HOLD",
+          "reason_code": "POLICY_PARAMETER_UNRESOLVED"
+        }
+      ],
+      "evidence": "หนังสือบอกกล่าว + ใบตอบรับ",
+      "upstream_sources": "M§24",
+      "decisions": [],
+      "reasons": [
+        {
+          "code": "DEMAND_WAITING_PERIOD_NOT_MET",
+          "control_status": "HOLD"
+        }
+      ],
+      "legacy_aliases": [
+        {
+          "alias": "PGS10-DMD-POL-002",
+          "version": "v1.1.0",
+          "note": "Demand waiting period"
+        }
+      ]
+    },
+    {
+      "id": "PGS10-HIS-001",
+      "name": "Historical Debt Snapshot",
+      "kind": "OPERATIONAL",
+      "requirement": "REQUIRED_HARD",
+      "requirement_by_stage": {
+        "PRE_REVIEW": "REQUIRED_HARD",
+        "FINAL_APPROVAL": "REQUIRED_HARD"
+      },
+      "applicable_when": "เสมอ (Reference Event = Demand)",
+      "inputs": [
+        "screen_historical_principal",
+        "screen_historical_interest",
+        "screen_historical_total",
+        "demand_principal",
+        "demand_interest",
+        "demand_total",
+        "historical_reference_event"
+      ],
+      "parameters": [
+        "PRM-034"
+      ],
+      "safe_hold": [],
+      "evidence": "หน้าจอ 'สภาพหนี้ ณ วันบอกกล่าว' + หนังสือบอกกล่าว",
+      "upstream_sources": "R#13, M§27",
+      "decisions": [
+        "DEC-07"
+      ],
+      "reasons": [
+        {
+          "code": "HISTORICAL_BALANCE_MISMATCH",
+          "control_status": "HOLD"
+        }
+      ],
+      "legacy_aliases": [
+        {
+          "alias": "PGS10-HIS-001",
+          "version": "v1.1.0",
+          "note": "Historical snapshot"
+        }
+      ]
+    },
+    {
+      "id": "PGS10-PST-001",
+      "name": "Postal Delivery Evidence",
+      "kind": "OPERATIONAL",
+      "requirement": "REQUIRED_HARD",
+      "requirement_by_stage": {
+        "PRE_REVIEW": "REQUIRED_HARD",
+        "FINAL_APPROVAL": "REQUIRED_HARD"
+      },
+      "applicable_when": "เสมอ",
+      "inputs": [
+        "postal_outcome",
+        "postal_received_date",
+        "postal_signature_type",
+        "returned_envelope_evidence",
+        "address_match"
+      ],
+      "parameters": [
+        "PRM-039"
+      ],
+      "safe_hold": [],
+      "evidence": "ใบตอบรับ / ซองตีกลับ",
+      "upstream_sources": "R#14, M§21",
+      "decisions": [
+        "DEC-14"
+      ],
+      "reasons": [
+        {
+          "code": "POSTAL_ACK_INCOMPLETE",
+          "control_status": "HOLD"
+        },
+        {
+          "code": "POSTAL_ADDRESS_UNVERIFIED",
+          "control_status": "HOLD"
+        },
+        {
+          "code": "POSTAL_EVIDENCE_MISSING",
+          "control_status": "HOLD"
+        },
+        {
+          "code": "POSTAL_RETURN_INCOMPLETE",
+          "control_status": "HOLD"
+        }
+      ],
+      "legacy_aliases": [
+        {
+          "alias": "PGS10-PST-001",
+          "version": "v1.1.0",
+          "note": "Postal success branch"
+        },
+        {
+          "alias": "PGS10-PST-002",
+          "version": "v1.1.0",
+          "note": "Postal returned-mail branch"
+        },
+        {
+          "alias": "PGS10-PST-001",
+          "version": "draft1.0",
+          "note": "D รวม linkage ไว้ใน PST-001"
+        }
+      ]
+    },
+    {
+      "id": "PGS10-PST-002",
+      "name": "Address Match",
+      "kind": "OPERATIONAL",
+      "requirement": "REQUIRED_HARD",
+      "requirement_by_stage": {
+        "PRE_REVIEW": "REQUIRED_HARD",
+        "FINAL_APPROVAL": "REQUIRED_HARD"
+      },
+      "applicable_when": "เสมอ",
+      "inputs": [
+        "postal_address",
+        "documented_address_set"
+      ],
+      "parameters": [
+        "PRM-040"
+      ],
+      "safe_hold": [
+        {
+          "parameter": "PRM-040",
+          "source_status": "LOCKED",
+          "behavior": "มีเอกสารแจ้งเปลี่ยนที่อยู่ แต่พิสูจน์วันที่มีผลเทียบวันส่งไม่ได้ → เทียบที่อยู่ล่าสุดเท่านั้น",
+          "reason_code": "ADDRESS_DIFFERS_FROM_LATEST"
+        }
+      ],
+      "evidence": "เอกสารใน PDF ทุกฉบับที่ระบุที่อยู่",
+      "upstream_sources": "R#15, M§22",
+      "decisions": [
+        "DEC-12",
+        "DEC-14"
+      ],
+      "reasons": [
+        {
+          "code": "ADDRESS_DIFFERS_FROM_LATEST",
+          "control_status": "HOLD"
+        },
+        {
+          "code": "ADDRESS_NOT_IN_DOCUMENTS",
+          "control_status": "HOLD"
+        },
+        {
+          "code": "POSTAL_ADDRESS_UNVERIFIED",
+          "control_status": "HOLD"
+        }
+      ],
+      "legacy_aliases": [
+        {
+          "alias": "PGS10-PST-003",
+          "version": "v1.1.0",
+          "note": "Address source set"
+        }
+      ]
+    },
+    {
+      "id": "PGS10-PST-003",
+      "name": "Postal Linkage",
+      "kind": "OPERATIONAL",
+      "requirement": "CONDITIONAL",
+      "requirement_by_stage": {
+        "PRE_REVIEW": "CONDITIONAL",
+        "FINAL_APPROVAL": "CONDITIONAL"
+      },
+      "applicable_when": "มี tracking number/barcode",
+      "inputs": [
+        "postal_tracking_number_ack",
+        "postal_tracking_number_envelope",
+        "postal_tracking_number_dispatch"
+      ],
+      "parameters": [],
+      "safe_hold": [],
+      "evidence": "ใบตอบรับ/ซอง/Track & Trace",
+      "upstream_sources": "M§23",
+      "decisions": [
+        "DEC-14"
+      ],
+      "reasons": [
+        {
+          "code": "POSTAL_LINKAGE_UNRESOLVED",
+          "control_status": "HOLD"
+        }
+      ],
+      "legacy_aliases": [
+        {
+          "alias": "PGS10-PST-004",
+          "version": "v1.1.0",
+          "note": "Postal linkage"
+        },
+        {
+          "alias": "PGS10-PST-001",
+          "version": "draft1.0",
+          "note": "D รวม linkage ไว้ใน PST-001"
+        }
+      ]
+    },
+    {
+      "id": "PGS10-CUR-001",
+      "name": "Current Principal",
+      "kind": "OPERATIONAL",
+      "requirement": "REQUIRED_HARD",
+      "requirement_by_stage": {
+        "PRE_REVIEW": "REQUIRED_HARD",
+        "FINAL_APPROVAL": "REQUIRED_HARD"
+      },
+      "applicable_when": "เสมอ",
+      "inputs": [
+        "screen_current_principal",
+        "current_principal"
+      ],
+      "parameters": [
+        "PRM-035"
+      ],
+      "safe_hold": [],
+      "evidence": "Statement ล่าสุด + หน้าจอ",
+      "upstream_sources": "R#16, M§26",
+      "decisions": [
+        "DEC-09"
+      ],
+      "reasons": [
+        {
+          "code": "CURRENT_PRINCIPAL_MISMATCH",
+          "control_status": "HOLD"
+        }
+      ],
+      "legacy_aliases": [
+        {
+          "alias": "PGS10-CUR-001",
+          "version": "v1.1.0",
+          "note": "Current principal"
+        },
+        {
+          "alias": "PGS10-CUR-001",
+          "version": "draft1.0",
+          "note": "D รวม principal + interest/total"
+        }
+      ]
+    },
+    {
+      "id": "PGS10-CUR-002",
+      "name": "Current Interest / Total",
+      "kind": "OPERATIONAL",
+      "requirement": "REQUIRED_HARD",
+      "requirement_by_stage": {
+        "PRE_REVIEW": "REQUIRED_HARD",
+        "FINAL_APPROVAL": "REQUIRED_HARD"
+      },
+      "applicable_when": "เสมอ",
+      "inputs": [
+        "screen_current_interest",
+        "screen_current_total",
+        "current_interest",
+        "current_other_amounts",
+        "current_total",
+        "tolerance_enabled"
+      ],
+      "parameters": [
+        "PRM-032",
+        "PRM-033",
+        "PRM-033b",
+        "PRM-034"
+      ],
+      "safe_hold": [
+        {
+          "parameter": "PRM-033",
+          "source_status": "PROPOSED_CONFIG_DISABLED",
+          "behavior": "tolerance.enabled=false → ส่วนต่างทุกจำนวน = HOLD",
+          "reason_code": "NUMERIC_VARIANCE"
+        },
+        {
+          "parameter": "PRM-033b",
+          "source_status": "PROPOSED_CONFIG_DISABLED",
+          "behavior": "tolerance.enabled=false → ไม่มี field ใดใช้ tolerance",
+          "reason_code": "NUMERIC_VARIANCE"
+        }
+      ],
+      "evidence": "Statement ล่าสุด + หน้าจอ",
+      "upstream_sources": "R#16, M§26",
+      "decisions": [
+        "DEC-09",
+        "DEC-18"
+      ],
+      "reasons": [
+        {
+          "code": "CURRENT_BALANCE_MISMATCH",
+          "control_status": "HOLD"
+        },
+        {
+          "code": "NUMERIC_VARIANCE",
+          "control_status": "HOLD",
+          "review_flag": "OBSERVATION_CANDIDATE"
+        },
+        {
+          "code": "VARIANCE_WITHIN_APPROVED_TOLERANCE",
+          "control_status": "OBSERVATION"
+        }
+      ],
+      "legacy_aliases": [
+        {
+          "alias": "PGS10-CUR-002",
+          "version": "v1.1.0",
+          "note": "Current interest/total"
+        },
+        {
+          "alias": "PGS10-CUR-001",
+          "version": "draft1.0",
+          "note": "D รวม principal + interest/total"
+        }
+      ]
+    },
+    {
+      "id": "PGS10-CLM-001",
+      "name": "Claim Filing Window",
+      "kind": "POLICY",
+      "requirement": "REQUIRED_HARD",
+      "requirement_by_stage": {
+        "PRE_REVIEW": "REQUIRED_HARD",
+        "FINAL_APPROVAL": "REQUIRED_HARD"
+      },
+      "applicable_when": "เสมอ",
+      "inputs": [
+        "lg_issue_date",
+        "final_lg_expiry_date",
+        "claim_submission_date"
+      ],
+      "parameters": [
+        "PRM-022",
+        "PRM-023",
+        "PRM-028"
+      ],
+      "safe_hold": [
+        {
+          "parameter": "PRM-028",
+          "source_status": "OPEN",
+          "behavior": "ใช้ CALENDAR_MONTH_CLAMP_END_OF_MONTH (ไม่นับวันตั้งต้น); ถ้าผลต่างกันเมื่อเปลี่ยนเป็นวิธีอื่น (นับรวมวัน/ rollover) → HOLD",
+          "reason_code": "POLICY_PARAMETER_UNRESOLVED"
+        }
+      ],
+      "evidence": "LG + แบบคำขอ",
+      "upstream_sources": "M§25",
+      "decisions": [
+        "DEC-14"
+      ],
+      "reasons": [
+        {
+          "code": "CLAIM_FILING_WINDOW_NOT_MET",
+          "control_status": "HOLD"
+        }
+      ],
+      "legacy_aliases": [
+        {
+          "alias": "PGS10-CLM-POL-001",
+          "version": "v1.1.0",
+          "note": "Filing window"
+        }
+      ]
+    },
+    {
+      "id": "PGS10-CLM-002",
+      "name": "Coverage Ratio",
+      "kind": "POLICY",
+      "requirement": "REQUIRED_HARD",
+      "requirement_by_stage": {
+        "PRE_REVIEW": "REQUIRED_HARD",
+        "FINAL_APPROVAL": "REQUIRED_HARD"
+      },
+      "applicable_when": "เสมอ",
+      "inputs": [
+        "product",
+        "lg_issue_date",
+        "claim_submission_date",
+        "npl_date",
+        "default_date",
+        "demand_date_letter",
+        "screen_coverage_ratio",
+        "coverage_ratio"
+      ],
+      "parameters": [
+        "PRM-024",
+        "PRM-025",
+        "PRM-026",
+        "PRM-026b",
+        "PRM-027",
+        "PRM-027b"
+      ],
+      "safe_hold": [
+        {
+          "parameter": "PRM-027",
+          "source_status": "OPEN",
+          "behavior": "คำนวณ Tier ตามทุก candidate event ที่มีข้อมูล (claim_submission_date, npl_date, default_date, demand_date) ถ้าให้ Tier เดียวกันทั้งหมดจึงใช้ Tier นั้น; ต่างกัน → HOLD",
+          "reason_code": "COVERAGE_AGE_BASIS_UNDEFINED"
+        }
+      ],
+      "evidence": "LG + แบบคำขอ + ตาราง Coverage",
+      "upstream_sources": "R#19, M§7",
+      "decisions": [
+        "DEC-11",
+        "DEC-21",
+        "DEC-22"
+      ],
+      "reasons": [
+        {
+          "code": "COVERAGE_AGE_BASIS_UNDEFINED",
+          "control_status": "HOLD"
+        },
+        {
+          "code": "COVERAGE_RATIO_MISMATCH",
+          "control_status": "HOLD"
+        },
+        {
+          "code": "NO_RULE_FOR_PRODUCT",
+          "control_status": "HOLD"
+        }
+      ],
+      "legacy_aliases": [
+        {
+          "alias": "PGS10-COV-001",
+          "version": "v1.1.0",
+          "note": "Coverage"
+        },
+        {
+          "alias": "PGS10-CLM-002",
+          "version": "v1.1.0",
+          "note": "Coverage lookup"
+        }
+      ]
+    },
+    {
+      "id": "PGS10-CLM-003",
+      "name": "Claim Base",
+      "kind": "POLICY",
+      "requirement": "REQUIRED_HARD",
+      "requirement_by_stage": {
+        "PRE_REVIEW": "REQUIRED_HARD",
+        "FINAL_APPROVAL": "REQUIRED_HARD"
+      },
+      "applicable_when": "เสมอ",
+      "inputs": [
+        "current_principal",
+        "current_guarantee_obligation",
+        "claim_base",
+        "claim_base_mode",
+        "screen_claim_base",
+        "screen_claim_base_mode"
+      ],
+      "parameters": [],
+      "safe_hold": [],
+      "evidence": "Statement ล่าสุด + LG/ข้อมูลภาระค้ำ",
+      "upstream_sources": "R#18, M§28",
+      "decisions": [
+        "DEC-09",
+        "DEC-14"
+      ],
+      "reasons": [
+        {
+          "code": "CLAIM_BASE_MISMATCH",
+          "control_status": "HOLD"
+        },
+        {
+          "code": "CLAIM_BASE_MODE_MISMATCH",
+          "control_status": "HOLD"
+        }
+      ],
+      "legacy_aliases": [
+        {
+          "alias": "PGS10-CLM-POL-002",
+          "version": "v1.1.0",
+          "note": "Claim base"
+        },
+        {
+          "alias": "PGS10-CLM-001",
+          "version": "v1.1.0",
+          "note": "Claim base"
+        }
+      ]
+    },
+    {
+      "id": "PGS10-CLM-004",
+      "name": "Claim Calculation",
+      "kind": "POLICY",
+      "requirement": "REQUIRED_HARD",
+      "requirement_by_stage": {
+        "PRE_REVIEW": "REQUIRED_HARD",
+        "FINAL_APPROVAL": "REQUIRED_HARD"
+      },
+      "applicable_when": "เสมอ",
+      "inputs": [
+        "claim_base",
+        "coverage_ratio",
+        "screen_claim_amount",
+        "screen_approved_payment",
+        "claim_amount"
+      ],
+      "parameters": [
+        "PRM-029",
+        "PRM-030"
+      ],
+      "safe_hold": [],
+      "evidence": "แบบคำขอ/หน้าจอ",
+      "upstream_sources": "R#20, M§29",
+      "decisions": [
+        "DEC-09",
+        "DEC-14"
+      ],
+      "reasons": [
+        {
+          "code": "CLAIM_CALCULATION_MISMATCH",
+          "control_status": "HOLD"
+        },
+        {
+          "code": "UPSTREAM_NOT_COMPUTABLE",
+          "control_status": "NOT_TESTABLE"
+        }
+      ],
+      "legacy_aliases": [
+        {
+          "alias": "PGS10-CLM-POL-003",
+          "version": "v1.1.0",
+          "note": "Claim calculation"
+        },
+        {
+          "alias": "PGS10-CLM-003",
+          "version": "v1.1.0",
+          "note": "Recalculation"
+        }
+      ]
+    },
+    {
+      "id": "PGS10-CAP-001",
+      "name": "CLAIM MAX / Package Capacity",
+      "kind": "POLICY",
+      "requirement": "REQUIRED_HARD",
+      "requirement_by_stage": {
+        "PRE_REVIEW": "OPTIONAL",
+        "FINAL_APPROVAL": "REQUIRED_HARD"
+      },
+      "applicable_when": "FINAL_APPROVAL (PRE_REVIEW: NOT_TESTABLE ได้และไม่กระทบเคส)",
+      "inputs": [
+        "review_stage",
+        "claim_max",
+        "paid_claims",
+        "pending_claims",
+        "claim_amount",
+        "available_claim_capacity",
+        "carry_forward_balance",
+        "screen_available_capacity",
+        "screen_carry_forward_balance"
+      ],
+      "parameters": [
+        "PRM-051"
+      ],
+      "safe_hold": [],
+      "evidence": "ข้อมูล Package (CLAIM MAX, จ่ายจริง, รอจ่าย)",
+      "upstream_sources": "R#21, M§30-32",
+      "decisions": [
+        "DEC-06",
+        "DEC-09",
+        "DEC-17"
+      ],
+      "reasons": [
+        {
+          "code": "CLAIM_EXCEEDS_CAP",
+          "control_status": "HOLD"
+        },
+        {
+          "code": "CLAIM_MAX_ARITHMETIC_MISMATCH",
+          "control_status": "HOLD"
+        },
+        {
+          "code": "PACKAGE_DEFINITION_REQUIRED",
+          "control_status": "NOT_TESTABLE",
+          "detail_codes": [
+            "PAID_PENDING_MISSING",
+            "CLAIM_MAX_UNDEFINED",
+            "ROUND_UNDEFINED"
+          ]
+        },
+        {
+          "code": "UPSTREAM_NOT_COMPUTABLE",
+          "control_status": "NOT_TESTABLE"
+        }
+      ],
+      "legacy_aliases": [
+        {
+          "alias": "PGS10-CAP-001",
+          "version": "v1.1.0",
+          "note": "Package arithmetic"
+        },
+        {
+          "alias": "PGS10-CAP-OP-001",
+          "version": "v1.1.0",
+          "note": "Arithmetic integrity"
+        }
+      ]
+    },
+    {
+      "id": "PGS10-TIME-001",
+      "name": "Timeline Integrity",
+      "kind": "OPERATIONAL",
+      "requirement": "REQUIRED_HARD",
+      "requirement_by_stage": {
+        "PRE_REVIEW": "REQUIRED_HARD",
+        "FINAL_APPROVAL": "REQUIRED_HARD"
+      },
+      "applicable_when": "เสมอ",
+      "inputs": [
+        "def_002_control_status",
+        "approval_date",
+        "lg_issue_date",
+        "first_payment_date",
+        "default_date",
+        "tracking_date_screen",
+        "demand_date_screen",
+        "postal_sent_date",
+        "postal_received_date",
+        "claim_submission_date",
+        "bank_submission_date",
+        "complete_documents_date",
+        "payment_approval_date"
+      ],
+      "parameters": [],
+      "safe_hold": [],
+      "evidence": "วันที่ทั้งหมดของเคส",
+      "upstream_sources": "R#22, M§36",
+      "decisions": [],
+      "reasons": [
+        {
+          "code": "TIMELINE_CONFLICT",
+          "control_status": "HOLD"
+        }
+      ],
+      "legacy_aliases": [
+        {
+          "alias": "PGS10-TIME-001",
+          "version": "v1.1.0",
+          "note": "Chronology"
+        }
+      ]
+    }
+  ],
+  "reason_codes": [
+    {
+      "code": "INVALID_INPUT",
+      "rules": [
+        "*"
+      ],
+      "control_status": "HOLD",
+      "meaning": "รูปแบบข้อมูลไม่ถูกต้อง",
+      "aliases": [],
+      "detail_codes": [],
+      "review_flag": null,
+      "proposed": false,
+      "owner_status": "CANDIDATE"
+    },
+    {
+      "code": "MISSING_INPUT",
+      "rules": [
+        "*"
+      ],
+      "control_status": "NOT_TESTABLE",
+      "meaning": "ขาดข้อมูลที่จำเป็น",
+      "aliases": [],
+      "detail_codes": [],
+      "review_flag": null,
+      "proposed": false,
+      "owner_status": "CANDIDATE"
+    },
+    {
+      "code": "POLICY_PARAMETER_UNRESOLVED",
+      "rules": [
+        "*"
+      ],
+      "control_status": "HOLD",
+      "meaning": "ผลขึ้นกับพารามิเตอร์นโยบายที่ยัง OPEN และ candidate ให้ผลต่างกัน (ระบุ PRM-xxx ใน detail_code)",
+      "aliases": [],
+      "detail_codes": [],
+      "review_flag": null,
+      "proposed": true,
+      "owner_status": "PROPOSED_BY_CLAUDE"
+    },
+    {
+      "code": "RULE_VERSION_CONFLICT",
+      "rules": [
+        "*"
+      ],
+      "control_status": "HOLD",
+      "meaning": "กฎ/Effective Date ขัดกันและตัดสินไม่ได้ ต้องรายงาน Conflict",
+      "aliases": [
+        "RULE_CONFLICT_UNRESOLVED"
+      ],
+      "detail_codes": [],
+      "review_flag": null,
+      "proposed": false,
+      "owner_status": "CANDIDATE"
+    },
+    {
+      "code": "CLAIM_EXCEEDS_CAP",
+      "rules": [
+        "PGS10-CAP-001"
+      ],
+      "control_status": "HOLD",
+      "meaning": "Claim เกินวงเงินคงเหลือ",
+      "aliases": [],
+      "detail_codes": [],
+      "review_flag": null,
+      "proposed": false,
+      "owner_status": "CANDIDATE"
+    },
+    {
+      "code": "CLAIM_MAX_ARITHMETIC_MISMATCH",
+      "rules": [
+        "PGS10-CAP-001"
+      ],
+      "control_status": "HOLD",
+      "meaning": "คงเหลือจ่ายได้อีก/หลังอนุมัติไม่ตรงทุกสตางค์",
+      "aliases": [
+        "CAP_ARITHMETIC_MISMATCH",
+        "HOLD_CLAIM_MAX_ARITHMETIC"
+      ],
+      "detail_codes": [],
+      "review_flag": null,
+      "proposed": false,
+      "owner_status": "CANDIDATE"
+    },
+    {
+      "code": "PACKAGE_DEFINITION_REQUIRED",
+      "rules": [
+        "PGS10-CAP-001"
+      ],
+      "control_status": "NOT_TESTABLE",
+      "meaning": "ข้อมูล/นิยาม Package (Claim Max, paid, pending, รอบ, carry-forward) ไม่ครบ. FINAL_APPROVAL → case HOLD; PRE_REVIEW → ไม่กระทบเคส",
+      "aliases": [
+        "HOLD_PACKAGE_DEFINITION_REQUIRED",
+        "PAID_PENDING_MISSING"
+      ],
+      "detail_codes": [
+        "PAID_PENDING_MISSING",
+        "CLAIM_MAX_UNDEFINED",
+        "ROUND_UNDEFINED"
+      ],
+      "review_flag": null,
+      "proposed": false,
+      "owner_status": "APPROVED_BY_OWNER"
+    },
+    {
+      "code": "CLAIM_FILING_WINDOW_NOT_MET",
+      "rules": [
+        "PGS10-CLM-001"
+      ],
+      "control_status": "HOLD",
+      "meaning": "ยื่นนอกช่วงที่อนุญาต",
+      "aliases": [],
+      "detail_codes": [],
+      "review_flag": null,
+      "proposed": false,
+      "owner_status": "CANDIDATE"
+    },
+    {
+      "code": "COVERAGE_AGE_BASIS_UNDEFINED",
+      "rules": [
+        "PGS10-CLM-002"
+      ],
+      "control_status": "HOLD",
+      "meaning": "coverage_age_basis ยัง OPEN และ Tier ต่างกันตาม candidate event",
+      "aliases": [],
+      "detail_codes": [],
+      "review_flag": null,
+      "proposed": true,
+      "owner_status": "PROPOSED_BY_CLAUDE"
+    },
+    {
+      "code": "COVERAGE_RATIO_MISMATCH",
+      "rules": [
+        "PGS10-CLM-002"
+      ],
+      "control_status": "HOLD",
+      "meaning": "อัตราหน้าจอ ≠ อัตราตามกฎ",
+      "aliases": [],
+      "detail_codes": [],
+      "review_flag": null,
+      "proposed": false,
+      "owner_status": "CANDIDATE"
+    },
+    {
+      "code": "NO_RULE_FOR_PRODUCT",
+      "rules": [
+        "PGS10-CLM-002"
+      ],
+      "control_status": "HOLD",
+      "meaning": "ไม่มีกฎ Coverage ที่ยืนยันสำหรับ Product นี้",
+      "aliases": [],
+      "detail_codes": [],
+      "review_flag": null,
+      "proposed": false,
+      "owner_status": "CANDIDATE"
+    },
+    {
+      "code": "CLAIM_BASE_MISMATCH",
+      "rules": [
+        "PGS10-CLM-003"
+      ],
+      "control_status": "HOLD",
+      "meaning": "ฐานคำนวณหน้าจอ ≠ MIN(principal, guarantee)",
+      "aliases": [],
+      "detail_codes": [],
+      "review_flag": null,
+      "proposed": false,
+      "owner_status": "CANDIDATE"
+    },
+    {
+      "code": "CLAIM_BASE_MODE_MISMATCH",
+      "rules": [
+        "PGS10-CLM-003"
+      ],
+      "control_status": "HOLD",
+      "meaning": "โหมดฐานคำนวณไม่ตรงกฎ",
+      "aliases": [],
+      "detail_codes": [],
+      "review_flag": null,
+      "proposed": false,
+      "owner_status": "CANDIDATE"
+    },
+    {
+      "code": "CLAIM_CALCULATION_MISMATCH",
+      "rules": [
+        "PGS10-CLM-004"
+      ],
+      "control_status": "HOLD",
+      "meaning": "จำนวนเงินค่าประกันชดเชย/ยอดอนุมัติจ่ายหน้าจอ ≠ ที่คำนวณ",
+      "aliases": [
+        "CLAIM_AMOUNT_MISMATCH"
+      ],
+      "detail_codes": [],
+      "review_flag": null,
+      "proposed": false,
+      "owner_status": "CANDIDATE"
+    },
+    {
+      "code": "UPSTREAM_NOT_COMPUTABLE",
+      "rules": [
+        "PGS10-CLM-004",
+        "PGS10-CAP-001"
+      ],
+      "control_status": "NOT_TESTABLE",
+      "meaning": "Control ต้นทางยังคำนวณไม่ได้",
+      "aliases": [],
+      "detail_codes": [],
+      "review_flag": null,
+      "proposed": false,
+      "owner_status": "CANDIDATE"
+    },
+    {
+      "code": "CONTRACT_DATE_BASIS_UNDEFINED",
+      "rules": [
+        "PGS10-CONTRACT-001"
+      ],
+      "control_status": "HOLD",
+      "meaning": "FI/Product นี้ยังไม่มีกฎกำหนดวันที่ทำสัญญา (กฎ Approval=Contract ใช้เฉพาะ Thai Credit revolving-loan — DEC-10)",
+      "aliases": [],
+      "detail_codes": [],
+      "review_flag": null,
+      "proposed": false,
+      "owner_status": "APPROVED_BY_OWNER"
+    },
+    {
+      "code": "CONTRACT_DATE_MISMATCH",
+      "rules": [
+        "PGS10-CONTRACT-001"
+      ],
+      "control_status": "HOLD",
+      "meaning": "วันที่อนุมัติ ≠ วันที่สัญญาที่อ้างในหนังสือบอกกล่าว",
+      "aliases": [
+        "HOLD_CONTRACT_DATE_MISMATCH"
+      ],
+      "detail_codes": [],
+      "review_flag": null,
+      "proposed": false,
+      "owner_status": "CANDIDATE"
+    },
+    {
+      "code": "CURRENT_PRINCIPAL_MISMATCH",
+      "rules": [
+        "PGS10-CUR-001"
+      ],
+      "control_status": "HOLD",
+      "meaning": "เงินต้นปัจจุบันไม่ตรง Statement ล่าสุด (tolerance = 0)",
+      "aliases": [],
+      "detail_codes": [],
+      "review_flag": null,
+      "proposed": false,
+      "owner_status": "CANDIDATE"
+    },
+    {
+      "code": "CURRENT_BALANCE_MISMATCH",
+      "rules": [
+        "PGS10-CUR-002"
+      ],
+      "control_status": "HOLD",
+      "meaning": "ดอกเบี้ย/รวมต่างเกินเกณฑ์ที่ใช้ได้",
+      "aliases": [],
+      "detail_codes": [],
+      "review_flag": null,
+      "proposed": false,
+      "owner_status": "CANDIDATE"
+    },
+    {
+      "code": "NUMERIC_VARIANCE",
+      "rules": [
+        "PGS10-CUR-002"
+      ],
+      "control_status": "HOLD",
+      "meaning": "ส่วนต่างจำนวนเงินเล็กน้อยที่ tolerance ยังปิดอยู่ (DEC-09)",
+      "aliases": [
+        "VARIANCE_PENDING_TOLERANCE_APPROVAL",
+        "ROUNDING_TOLERANCE_NOT_APPROVED"
+      ],
+      "detail_codes": [],
+      "review_flag": "OBSERVATION_CANDIDATE",
+      "proposed": false,
+      "owner_status": "APPROVED_BY_OWNER"
+    },
+    {
+      "code": "VARIANCE_WITHIN_APPROVED_TOLERANCE",
+      "rules": [
+        "PGS10-CUR-002"
+      ],
+      "control_status": "OBSERVATION",
+      "meaning": "ส่วนต่างอยู่ใน tolerance ที่อนุมัติ (เปิด Config แล้ว/มี reviewer override) และเงินต้นตรง",
+      "aliases": [],
+      "detail_codes": [],
+      "review_flag": null,
+      "proposed": false,
+      "owner_status": "CANDIDATE"
+    },
+    {
+      "code": "POST_DEFAULT_PAYMENT",
+      "rules": [
+        "PGS10-DEF-001"
+      ],
+      "control_status": "HOLD",
+      "meaning": "default_date < last_actual_payment_date → เข้า DEF-002 (สถานะตามผล DEF-002)",
+      "aliases": [],
+      "detail_codes": [],
+      "review_flag": null,
+      "proposed": false,
+      "owner_status": "CANDIDATE"
+    },
+    {
+      "code": "POST_DEFAULT_PAYMENT_SUPPORTED",
+      "rules": [
+        "PGS10-DEF-001",
+        "PGS10-DEF-002"
+      ],
+      "control_status": "PASS_WITH_SUPPORT",
+      "meaning": "มีการชำระหลังผิดนัดและหนังสือยืนยันสมบูรณ์ ตรงหน้าจอ",
+      "aliases": [],
+      "detail_codes": [],
+      "review_flag": null,
+      "proposed": false,
+      "owner_status": "CANDIDATE"
+    },
+    {
+      "code": "CONFIRMATION_CONTENT_INCOMPLETE",
+      "rules": [
+        "PGS10-DEF-002"
+      ],
+      "control_status": "HOLD",
+      "meaning": "หนังสือไม่ระบุสาระที่ต้องมี",
+      "aliases": [],
+      "detail_codes": [],
+      "review_flag": null,
+      "proposed": false,
+      "owner_status": "CANDIDATE"
+    },
+    {
+      "code": "CONFIRMED_DEFAULT_DATE_MISMATCH",
+      "rules": [
+        "PGS10-DEF-002"
+      ],
+      "control_status": "HOLD",
+      "meaning": "Default Date ในหนังสือ ≠ หน้าจอ",
+      "aliases": [],
+      "detail_codes": [],
+      "review_flag": null,
+      "proposed": false,
+      "owner_status": "CANDIDATE"
+    },
+    {
+      "code": "IDENTIFIER_LINKAGE_UNRESOLVED",
+      "rules": [
+        "PGS10-DEF-002",
+        "PGS10-ID-001"
+      ],
+      "control_status": "HOLD",
+      "meaning": "Identifier ในหนังสือ/เอกสารไม่ลิงก์กลับเคสได้",
+      "aliases": [
+        "CONFIRMATION_IDENTIFIER_UNLINKED"
+      ],
+      "detail_codes": [],
+      "review_flag": null,
+      "proposed": false,
+      "owner_status": "CANDIDATE"
+    },
+    {
+      "code": "POST_DEFAULT_SUPPORT_MISSING",
+      "rules": [
+        "PGS10-DEF-002"
+      ],
+      "control_status": "HOLD",
+      "meaning": "ไม่มีหนังสือยืนยันการชำระหลังวันผิดนัด",
+      "aliases": [
+        "EXCEPTION_LETTER_MISSING",
+        "HOLD_POST_DEFAULT_SUPPORT_MISSING"
+      ],
+      "detail_codes": [],
+      "review_flag": null,
+      "proposed": false,
+      "owner_status": "CANDIDATE"
+    },
+    {
+      "code": "DEMAND_IDENTITY_UNCONFIRMED",
+      "rules": [
+        "PGS10-DMD-001"
+      ],
+      "control_status": "HOLD",
+      "meaning": "ยังไม่ยืนยันผู้กู้/Account/วงเงิน/ที่อยู่ในหนังสือ",
+      "aliases": [],
+      "detail_codes": [],
+      "review_flag": null,
+      "proposed": false,
+      "owner_status": "CANDIDATE"
+    },
+    {
+      "code": "DEMAND_LETTER_MISMATCH",
+      "rules": [
+        "PGS10-DMD-001"
+      ],
+      "control_status": "HOLD",
+      "meaning": "วันที่/ยอดในหนังสือบอกกล่าวไม่ตรงหน้าจอหรือไม่สอดคล้องกันเอง",
+      "aliases": [],
+      "detail_codes": [],
+      "review_flag": null,
+      "proposed": false,
+      "owner_status": "CANDIDATE"
+    },
+    {
+      "code": "DEMAND_PRINCIPAL_AS_OF_DATE_UNVERIFIED",
+      "rules": [
+        "PGS10-DMD-002"
+      ],
+      "control_status": "HOLD",
+      "meaning": "พิสูจน์เงินต้น ณ วันบอกกล่าวไม่ได้ (ไม่มี Snapshot และ derive ไม่ได้: Statement ไม่ครอบคลุม/มี gap/มีรายการกระทบเงินต้นหลัง demand ที่ reconstruct ไม่ได้)",
+      "aliases": [
+        "DEMAND_PRINCIPAL_UNRECONCILED",
+        "ASOF_DEMAND_PRINCIPAL_REQUIRED",
+        "HOLD_DEMAND_PRINCIPAL_UNRECONCILED"
+      ],
+      "detail_codes": [],
+      "review_flag": null,
+      "proposed": false,
+      "owner_status": "APPROVED_BY_OWNER"
+    },
+    {
+      "code": "DEMAND_PRINCIPAL_MISMATCH",
+      "rules": [
+        "PGS10-DMD-002"
+      ],
+      "control_status": "HOLD",
+      "meaning": "เงินต้นบอกกล่าว ≠ Statement ณ วันบอกกล่าว (พิสูจน์ได้ว่าต่าง)",
+      "aliases": [],
+      "detail_codes": [],
+      "review_flag": null,
+      "proposed": false,
+      "owner_status": "CANDIDATE"
+    },
+    {
+      "code": "DERIVED_AS_OF_DEMAND",
+      "rules": [
+        "PGS10-DMD-002"
+      ],
+      "control_status": "PASS_WITH_SUPPORT",
+      "meaning": "derive เงินต้น ณ วันบอกกล่าวจาก Statement/Ledger ได้ครบตามเงื่อนไข (ครอบคลุม ไม่มี gap ไม่มีรายการกระทบเงินต้นหลัง demand หรือ reconstruct ได้)",
+      "aliases": [],
+      "detail_codes": [],
+      "review_flag": null,
+      "proposed": false,
+      "owner_status": "APPROVED_BY_OWNER"
+    },
+    {
+      "code": "DEMAND_WAITING_PERIOD_NOT_MET",
+      "rules": [
+        "PGS10-DMD-003"
+      ],
+      "control_status": "HOLD",
+      "meaning": "ยังไม่พ้นระยะรอหลังหนังสือบอกกล่าว",
+      "aliases": [],
+      "detail_codes": [],
+      "review_flag": null,
+      "proposed": false,
+      "owner_status": "CANDIDATE"
+    },
+    {
+      "code": "APPROVAL_DOCUMENT_INCOMPLETE",
+      "rules": [
+        "PGS10-DOC-001"
+      ],
+      "control_status": "HOLD",
+      "meaning": "เอกสารอนุมัติ/สัญญาไม่ครบ",
+      "aliases": [
+        "DOCUMENT_PAGE_SEQUENCE_GAP",
+        "DOCUMENT_TRUNCATED",
+        "DOCUMENT_PAGE_UNREADABLE"
+      ],
+      "detail_codes": [
+        "PAGE_SEQUENCE_GAP",
+        "DOCUMENT_TRUNCATED",
+        "PAGE_UNREADABLE"
+      ],
+      "review_flag": null,
+      "proposed": false,
+      "owner_status": "CANDIDATE"
+    },
+    {
+      "code": "ELIGIBILITY_EXPOSURE_LIMIT_EXCEEDED",
+      "rules": [
+        "PGS10-ELIG-001"
+      ],
+      "control_status": "FAIL",
+      "meaning": "วงเงินรวมต่อรายเกินเพดาน",
+      "aliases": [],
+      "detail_codes": [],
+      "review_flag": null,
+      "proposed": false,
+      "owner_status": "CANDIDATE"
+    },
+    {
+      "code": "ELIGIBILITY_GUARANTEE_BELOW_MINIMUM",
+      "rules": [
+        "PGS10-ELIG-001"
+      ],
+      "control_status": "FAIL",
+      "meaning": "วงเงินค้ำต่อครั้งต่ำกว่า 10,000 บาท",
+      "aliases": [],
+      "detail_codes": [],
+      "review_flag": null,
+      "proposed": false,
+      "owner_status": "CANDIDATE"
+    },
+    {
+      "code": "ELIGIBILITY_NOT_BUSINESS_PURPOSE",
+      "rules": [
+        "PGS10-ELIG-001"
+      ],
+      "control_status": "FAIL",
+      "meaning": "สินเชื่อไม่ใช่เพื่อวัตถุประสงค์ธุรกิจ (DEC-12)",
+      "aliases": [],
+      "detail_codes": [],
+      "review_flag": null,
+      "proposed": false,
+      "owner_status": "APPROVED_BY_OWNER"
+    },
+    {
+      "code": "ELIGIBILITY_NOT_NEW_BUSINESS_LOAN",
+      "rules": [
+        "PGS10-ELIG-001"
+      ],
+      "control_status": "FAIL",
+      "meaning": "ไม่ใช่สินเชื่อใหม่",
+      "aliases": [],
+      "detail_codes": [],
+      "review_flag": null,
+      "proposed": false,
+      "owner_status": "CANDIDATE"
+    },
+    {
+      "code": "ELIGIBILITY_NOT_PGS10",
+      "rules": [
+        "PGS10-ELIG-001"
+      ],
+      "control_status": "FAIL",
+      "meaning": "ไม่ใช่ PGS ระยะที่ 10",
+      "aliases": [],
+      "detail_codes": [],
+      "review_flag": null,
+      "proposed": false,
+      "owner_status": "CANDIDATE"
+    },
+    {
+      "code": "ELIGIBILITY_PRODUCT_EXCLUDED",
+      "rules": [
+        "PGS10-ELIG-001"
+      ],
+      "control_status": "FAIL",
+      "meaning": "Product ไม่อยู่ในกลุ่มที่เข้าเกณฑ์",
+      "aliases": [],
+      "detail_codes": [],
+      "review_flag": null,
+      "proposed": false,
+      "owner_status": "CANDIDATE"
+    },
+    {
+      "code": "ELIGIBILITY_PROHIBITED_CREDIT_TYPE",
+      "rules": [
+        "PGS10-ELIG-001"
+      ],
+      "control_status": "FAIL",
+      "meaning": "สินเชื่อเป็นประเภทที่นโยบายไม่อนุญาต (Hire Purchase / Leasing) — แยกจาก NOT_BUSINESS_PURPOSE",
+      "aliases": [
+        "ELIGIBILITY_HIRE_PURCHASE_LEASING"
+      ],
+      "detail_codes": [],
+      "review_flag": null,
+      "proposed": false,
+      "owner_status": "APPROVED_BY_OWNER"
+    },
+    {
+      "code": "ELIGIBILITY_UNCONFIRMED",
+      "rules": [
+        "PGS10-ELIG-001"
+      ],
+      "control_status": "HOLD",
+      "meaning": "ยังไม่ยืนยันคุณสมบัติบางข้อ",
+      "aliases": [],
+      "detail_codes": [],
+      "review_flag": null,
+      "proposed": false,
+      "owner_status": "CANDIDATE"
+    },
+    {
+      "code": "PGS_REVISION_MISMATCH",
+      "rules": [
+        "PGS10-ELIG-001"
+      ],
+      "control_status": "HOLD",
+      "meaning": "รุ่นปรับปรุงไม่ใช่ครั้งที่ 5",
+      "aliases": [],
+      "detail_codes": [],
+      "review_flag": null,
+      "proposed": false,
+      "owner_status": "CANDIDATE"
+    },
+    {
+      "code": "PRODUCT_UNKNOWN",
+      "rules": [
+        "PGS10-ELIG-001"
+      ],
+      "control_status": "HOLD",
+      "meaning": "ระบุ Product ไม่ได้",
+      "aliases": [],
+      "detail_codes": [],
+      "review_flag": null,
+      "proposed": false,
+      "owner_status": "CANDIDATE"
+    },
+    {
+      "code": "TRACKING_EVIDENCE_INCOMPLETE",
+      "rules": [
+        "PGS10-FUP-001"
+      ],
+      "control_status": "HOLD",
+      "meaning": "ขาดวิธี/ผลติดตาม",
+      "aliases": [],
+      "detail_codes": [],
+      "review_flag": null,
+      "proposed": false,
+      "owner_status": "CANDIDATE"
+    },
+    {
+      "code": "TRACKING_EVIDENCE_MISMATCH",
+      "rules": [
+        "PGS10-FUP-001"
+      ],
+      "control_status": "HOLD",
+      "meaning": "วันที่/ผู้กู้/LG ในรายงานติดตามไม่ตรงหน้าจอ",
+      "aliases": [
+        "TRACKING_DATE_MISMATCH",
+        "HOLD_TRACKING_EVIDENCE_MISMATCH"
+      ],
+      "detail_codes": [],
+      "review_flag": null,
+      "proposed": false,
+      "owner_status": "CANDIDATE"
+    },
+    {
+      "code": "TRACKING_REPORT_MISSING",
+      "rules": [
+        "PGS10-FUP-001"
+      ],
+      "control_status": "HOLD",
+      "meaning": "ไม่มีรายงานติดตาม",
+      "aliases": [],
+      "detail_codes": [],
+      "review_flag": null,
+      "proposed": false,
+      "owner_status": "CANDIDATE"
+    },
+    {
+      "code": "HISTORICAL_BALANCE_MISMATCH",
+      "rules": [
+        "PGS10-HIS-001"
+      ],
+      "control_status": "HOLD",
+      "meaning": "สภาพหนี้ ณ วันอ้างอิงบนหน้าจอ (ต้น/ดอก/รวม) ไม่ตรงหนังสือบอกกล่าว — Blocking แม้ไม่กระทบ Claim Base (DEC-07)",
+      "aliases": [],
+      "detail_codes": [],
+      "review_flag": null,
+      "proposed": false,
+      "owner_status": "CANDIDATE"
+    },
+    {
+      "code": "FORMAT_VARIANCE",
+      "rules": [
+        "PGS10-ID-001"
+      ],
+      "control_status": "PASS",
+      "meaning": "ต่างเฉพาะรูปแบบที่ไม่มีนัยเชิงความหมาย (field-specific: LG, ตัวเลขไทย/อารบิก, Leading Zero เฉพาะ field ที่ประกาศ) — เก็บ raw_value และ normalized_value; เคสเป็น PASS_WITH_OBSERVATION",
+      "aliases": [],
+      "detail_codes": [],
+      "review_flag": "FORMAT_NORMALIZED",
+      "proposed": false,
+      "owner_status": "APPROVED_BY_OWNER"
+    },
+    {
+      "code": "IDENTITY_MISMATCH",
+      "rules": [
+        "PGS10-ID-001"
+      ],
+      "control_status": "HOLD",
+      "meaning": "LG/ชื่อ/วงเงิน/วันที่ LG ไม่ตรงกันข้ามเอกสาร (ห้ามแก้เลขเอง — DEC-03)",
+      "aliases": [],
+      "detail_codes": [],
+      "review_flag": null,
+      "proposed": false,
+      "owner_status": "CANDIDATE"
+    },
+    {
+      "code": "VERIFY_REFERENCE_MAPPING",
+      "rules": [
+        "PGS10-ID-001"
+      ],
+      "control_status": "HOLD",
+      "meaning": "เลขบัญชี/สัญญาต่างที่ตัวเลขภายใน ต้องพิสูจน์ Mapping",
+      "aliases": [],
+      "detail_codes": [],
+      "review_flag": null,
+      "proposed": false,
+      "owner_status": "CANDIDATE"
+    },
+    {
+      "code": "LG_DATA_MISSING",
+      "rules": [
+        "PGS10-LG-001"
+      ],
+      "control_status": "HOLD",
+      "meaning": "ขาดข้อมูล LG",
+      "aliases": [],
+      "detail_codes": [],
+      "review_flag": null,
+      "proposed": false,
+      "owner_status": "CANDIDATE"
+    },
+    {
+      "code": "LG_FEE_NOT_CONTINUOUS",
+      "rules": [
+        "PGS10-LG-001"
+      ],
+      "control_status": "HOLD",
+      "meaning": "ชำระค่าธรรมเนียมค้ำประกันไม่ต่อเนื่อง",
+      "aliases": [],
+      "detail_codes": [],
+      "review_flag": null,
+      "proposed": false,
+      "owner_status": "CANDIDATE"
+    },
+    {
+      "code": "LG_TENOR_EXCEEDED",
+      "rules": [
+        "PGS10-LG-001"
+      ],
+      "control_status": "HOLD",
+      "meaning": "อายุ LG เกิน 10 ปี",
+      "aliases": [],
+      "detail_codes": [],
+      "review_flag": null,
+      "proposed": false,
+      "owner_status": "CANDIDATE"
+    },
+    {
+      "code": "NPL_ANCHOR_DATE_UNDEFINED",
+      "rules": [
+        "PGS10-NPL-001"
+      ],
+      "control_status": "HOLD",
+      "meaning": "ยังไม่มี Mapping ที่อนุมัติระหว่าง guarantee_effective_date กับ lg_issue_date (A-30) จึงคำนวณ NPL seasoning ไม่ได้",
+      "aliases": [],
+      "detail_codes": [],
+      "review_flag": null,
+      "proposed": true,
+      "owner_status": "PROPOSED_BY_CLAUDE"
+    },
+    {
+      "code": "NPL_DATE_MISSING",
+      "rules": [
+        "PGS10-NPL-001"
+      ],
+      "control_status": "HOLD",
+      "meaning": "ไม่มี npl_date จากข้อมูล FI (ห้าม derive จาก default_date)",
+      "aliases": [
+        "NPL_DATE_MAPPING_UNDEFINED",
+        "NPL_MAPPING_REQUIRED",
+        "HOLD_NPL_MAPPING_REQUIRED"
+      ],
+      "detail_codes": [],
+      "review_flag": null,
+      "proposed": false,
+      "owner_status": "APPROVED_BY_OWNER"
+    },
+    {
+      "code": "NPL_SEASONING_NOT_MET",
+      "rules": [
+        "PGS10-NPL-001"
+      ],
+      "control_status": "HOLD",
+      "meaning": "npl_date ยังไม่พ้นระยะ seasoning",
+      "aliases": [],
+      "detail_codes": [],
+      "review_flag": null,
+      "proposed": false,
+      "owner_status": "CANDIDATE"
+    },
+    {
+      "code": "POSTAL_ACK_INCOMPLETE",
+      "rules": [
+        "PGS10-PST-001"
+      ],
+      "control_status": "HOLD",
+      "meaning": "หลักฐานส่งสำเร็จไม่ครบ (วันที่รับ/ลายมือชื่อผู้รับ/ผู้รับแทน)",
+      "aliases": [
+        "DELIVERY_PROOF_INCOMPLETE"
+      ],
+      "detail_codes": [],
+      "review_flag": null,
+      "proposed": false,
+      "owner_status": "CANDIDATE"
+    },
+    {
+      "code": "POSTAL_ADDRESS_UNVERIFIED",
+      "rules": [
+        "PGS10-PST-001",
+        "PGS10-PST-002"
+      ],
+      "control_status": "HOLD",
+      "meaning": "ที่อยู่จัดส่งอ้างอิงกลับเอกสารใน PDF ไม่ได้",
+      "aliases": [
+        "ADDRESS_SOURCE_NOT_FOUND",
+        "HOLD_POSTAL_ADDRESS_UNVERIFIED"
+      ],
+      "detail_codes": [],
+      "review_flag": null,
+      "proposed": false,
+      "owner_status": "CANDIDATE"
+    },
+    {
+      "code": "POSTAL_EVIDENCE_MISSING",
+      "rules": [
+        "PGS10-PST-001"
+      ],
+      "control_status": "HOLD",
+      "meaning": "ใบตอบรับว่าง/ไม่มีหลักฐานส่ง/ซองตีกลับ",
+      "aliases": [],
+      "detail_codes": [],
+      "review_flag": null,
+      "proposed": false,
+      "owner_status": "CANDIDATE"
+    },
+    {
+      "code": "POSTAL_RETURN_INCOMPLETE",
+      "rules": [
+        "PGS10-PST-001"
+      ],
+      "control_status": "HOLD",
+      "meaning": "หลักฐานส่งไม่สำเร็จไม่ครบ (ซองตีกลับ/คืนผู้ฝาก)",
+      "aliases": [
+        "RETURN_PROOF_INCOMPLETE"
+      ],
+      "detail_codes": [],
+      "review_flag": null,
+      "proposed": false,
+      "owner_status": "CANDIDATE"
+    },
+    {
+      "code": "ADDRESS_DIFFERS_FROM_LATEST",
+      "rules": [
+        "PGS10-PST-002"
+      ],
+      "control_status": "HOLD",
+      "meaning": "มีหลักฐานแจ้งเปลี่ยนที่อยู่ แต่จัดส่งไม่ตรงที่อยู่ล่าสุด",
+      "aliases": [],
+      "detail_codes": [],
+      "review_flag": null,
+      "proposed": false,
+      "owner_status": "CANDIDATE"
+    },
+    {
+      "code": "ADDRESS_NOT_IN_DOCUMENTS",
+      "rules": [
+        "PGS10-PST-002"
+      ],
+      "control_status": "HOLD",
+      "meaning": "ที่อยู่จัดส่งไม่ตรงเอกสารใดและไม่มีหลักฐานแจ้งเปลี่ยน",
+      "aliases": [],
+      "detail_codes": [],
+      "review_flag": null,
+      "proposed": false,
+      "owner_status": "CANDIDATE"
+    },
+    {
+      "code": "POSTAL_LINKAGE_UNRESOLVED",
+      "rules": [
+        "PGS10-PST-003"
+      ],
+      "control_status": "HOLD",
+      "meaning": "ใบตอบรับ/ซองไม่ใช่ชิ้นเดียวกับที่ส่ง หรือพิสูจน์ไม่ได้",
+      "aliases": [
+        "POSTAL_TRACKING_MISMATCH"
+      ],
+      "detail_codes": [],
+      "review_flag": null,
+      "proposed": false,
+      "owner_status": "CANDIDATE"
+    },
+    {
+      "code": "RESTRUCTURE_PATH_UNDETERMINED",
+      "rules": [
+        "PGS10-RST-001"
+      ],
+      "control_status": "HOLD",
+      "meaning": "ยังไม่ระบุเส้นทาง Restructure (restructure_date=null ไม่ผ่านอัตโนมัติ)",
+      "aliases": [],
+      "detail_codes": [],
+      "review_flag": null,
+      "proposed": false,
+      "owner_status": "CANDIDATE"
+    },
+    {
+      "code": "RESTRUCTURE_REQUIREMENT_NOT_MET",
+      "rules": [
+        "PGS10-RST-001"
+      ],
+      "control_status": "HOLD",
+      "meaning": "เส้นทางปกติยังไม่ครบเงื่อนไข",
+      "aliases": [],
+      "detail_codes": [],
+      "review_flag": null,
+      "proposed": false,
+      "owner_status": "CANDIDATE"
+    },
+    {
+      "code": "EXCEPTION_ROUTE_NOT_CONFIGURED",
+      "rules": [
+        "PGS10-RST-002"
+      ],
+      "control_status": "HOLD",
+      "meaning": "เลือกเส้นทางยกเว้นแต่ Config ปิดอยู่",
+      "aliases": [],
+      "detail_codes": [],
+      "review_flag": null,
+      "proposed": false,
+      "owner_status": "CANDIDATE"
+    },
+    {
+      "code": "TRACKING_REPORT_NOT_CERTIFIED",
+      "rules": [
+        "PGS10-RST-002"
+      ],
+      "control_status": "HOLD",
+      "meaning": "รายงานติดตามไม่ใช่ Certified",
+      "aliases": [],
+      "detail_codes": [],
+      "review_flag": null,
+      "proposed": false,
+      "owner_status": "CANDIDATE"
+    },
+    {
+      "code": "UNCONTACTABLE_EXCEPTION_MATURED",
+      "rules": [
+        "PGS10-RST-002"
+      ],
+      "control_status": "PASS_WITH_SUPPORT",
+      "meaning": "ครบเงื่อนไขทางออก: maturity (start + 7 เดือนปฏิทิน) + Certified Tracking Report + หนังสือบอกกล่าว/บอกเลิก ≥ 1",
+      "aliases": [],
+      "detail_codes": [],
+      "review_flag": null,
+      "proposed": true,
+      "owner_status": "PROPOSED_BY_CLAUDE"
+    },
+    {
+      "code": "UNCONTACTABLE_EXCEPTION_NOT_MET",
+      "rules": [
+        "PGS10-RST-002"
+      ],
+      "control_status": "HOLD",
+      "meaning": "เส้นทางยกเว้นยังไม่ครบเงื่อนไข",
+      "aliases": [],
+      "detail_codes": [],
+      "review_flag": null,
+      "proposed": false,
+      "owner_status": "CANDIDATE"
+    },
+    {
+      "code": "MATCHED_STATEMENT_HEADER",
+      "rules": [
+        "PGS10-RST-003"
+      ],
+      "control_status": "PASS_WITH_SUPPORT",
+      "meaning": "ตรงหัว Statement (Level 2)",
+      "aliases": [],
+      "detail_codes": [],
+      "review_flag": null,
+      "proposed": false,
+      "owner_status": "CANDIDATE"
+    },
+    {
+      "code": "RESTRUCTURE_DATE_MISMATCH",
+      "rules": [
+        "PGS10-RST-003"
+      ],
+      "control_status": "HOLD",
+      "meaning": "ไม่ตรงทั้งเอกสารและหัว Statement",
+      "aliases": [],
+      "detail_codes": [],
+      "review_flag": null,
+      "proposed": false,
+      "owner_status": "CANDIDATE"
+    },
+    {
+      "code": "RESTRUCTURE_DATE_SEMANTICS_UNRESOLVED",
+      "rules": [
+        "PGS10-RST-003"
+      ],
+      "control_status": "HOLD",
+      "meaning": "ความหมายของวันที่ (ลงนาม/อนุมัติ/มีผล/เริ่มบัญชี) ยังไม่ถูกแยก ต้องตรวจหัว Statement",
+      "aliases": [
+        "CHECK_STATEMENT_HEADER",
+        "HOLD_RESTRUCTURE_DATE_SEMANTICS"
+      ],
+      "detail_codes": [],
+      "review_flag": null,
+      "proposed": false,
+      "owner_status": "CANDIDATE"
+    },
+    {
+      "code": "RESTRUCTURE_EVIDENCE_MISSING",
+      "rules": [
+        "PGS10-RST-003"
+      ],
+      "control_status": "HOLD",
+      "meaning": "ไม่มีเอกสารปรับโครงสร้าง/หัว Statement",
+      "aliases": [],
+      "detail_codes": [],
+      "review_flag": null,
+      "proposed": false,
+      "owner_status": "CANDIDATE"
+    },
+    {
+      "code": "NO_PAYMENT_FOUND",
+      "rules": [
+        "PGS10-STM-001"
+      ],
+      "control_status": "HOLD",
+      "meaning": "ไม่พบรายการรับชำระจริงใน Statement — ไม่ใช่ format normalization จึงไม่ Auto-pass ต้องให้ผู้ตรวจยืนยัน",
+      "aliases": [],
+      "detail_codes": [],
+      "review_flag": null,
+      "proposed": false,
+      "owner_status": "CANDIDATE"
+    },
+    {
+      "code": "UNKNOWN_TRANSACTION_NEAR_DEFAULT",
+      "rules": [
+        "PGS10-STM-001"
+      ],
+      "control_status": "HOLD",
+      "meaning": "มีรายการ UNKNOWN ที่อาจเป็นเงินรับจริง ไม่เดา",
+      "aliases": [],
+      "detail_codes": [],
+      "review_flag": null,
+      "proposed": false,
+      "owner_status": "CANDIDATE"
+    },
+    {
+      "code": "PAYMENT_AFTER_STATEMENT_CUTOFF",
+      "rules": [
+        "PGS10-STM-002"
+      ],
+      "control_status": "HOLD",
+      "meaning": "มีการชำระหลัง Statement cut-off และยังไม่มี Statement ใหม่ (Regression 66-044366)",
+      "aliases": [],
+      "detail_codes": [],
+      "review_flag": null,
+      "proposed": false,
+      "owner_status": "CANDIDATE"
+    },
+    {
+      "code": "TIMELINE_CONFLICT",
+      "rules": [
+        "PGS10-TIME-001"
+      ],
+      "control_status": "HOLD",
+      "meaning": "ลำดับเหตุการณ์ขัดกัน",
+      "aliases": [],
+      "detail_codes": [],
+      "review_flag": null,
+      "proposed": false,
+      "owner_status": "CANDIDATE"
+    },
+    {
+      "code": "STATEMENT_MISSING",
+      "rules": [
+        "PGS10-TXN-001",
+        "PGS10-STM-001"
+      ],
+      "control_status": "NOT_TESTABLE",
+      "meaning": "ไม่มี Statement",
+      "aliases": [],
+      "detail_codes": [],
+      "review_flag": null,
+      "proposed": false,
+      "owner_status": "CANDIDATE"
+    },
+    {
+      "code": "TRANSACTION_CODE_UNMAPPED",
+      "rules": [
+        "PGS10-TXN-001"
+      ],
+      "control_status": "HOLD",
+      "meaning": "Transaction code ที่อาจกระทบ Last Payment/Principal ไม่มี Mapping ที่อนุมัติ (DEC-02)",
+      "aliases": [
+        "HOLD_TRANSACTION_CODE_UNMAPPED"
+      ],
+      "detail_codes": [],
+      "review_flag": null,
+      "proposed": false,
+      "owner_status": "APPROVED_BY_OWNER"
+    },
+    {
+      "code": "CONFIRMATION_LETTER_VISUALLY_INCOMPLETE",
+      "rules": [
+        "PGS10-VIS-001",
+        "PGS10-DEF-002"
+      ],
+      "control_status": "HOLD",
+      "meaning": "หนังสือยืนยันการชำระหลังผิดนัดไม่สมบูรณ์ทางภาพ",
+      "aliases": [],
+      "detail_codes": [],
+      "review_flag": null,
+      "proposed": false,
+      "owner_status": "CANDIDATE"
+    },
+    {
+      "code": "VISUAL_RECHECK_REQUIRED",
+      "rules": [
+        "PGS10-VIS-001",
+        "PGS10-VIS-002"
+      ],
+      "control_status": "NOT_TESTABLE",
+      "meaning": "ยังไม่มีภาพต้นฉบับให้ตรวจ/Render ใหม่ตามกฎ Visual Completeness",
+      "aliases": [
+        "VISUAL_CHECK_PENDING"
+      ],
+      "detail_codes": [],
+      "review_flag": null,
+      "proposed": false,
+      "owner_status": "CANDIDATE"
+    },
+    {
+      "code": "DOCUMENT_VISUALLY_INCOMPLETE",
+      "rules": [
+        "PGS10-VIS-002"
+      ],
+      "control_status": "HOLD",
+      "meaning": "Critical Document อื่นไม่ครบในภาพจริง",
+      "aliases": [],
+      "detail_codes": [],
+      "review_flag": null,
+      "proposed": false,
+      "owner_status": "CANDIDATE"
+    }
+  ],
+  "alias_index_rules": {
+    "PGS10-POL-001@v1.1.0": "PGS10-ELIG-001",
+    "PGS10-POL-002@v1.1.0": "PGS10-LG-001",
+    "PGS10-POL-003@v1.1.0": "PGS10-ELIG-001",
+    "PGS10-NPL-001@v1.1.0": "PGS10-NPL-001",
+    "PGS10-NPL-002@v1.1.0": "PGS10-NPL-001",
+    "PGS10-RST-001@v1.1.0": "PGS10-RST-001",
+    "PGS10-RST-002@v1.1.0": "PGS10-RST-002",
+    "PGS10-DMD-POL-001@v1.1.0": "PGS10-DMD-001",
+    "PGS10-DMD-POL-002@v1.1.0": "PGS10-DMD-003",
+    "PGS10-CLM-POL-001@v1.1.0": "PGS10-CLM-001",
+    "PGS10-COV-001@v1.1.0": "PGS10-CLM-002",
+    "PGS10-CLM-POL-002@v1.1.0": "PGS10-CLM-003",
+    "PGS10-CLM-POL-003@v1.1.0": "PGS10-CLM-004",
+    "PGS10-CAP-001@v1.1.0": "PGS10-CAP-001",
+    "PGS10-ID-001@v1.1.0": "PGS10-ID-001",
+    "PGS10-DOC-001@v1.1.0": "PGS10-DOC-001",
+    "PGS10-CON-001@v1.1.0": "PGS10-CONTRACT-001",
+    "PGS10-STM-001@v1.1.0": "PGS10-TXN-001",
+    "PGS10-STM-002@v1.1.0": "PGS10-STM-001",
+    "PGS10-DEF-001@v1.1.0": "PGS10-DEF-001",
+    "PGS10-DEF-002@v1.1.0": "PGS10-DEF-002",
+    "PGS10-VIS-001@v1.1.0": "PGS10-VIS-001",
+    "PGS10-FUP-001@v1.1.0": "PGS10-FUP-001",
+    "PGS10-RST-OP-001@v1.1.0": "PGS10-RST-003",
+    "PGS10-RST-OP-002@v1.1.0": "PGS10-RST-002",
+    "PGS10-DMD-001@v1.1.0": "PGS10-DMD-001",
+    "PGS10-DMD-002@v1.1.0": "PGS10-DMD-002",
+    "PGS10-HIS-001@v1.1.0": "PGS10-HIS-001",
+    "PGS10-PST-001@v1.1.0": "PGS10-PST-001",
+    "PGS10-PST-002@v1.1.0": "PGS10-PST-001",
+    "PGS10-PST-003@v1.1.0": "PGS10-PST-002",
+    "PGS10-PST-004@v1.1.0": "PGS10-PST-003",
+    "PGS10-CUR-001@v1.1.0": "PGS10-CUR-001",
+    "PGS10-CUR-002@v1.1.0": "PGS10-CUR-002",
+    "PGS10-CLM-001@v1.1.0": "PGS10-CLM-003",
+    "PGS10-CLM-002@v1.1.0": "PGS10-CLM-002",
+    "PGS10-CLM-003@v1.1.0": "PGS10-CLM-004",
+    "PGS10-CAP-OP-001@v1.1.0": "PGS10-CAP-001",
+    "PGS10-TIME-001@v1.1.0": "PGS10-TIME-001",
+    "PGS10-VIS-002@v1.1.0": "PGS10-VIS-002",
+    "PGS10-STM-001@draft1.0": "PGS10-TXN-001 + PGS10-STM-001",
+    "PGS10-VIS-001@draft1.0": "PGS10-VIS-001 + PGS10-VIS-002",
+    "PGS10-CUR-001@draft1.0": "PGS10-CUR-001 + PGS10-CUR-002",
+    "PGS10-PST-001@draft1.0": "PGS10-PST-001 + PGS10-PST-003"
+  },
+  "alias_index_reasons": {
+    "ADDRESS_SOURCE_NOT_FOUND": "POSTAL_ADDRESS_UNVERIFIED",
+    "ASOF_DEMAND_PRINCIPAL_REQUIRED": "DEMAND_PRINCIPAL_AS_OF_DATE_UNVERIFIED",
+    "CAP_ARITHMETIC_MISMATCH": "CLAIM_MAX_ARITHMETIC_MISMATCH",
+    "CHECK_STATEMENT_HEADER": "RESTRUCTURE_DATE_SEMANTICS_UNRESOLVED",
+    "CLAIM_AMOUNT_MISMATCH": "CLAIM_CALCULATION_MISMATCH",
+    "CONFIRMATION_IDENTIFIER_UNLINKED": "IDENTIFIER_LINKAGE_UNRESOLVED",
+    "DELIVERY_PROOF_INCOMPLETE": "POSTAL_ACK_INCOMPLETE",
+    "DEMAND_PRINCIPAL_UNRECONCILED": "DEMAND_PRINCIPAL_AS_OF_DATE_UNVERIFIED",
+    "DOCUMENT_PAGE_SEQUENCE_GAP": "APPROVAL_DOCUMENT_INCOMPLETE",
+    "DOCUMENT_PAGE_UNREADABLE": "APPROVAL_DOCUMENT_INCOMPLETE",
+    "DOCUMENT_TRUNCATED": "APPROVAL_DOCUMENT_INCOMPLETE",
+    "ELIGIBILITY_HIRE_PURCHASE_LEASING": "ELIGIBILITY_PROHIBITED_CREDIT_TYPE",
+    "EXCEPTION_LETTER_MISSING": "POST_DEFAULT_SUPPORT_MISSING",
+    "HOLD_CLAIM_MAX_ARITHMETIC": "CLAIM_MAX_ARITHMETIC_MISMATCH",
+    "HOLD_CONTRACT_DATE_MISMATCH": "CONTRACT_DATE_MISMATCH",
+    "HOLD_DEMAND_PRINCIPAL_UNRECONCILED": "DEMAND_PRINCIPAL_AS_OF_DATE_UNVERIFIED",
+    "HOLD_NPL_MAPPING_REQUIRED": "NPL_DATE_MISSING",
+    "HOLD_PACKAGE_DEFINITION_REQUIRED": "PACKAGE_DEFINITION_REQUIRED",
+    "HOLD_POSTAL_ADDRESS_UNVERIFIED": "POSTAL_ADDRESS_UNVERIFIED",
+    "HOLD_POST_DEFAULT_SUPPORT_MISSING": "POST_DEFAULT_SUPPORT_MISSING",
+    "HOLD_RESTRUCTURE_DATE_SEMANTICS": "RESTRUCTURE_DATE_SEMANTICS_UNRESOLVED",
+    "HOLD_TRACKING_EVIDENCE_MISMATCH": "TRACKING_EVIDENCE_MISMATCH",
+    "HOLD_TRANSACTION_CODE_UNMAPPED": "TRANSACTION_CODE_UNMAPPED",
+    "NPL_DATE_MAPPING_UNDEFINED": "NPL_DATE_MISSING",
+    "NPL_MAPPING_REQUIRED": "NPL_DATE_MISSING",
+    "PAID_PENDING_MISSING": "PACKAGE_DEFINITION_REQUIRED",
+    "POSTAL_TRACKING_MISMATCH": "POSTAL_LINKAGE_UNRESOLVED",
+    "RETURN_PROOF_INCOMPLETE": "POSTAL_RETURN_INCOMPLETE",
+    "ROUNDING_TOLERANCE_NOT_APPROVED": "NUMERIC_VARIANCE",
+    "RULE_CONFLICT_UNRESOLVED": "RULE_VERSION_CONFLICT",
+    "TRACKING_DATE_MISMATCH": "TRACKING_EVIDENCE_MISMATCH",
+    "VARIANCE_PENDING_TOLERANCE_APPROVAL": "NUMERIC_VARIANCE",
+    "VISUAL_CHECK_PENDING": "VISUAL_RECHECK_REQUIRED"
+  },
+  "retired_names": {
+    "HOLD_DATA_MISMATCH": "สถานะเดิมของ R§26 — ใช้ HOLD + reason_code *_MISMATCH",
+    "HOLD_MISSING_DOCUMENT": "สถานะเดิมของ R§26 — ใช้ HOLD + reason_code *_MISSING",
+    "HOLD_INCOMPLETE_DOCUMENT": "สถานะเดิมของ R§26 — ใช้ HOLD + reason_code *_INCOMPLETE",
+    "HOLD_NEED_CLARIFICATION": "สถานะเดิมของ R§26 — ใช้ HOLD + reason_code เฉพาะ",
+    "FAIL_ELIGIBILITY": "สถานะเดิมของ R§26 — ใช้ FAIL + reason_code ELIGIBILITY_*",
+    "PASS_WITH_DOCUMENTARY_SUPPORT": "ชื่อเดิมของ R§26 → PASS_WITH_SUPPORT",
+    "OBSERVATION_CANDIDATE (control_status)": "ย้ายเป็น review_flag (DEC-09)",
+    "FORMAT_VARIANCE as control_status OBSERVATION": "DEC-15: ปัจจุบัน control_status=PASS + review_flag=FORMAT_NORMALIZED"
+  },
+  "same_id_different_meaning_hazards": [
+    {
+      "legacy_id": "PGS10-STM-001@v1.1.0",
+      "legacy_meaning": "Bank-specific transaction mapping",
+      "same_string_now_means": "Last Actual Payment",
+      "maps_to": "PGS10-TXN-001"
+    },
+    {
+      "legacy_id": "PGS10-STM-002@v1.1.0",
+      "legacy_meaning": "Last Actual Payment",
+      "same_string_now_means": "Statement Cut-off vs Later Payments",
+      "maps_to": "PGS10-STM-001"
+    },
+    {
+      "legacy_id": "PGS10-PST-002@v1.1.0",
+      "legacy_meaning": "Postal returned-mail branch",
+      "same_string_now_means": "Address Match",
+      "maps_to": "PGS10-PST-001"
+    },
+    {
+      "legacy_id": "PGS10-PST-003@v1.1.0",
+      "legacy_meaning": "Address source set",
+      "same_string_now_means": "Postal Linkage",
+      "maps_to": "PGS10-PST-002"
+    },
+    {
+      "legacy_id": "PGS10-CLM-001@v1.1.0",
+      "legacy_meaning": "Claim base",
+      "same_string_now_means": "Claim Filing Window",
+      "maps_to": "PGS10-CLM-003"
+    },
+    {
+      "legacy_id": "PGS10-CLM-003@v1.1.0",
+      "legacy_meaning": "Recalculation",
+      "same_string_now_means": "Claim Base",
+      "maps_to": "PGS10-CLM-004"
+    },
+    {
+      "legacy_id": "PGS10-STM-001@draft1.0",
+      "legacy_meaning": "D รวม classification + last payment",
+      "same_string_now_means": "Last Actual Payment",
+      "maps_to": "PGS10-TXN-001 + PGS10-STM-001"
+    },
+    {
+      "legacy_id": "PGS10-VIS-001@draft1.0",
+      "legacy_meaning": "D รวมเอกสาร Critical ทุกชนิด",
+      "same_string_now_means": "Confirmation Letter Visual Completeness",
+      "maps_to": "PGS10-VIS-001 + PGS10-VIS-002"
+    },
+    {
+      "legacy_id": "PGS10-CUR-001@draft1.0",
+      "legacy_meaning": "D รวม principal + interest/total",
+      "same_string_now_means": "Current Principal",
+      "maps_to": "PGS10-CUR-001 + PGS10-CUR-002"
+    },
+    {
+      "legacy_id": "PGS10-PST-001@draft1.0",
+      "legacy_meaning": "D รวม linkage ไว้ใน PST-001",
+      "same_string_now_means": "Postal Delivery Evidence",
+      "maps_to": "PGS10-PST-001 + PGS10-PST-003"
+    }
+  ],
+  "generic_reason_codes": [
+    "RULE_VERSION_CONFLICT",
+    "MISSING_INPUT",
+    "INVALID_INPUT",
+    "POLICY_PARAMETER_UNRESOLVED"
+  ]
+}

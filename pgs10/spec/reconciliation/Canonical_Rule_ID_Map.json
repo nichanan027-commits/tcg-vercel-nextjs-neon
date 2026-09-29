@@ -1,6 +1,6 @@
 {
   "meta": {
-    "spec_version": "1.2.0-RECONCILIATION",
+    "spec_version": "1.2.0-RECONCILIATION-r2",
     "frozen": false,
     "status": "RECONCILIATION_DRAFT — ไม่ใช่ Spec Candidate และไม่ใช่การ Freeze",
     "decision_baseline": "DEC-01..DEC-14 (Rule_Reconciliation_Report §2)",
@@ -268,7 +268,7 @@
       "name": "Restructure Requirement / Route",
       "kind": "POLICY",
       "requirement": "CONDITIONAL",
-      "applicable_when": "Small Biz/Start up ภายใน 5 ปีแรกของ LG (เงื่อนไข (ค))",
+      "applicable_when": "path ที่มีเงื่อนไข (ค): SMEs ≤ 5 ปี และ Small Biz ≤ 5 ปี. Start up → NOT_APPLICABLE (DEC-24)",
       "upstream": "M§4.2, M§5, M§6",
       "id_origin": "M§41/R",
       "legacy_aliases": [
@@ -284,7 +284,7 @@
       "name": "Uncontactable / Unable-to-agree Exception",
       "kind": "POLICY",
       "requirement": "CONDITIONAL",
-      "applicable_when": "route = UNCONTACTABLE_EXCEPTION_PATH",
+      "applicable_when": "route=UNCONTACTABLE_EXCEPTION_PATH (ใช้ได้เฉพาะ path ที่มี (ค) = กรณี 1 และ 3 — DEC-20)",
       "upstream": "M§5, R§32",
       "id_origin": "M§41/R",
       "legacy_aliases": [
@@ -574,7 +574,7 @@
       "name": "CLAIM MAX / Package Capacity",
       "kind": "POLICY",
       "requirement": "REQUIRED_HARD",
-      "applicable_when": "เสมอ (เสนอ — ขอยืนยัน)",
+      "applicable_when": "FINAL_APPROVAL (PRE_REVIEW: NOT_TESTABLE ได้และไม่กระทบเคส)",
       "upstream": "R#21, M§30-32",
       "id_origin": "M§41/R",
       "legacy_aliases": [
