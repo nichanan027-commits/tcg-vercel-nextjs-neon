@@ -40,7 +40,11 @@ assert.match(html, /tower:\['monitor','queue','risk-map','fa-center','promptcure
 assert.match(html, /fa:\['intake','interruption','debt-plan','income-plan','cases'\]/,
   'F.A. Center must keep 5 routes');
 
+// the root serves the full system; the 90-second walkthrough keeps its own path
 const config = JSON.parse(fs.readFileSync(vercel, 'utf8'));
-assert.deepEqual(config.rewrites, [{ source: '/', destination: '/competition-final-v3.html' }]);
+assert.deepEqual(config.rewrites, [
+  { source: '/', destination: '/index.html' },
+  { source: '/demo', destination: '/competition-final-v3.html' }
+]);
 
 console.log('PASS: competition risk/reference contract');

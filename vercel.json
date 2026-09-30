@@ -1,3 +1,6 @@
 {
-  "rewrites": [{ "source": "/", "destination": "/competition-final-v3.html" }]
+  "rewrites": [
+    { "source": "/", "destination": "/index.html" },
+    { "source": "/demo", "destination": "/competition-final-v3.html" }
+  ]
 }
