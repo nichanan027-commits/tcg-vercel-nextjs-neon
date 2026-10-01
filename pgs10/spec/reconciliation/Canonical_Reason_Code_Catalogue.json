@@ -1,6 +1,6 @@
 {
   "meta": {
-    "spec_version": "1.2.0-RECONCILIATION-r3",
+    "spec_version": "1.2.0-RECONCILIATION-r4",
     "frozen": false,
     "status": "RECONCILIATION_DRAFT — ไม่ใช่ Spec Candidate และไม่ใช่การ Freeze",
     "decision_baseline": "DEC-01..DEC-14 (Rule_Reconciliation_Report §2)",
@@ -158,8 +158,8 @@
       ],
       "detail_codes": [],
       "review_flag": null,
-      "proposed": true,
-      "owner_status": "PROPOSED_BY_CLAUDE"
+      "proposed": false,
+      "owner_status": "APPROVED_BY_OWNER"
     },
     {
       "code": "CLAIM_FILING_WINDOW_EXPIRED",
@@ -171,8 +171,8 @@
       "aliases": [],
       "detail_codes": [],
       "review_flag": null,
-      "proposed": true,
-      "owner_status": "PROPOSED_BY_CLAUDE",
+      "proposed": false,
+      "owner_status": "APPROVED_BY_OWNER",
       "policy_disqualifying": true,
       "remediable_by_document": false,
       "requires_evidence_verified": true

@@ -1,10 +1,10 @@
 # Conflict Register
 
-**เวอร์ชัน:** 1.2.0-RECONCILIATION-r3 · ต่อยอดจากภาคผนวก A ของ `02_PGS10_OPERATIONAL_AUDIT_RULES.md` (A-01…A-28) + รายการใหม่จาก Pack v1.1.0 และคำตัดสิน (A-29…A-46)
+**เวอร์ชัน:** 1.2.0-RECONCILIATION-r4 · ต่อยอดจากภาคผนวก A ของ `02_PGS10_OPERATIONAL_AUDIT_RULES.md` (A-01…A-28) + รายการใหม่จาก Pack v1.1.0 และคำตัดสิน (A-29…A-46)
 
 สถานะ: `RESOLVED` ปิดแล้วด้วย DEC · `RESOLVED_PENDING_SOURCE_EDIT` ตัดสินแล้วแต่เอกสารต้นทางต้องแก้ · `PARTIAL` ปิดบางส่วน · `OPEN` ยังไม่ตัดสิน
 
-สรุป: RESOLVED 29, RESOLVED_PENDING_SOURCE_EDIT 1, PARTIAL 5, OPEN 11 · **ขวาง Freeze 0** รายการ
+สรุป: RESOLVED 30, RESOLVED_PENDING_SOURCE_EDIT 1, PARTIAL 5, OPEN 10 · **ขวาง Freeze 0** รายการ
 
 | ID | ประเด็น | ประเภท | แหล่ง | สถานะ | DEC | ผลที่ใช้ตอนนี้ | ขวาง Freeze? |
 |---|---|---|---|---|---|---|---|
@@ -50,22 +50,19 @@
 | A-40 | NO_PAYMENT_FOUND ต้องแยก 'พิสูจน์ว่าไม่เคยชำระ' กับ 'Statement ไม่ครบ' | CONSEQUENCE | D STM-001 vs DEC-15 | RESOLVED | DEC-34 | payment_history_status: NO_PAYMENT_VERIFIED (PASS) / INCOMPLETE (HOLD PAYMENT_HISTORY_INCOMPLETE). ส่วน Default chronology เมื่อไม่เคยชำระ → A-45 | — |
 | A-41 | CAP-001 ขึ้นกับ Stage | CONSEQUENCE | DEC-17 | RESOLVED | DEC-17 | เพิ่ม input `review_stage` (PRE_REVIEW \| FINAL_APPROVAL); requirement_by_stage | — |
 | A-42 | การจับคู่ 'กรณี 1–5' ของหน้า 7 กับ claim path | AMBIGUOUS | DEC-20, DEC-24 | RESOLVED | DEC-32 | Case 1/3/5 ยืนยันแล้ว (DEC-32); Small Biz >5 ปี รวม (ข) | — |
-| A-43 | Safe-Hold แบบ 'invariance' ข้าม candidate (Demand waiting reference, date arithmetic) — เลิกใช้กับ Coverage | DESIGN | DEC-22, DEC-28 | OPEN | DEC-28 | ยังใช้กับ PRM-021/028 เท่านั้น (ผ่านต่อเมื่อผลเหมือนกันทุก candidate/convention) ไม่เช่นนั้น HOLD — การออกแบบของผม ขอยืนยัน | — |
-| A-44 | Band ≤5/>5 ปี ของ Case 1–4 (claim path) นับจากอะไร — ต่างจาก Coverage (contractual tenor) | AMBIGUOUS | M§3.1 vs DEC-30 | OPEN | DEC-30 | สมมติ: เวลายื่นเทียบวันออก LG (PRM-054, ASSUMPTION) — Q-08. Safe-Hold: ข้อมูลไม่ครบ → HOLD LG_DATA_MISSING | — |
-| A-45 | Default chronology เมื่อ NO_PAYMENT_VERIFIED ต้องใช้ alternative evidence (due-date/FI) — ยังไม่มี Rule อนุมัติ | AMBIGUOUS | DEC-34 | OPEN | DEC-34 | Safe-Hold: DEF-001 = HOLD POLICY_PARAMETER_UNRESOLVED (PRM-055) — Q-09 | — |
-| A-46 | Coverage tenor ของ LG ที่ถูกต่ออายุ/ขยาย | AMBIGUOUS | DEC-30, LG-001 | OPEN | DEC-30 | Safe-Hold: LG ต่ออายุและไม่มี guarantee_term ที่ระบุ → HOLD LG_TENOR_UNDETERMINABLE — Q-10 | — |
+| A-43 | Safe-Hold แบบ 'invariance' ข้าม candidate (Demand waiting reference, date arithmetic) — เลิกใช้กับ Coverage | DESIGN | DEC-22, DEC-28 | OPEN | DEC-43 | ยืนยันโดยเจ้าของ (DEC-43): คง invariance Safe-Hold เฉพาะ PRM-021/PRM-028 (demand-waiting, date arithmetic) | — |
+| A-44 | Band ≤5/>5 ปี ของ Case 1–4 (claim path) นับจากอะไร — ต่างจาก Coverage (contractual tenor) | AMBIGUOUS | M§3.1 vs DEC-30 | RESOLVED | DEC-39 | ยืนยัน (DEC-39): band นับจากวันที่ยื่นเทียบวันออก LG; PRM-054 = APPROVED_OPERATIONAL. ข้อมูลไม่ครบ → HOLD LG_DATA_MISSING | — |
+| A-45 | Default chronology เมื่อ NO_PAYMENT_VERIFIED ต้องใช้ alternative evidence (due-date/FI) — ยังไม่มี Rule อนุมัติ | AMBIGUOUS | DEC-34 | OPEN | DEC-34, DEC-40 | Safe-Hold ยืนยันโดยเจ้าของ (DEC-40): DEF-001 = HOLD POLICY_PARAMETER_UNRESOLVED จนกว่าจะมี alternative evidence rule (PRM-055) — Q-09 | — |
+| A-46 | Coverage tenor ของ LG ที่ถูกต่ออายุ/ขยาย | AMBIGUOUS | DEC-30, LG-001 | OPEN | DEC-30, DEC-41 | Safe-Hold ยืนยันโดยเจ้าของ (DEC-41): LG ต่ออายุและไม่มี guarantee_term ที่ระบุ → HOLD LG_TENOR_UNDETERMINABLE — Q-10 | — |
 
 ## คำถาม
 
-ตอบแล้ว: Q-01 → DEC-15, Q-02 → DEC-16, Q-03 → DEC-17, Q-04 → DEC-18, Q-05 → DEC-31, Q-06 → DEC-32, Q-07 → DEC-33
+ตอบแล้ว: Q-01 → DEC-15, Q-02 → DEC-16, Q-03 → DEC-17, Q-04 → DEC-18, Q-05 → DEC-31, Q-06 → DEC-32, Q-07 → DEC-33, Q-08 → DEC-39, Q-09 → DEC-40, Q-10 → DEC-41
 
 คำถามใหม่จากรอบ r2 (ไม่ขวาง Freeze):
 
 | ID | คำถาม | ข้อเสนอ |
 |---|---|---|
-| Q-08 | Band ≤5/>5 ปีของ Case 1–4 (claim path) นับจากวันที่ยื่นเทียบวันออก LG ใช่หรือไม่ (ต่างจาก Coverage ที่ใช้ contractual tenor)? | สมมติเช่นนั้น (PRM-054) — Safe-Hold: ข้อมูลไม่ครบ → HOLD |
-| Q-09 | Default chronology เมื่อพิสูจน์แล้วว่าไม่เคยชำระ: alternative evidence rule (due-date / FI evidence) ที่อนุมัติคืออะไร? | ตอนนี้ DEF-001 = HOLD (POLICY_PARAMETER_UNRESOLVED) |
-| Q-10 | Coverage tenor ของ LG ที่ถูกต่ออายุ/ขยาย ใช้ term เดิม, term รวม หรือ term ของ LG ฉบับปัจจุบัน? | ตอนนี้ต่ออายุและไม่มี guarantee_term ระบุ → HOLD LG_TENOR_UNDETERMINABLE |
 
 ## ต้องแก้ในเอกสารต้นทาง (Master Audit / Rulebook)
 

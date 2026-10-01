@@ -1,6 +1,6 @@
 # Proposed Changes for v1.2.0 (r2 — Candidate สร้างแล้วที่ `pgs10/spec/v1.2.0-candidate/` ส่วน Engine ยังไม่แก้)
 
-**เวอร์ชัน:** 1.2.0-RECONCILIATION-r3 · **ไม่ใช่ Spec Candidate** · ไม่มีการแก้ไฟล์ Spec/Engine/Tests · รอ Review ของ Reconciliation ก่อน
+**เวอร์ชัน:** 1.2.0-RECONCILIATION-r4 · **ไม่ใช่ Spec Candidate** · ไม่มีการแก้ไฟล์ Spec/Engine/Tests · รอ Review ของ Reconciliation ก่อน
 
 ## 0. ฐานของ v1.2.0
 

@@ -1,9 +1,9 @@
-# PGS 10 Spec Candidate v1.2.0-candidate.2 — NOT FROZEN
+# PGS 10 Spec Candidate v1.2.0-candidate.3 — NOT FROZEN
 
-**สถานะ: READY FOR FINAL FREEZE GATE REVIEW — ยังไม่ FROZEN** (Freeze Gate 6/6 ผ่าน, ไม่มี freeze blocker; ต้องผ่านการ review ของเจ้าของก่อนจึงประกาศ FROZEN และก่อนแตะ `engine.js`)
+**สถานะ: READY FOR FINAL FREEZE GATE REVIEW — ยังไม่ FROZEN** (Freeze Gate 6/6 ผ่าน, ไม่มี freeze blocker; ข้อตีความ Q-08…Q-10 และรหัสใหม่ที่ Claude เสนอ เจ้าของยืนยันแล้ว; ต้องมีคำสั่งประกาศ FROZEN อย่างชัดเจนก่อนแตะ `engine.js`)
 
 **สถานะ:** Spec Candidate เพื่อ Freeze Gate Review · **ห้ามแก้ Rule Engine (`pgs10/engine.js`) และห้ามประกาศ Freeze** จนกว่าจะผ่าน Freeze Gate
-**ที่มา:** Reconciliation r2 (DEC-01…DEC-28, ตอบ Q-01…Q-04 แล้ว) + Deployment Pack v1.1.0 + Spec ร่าง v1.0
+**ที่มา:** Reconciliation r4 (DEC-01…DEC-43, ตอบ Q-01…Q-10 แล้ว) + Deployment Pack v1.1.0 + Spec ร่าง v1.0
 
 ## ไฟล์
 | ไฟล์ | เนื้อหา |
@@ -32,23 +32,24 @@
 - `PRM-028` Calendar arithmetic convention — OPEN → POLICY_PARAMETER_UNRESOLVED
 - `PRM-038` Critical documents requiring visual review — OPEN → DOCUMENT_VISUALLY_INCOMPLETE
 - `PRM-042` UNKNOWN transaction proximity — OPEN → UNKNOWN_TRANSACTION_NEAR_DEFAULT
-- `PRM-054` claim_path age band reference — ASSUMPTION → LG_DATA_MISSING
 - `PRM-055` Default-date alternative evidence when NO_PAYMENT_VERIFIED — OPEN → POLICY_PARAMETER_UNRESOLVED
 
-## สิ่งที่ผมตีความเอง (ขอยืนยัน — ไม่ขวาง Freeze)
-- **A-44 / Q-08** band ≤5/>5 ปีของ Case 1–4 (claim path) นับจากวันที่ยื่นเทียบวันออก LG (PRM-054, ASSUMPTION) — ต่างจาก Coverage ที่ใช้ contractual tenor; Safe-Hold: ข้อมูลไม่ครบ → HOLD
-- **A-45 / Q-09** Default chronology เมื่อ NO_PAYMENT_VERIFIED: alternative evidence rule (due-date/FI) ยังไม่อนุมัติ → DEF-001 = HOLD (POLICY_PARAMETER_UNRESOLVED, PRM-055)
-- **A-46 / Q-10** Coverage tenor ของ LG ที่ถูกต่ออายุ/ขยาย: ไม่มี guarantee_term ระบุ → HOLD `LG_TENOR_UNDETERMINABLE`
-- **A-43** Safe-Hold แบบ 'ผลต้องเท่ากันทุก candidate' ยังใช้กับ Demand waiting reference และ date arithmetic (PRM-021/028) — การออกแบบของผม
-- Claim window: `CLAIM_FILING_NOT_YET_OPEN` (HOLD) และ `CLAIM_FILING_WINDOW_EXPIRED` (FAIL) เป็นรหัสที่ผมตั้งจากหลักการ DEC-31 (ยังไม่อนุมัติ); 'หมดสิทธิแต่วันที่ยังไม่ verify' ไม่มีรหัสเฉพาะ จึงไม่มี Test ยืนยัน
-- รหัสใหม่ที่ผมเสนอ (ยังไม่ผ่านการอนุมัติ): `CLAIM_FILING_NOT_YET_OPEN`, `CLAIM_FILING_WINDOW_EXPIRED`
+## ข้อตีความที่เจ้าของยืนยันแล้ว (DEC-39…DEC-43)
+- **Q-08 / A-44** band ≤5/>5 ปีของ Case 1–4 นับจากวันที่ยื่นเทียบวันออก LG — PRM-054 = `APPROVED_OPERATIONAL`; ข้อมูลไม่ครบ → HOLD `LG_DATA_MISSING` (A-44 RESOLVED)
+- **Q-09 / A-45** NO_PAYMENT_VERIFIED → DEF-001 = HOLD `POLICY_PARAMETER_UNRESOLVED` เป็น Safe-Hold ที่ยืนยันแล้ว **จนกว่าจะมี alternative evidence rule** (PRM-055 ยัง OPEN — เจ้าของยังไม่ได้กำหนด rule)
+- **Q-10 / A-46** LG ต่ออายุ/ขยายและไม่มี guarantee_term ระบุ → HOLD `LG_TENOR_UNDETERMINABLE` เป็น Safe-Hold ที่ยืนยันแล้ว จนกว่าจะมี rule
+- **A-43** invariance Safe-Hold คงไว้เฉพาะ demand-waiting reference และ date arithmetic (PRM-021/028)
+- Claim window: `CLAIM_FILING_NOT_YET_OPEN` (HOLD) และ `CLAIM_FILING_WINDOW_EXPIRED` (FAIL) **อนุมัติแล้ว**; 'หมดสิทธิแต่วันที่ยังไม่ verify' ไม่มีรหัสเฉพาะและไม่มี Test (ใช้ HOLD ทั่วไปของ CLM-001)
+- รหัสที่ยัง PROPOSED_BY_CLAUDE: ไม่มี
+
+หมายเหตุ: Q-09 และ Q-10 ที่ยืนยันคือ *พฤติกรรม Safe-Hold ปัจจุบัน* ไม่ใช่การกำหนด rule ใหม่ จึงยังเป็น OPEN ที่มี Safe-Hold (ไม่ขวาง Freeze)
 
 ## หลักฐานที่ผมตรวจเองไม่ได้ (owner-verified)
 หลักเกณฑ์ PGS 10 ฉบับทางการ (หน้า 7 และตาราง Coverage), Statement Thai Credit (remark + พฤติกรรม ledger ของ 6619/6656/6920/6922/6931), รายงานติดตามของเคส 66-037410 — ผู้ใช้ยืนยันว่า verify จากไฟล์โครงการแล้ว (หน้า 5, 7; Statement remark/ledger; รายงานติดตาม + Statement ของ 66037410) — ผมไม่ได้ตรวจไฟล์ต้นฉบับเอง จึงบันทึกเป็น `owner-verified` (ไม่ใช่ independently verified); เติม doc/page ก่อน Production
 
 ## Freeze Gate (สถานะล่าสุด — รัน `node check_freeze_gate.js` เพื่อยืนยันซ้ำ)
 ```
-PGS10 1.2.0-candidate.2 — Freeze Gate  (frozen=false)
+PGS10 1.2.0-candidate.3 — Freeze Gate  (frozen=false)
 
 [PASS] 1. Canonical IDs resolve 100%
       32 canonical rules, 44 versioned aliases, 433 ID tokens scanned
@@ -60,7 +61,7 @@ PGS10 1.2.0-candidate.2 — Freeze Gate  (frozen=false)
       case statuses: PASS, PASS_WITH_SUPPORT, PASS_WITH_OBSERVATION, HOLD, FAIL; retired status-like names (aliases only): 10
 
 [PASS] 4. Policy OPEN rules have Safe-Hold
-      OPEN/ASSUMPTION/UNVERIFIED/PROPOSED params with safe-hold: PRM-008, PRM-021, PRM-028, PRM-033, PRM-038, PRM-042, PRM-033b, PRM-054, PRM-055
+      OPEN/ASSUMPTION/UNVERIFIED/PROPOSED params with safe-hold: PRM-008, PRM-021, PRM-028, PRM-033, PRM-038, PRM-042, PRM-033b, PRM-055
       transaction codes: 5 evidence-supported, 4 unverified
 
 [PASS] 5. Golden tests have evidence and no invented expected result
@@ -68,7 +69,7 @@ PGS10 1.2.0-candidate.2 — Freeze Gate  (frozen=false)
       numeric blocks re-verified: 7; rule/aggregation expectations re-evaluated from spec: 35
 
 [PASS] 6. Conflict Register: every unresolved item has a Safe-Hold
-      46 register items: resolved 30, unresolved with Safe-Hold 16
+      46 register items: resolved 31, unresolved with Safe-Hold 15
 
 Freeze blockers (unresolved items flagged blocks_freeze): none
 
@@ -76,4 +77,4 @@ RESULT: all 6 checks pass, no blockers — READY FOR FINAL FREEZE GATE REVIEW (n
 ```
 
 **ข้อจำกัดที่ต้องรู้:** Gate ตรวจ *ความสอดคล้องภายในของ Spec* (ID/Reason Code/สถานะ/Safe-Hold/Golden Test) ไม่ได้ตรวจว่านโยบายถูกต้อง; แหล่งอ้างอิงที่เจ้าของระบุ (เช่น PGS10 p.5, p.7, LG 66-037410) ยังไม่ได้ตรวจกับเอกสารต้นฉบับโดย Claude; Evaluator ใน Gate ครอบคลุมเฉพาะบางส่วนของ test (35 expectation ที่คำนวณซ้ำจาก Spec).
-ทดสอบ Gate ด้วย mutation 18 แบบ (ใส่ความผิดเจตนา เช่น reason ขึ้นต้น HOLD_, blocked fixture ที่ assert ผล, register ข้อที่ไม่มี Safe-Hold, support_code ปนใน reason catalogue, FAIL ที่ไม่มี flag ยืนยัน) — Gate จับได้ครบ 18/18
+ทดสอบ Gate ด้วย mutation 18 แบบ (ใส่ความผิดเจตนา) — Gate จับได้ครบ 18/18

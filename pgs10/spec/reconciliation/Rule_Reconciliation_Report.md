@@ -1,6 +1,6 @@
 # Rule Reconciliation Report
 
-**เวอร์ชัน:** 1.2.0-RECONCILIATION-r3 · **สถานะ:** RECONCILIATION_DRAFT r2 (รวมคำตอบ Q-01…Q-04 และคำตัดสิน DEC-15…28) — **ไม่ใช่การ Freeze**; Spec Candidate อยู่ที่ `pgs10/spec/v1.2.0-candidate/` · **Rule Engine / tests เดิม / Spec ร่าง v1.0 / Pack v1.1.0: ไม่ถูกแก้**
+**เวอร์ชัน:** 1.2.0-RECONCILIATION-r4 · **สถานะ:** RECONCILIATION_DRAFT r2 (รวมคำตอบ Q-01…Q-04 และคำตัดสิน DEC-15…28) — **ไม่ใช่การ Freeze**; Spec Candidate อยู่ที่ `pgs10/spec/v1.2.0-candidate/` · **Rule Engine / tests เดิม / Spec ร่าง v1.0 / Pack v1.1.0: ไม่ถูกแก้**
 
 ชุดนี้ประกอบด้วย 8 รายการ ในโฟลเดอร์ `pgs10/spec/reconciliation/`:
 `Rule_Reconciliation_Report.md` (ไฟล์นี้) · `Canonical_Rule_ID_Map.json` · `Canonical_Reason_Code_Catalogue.json` · `Rule_to_Reason_Mapping.json` · `Policy_Parameter_Table.json` · `Conflict_Register.md` · `Golden_Test_Gap_Report.md` · `Proposed_Changes_for_v1.2.0.md`
@@ -56,6 +56,11 @@
 | DEC-36 | Reason/Support code: `NPL_ANCHOR_DATE_UNDEFINED` อนุมัติ (defensive HOLD); `COVERAGE_AGE_BASIS_UNDEFINED` ยกเลิก → `LG_TENOR_UNDETERMINABLE`; `UNCONTACTABLE_EXCEPTION_MATURED` ไม่ใช่ reason_code → `support_code=UNCONTACTABLE_7_MONTH_EXCEPTION`; `POLICY_PARAMETER_UNRESOLVED` อนุมัติเป็น generic Safe-Hold fallback. |
 | DEC-37 | อัปเกรดแหล่งที่มา (ผู้ใช้ยืนยันจากไฟล์โครงการ): Start up 6 เดือน + Case 5 (ข)+(จ)+(ฉ) = OFFICIAL (PGS 10 หน้า 7); Coverage ทุก Product = OFFICIAL (หน้า 5); Thai Credit 6619/6656/6920/6922/6931 = EVIDENCE_SUPPORTED_BANK_SPECIFIC (Statement remark + ledger); LG 66-037410 = SOURCE_VERIFIED_CASE (รายงานติดตาม + Statement). |
 | DEC-38 | Gate hardening: เคส `BLOCKED_PENDING_EVIDENCE` ที่ไม่มี `evidence_ref` **ห้ามมี asserted expected result** (`expected_case_status=null`, `expected_reason_codes=[]`, ไม่มี `expected_rule_results`) — เก็บผลเดิมเป็น `manual_baseline_note` ซึ่งไม่นับเป็น Regression Assertion. เงื่อนไข Freeze: 5/5 checks ผ่าน + ไม่มี asserted result ใน Blocked fixtures + Conflict Register ไม่มีรายการค้างที่ไม่มี Safe-Hold. |
+| DEC-39 | Q-08 ยืนยัน: band ≤5/>5 ปีของ Case 1–4 (claim path) นับจากวันที่ยื่นเทียบวันออก LG (`lg_issue_date + 5 ปี`); ต่างจาก Coverage ที่ใช้ contractual tenor. PRM-054 → `APPROVED_OPERATIONAL`; ข้อมูลวันที่ไม่ครบยัง HOLD `LG_DATA_MISSING`. |
+| DEC-40 | Q-09 ยืนยัน: NO_PAYMENT_VERIFIED → DEF-001 = HOLD `POLICY_PARAMETER_UNRESOLVED` เป็นพฤติกรรมที่อนุมัติ **จนกว่าจะมี alternative evidence rule** (PRM-055 ยัง OPEN; ไม่มี rule ให้สร้างเอง). |
+| DEC-41 | Q-10 ยืนยัน: LG ที่ต่ออายุ/ขยายและไม่มี guarantee_term ระบุ → HOLD `LG_TENOR_UNDETERMINABLE` เป็นพฤติกรรมที่อนุมัติ จนกว่าจะมี rule เรื่อง tenor ของ LG ที่ต่ออายุ. |
+| DEC-42 | อนุมัติ reason code `CLAIM_FILING_NOT_YET_OPEN` (HOLD) และ `CLAIM_FILING_WINDOW_EXPIRED` (FAIL; ต้อง verified) ที่ Claude เสนอ. |
+| DEC-43 | A-43 ยืนยัน: Safe-Hold 'ผลต้องเหมือนกันทุก candidate' คงไว้เฉพาะ demand-waiting reference และ date arithmetic (PRM-021/PRM-028); 'หมดสิทธิแต่วันที่ยังไม่ verify' ไม่มี code เฉพาะและไม่มี golden test (ใช้ HOLD ทั่วไปของ CLM-001). |
 
 ## 3. ข้อจำกัดของหลักฐาน (สำคัญ)
 
@@ -72,8 +77,8 @@
 ## 5. ผลโดยรวม
 
 - Canonical rules **32** รายการ: ตรงกัน `ALIGNED` 13, ตรงหลังคำตัดสิน `ALIGNED_AFTER_DECISION` 9, ต่างกัน `DIFFERS` 7, เติมกลับ `RESTORED` 1, ID ใหม่ `NEW_CANONICAL` 2
-- Reason codes Canonical **80** ตัว (รวม 2 ตัวที่ **เสนอใหม่**: `CLAIM_FILING_NOT_YET_OPEN`, `CLAIM_FILING_WINDOW_EXPIRED`)
-- ทะเบียน Conflict 46 รายการ: RESOLVED 29, ยังไม่ปิด 17, **ขวาง Freeze 0** (ดู `Conflict_Register.md`)
+- Reason codes Canonical **80** ตัว (รวม 0 ตัวที่ **เสนอใหม่**: ``)
+- ทะเบียน Conflict 46 รายการ: RESOLVED 30, ยังไม่ปิด 16, **ขวาง Freeze 0** (ดู `Conflict_Register.md`)
 - **ID ที่ต้องระวังที่สุด:** 10 รายการเป็น 'ID เดิมความหมายใหม่' เช่น `PGS10-STM-001` (P = Transaction mapping, Canonical = Last Actual Payment), `PGS10-CLM-001` (P = Claim Base, Canonical = Filing Window). ห้าม resolve alias โดยไม่ระบุ `@version`
 
 ## 6. Rule-by-Rule
@@ -158,14 +163,11 @@
 
 ## 10. คำถาม
 
-ตอบแล้ว: Q-01 → DEC-15, Q-02 → DEC-16, Q-03 → DEC-17, Q-04 → DEC-18, Q-05 → DEC-31, Q-06 → DEC-32, Q-07 → DEC-33
+ตอบแล้ว: Q-01 → DEC-15, Q-02 → DEC-16, Q-03 → DEC-17, Q-04 → DEC-18, Q-05 → DEC-31, Q-06 → DEC-32, Q-07 → DEC-33, Q-08 → DEC-39, Q-09 → DEC-40, Q-10 → DEC-41
 
 คำถามใหม่ (ไม่ขวาง Freeze — Safe-Hold รองรับ):
 
 | ID | คำถาม | ข้อเสนอของผม |
 |---|---|---|
-| Q-08 | Band ≤5/>5 ปีของ Case 1–4 (claim path) นับจากวันที่ยื่นเทียบวันออก LG ใช่หรือไม่ (ต่างจาก Coverage ที่ใช้ contractual tenor)? | สมมติเช่นนั้น (PRM-054) — Safe-Hold: ข้อมูลไม่ครบ → HOLD |
-| Q-09 | Default chronology เมื่อพิสูจน์แล้วว่าไม่เคยชำระ: alternative evidence rule (due-date / FI evidence) ที่อนุมัติคืออะไร? | ตอนนี้ DEF-001 = HOLD (POLICY_PARAMETER_UNRESOLVED) |
-| Q-10 | Coverage tenor ของ LG ที่ถูกต่ออายุ/ขยาย ใช้ term เดิม, term รวม หรือ term ของ LG ฉบับปัจจุบัน? | ตอนนี้ต่ออายุและไม่มี guarantee_term ระบุ → HOLD LG_TENOR_UNDETERMINABLE |
 
 รายการขวาง Freeze ทั้งหมด: .

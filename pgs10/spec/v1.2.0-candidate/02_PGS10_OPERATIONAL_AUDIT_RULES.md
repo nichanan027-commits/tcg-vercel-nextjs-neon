@@ -1,6 +1,6 @@
-# 02 · PGS 10 Operational Audit Rules — v1.2.0-candidate.2 (NOT FROZEN)
+# 02 · PGS 10 Operational Audit Rules — v1.2.0-candidate.3 (NOT FROZEN)
 
-**Ruleset:** PGS10 1.2.0-candidate.2 · กฎตรวจเชิงปฏิบัติการ (เอกสาร / Statement / ไปรษณีย์ / ภาพ / Cross-document) — **ไม่แทนที่นโยบายใน 01**; ไม่มี UI/System design
+**Ruleset:** PGS10 1.2.0-candidate.3 · กฎตรวจเชิงปฏิบัติการ (เอกสาร / Statement / ไปรษณีย์ / ภาพ / Cross-document) — **ไม่แทนที่นโยบายใน 01**; ไม่มี UI/System design
 ID ทั้งหมดเป็น Canonical (Master Audit §41); ID เก่าต้องอ้างเป็น `id@version` (ดู `05_PGS10_RULE_REGISTRY.json`)
 
 ## 0. Locked rules ที่ใช้ทุก Control
@@ -269,11 +269,11 @@ Program → Identity → Document Completeness → Visual Completeness → Contr
 **Inputs:** `product`, `claim_path`, `claim_case_no`, `restructure_route`, `restructure_date`, `restructure_doc_signing_date`, `last_actual_payment_date`, `claim_submission_date`
 **Logic:**
 - ใช้กับ **Case 1 (SMEs ≤ 5 ปี) และ Case 3 (Small Biz ≤ 5 ปี)** — path ที่มีเงื่อนไข (ค); Case 2, 4, 5 (รวม Start up) → NOT_APPLICABLE (DEC-32)
-- band ≤5/>5 ปีของ Case นับจากวันที่ยื่นเทียบวันออก LG (PRM-054, ASSUMPTION — Q-08); ข้อมูลไม่ครบ → HOLD `LG_DATA_MISSING`
+- band ≤5/>5 ปีของ Case นับจากวันที่ยื่นเทียบวันออก LG (PRM-054, APPROVED_OPERATIONAL — DEC-39); ข้อมูลไม่ครบ → HOLD `LG_DATA_MISSING`
 - ระบุ `restructure_route`: `NORMAL_RESTRUCTURE_PATH` (ปรับโครงสร้าง ≥ 1 ครั้ง + พ้น 3 เดือนหลังวันทำสัญญาปรับโครงสร้าง + ไม่ชำระติดต่อกันอีก 3 เดือน) | `UNCONTACTABLE_EXCEPTION_PATH` (→ RST-002)
 - `restructure_date = null` **ไม่ผ่านอัตโนมัติ** → HOLD `RESTRUCTURE_PATH_UNDETERMINED`; ไม่ครบเงื่อนไข → HOLD `RESTRUCTURE_REQUIREMENT_NOT_MET`
 **Safe-Hold (พารามิเตอร์ที่ยัง OPEN):**
-- `PRM-054` (ASSUMPTION): ไม่มี claim_submission_date หรือ lg_issue_date → claim_path กำหนดไม่ได้ → HOLD → `LG_DATA_MISSING`
+- `PRM-054` (APPROVED_OPERATIONAL): ไม่มี claim_submission_date หรือ lg_issue_date → claim_path กำหนดไม่ได้ → HOLD → `LG_DATA_MISSING`
 **Evidence:** เอกสารปรับโครงสร้าง / รายงานติดตาม
 
 | reason_code | control_status | ความหมาย | สถานะรหัส |
@@ -459,8 +459,8 @@ Program → Identity → Document Completeness → Visual Completeness → Contr
 
 | reason_code | control_status | ความหมาย | สถานะรหัส |
 |---|---|---|---|
-| `CLAIM_FILING_NOT_YET_OPEN` | HOLD | ยังไม่ถึงเวลายื่น Claim (ก่อนปีที่ 2 ของอายุ LG) — แก้ได้ด้วยเวลา จึงเป็น HOLD/Pending | PROPOSED_BY_CLAUDE |
-| `CLAIM_FILING_WINDOW_EXPIRED` | FAIL | หมดสิทธิยื่น Claim แล้ว (เกิน 1 ปีหลัง LG ฉบับสุดท้ายสิ้นอายุ) และวันที่ถูก verify ครบ — Proven Policy Ineligibility | PROPOSED_BY_CLAUDE |
+| `CLAIM_FILING_NOT_YET_OPEN` | HOLD | ยังไม่ถึงเวลายื่น Claim (ก่อนปีที่ 2 ของอายุ LG) — แก้ได้ด้วยเวลา จึงเป็น HOLD/Pending | APPROVED_BY_OWNER |
+| `CLAIM_FILING_WINDOW_EXPIRED` | FAIL | หมดสิทธิยื่น Claim แล้ว (เกิน 1 ปีหลัง LG ฉบับสุดท้ายสิ้นอายุ) และวันที่ถูก verify ครบ — Proven Policy Ineligibility | APPROVED_BY_OWNER |
 
 ### PGS10-CLM-002 · Coverage Ratio
 **Requirement:** REQUIRED_HARD · **ใช้เมื่อ:** เสมอ · **ที่มา:** R#19, M§7 · **Decisions:** DEC-11, DEC-21, DEC-30 · **Legacy aliases:** `PGS10-COV-001@v1.1.0`, `PGS10-CLM-002@v1.1.0`

@@ -1,6 +1,6 @@
 {
   "metadata": {
-    "ruleset_version": "1.2.0-candidate.2",
+    "ruleset_version": "1.2.0-candidate.3",
     "status": "SPEC_CANDIDATE_NOT_FROZEN",
     "frozen": false,
     "engine_changes_allowed": false,
@@ -879,7 +879,7 @@
       "safe_hold": [
         {
           "parameter": "PRM-054",
-          "source_status": "ASSUMPTION",
+          "source_status": "APPROVED_OPERATIONAL",
           "behavior": "ไม่มี claim_submission_date หรือ lg_issue_date → claim_path กำหนดไม่ได้ → HOLD",
           "reason_code": "LG_DATA_MISSING"
         }
@@ -1950,8 +1950,8 @@
       ],
       "detail_codes": [],
       "review_flag": null,
-      "proposed": true,
-      "owner_status": "PROPOSED_BY_CLAUDE"
+      "proposed": false,
+      "owner_status": "APPROVED_BY_OWNER"
     },
     {
       "code": "CLAIM_FILING_WINDOW_EXPIRED",
@@ -1963,8 +1963,8 @@
       "aliases": [],
       "detail_codes": [],
       "review_flag": null,
-      "proposed": true,
-      "owner_status": "PROPOSED_BY_CLAUDE",
+      "proposed": false,
+      "owner_status": "APPROVED_BY_OWNER",
       "policy_disqualifying": true,
       "remediable_by_document": false,
       "requires_evidence_verified": true
@@ -3576,7 +3576,7 @@
       "id": "A-43",
       "topic": "Safe-Hold แบบ 'invariance' ข้าม candidate (Demand waiting reference, date arithmetic) — เลิกใช้กับ Coverage",
       "status": "OPEN",
-      "decision_ref": "DEC-28",
+      "decision_ref": "DEC-43",
       "blocks_freeze": false,
       "safe_hold": {
         "mechanism": "PARAM",
@@ -3588,8 +3588,8 @@
     {
       "id": "A-44",
       "topic": "Band ≤5/>5 ปี ของ Case 1–4 (claim path) นับจากอะไร — ต่างจาก Coverage (contractual tenor)",
-      "status": "OPEN",
-      "decision_ref": "DEC-30",
+      "status": "RESOLVED",
+      "decision_ref": "DEC-39",
       "blocks_freeze": false,
       "safe_hold": {
         "mechanism": "PARAM",
@@ -3602,7 +3602,7 @@
       "id": "A-45",
       "topic": "Default chronology เมื่อ NO_PAYMENT_VERIFIED ต้องใช้ alternative evidence (due-date/FI) — ยังไม่มี Rule อนุมัติ",
       "status": "OPEN",
-      "decision_ref": "DEC-34",
+      "decision_ref": "DEC-34, DEC-40",
       "blocks_freeze": false,
       "safe_hold": {
         "mechanism": "PARAM",
@@ -3615,7 +3615,7 @@
       "id": "A-46",
       "topic": "Coverage tenor ของ LG ที่ถูกต่ออายุ/ขยาย",
       "status": "OPEN",
-      "decision_ref": "DEC-30",
+      "decision_ref": "DEC-30, DEC-41",
       "blocks_freeze": false,
       "safe_hold": {
         "mechanism": "CONTROL",

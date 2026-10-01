@@ -1,6 +1,6 @@
-# 01 · PGS 10 Policy Rulebook — v1.2.0-candidate.2 (NOT FROZEN)
+# 01 · PGS 10 Policy Rulebook — v1.2.0-candidate.3 (NOT FROZEN)
 
-**Ruleset:** PGS10 1.2.0-candidate.2 · **สถานะ:** Spec Candidate — ยังไม่ Freeze · Rule Engine ห้ามแก้จนกว่าจะผ่าน Freeze Gate
+**Ruleset:** PGS10 1.2.0-candidate.3 · **สถานะ:** Spec Candidate — ยังไม่ Freeze · Rule Engine ห้ามแก้จนกว่าจะผ่าน Freeze Gate
 **ขอบเขตไฟล์:** กฎระดับนโยบายเท่านั้น (ห้ามมี UI / architecture / reviewer workflow). ตัวเลขทุกตัวอยู่ใน `06_PGS10_POLICY_PARAMETERS.json` (อ้างด้วย `PRM-xxx`) — ไฟล์นี้ไม่ฝังตัวเลขที่ยังไม่ยืนยัน
 **Precedence:** หลักเกณฑ์ PGS 10 ทางการ > หนังสือแก้ไข/ประกาศที่มีผล > Operational Hard Controls ที่ล็อก > เอกสารต้นฉบับของเคส > หน้าจอ > OCR/Text Layer
 **Safety:** พารามิเตอร์ที่ยังไม่พิสูจน์ (OPEN / ASSUMPTION / UNVERIFIED) → **Safe-Hold** ตามที่ระบุ ไม่อนุมาน
@@ -40,7 +40,7 @@
 | Small Biz | (ข)+(ค)+(จ)+(ฉ) | (ข)+(ง)+(จ)+(ฉ) |
 | **Start up** | **(ข)+(จ)+(ฉ)** — ไม่รับ (ค) (DEC-24) | (ข)+(จ)+(ฉ) |
 
-Case (DEC-32): **1** = SMEs ≤5 ปี · **2** = SMEs >5 ปี · **3** = Small Biz ≤5 ปี · **4** = Small Biz >5 ปี (รวม (ข)) · **5** = Start up. band ≤5/>5 ปีของ Case นับจากวันที่ยื่นเทียบวันออก LG (`PRM-054` = claim_submission_date เทียบ lg_issue_date + 5 ปี ('ขอ Claim ภายใน 5 ปีแรก') · **ASSUMPTION** — Q-08; ข้อมูลไม่ครบ → HOLD `LG_DATA_MISSING`)
+Case (DEC-32): **1** = SMEs ≤5 ปี · **2** = SMEs >5 ปี · **3** = Small Biz ≤5 ปี · **4** = Small Biz >5 ปี (รวม (ข)) · **5** = Start up. band ≤5/>5 ปีของ Case นับจากวันที่ยื่นเทียบวันออก LG (`PRM-054` = claim_submission_date เทียบ lg_issue_date + 5 ปี ('ขอ Claim ภายใน 5 ปีแรก') · **APPROVED_OPERATIONAL** — Q-08; ข้อมูลไม่ครบ → HOLD `LG_DATA_MISSING`)
 
 ## 5. Restructure และทางออก — `PGS10-RST-001/002/003`
 - เส้นทาง: `NORMAL_RESTRUCTURE_PATH` | `UNCONTACTABLE_EXCEPTION_PATH` | `NOT_REQUIRED` (path ที่ไม่มี (ค))

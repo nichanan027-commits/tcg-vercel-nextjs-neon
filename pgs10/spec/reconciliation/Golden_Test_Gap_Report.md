@@ -1,6 +1,6 @@
 # Golden Test Gap Report
 
-**เวอร์ชัน:** 1.2.0-RECONCILIATION-r3 · ไม่แก้ `engine.test.js` หรือ `04_PGS10_GOLDEN_TESTS.json` ทั้งของ D และ P — เป็นรายงานช่องว่างและข้อเสนอเท่านั้น
+**เวอร์ชัน:** 1.2.0-RECONCILIATION-r4 · ไม่แก้ `engine.test.js` หรือ `04_PGS10_GOLDEN_TESTS.json` ทั้งของ D และ P — เป็นรายงานช่องว่างและข้อเสนอเท่านั้น
 
 ## 1. Schema ใหม่ (DEC-13)
 

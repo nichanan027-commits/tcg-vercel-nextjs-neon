@@ -1,6 +1,6 @@
 {
   "metadata": {
-    "ruleset_version": "1.2.0-candidate.2",
+    "ruleset_version": "1.2.0-candidate.3",
     "status": "SPEC_CANDIDATE_NOT_FROZEN",
     "frozen": false,
     "engine_changes_allowed": false,
@@ -953,10 +953,10 @@
       "unit": "-",
       "applies_to": "claim_path (Case 1–4)",
       "source_ref": "M§3.1 ถ้อยคำ 'ขอ Claim ภายใน 5 ปีแรก / เมื่อพ้น 5 ปีแรก' — เป็นเรื่องเวลายื่น ต่างจาก Coverage ที่ใช้ contractual tenor",
-      "decision_ref": "DEC-30",
+      "decision_ref": "DEC-30, DEC-39",
       "config_key": "claim.path_age_reference",
       "hardcode_allowed": false,
-      "notes": "ขอยืนยัน (Q-08): band ของ Case 1/2/3/4 นับจากวันที่ยื่นเทียบวันออก LG",
+      "notes": "ยืนยันโดยเจ้าของ (Q-08/DEC-39): band ของ Case 1/2/3/4 นับจากวันที่ยื่นเทียบวันออก LG",
       "safe_hold": {
         "behavior": "ไม่มี claim_submission_date หรือ lg_issue_date → claim_path กำหนดไม่ได้ → HOLD",
         "reason_code": "LG_DATA_MISSING"
@@ -964,16 +964,16 @@
       "id": "PRM-054",
       "name": "claim_path age band reference",
       "value": "claim_submission_date เทียบ lg_issue_date + 5 ปี ('ขอ Claim ภายใน 5 ปีแรก')",
-      "source_status": "ASSUMPTION"
+      "source_status": "APPROVED_OPERATIONAL"
     },
     {
       "unit": "-",
       "applies_to": "DEF-001",
       "source_ref": "DEC-34 (ตาม Rule ที่อนุมัติ)",
-      "decision_ref": "DEC-34",
+      "decision_ref": "DEC-34, DEC-40",
       "config_key": "default.alt_evidence",
       "hardcode_allowed": false,
-      "notes": "ยังไม่มี Rule อนุมัติ (Q-09)",
+      "notes": "ยังไม่มี Rule อนุมัติ (Q-09) — Safe-Hold HOLD ได้รับการยืนยันโดยเจ้าของ (DEC-40)",
       "safe_hold": {
         "behavior": "payment_history_status=NO_PAYMENT_VERIFIED → DEF-001 = HOLD จนมี alternative evidence rule",
         "reason_code": "POLICY_PARAMETER_UNRESOLVED"

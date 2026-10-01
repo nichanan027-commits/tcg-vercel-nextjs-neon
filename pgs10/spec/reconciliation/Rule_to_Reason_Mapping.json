@@ -1,6 +1,6 @@
 {
   "meta": {
-    "spec_version": "1.2.0-RECONCILIATION-r3",
+    "spec_version": "1.2.0-RECONCILIATION-r4",
     "frozen": false,
     "status": "RECONCILIATION_DRAFT — ไม่ใช่ Spec Candidate และไม่ใช่การ Freeze",
     "decision_baseline": "DEC-01..DEC-14 (Rule_Reconciliation_Report §2)",
@@ -679,14 +679,12 @@
         {
           "code": "CLAIM_FILING_NOT_YET_OPEN",
           "control_status": "HOLD",
-          "case_effect": "case HOLD",
-          "proposed_new": true
+          "case_effect": "case HOLD"
         },
         {
           "code": "CLAIM_FILING_WINDOW_EXPIRED",
           "control_status": "FAIL",
-          "case_effect": "case FAIL",
-          "proposed_new": true
+          "case_effect": "case FAIL"
         }
       ]
     },
