@@ -1,6 +1,6 @@
 {
   "meta": {
-    "spec_version": "1.2.0-RECONCILIATION-r2",
+    "spec_version": "1.2.0-RECONCILIATION-r3",
     "frozen": false,
     "status": "RECONCILIATION_DRAFT — ไม่ใช่ Spec Candidate และไม่ใช่การ Freeze",
     "decision_baseline": "DEC-01..DEC-14 (Rule_Reconciliation_Report §2)",
@@ -268,7 +268,7 @@
       "name": "Restructure Requirement / Route",
       "kind": "POLICY",
       "requirement": "CONDITIONAL",
-      "applicable_when": "path ที่มีเงื่อนไข (ค): SMEs ≤ 5 ปี และ Small Biz ≤ 5 ปี. Start up → NOT_APPLICABLE (DEC-24)",
+      "applicable_when": "Case 1 (SMEs ≤5 ปี) และ Case 3 (Small Biz ≤5 ปี) — path ที่มีเงื่อนไข (ค); Case 2, 4, 5 → NOT_APPLICABLE",
       "upstream": "M§4.2, M§5, M§6",
       "id_origin": "M§41/R",
       "legacy_aliases": [

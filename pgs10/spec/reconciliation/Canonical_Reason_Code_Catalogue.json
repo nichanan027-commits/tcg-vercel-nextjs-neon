@@ -1,6 +1,6 @@
 {
   "meta": {
-    "spec_version": "1.2.0-RECONCILIATION-r2",
+    "spec_version": "1.2.0-RECONCILIATION-r3",
     "frozen": false,
     "status": "RECONCILIATION_DRAFT — ไม่ใช่ Spec Candidate และไม่ใช่การ Freeze",
     "decision_baseline": "DEC-01..DEC-14 (Rule_Reconciliation_Report §2)",
@@ -79,8 +79,8 @@
       "aliases": [],
       "detail_codes": [],
       "review_flag": null,
-      "proposed": true,
-      "owner_status": "PROPOSED_BY_CLAUDE"
+      "proposed": false,
+      "owner_status": "APPROVED_BY_OWNER"
     },
     {
       "code": "RULE_VERSION_CONFLICT",
@@ -147,30 +147,35 @@
       "owner_status": "APPROVED_BY_OWNER"
     },
     {
-      "code": "CLAIM_FILING_WINDOW_NOT_MET",
+      "code": "CLAIM_FILING_NOT_YET_OPEN",
       "rules": [
         "PGS10-CLM-001"
       ],
       "control_status": "HOLD",
-      "meaning": "ยื่นนอกช่วงที่อนุญาต",
-      "aliases": [],
-      "detail_codes": [],
-      "review_flag": null,
-      "proposed": false,
-      "owner_status": "CANDIDATE"
-    },
-    {
-      "code": "COVERAGE_AGE_BASIS_UNDEFINED",
-      "rules": [
-        "PGS10-CLM-002"
+      "meaning": "ยังไม่ถึงเวลายื่น Claim (ก่อนปีที่ 2 ของอายุ LG) — แก้ได้ด้วยเวลา จึงเป็น HOLD/Pending",
+      "aliases": [
+        "CLAIM_FILING_WINDOW_NOT_MET"
       ],
-      "control_status": "HOLD",
-      "meaning": "coverage_age_basis ยัง OPEN และ Tier ต่างกันตาม candidate event",
-      "aliases": [],
       "detail_codes": [],
       "review_flag": null,
       "proposed": true,
       "owner_status": "PROPOSED_BY_CLAUDE"
+    },
+    {
+      "code": "CLAIM_FILING_WINDOW_EXPIRED",
+      "rules": [
+        "PGS10-CLM-001"
+      ],
+      "control_status": "FAIL",
+      "meaning": "หมดสิทธิยื่น Claim แล้ว (เกิน 1 ปีหลัง LG ฉบับสุดท้ายสิ้นอายุ) และวันที่ถูก verify ครบ — Proven Policy Ineligibility",
+      "aliases": [],
+      "detail_codes": [],
+      "review_flag": null,
+      "proposed": true,
+      "owner_status": "PROPOSED_BY_CLAUDE",
+      "policy_disqualifying": true,
+      "remediable_by_document": false,
+      "requires_evidence_verified": true
     },
     {
       "code": "COVERAGE_RATIO_MISMATCH",
@@ -184,6 +189,21 @@
       "review_flag": null,
       "proposed": false,
       "owner_status": "CANDIDATE"
+    },
+    {
+      "code": "LG_TENOR_UNDETERMINABLE",
+      "rules": [
+        "PGS10-CLM-002"
+      ],
+      "control_status": "HOLD",
+      "meaning": "พิสูจน์ contractual LG tenor ไม่ได้ (ไม่มี guarantee_term ใน LG, ไม่มี lg_issue_date/lg_expiry_date ครบ, หรือ LG ถูกต่ออายุโดยไม่ระบุ term)",
+      "aliases": [
+        "COVERAGE_AGE_BASIS_UNDEFINED"
+      ],
+      "detail_codes": [],
+      "review_flag": null,
+      "proposed": false,
+      "owner_status": "APPROVED_BY_OWNER"
     },
     {
       "code": "NO_RULE_FOR_PRODUCT",
@@ -350,20 +370,6 @@
       "owner_status": "CANDIDATE"
     },
     {
-      "code": "POST_DEFAULT_PAYMENT_SUPPORTED",
-      "rules": [
-        "PGS10-DEF-001",
-        "PGS10-DEF-002"
-      ],
-      "control_status": "PASS_WITH_SUPPORT",
-      "meaning": "มีการชำระหลังผิดนัดและหนังสือยืนยันสมบูรณ์ ตรงหน้าจอ",
-      "aliases": [],
-      "detail_codes": [],
-      "review_flag": null,
-      "proposed": false,
-      "owner_status": "CANDIDATE"
-    },
-    {
       "code": "CONFIRMATION_CONTENT_INCOMPLETE",
       "rules": [
         "PGS10-DEF-002"
@@ -478,19 +484,6 @@
       "owner_status": "CANDIDATE"
     },
     {
-      "code": "DERIVED_AS_OF_DEMAND",
-      "rules": [
-        "PGS10-DMD-002"
-      ],
-      "control_status": "PASS_WITH_SUPPORT",
-      "meaning": "derive เงินต้น ณ วันบอกกล่าวจาก Statement/Ledger ได้ครบตามเงื่อนไข (ครอบคลุม ไม่มี gap ไม่มีรายการกระทบเงินต้นหลัง demand หรือ reconstruct ได้)",
-      "aliases": [],
-      "detail_codes": [],
-      "review_flag": null,
-      "proposed": false,
-      "owner_status": "APPROVED_BY_OWNER"
-    },
-    {
       "code": "DEMAND_WAITING_PERIOD_NOT_MET",
       "rules": [
         "PGS10-DMD-003"
@@ -535,7 +528,10 @@
       "detail_codes": [],
       "review_flag": null,
       "proposed": false,
-      "owner_status": "CANDIDATE"
+      "owner_status": "CANDIDATE",
+      "policy_disqualifying": true,
+      "remediable_by_document": false,
+      "requires_evidence_verified": true
     },
     {
       "code": "ELIGIBILITY_GUARANTEE_BELOW_MINIMUM",
@@ -548,7 +544,10 @@
       "detail_codes": [],
       "review_flag": null,
       "proposed": false,
-      "owner_status": "CANDIDATE"
+      "owner_status": "CANDIDATE",
+      "policy_disqualifying": true,
+      "remediable_by_document": false,
+      "requires_evidence_verified": true
     },
     {
       "code": "ELIGIBILITY_NOT_BUSINESS_PURPOSE",
@@ -561,7 +560,10 @@
       "detail_codes": [],
       "review_flag": null,
       "proposed": false,
-      "owner_status": "APPROVED_BY_OWNER"
+      "owner_status": "APPROVED_BY_OWNER",
+      "policy_disqualifying": true,
+      "remediable_by_document": false,
+      "requires_evidence_verified": true
     },
     {
       "code": "ELIGIBILITY_NOT_NEW_BUSINESS_LOAN",
@@ -574,7 +576,10 @@
       "detail_codes": [],
       "review_flag": null,
       "proposed": false,
-      "owner_status": "CANDIDATE"
+      "owner_status": "CANDIDATE",
+      "policy_disqualifying": true,
+      "remediable_by_document": false,
+      "requires_evidence_verified": true
     },
     {
       "code": "ELIGIBILITY_NOT_PGS10",
@@ -587,7 +592,10 @@
       "detail_codes": [],
       "review_flag": null,
       "proposed": false,
-      "owner_status": "CANDIDATE"
+      "owner_status": "CANDIDATE",
+      "policy_disqualifying": true,
+      "remediable_by_document": false,
+      "requires_evidence_verified": true
     },
     {
       "code": "ELIGIBILITY_PRODUCT_EXCLUDED",
@@ -600,7 +608,10 @@
       "detail_codes": [],
       "review_flag": null,
       "proposed": false,
-      "owner_status": "CANDIDATE"
+      "owner_status": "CANDIDATE",
+      "policy_disqualifying": true,
+      "remediable_by_document": false,
+      "requires_evidence_verified": true
     },
     {
       "code": "ELIGIBILITY_PROHIBITED_CREDIT_TYPE",
@@ -615,7 +626,10 @@
       "detail_codes": [],
       "review_flag": null,
       "proposed": false,
-      "owner_status": "APPROVED_BY_OWNER"
+      "owner_status": "APPROVED_BY_OWNER",
+      "policy_disqualifying": true,
+      "remediable_by_document": false,
+      "requires_evidence_verified": true
     },
     {
       "code": "ELIGIBILITY_UNCONFIRMED",
@@ -717,7 +731,7 @@
         "PGS10-ID-001"
       ],
       "control_status": "PASS",
-      "meaning": "ต่างเฉพาะรูปแบบที่ไม่มีนัยเชิงความหมาย (field-specific: LG, ตัวเลขไทย/อารบิก, Leading Zero เฉพาะ field ที่ประกาศ) — เก็บ raw_value และ normalized_value; เคสเป็น PASS_WITH_OBSERVATION",
+      "meaning": "ต่างเฉพาะรูปแบบที่ไม่มีนัยเชิงความหมาย: LG ตัดขีด/ช่องว่าง, ตัวเลขไทย↔อารบิก, และ Leading Zero ของ `loan_account_no` เฉพาะ FI ที่มี normalization profile — เก็บ raw_value/normalized_value/normalization_rule/fi_profile",
       "aliases": [],
       "detail_codes": [],
       "review_flag": "FORMAT_NORMALIZED",
@@ -795,12 +809,12 @@
         "PGS10-NPL-001"
       ],
       "control_status": "HOLD",
-      "meaning": "ยังไม่มี Mapping ที่อนุมัติระหว่าง guarantee_effective_date กับ lg_issue_date (A-30) จึงคำนวณ NPL seasoning ไม่ได้",
+      "meaning": "ไม่มี lg_issue_date (anchor ที่อนุมัติ) หรือพิสูจน์ไม่ได้ จึงคำนวณ NPL seasoning ไม่ได้ — defensive HOLD",
       "aliases": [],
       "detail_codes": [],
       "review_flag": null,
-      "proposed": true,
-      "owner_status": "PROPOSED_BY_CLAUDE"
+      "proposed": false,
+      "owner_status": "APPROVED_BY_OWNER"
     },
     {
       "code": "NPL_DATE_MISSING",
@@ -808,7 +822,7 @@
         "PGS10-NPL-001"
       ],
       "control_status": "HOLD",
-      "meaning": "ไม่มี npl_date จากข้อมูล FI (ห้าม derive จาก default_date)",
+      "meaning": "ไม่มี npl_date จากข้อมูล FI หรือยังไม่ผ่านการ verify (ห้าม derive จาก default_date)",
       "aliases": [
         "NPL_DATE_MAPPING_UNDEFINED",
         "NPL_MAPPING_REQUIRED",
@@ -824,13 +838,16 @@
       "rules": [
         "PGS10-NPL-001"
       ],
-      "control_status": "HOLD",
-      "meaning": "npl_date ยังไม่พ้นระยะ seasoning",
+      "control_status": "FAIL",
+      "meaning": "npl_date + anchor + Policy verify ครบแล้ว และ npl_date ยังไม่พ้นระยะ seasoning — Proven Policy Ineligibility (DEC-31)",
       "aliases": [],
       "detail_codes": [],
       "review_flag": null,
       "proposed": false,
-      "owner_status": "CANDIDATE"
+      "owner_status": "CANDIDATE",
+      "policy_disqualifying": true,
+      "remediable_by_document": false,
+      "requires_evidence_verified": true
     },
     {
       "code": "POSTAL_ACK_INCOMPLETE",
@@ -986,38 +1003,12 @@
       "owner_status": "CANDIDATE"
     },
     {
-      "code": "UNCONTACTABLE_EXCEPTION_MATURED",
-      "rules": [
-        "PGS10-RST-002"
-      ],
-      "control_status": "PASS_WITH_SUPPORT",
-      "meaning": "ครบเงื่อนไขทางออก: maturity (start + 7 เดือนปฏิทิน) + Certified Tracking Report + หนังสือบอกกล่าว/บอกเลิก ≥ 1",
-      "aliases": [],
-      "detail_codes": [],
-      "review_flag": null,
-      "proposed": true,
-      "owner_status": "PROPOSED_BY_CLAUDE"
-    },
-    {
       "code": "UNCONTACTABLE_EXCEPTION_NOT_MET",
       "rules": [
         "PGS10-RST-002"
       ],
       "control_status": "HOLD",
       "meaning": "เส้นทางยกเว้นยังไม่ครบเงื่อนไข",
-      "aliases": [],
-      "detail_codes": [],
-      "review_flag": null,
-      "proposed": false,
-      "owner_status": "CANDIDATE"
-    },
-    {
-      "code": "MATCHED_STATEMENT_HEADER",
-      "rules": [
-        "PGS10-RST-003"
-      ],
-      "control_status": "PASS_WITH_SUPPORT",
-      "meaning": "ตรงหัว Statement (Level 2)",
       "aliases": [],
       "detail_codes": [],
       "review_flag": null,
@@ -1067,17 +1058,19 @@
       "owner_status": "CANDIDATE"
     },
     {
-      "code": "NO_PAYMENT_FOUND",
+      "code": "PAYMENT_HISTORY_INCOMPLETE",
       "rules": [
         "PGS10-STM-001"
       ],
       "control_status": "HOLD",
-      "meaning": "ไม่พบรายการรับชำระจริงใน Statement — ไม่ใช่ format normalization จึงไม่ Auto-pass ต้องให้ผู้ตรวจยืนยัน",
-      "aliases": [],
+      "meaning": "Statement ไม่ครบ Origination→Cut-off / มี gap จึงไม่รู้ว่ามี payment หรือไม่",
+      "aliases": [
+        "NO_PAYMENT_FOUND"
+      ],
       "detail_codes": [],
       "review_flag": null,
       "proposed": false,
-      "owner_status": "CANDIDATE"
+      "owner_status": "APPROVED_BY_OWNER"
     },
     {
       "code": "UNKNOWN_TRANSACTION_NEAR_DEFAULT",
@@ -1191,13 +1184,42 @@
       "owner_status": "CANDIDATE"
     }
   ],
+  "support_codes": {
+    "POST_DEFAULT_PAYMENT_SUPPORTED": {
+      "rules": [
+        "PGS10-DEF-001",
+        "PGS10-DEF-002"
+      ],
+      "meaning": "มีการชำระหลังผิดนัด และหนังสือยืนยันสมบูรณ์ทางภาพ/เนื้อหา ตรง Default Date หน้าจอ"
+    },
+    "MATCHED_STATEMENT_HEADER": {
+      "rules": [
+        "PGS10-RST-003"
+      ],
+      "meaning": "วันที่ปรับโครงสร้างตรงหัว Statement (Level 2) แม้ไม่ตรงวันลงนามในเอกสาร"
+    },
+    "DERIVED_AS_OF_DEMAND": {
+      "rules": [
+        "PGS10-DMD-002"
+      ],
+      "meaning": "derive เงินต้น ณ วันบอกกล่าวจาก Statement/Ledger ได้ครบเงื่อนไข (ครอบคลุม ไม่มี gap ไม่มีรายการกระทบเงินต้นหลัง demand หรือ reconstruct ได้)"
+    },
+    "UNCONTACTABLE_7_MONTH_EXCEPTION": {
+      "rules": [
+        "PGS10-RST-002"
+      ],
+      "meaning": "ครบเงื่อนไขทางออก (หน้า 7 กรณี 1 และ 3): start + 7 เดือนปฏิทิน + Certified Tracking Report + หนังสือบอกกล่าว/บอกเลิก ≥ 1"
+    }
+  },
   "alias_index": {
     "ADDRESS_SOURCE_NOT_FOUND": "POSTAL_ADDRESS_UNVERIFIED",
     "ASOF_DEMAND_PRINCIPAL_REQUIRED": "DEMAND_PRINCIPAL_AS_OF_DATE_UNVERIFIED",
     "CAP_ARITHMETIC_MISMATCH": "CLAIM_MAX_ARITHMETIC_MISMATCH",
     "CHECK_STATEMENT_HEADER": "RESTRUCTURE_DATE_SEMANTICS_UNRESOLVED",
     "CLAIM_AMOUNT_MISMATCH": "CLAIM_CALCULATION_MISMATCH",
+    "CLAIM_FILING_WINDOW_NOT_MET": "CLAIM_FILING_NOT_YET_OPEN",
     "CONFIRMATION_IDENTIFIER_UNLINKED": "IDENTIFIER_LINKAGE_UNRESOLVED",
+    "COVERAGE_AGE_BASIS_UNDEFINED": "LG_TENOR_UNDETERMINABLE",
     "DELIVERY_PROOF_INCOMPLETE": "POSTAL_ACK_INCOMPLETE",
     "DEMAND_PRINCIPAL_UNRECONCILED": "DEMAND_PRINCIPAL_AS_OF_DATE_UNVERIFIED",
     "DOCUMENT_PAGE_SEQUENCE_GAP": "APPROVAL_DOCUMENT_INCOMPLETE",
@@ -1215,6 +1237,7 @@
     "HOLD_RESTRUCTURE_DATE_SEMANTICS": "RESTRUCTURE_DATE_SEMANTICS_UNRESOLVED",
     "HOLD_TRACKING_EVIDENCE_MISMATCH": "TRACKING_EVIDENCE_MISMATCH",
     "HOLD_TRANSACTION_CODE_UNMAPPED": "TRANSACTION_CODE_UNMAPPED",
+    "NO_PAYMENT_FOUND": "PAYMENT_HISTORY_INCOMPLETE",
     "NPL_DATE_MAPPING_UNDEFINED": "NPL_DATE_MISSING",
     "NPL_MAPPING_REQUIRED": "NPL_DATE_MISSING",
     "PAID_PENDING_MISSING": "PACKAGE_DEFINITION_REQUIRED",
@@ -1234,6 +1257,10 @@
     "FAIL_ELIGIBILITY": "สถานะเดิมของ R§26 — ใช้ FAIL + reason_code ELIGIBILITY_*",
     "PASS_WITH_DOCUMENTARY_SUPPORT": "ชื่อเดิมของ R§26 → PASS_WITH_SUPPORT",
     "OBSERVATION_CANDIDATE (control_status)": "ย้ายเป็น review_flag (DEC-09)",
-    "FORMAT_VARIANCE as control_status OBSERVATION": "DEC-15: ปัจจุบัน control_status=PASS + review_flag=FORMAT_NORMALIZED"
+    "FORMAT_VARIANCE as control_status OBSERVATION": "DEC-15: ปัจจุบัน control_status=PASS + review_flag=FORMAT_NORMALIZED",
+    "POST_DEFAULT_PAYMENT_SUPPORTED": "ไม่ใช่ reason_code (เป็นเหตุผ่านด้วย support) → support_code POST_DEFAULT_PAYMENT_SUPPORTED (DEC-36)",
+    "MATCHED_STATEMENT_HEADER": "ไม่ใช่ reason_code (เป็นเหตุผ่านด้วย support) → support_code MATCHED_STATEMENT_HEADER (DEC-36)",
+    "DERIVED_AS_OF_DEMAND": "ไม่ใช่ reason_code (เป็นเหตุผ่านด้วย support) → support_code DERIVED_AS_OF_DEMAND (DEC-36)",
+    "UNCONTACTABLE_EXCEPTION_MATURED": "ไม่ใช่ reason_code (เป็นเหตุผ่านด้วย support) → support_code UNCONTACTABLE_7_MONTH_EXCEPTION (DEC-36)"
   }
 }

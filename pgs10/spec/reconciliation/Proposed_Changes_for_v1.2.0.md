@@ -1,13 +1,13 @@
 # Proposed Changes for v1.2.0 (r2 — Candidate สร้างแล้วที่ `pgs10/spec/v1.2.0-candidate/` ส่วน Engine ยังไม่แก้)
 
-**เวอร์ชัน:** 1.2.0-RECONCILIATION-r2 · **ไม่ใช่ Spec Candidate** · ไม่มีการแก้ไฟล์ Spec/Engine/Tests · รอ Review ของ Reconciliation ก่อน
+**เวอร์ชัน:** 1.2.0-RECONCILIATION-r3 · **ไม่ใช่ Spec Candidate** · ไม่มีการแก้ไฟล์ Spec/Engine/Tests · รอ Review ของ Reconciliation ก่อน
 
 ## 0. ฐานของ v1.2.0
 
 - โครงไฟล์ = Pack v1.1.0 (5 ไฟล์) เพราะเป็นที่ ChatGPT/Claude/Backend ใช้อยู่
 - เนื้อหา = P + ส่วนที่ D เติมกลับ + ผล DEC-01…14
 - ทุกไฟล์ใส่ `ruleset_version: 1.2.0-candidate`, `frozen: false` จนผ่าน Freeze Gate
-- ใช้ Rule ID Canonical (32 รายการ) และ reason code Canonical (83 ตัว) ตามไฟล์ Reconciliation
+- ใช้ Rule ID Canonical (32 รายการ) และ reason code Canonical (80 ตัว) ตามไฟล์ Reconciliation
 
 ## 1. `01_PGS10_POLICY_RULEBOOK.md`
 
@@ -35,7 +35,7 @@
 
 ## 3. `03_PGS10_DATA_DICTIONARY.json`
 
-1. แทน `reason_codes` (18) ด้วย Canonical catalogue (83) + `alias_index`
+1. แทน `reason_codes` (18) ด้วย Canonical catalogue (80) + `alias_index`
 2. **เพิ่มฟิลด์:** `fi_id`, `bank_id`, `npl_date`(คง) + `npl_anchor_date`, `later_payment_date/amount`, `statement_cutoff_date`, `later_statement_covers`, `loan_purpose_business`, `loan_is_new_business`, `loan_is_hp_leasing`, `postal_sent_date`, `confirmation_visual_elements{12}`, `support_used`, `review_flag`, `control_status`, `requirement`
 3. **Transaction map** เป็นตาราง (`bank_id, code, semantic_type, effective_from, effective_to, evidence_source, approval_status, approved_by`) — ไม่ใช่ object ตาม code; 6921/6680 = `UNVERIFIED_UNTIL_SOURCE` (ถอด 6921 ออกจาก mapping ของ P)
 4. **Conventions:** วันที่ ISO CE + `calendar` (BE|CE) + `original_text`; เงิน = integer satang; ROUND_HALF_UP; percent = basis points
@@ -44,7 +44,7 @@
 
 ## 4. `04_PGS10_GOLDEN_TESTS.json`
 
-ตาม `Golden_Test_Gap_Report.md`: schema ใหม่, แปลง GT-001…013, เพิ่ม T-01…T-42, นำ unit cases ตัวเลขของ D กลับ (reason ที่เปลี่ยนชื่อแล้ว), `evidence_ref` บังคับ, ไม่ Assert ที่ไม่มีหลักฐาน
+ตาม `Golden_Test_Gap_Report.md`: schema ใหม่, แปลง GT-001…013, เพิ่ม T-01…T-47, นำ unit cases ตัวเลขของ D กลับ (reason ที่เปลี่ยนชื่อแล้ว), `evidence_ref` บังคับ, ไม่ Assert ที่ไม่มีหลักฐาน
 
 ## 5. ผลกระทบต่อ Rule Engine (เมื่อได้รับอนุมัติเท่านั้น — ตอนนี้ **ไม่แก้**)
 
@@ -65,11 +65,10 @@
 
 ## 6. Freeze Gate Checklist
 
-ต้องปิดก่อนเรียก Spec Candidate ว่า Freeze (1 รายการ; นอกจากนี้ต้องผ่าน Freeze Gate 5 ข้อ — สคริปต์ `check_freeze_gate.js` ในโฟลเดอร์ Candidate):
+ต้องปิดก่อนเรียก Spec Candidate ว่า Freeze (0 รายการ; นอกจากนี้ต้องผ่าน Freeze Gate 5 ข้อ — สคริปต์ `check_freeze_gate.js` ในโฟลเดอร์ Candidate):
 
 | ID | ประเด็น | สถานะ | ผลที่ใช้ตอนนี้ |
 |---|---|---|---|
-| A-30 | NPL anchor date | OPEN | แยก guarantee_effective_date / lg_issue_date; ห้ามอนุมาน; ต้องให้ Business Owner ยืนยัน Mapping → APPROVED_OPERATIONAL. ระหว่างนี้ NPL-001 = Safe-Hold HOLD NPL_ANCHOR_DATE_UNDEFINED. **Freeze Blocker เดียวที่เหลือ** |
 
 นอกจากนี้ต้องมี: (1) evidence ref ของ DEC-01/02/03 (2) แก้ Master Audit ตามรายการใน Conflict_Register (3) เจ้าของ Business Rule ยืนยัน A-30 และตอบ Q-05…Q-07 (4) ตรวจ Golden Tests ใหม่ผ่านสคริปต์ consistency
 

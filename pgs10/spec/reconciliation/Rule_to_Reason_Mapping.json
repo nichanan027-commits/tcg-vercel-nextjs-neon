@@ -1,6 +1,6 @@
 {
   "meta": {
-    "spec_version": "1.2.0-RECONCILIATION-r2",
+    "spec_version": "1.2.0-RECONCILIATION-r3",
     "frozen": false,
     "status": "RECONCILIATION_DRAFT — ไม่ใช่ Spec Candidate และไม่ใช่การ Freeze",
     "decision_baseline": "DEC-01..DEC-14 (Rule_Reconciliation_Report §2)",
@@ -42,6 +42,7 @@
       "requirement": "REQUIRED_HARD",
       "applicable_when": "เสมอ",
       "control_status_when_ok": "PASS",
+      "support_codes": [],
       "reason_codes": [
         {
           "code": "ELIGIBILITY_EXPOSURE_LIMIT_EXCEEDED",
@@ -101,6 +102,7 @@
       "requirement": "REQUIRED_HARD",
       "applicable_when": "เสมอ",
       "control_status_when_ok": "PASS",
+      "support_codes": [],
       "reason_codes": [
         {
           "code": "FORMAT_VARIANCE",
@@ -131,6 +133,7 @@
       "requirement": "REQUIRED_HARD",
       "applicable_when": "เสมอ (มีเอกสารอนุมัติ/สัญญา)",
       "control_status_when_ok": "PASS",
+      "support_codes": [],
       "reason_codes": [
         {
           "code": "APPROVAL_DOCUMENT_INCOMPLETE",
@@ -150,6 +153,7 @@
       "requirement": "CONDITIONAL",
       "applicable_when": "DEF-002 ต้องใช้หนังสือยืนยัน (default < last payment) หรือมีหนังสือยืนยันในเคส",
       "control_status_when_ok": "NOT_APPLICABLE",
+      "support_codes": [],
       "reason_codes": [
         {
           "code": "CONFIRMATION_LETTER_VISUALLY_INCOMPLETE",
@@ -169,6 +173,7 @@
       "requirement": "CONDITIONAL",
       "applicable_when": "มีเอกสาร Critical ในเคส",
       "control_status_when_ok": "NOT_APPLICABLE",
+      "support_codes": [],
       "reason_codes": [
         {
           "code": "DOCUMENT_VISUALLY_INCOMPLETE",
@@ -188,6 +193,7 @@
       "requirement": "REQUIRED_HARD",
       "applicable_when": "เสมอ; ฐานวันที่ทำสัญญาใช้ได้เฉพาะ Thai Credit revolving-loan",
       "control_status_when_ok": "PASS",
+      "support_codes": [],
       "reason_codes": [
         {
           "code": "CONTRACT_DATE_BASIS_UNDEFINED",
@@ -207,6 +213,7 @@
       "requirement": "REQUIRED_HARD",
       "applicable_when": "เสมอ",
       "control_status_when_ok": "PASS",
+      "support_codes": [],
       "reason_codes": [
         {
           "code": "LG_DATA_MISSING",
@@ -231,12 +238,12 @@
       "requirement": "REQUIRED_HARD",
       "applicable_when": "เสมอ",
       "control_status_when_ok": "PASS",
+      "support_codes": [],
       "reason_codes": [
         {
           "code": "NPL_ANCHOR_DATE_UNDEFINED",
           "control_status": "HOLD",
-          "case_effect": "case HOLD",
-          "proposed_new": true
+          "case_effect": "case HOLD"
         },
         {
           "code": "NPL_DATE_MISSING",
@@ -245,8 +252,8 @@
         },
         {
           "code": "NPL_SEASONING_NOT_MET",
-          "control_status": "HOLD",
-          "case_effect": "case HOLD"
+          "control_status": "FAIL",
+          "case_effect": "case FAIL"
         }
       ]
     },
@@ -256,6 +263,7 @@
       "requirement": "REQUIRED_HARD",
       "applicable_when": "เสมอ (มี Statement)",
       "control_status_when_ok": "PASS",
+      "support_codes": [],
       "reason_codes": [
         {
           "code": "STATEMENT_MISSING",
@@ -275,9 +283,10 @@
       "requirement": "REQUIRED_HARD",
       "applicable_when": "เสมอ",
       "control_status_when_ok": "PASS",
+      "support_codes": [],
       "reason_codes": [
         {
-          "code": "NO_PAYMENT_FOUND",
+          "code": "PAYMENT_HISTORY_INCOMPLETE",
           "control_status": "HOLD",
           "case_effect": "case HOLD"
         },
@@ -299,6 +308,7 @@
       "requirement": "REQUIRED_HARD",
       "applicable_when": "เสมอ",
       "control_status_when_ok": "PASS",
+      "support_codes": [],
       "reason_codes": [
         {
           "code": "PAYMENT_AFTER_STATEMENT_CUTOFF",
@@ -313,16 +323,17 @@
       "requirement": "REQUIRED_HARD",
       "applicable_when": "เสมอ",
       "control_status_when_ok": "PASS",
+      "support_codes": [
+        {
+          "code": "POST_DEFAULT_PAYMENT_SUPPORTED",
+          "meaning": "มีการชำระหลังผิดนัด และหนังสือยืนยันสมบูรณ์ทางภาพ/เนื้อหา ตรง Default Date หน้าจอ"
+        }
+      ],
       "reason_codes": [
         {
           "code": "POST_DEFAULT_PAYMENT",
           "control_status": "HOLD",
           "case_effect": "case HOLD"
-        },
-        {
-          "code": "POST_DEFAULT_PAYMENT_SUPPORTED",
-          "control_status": "PASS_WITH_SUPPORT",
-          "case_effect": "case PASS_WITH_SUPPORT; ถ้ามี OBSERVATION ด้วย → PASS_WITH_OBSERVATION + support_used=true"
         }
       ]
     },
@@ -332,6 +343,12 @@
       "requirement": "CONDITIONAL",
       "applicable_when": "default_date < last_actual_payment_date",
       "control_status_when_ok": "NOT_APPLICABLE",
+      "support_codes": [
+        {
+          "code": "POST_DEFAULT_PAYMENT_SUPPORTED",
+          "meaning": "มีการชำระหลังผิดนัด และหนังสือยืนยันสมบูรณ์ทางภาพ/เนื้อหา ตรง Default Date หน้าจอ"
+        }
+      ],
       "reason_codes": [
         {
           "code": "CONFIRMATION_CONTENT_INCOMPLETE",
@@ -354,11 +371,6 @@
           "case_effect": "case HOLD"
         },
         {
-          "code": "POST_DEFAULT_PAYMENT_SUPPORTED",
-          "control_status": "PASS_WITH_SUPPORT",
-          "case_effect": "case PASS_WITH_SUPPORT; ถ้ามี OBSERVATION ด้วย → PASS_WITH_OBSERVATION + support_used=true"
-        },
-        {
           "code": "POST_DEFAULT_SUPPORT_MISSING",
           "control_status": "HOLD",
           "case_effect": "case HOLD"
@@ -371,6 +383,7 @@
       "requirement": "REQUIRED_HARD",
       "applicable_when": "เสมอ",
       "control_status_when_ok": "PASS",
+      "support_codes": [],
       "reason_codes": [
         {
           "code": "TRACKING_EVIDENCE_INCOMPLETE",
@@ -393,8 +406,9 @@
       "rule_id": "PGS10-RST-001",
       "name": "Restructure Requirement / Route",
       "requirement": "CONDITIONAL",
-      "applicable_when": "path ที่มีเงื่อนไข (ค): SMEs ≤ 5 ปี และ Small Biz ≤ 5 ปี. Start up → NOT_APPLICABLE (DEC-24)",
+      "applicable_when": "Case 1 (SMEs ≤5 ปี) และ Case 3 (Small Biz ≤5 ปี) — path ที่มีเงื่อนไข (ค); Case 2, 4, 5 → NOT_APPLICABLE",
       "control_status_when_ok": "NOT_APPLICABLE",
+      "support_codes": [],
       "reason_codes": [
         {
           "code": "RESTRUCTURE_PATH_UNDETERMINED",
@@ -414,6 +428,12 @@
       "requirement": "CONDITIONAL",
       "applicable_when": "route=UNCONTACTABLE_EXCEPTION_PATH (ใช้ได้เฉพาะ path ที่มี (ค) = กรณี 1 และ 3 — DEC-20)",
       "control_status_when_ok": "NOT_APPLICABLE",
+      "support_codes": [
+        {
+          "code": "UNCONTACTABLE_7_MONTH_EXCEPTION",
+          "meaning": "ครบเงื่อนไขทางออก (หน้า 7 กรณี 1 และ 3): start + 7 เดือนปฏิทิน + Certified Tracking Report + หนังสือบอกกล่าว/บอกเลิก ≥ 1"
+        }
+      ],
       "reason_codes": [
         {
           "code": "EXCEPTION_ROUTE_NOT_CONFIGURED",
@@ -424,12 +444,6 @@
           "code": "TRACKING_REPORT_NOT_CERTIFIED",
           "control_status": "HOLD",
           "case_effect": "case HOLD"
-        },
-        {
-          "code": "UNCONTACTABLE_EXCEPTION_MATURED",
-          "control_status": "PASS_WITH_SUPPORT",
-          "case_effect": "case PASS_WITH_SUPPORT; ถ้ามี OBSERVATION ด้วย → PASS_WITH_OBSERVATION + support_used=true",
-          "proposed_new": true
         },
         {
           "code": "UNCONTACTABLE_EXCEPTION_NOT_MET",
@@ -444,12 +458,13 @@
       "requirement": "CONDITIONAL",
       "applicable_when": "มีการปรับโครงสร้างหนี้",
       "control_status_when_ok": "NOT_APPLICABLE",
-      "reason_codes": [
+      "support_codes": [
         {
           "code": "MATCHED_STATEMENT_HEADER",
-          "control_status": "PASS_WITH_SUPPORT",
-          "case_effect": "case PASS_WITH_SUPPORT; ถ้ามี OBSERVATION ด้วย → PASS_WITH_OBSERVATION + support_used=true"
-        },
+          "meaning": "วันที่ปรับโครงสร้างตรงหัว Statement (Level 2) แม้ไม่ตรงวันลงนามในเอกสาร"
+        }
+      ],
+      "reason_codes": [
         {
           "code": "RESTRUCTURE_DATE_MISMATCH",
           "control_status": "HOLD",
@@ -473,6 +488,7 @@
       "requirement": "REQUIRED_HARD",
       "applicable_when": "เสมอ",
       "control_status_when_ok": "PASS",
+      "support_codes": [],
       "reason_codes": [
         {
           "code": "DEMAND_IDENTITY_UNCONFIRMED",
@@ -492,6 +508,12 @@
       "requirement": "REQUIRED_HARD",
       "applicable_when": "เสมอ",
       "control_status_when_ok": "PASS",
+      "support_codes": [
+        {
+          "code": "DERIVED_AS_OF_DEMAND",
+          "meaning": "derive เงินต้น ณ วันบอกกล่าวจาก Statement/Ledger ได้ครบเงื่อนไข (ครอบคลุม ไม่มี gap ไม่มีรายการกระทบเงินต้นหลัง demand หรือ reconstruct ได้)"
+        }
+      ],
       "reason_codes": [
         {
           "code": "DEMAND_PRINCIPAL_AS_OF_DATE_UNVERIFIED",
@@ -502,11 +524,6 @@
           "code": "DEMAND_PRINCIPAL_MISMATCH",
           "control_status": "HOLD",
           "case_effect": "case HOLD"
-        },
-        {
-          "code": "DERIVED_AS_OF_DEMAND",
-          "control_status": "PASS_WITH_SUPPORT",
-          "case_effect": "case PASS_WITH_SUPPORT; ถ้ามี OBSERVATION ด้วย → PASS_WITH_OBSERVATION + support_used=true"
         }
       ]
     },
@@ -516,6 +533,7 @@
       "requirement": "CONDITIONAL",
       "applicable_when": "ไม่ใช่เส้นทางล้มละลาย",
       "control_status_when_ok": "NOT_APPLICABLE",
+      "support_codes": [],
       "reason_codes": [
         {
           "code": "DEMAND_WAITING_PERIOD_NOT_MET",
@@ -530,6 +548,7 @@
       "requirement": "REQUIRED_HARD",
       "applicable_when": "เสมอ (Reference Event = Demand)",
       "control_status_when_ok": "PASS",
+      "support_codes": [],
       "reason_codes": [
         {
           "code": "HISTORICAL_BALANCE_MISMATCH",
@@ -544,6 +563,7 @@
       "requirement": "REQUIRED_HARD",
       "applicable_when": "เสมอ",
       "control_status_when_ok": "PASS",
+      "support_codes": [],
       "reason_codes": [
         {
           "code": "POSTAL_ACK_INCOMPLETE",
@@ -573,6 +593,7 @@
       "requirement": "REQUIRED_HARD",
       "applicable_when": "เสมอ",
       "control_status_when_ok": "PASS",
+      "support_codes": [],
       "reason_codes": [
         {
           "code": "ADDRESS_DIFFERS_FROM_LATEST",
@@ -597,6 +618,7 @@
       "requirement": "CONDITIONAL",
       "applicable_when": "มี tracking number/barcode",
       "control_status_when_ok": "NOT_APPLICABLE",
+      "support_codes": [],
       "reason_codes": [
         {
           "code": "POSTAL_LINKAGE_UNRESOLVED",
@@ -611,6 +633,7 @@
       "requirement": "REQUIRED_HARD",
       "applicable_when": "เสมอ",
       "control_status_when_ok": "PASS",
+      "support_codes": [],
       "reason_codes": [
         {
           "code": "CURRENT_PRINCIPAL_MISMATCH",
@@ -625,6 +648,7 @@
       "requirement": "REQUIRED_HARD",
       "applicable_when": "เสมอ",
       "control_status_when_ok": "PASS",
+      "support_codes": [],
       "reason_codes": [
         {
           "code": "CURRENT_BALANCE_MISMATCH",
@@ -650,11 +674,19 @@
       "requirement": "REQUIRED_HARD",
       "applicable_when": "เสมอ",
       "control_status_when_ok": "PASS",
+      "support_codes": [],
       "reason_codes": [
         {
-          "code": "CLAIM_FILING_WINDOW_NOT_MET",
+          "code": "CLAIM_FILING_NOT_YET_OPEN",
           "control_status": "HOLD",
-          "case_effect": "case HOLD"
+          "case_effect": "case HOLD",
+          "proposed_new": true
+        },
+        {
+          "code": "CLAIM_FILING_WINDOW_EXPIRED",
+          "control_status": "FAIL",
+          "case_effect": "case FAIL",
+          "proposed_new": true
         }
       ]
     },
@@ -664,15 +696,15 @@
       "requirement": "REQUIRED_HARD",
       "applicable_when": "เสมอ",
       "control_status_when_ok": "PASS",
+      "support_codes": [],
       "reason_codes": [
         {
-          "code": "COVERAGE_AGE_BASIS_UNDEFINED",
+          "code": "COVERAGE_RATIO_MISMATCH",
           "control_status": "HOLD",
-          "case_effect": "case HOLD",
-          "proposed_new": true
+          "case_effect": "case HOLD"
         },
         {
-          "code": "COVERAGE_RATIO_MISMATCH",
+          "code": "LG_TENOR_UNDETERMINABLE",
           "control_status": "HOLD",
           "case_effect": "case HOLD"
         },
@@ -689,6 +721,7 @@
       "requirement": "REQUIRED_HARD",
       "applicable_when": "เสมอ",
       "control_status_when_ok": "PASS",
+      "support_codes": [],
       "reason_codes": [
         {
           "code": "CLAIM_BASE_MISMATCH",
@@ -708,6 +741,7 @@
       "requirement": "REQUIRED_HARD",
       "applicable_when": "เสมอ",
       "control_status_when_ok": "PASS",
+      "support_codes": [],
       "reason_codes": [
         {
           "code": "CLAIM_CALCULATION_MISMATCH",
@@ -727,6 +761,7 @@
       "requirement": "REQUIRED_HARD",
       "applicable_when": "FINAL_APPROVAL (PRE_REVIEW: NOT_TESTABLE ได้และไม่กระทบเคส)",
       "control_status_when_ok": "PASS",
+      "support_codes": [],
       "reason_codes": [
         {
           "code": "CLAIM_EXCEEDS_CAP",
@@ -761,6 +796,7 @@
       "requirement": "REQUIRED_HARD",
       "applicable_when": "เสมอ",
       "control_status_when_ok": "PASS",
+      "support_codes": [],
       "reason_codes": [
         {
           "code": "TIMELINE_CONFLICT",

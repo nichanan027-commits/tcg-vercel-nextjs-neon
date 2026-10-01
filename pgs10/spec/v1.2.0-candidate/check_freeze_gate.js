@@ -5,9 +5,10 @@
  *   node check_freeze_gate.js --json   # machine-readable
  * Exit code: 0 = all 5 checks pass and no freeze blockers · 1 = a check failed · 2 = checks pass but freeze blockers remain.
  *
- * Checks (Reconciliation DEC-28):
- *   1 Canonical IDs resolve 100%      2 Reason codes resolve 100%      3 No status/reason mixing
- *   4 Policy OPEN rules have Safe-Hold      5 Golden tests have evidence and no invented expected result
+ * Checks (Reconciliation DEC-28, DEC-38):
+ *   1 Canonical IDs resolve 100%      2 Reason/support codes resolve 100%      3 No status/reason mixing
+ *   4 Policy OPEN rules have Safe-Hold      5 Golden tests have evidence and no invented expected result (Blocked fixtures never assert)
+ *   6 Conflict Register: every unresolved item has a Safe-Hold
  */
 'use strict';
 const fs = require('fs');
@@ -68,9 +69,9 @@ gate(2, 'Reason codes resolve 100%', (E, I) => {
   if (codes.length !== reg.reason_codes.length) E.push('duplicate reason code');
   Object.entries(aliasReasons).forEach(([a, c]) => { if (!reasons.has(c)) E.push(`alias ${a} -> unknown ${c}`); if (reasons.has(a)) E.push(`alias ${a} is also a canonical code`); });
   const nonReason = new Set([...CASE, ...CONTROL, ...FLAGS, ...dict.enums.review_stage, ...dict.enums.requirement, ...dict.enums.transaction_type, ...dict.enums.source_status,
-    ...dict.enums.transaction_code_evidence_status, 'ROUND_HALF_UP', 'THAI_CREDIT', 'BLOCKED_PENDING_EVIDENCE', 'NORMAL_RESTRUCTURE_PATH', 'UNCONTACTABLE_EXCEPTION_PATH', 'NOT_REQUIRED',
+    ...dict.enums.transaction_code_evidence_status, ...Object.keys(reg.support_codes), 'ROUND_HALF_UP', 'EXAMPLE_FI_WITH_PROFILE', 'FI_CONFIGURABLE', 'OWNER_VERIFIED', 'APPROVED_OPERATIONAL', 'PAYMENTS_FOUND', 'NO_PAYMENT_VERIFIED', 'INCOMPLETE', 'SYNTHETIC_LOGIC', 'AGGREGATION_ONLY', 'THAI_CREDIT', 'BLOCKED_PENDING_EVIDENCE', 'NORMAL_RESTRUCTURE_PATH', 'UNCONTACTABLE_EXCEPTION_PATH', 'NOT_REQUIRED',
     'DIRECT_SNAPSHOT', 'BY_PRINCIPAL', 'BY_GUARANTEE', 'DELIVERED', 'RETURNED', 'PROVEN_INELIGIBILITY_ONLY', 'SMALL_BIZ', 'START_UP', 'SMART_BIZ', 'SMART_ONE', 'SMART_GREEN', 'SMART_PLUS',
-    'NOT_PGS10', 'REQUIRED', 'PGS10', 'OFFICIAL', 'LOCKED', 'USER_ATTESTED', 'VERIFIED', 'RULE_ONLY', 'FULL_CASE', 'AGGREGATION_LOGIC', 'EXACT', 'CONTAINS', 'ISO', 'RECIPIENT', 'AUTHORIZED',
+    'NOT_PGS10', 'REQUIRED', 'PGS10', 'OFFICIAL', 'LOCKED', 'USER_ATTESTED', 'VERIFIED', 'RULE_ONLY', 'FULL_CASE', 'AGGREGATION_ONLY', 'EXACT', 'CONTAINS', 'ISO', 'RECIPIENT', 'AUTHORIZED',
     'PRINTED_NAME_ONLY', 'POSTAL_OFFICER_ONLY', 'NONE', 'DERIVED', 'DIRECT', 'FINAL_APPROVAL', 'PRE_REVIEW', 'NORMAL', 'MISSING', 'PAGE_SEQUENCE_GAP', 'PAGE_UNREADABLE', 'DOCUMENT_TRUNCATED',
     'CLAIM_MAX_UNDEFINED', 'ROUND_UNDEFINED', 'PAID_PENDING_MISSING']);
   reasons.forEach((c) => (c.detail_codes || []).forEach((d) => nonReason.add(d)));
@@ -81,9 +82,21 @@ gate(2, 'Reason codes resolve 100%', (E, I) => {
     E.push(`${n}: unresolved token \`${t}\``);
   }));
   reg.rules.forEach((r) => r.reasons.forEach((c) => { if (!reasons.has(c.code)) E.push(`${r.id}: reason ${c.code} not in catalogue`); }));
+  Object.keys(reg.support_codes).forEach((k) => { if (reasons.has(k)) E.push(`support code ${k} is also a reason code`); });
+  reasons.forEach((c, code) => { if (c.control_status === 'PASS_WITH_SUPPORT') E.push(`reason code ${code} explains a support pass — must be a support_code`); });
+  reg.rules.forEach((r) => (r.support_codes || []).forEach((k) => { if (!(k in reg.support_codes)) E.push(`${r.id}: unknown support_code ${k}`); }));
   par.parameters.forEach((p) => { if (p.safe_hold && !reasons.has(p.safe_hold.reason_code)) E.push(`${p.id}: safe_hold reason ${p.safe_hold.reason_code} not in catalogue`); });
   gold.tests.forEach((t) => {
     const all = [...(t.expected_reason_codes || [])];
+    (t.expected_rule_results || []).forEach((e) => {
+      if (e.support_code) {
+        const sc = reg.support_codes[e.support_code];
+        if (!sc) E.push(`${t.test_id}: unknown support_code ${e.support_code}`);
+        else if (!sc.rules.includes(e.rule_id)) E.push(`${t.test_id}: support_code ${e.support_code} not defined for ${e.rule_id}`);
+        if (e.control_status !== 'PASS_WITH_SUPPORT') E.push(`${t.test_id}: support_code requires control_status PASS_WITH_SUPPORT`);
+        if ((e.reason_codes || []).length) E.push(`${t.test_id}: a support pass must not carry reason_codes`);
+      } else if (e.control_status === 'PASS_WITH_SUPPORT') E.push(`${t.test_id}: PASS_WITH_SUPPORT without support_code`);
+    });
     (t.expected_rule_results || []).forEach((e) => (e.reason_codes || []).forEach((c) => {
       all.push(c);
       const rc = reasons.get(c);
@@ -102,6 +115,8 @@ gate(3, 'No status/reason mixing', (E, I) => {
   const statuses = new Set([...CASE, ...CONTROL, ...FLAGS]);
   if (CASE.length !== 5) E.push('case_status must have exactly 5 values');
   reasons.forEach((c, code) => {
+    if (c.control_status === 'FAIL' && !(c.policy_disqualifying === true && c.remediable_by_document === false && c.requires_evidence_verified === true)) E.push(`${code}: FAIL without policy_disqualifying ∧ ¬remediable_by_document ∧ evidence_verified`);
+    if (c.control_status !== 'FAIL' && c.policy_disqualifying === true) E.push(`${code}: policy_disqualifying reason must be FAIL-capable`);
     if (/^(HOLD|FAIL|PASS)_/.test(code)) E.push(`reason code looks like a status: ${code}`);
     if (statuses.has(code)) E.push(`reason code equals a status/flag: ${code}`);
     if (!CONTROL.includes(c.control_status)) E.push(`${code}: control_status ${c.control_status} invalid`);
@@ -116,6 +131,7 @@ gate(3, 'No status/reason mixing', (E, I) => {
     });
   });
   Object.keys(aliasReasons).forEach((a) => { if (!/^(HOLD_|FAIL_)/.test(a) && statuses.has(a)) E.push('alias equals status ' + a); });
+  if (JSON.stringify(reg.fail_criteria).indexOf('prefix') > -1 && /startsWith|prefix\s*=/i.test(md02)) E.push('FAIL must not be decided by reason_code prefix');
   I.push(`case statuses: ${CASE.join(', ')}; retired status-like names (aliases only): ${Object.keys(aliasReasons).filter((a) => /^HOLD_/.test(a)).length}`);
 });
 
@@ -146,10 +162,8 @@ gate(4, 'Policy OPEN rules have Safe-Hold', (E, I) => {
   if (!lz || lz.value !== false) E.push('PRM-014 allow_default_date_as_npl_date must be false');
   const tol = par.parameters.find((p) => p.id === 'PRM-032');
   if (!tol || tol.value !== false) E.push('PRM-032 tolerance must be disabled by default');
-  const meta = reg.metadata;
   I.push(`OPEN/ASSUMPTION/UNVERIFIED/PROPOSED params with safe-hold: ${open.join(', ')}`);
   I.push(`transaction codes: ${tm.entries.filter((e) => e.evidence_status.startsWith('EVIDENCE')).length} evidence-supported, ${tm.entries.filter((e) => e.evidence_status.startsWith('UNVERIFIED')).length} unverified`);
-  results.blockers = meta.freeze_blockers || [];
 });
 
 // ------------------------------------------------------------------ 5. golden tests: evidence, no invented expected result
@@ -176,7 +190,7 @@ function aggregate(controls, stage) {
   return { case_status: 'PASS', support_used: false };
 }
 gate(5, 'Golden tests have evidence and no invented expected result', (E, I) => {
-  const scopes = ['RULE_ONLY', 'FULL_CASE', 'AGGREGATION_LOGIC'], modes = ['RULE_ONLY', 'EXACT', 'CONTAINS'], bases = ['FROM_DOCUMENT', 'DERIVED_FROM_LOCKED_RULE', 'SYNTHETIC_FROM_RULE', 'OWNER_REVIEWED_CASE'];
+  const scopes = ['RULE_ONLY', 'FULL_CASE', 'AGGREGATION_ONLY'], modes = ['RULE_ONLY', 'EXACT', 'CONTAINS'], bases = ['FROM_DOCUMENT', 'DERIVED_FROM_LOCKED_RULE', 'SYNTHETIC_FROM_RULE', 'OWNER_REVIEWED_CASE'];
   const ids = gold.tests.map((t) => t.test_id);
   if (new Set(ids).size !== ids.length) E.push('duplicate test_id');
   const allowedExtra = new Set(['controls', 'review_stage']);
@@ -190,7 +204,12 @@ gate(5, 'Golden tests have evidence and no invented expected result', (E, I) => 
     if (!t.rule_basis || typeof t.rule_basis !== 'string') E.push(`${id}: missing rule_basis (expected result must cite its source)`);
     if (t.test_scope === 'RULE_ONLY' && (t.expected_case_status !== null || (t.expected_reason_codes || []).length)) E.push(`${id}: RULE_ONLY must not assert case status/case reasons`);
     if (t.test_scope === 'FULL_CASE' && !(t.evidence_package && t.evidence_package.complete === true)) E.push(`${id}: FULL_CASE requires a complete evidence_package`);
-    if (t.test_scope === 'AGGREGATION_LOGIC' && !t.proposed_scope) E.push(`${id}: AGGREGATION_LOGIC must be flagged proposed_scope`);
+    if (t.test_scope === 'AGGREGATION_ONLY' && !(t.fixture_type === 'SYNTHETIC_LOGIC' && t.evidence_required === false && t.lg_no === null)) E.push(`${id}: AGGREGATION_ONLY must be SYNTHETIC_LOGIC, evidence_required=false, no real case`);
+    if (t.activation === 'BLOCKED_PENDING_EVIDENCE') {
+      if ((t.expected_rule_results || []).length || t.expected_case_status !== null || (t.expected_reason_codes || []).length) E.push(`${id}: BLOCKED_PENDING_EVIDENCE must not assert any expected result (DEC-38)`);
+      if (t.evidence_ref && (t.evidence_ref.document || (t.evidence_ref.pages || []).length)) E.push(`${id}: has evidence but still BLOCKED — activate it or drop the evidence fields`);
+    }
+    if (t.manual_baseline_note && t.activation !== 'BLOCKED_PENDING_EVIDENCE') E.push(`${id}: manual_baseline_note only allowed on blocked fixtures`);
     if (t.lg_no) {
       if (!t.evidence_ref || !t.evidence_ref.status) E.push(`${id}: real case without evidence_ref`);
       else if (t.activation === 'ACTIVE' && !(['VERIFIED', 'USER_ATTESTED'].includes(t.evidence_ref.status) && t.evidence_ref.document && (t.evidence_ref.pages || []).length)) E.push(`${id}: ACTIVE real case needs evidence_ref.document/pages`);
@@ -202,11 +221,11 @@ gate(5, 'Golden tests have evidence and no invented expected result', (E, I) => 
       if (t.input === null || typeof t.input !== 'object') E.push(`${id}: synthetic test needs input`);
       if (t.activation !== 'ACTIVE') E.push(`${id}: synthetic test must be ACTIVE`);
     }
-    if (t.input && t.test_scope !== 'AGGREGATION_LOGIC') Object.keys(t.input).forEach((k) => { if (!fields[k] && !allowedExtra.has(k)) E.push(`${id}: input field not in dictionary: ${k}`); });
+    if (t.input && t.test_scope !== 'AGGREGATION_ONLY') Object.keys(t.input).forEach((k) => { if (!fields[k] && !allowedExtra.has(k)) E.push(`${id}: input field not in dictionary: ${k}`); });
     (t.expected_rule_results || []).forEach((e) => { if (!(t.rule_ids || []).includes(e.rule_id)) E.push(`${id}: expected rule ${e.rule_id} not in rule_ids`); });
-    if (t.activation === 'ACTIVE' && t.test_scope !== 'AGGREGATION_LOGIC' && !(t.expected_rule_results || []).length) E.push(`${id}: ACTIVE test has no expected_rule_results`);
+    if (t.activation === 'ACTIVE' && t.test_scope !== 'AGGREGATION_ONLY' && !(t.expected_rule_results || []).length) E.push(`${id}: ACTIVE test has no expected_rule_results`);
     // aggregation logic is recomputed from the registry — expected must equal the spec's own result
-    if (t.test_scope === 'AGGREGATION_LOGIC') {
+    if (t.test_scope === 'AGGREGATION_ONLY') {
       const r = aggregate(t.input.controls, t.input.review_stage || 'FINAL_APPROVAL');
       evaluated++;
       if (r.case_status !== t.expected_case_status) E.push(`${id}: aggregation gives ${r.case_status}, test expects ${t.expected_case_status}`);
@@ -223,33 +242,75 @@ gate(5, 'Golden tests have evidence and no invented expected result', (E, I) => 
         if (v.kind === 'capacity') { const av = BI(v.claim_max) - BI(v.paid) - BI(v.pending); if (fmt(av) !== v.expect_available || fmt(av - BI(v.claim)) !== v.expect_after) E.push(`${id}: capacity arithmetic mismatch`); }
       } catch (e) { E.push(`${id}: verify error ${e.message}`); }
     }
-    // date-rule re-evaluation for tests whose expectation is a pure function of the rules
+    // re-evaluate expectations that are a pure function of the spec (no invented expected results)
     const inp = t.input || {}, exp = (t.expected_rule_results || [])[0];
-    if (t.activation === 'ACTIVE' && exp) {
-      if (exp.rule_id === 'PGS10-NPL-001' && inp.npl_date && inp.guarantee_effective_date) {
-        const months = { START_UP: 6, SMALL_BIZ: 6, SMART_BIZ: 9 }[inp.product];
-        const ok = inp.npl_date >= addMonths(inp.guarantee_effective_date, months); evaluated++;
-        if ((exp.control_status === 'PASS') !== ok) E.push(`${id}: NPL seasoning re-evaluation says ${ok ? 'PASS' : 'HOLD'}`);
+    if (t.activation === 'ACTIVE' && exp && t.test_scope === 'RULE_ONLY') {
+      const need = (cond, msg) => { evaluated++; if (!cond) E.push(`${id}: ${msg}`); };
+      if (exp.rule_id === 'PGS10-NPL-001') {
+        const months = { START_UP: 6, SMALL_BIZ: 6, SMART_BIZ: 9, SMART_ONE: 9, SMART_GREEN: 9, SMART_PLUS: 9 }[inp.product];
+        let st, rc;
+        if (!inp.npl_date || inp.npl_date_verified !== true) { st = 'HOLD'; rc = 'NPL_DATE_MISSING'; }
+        else if (!inp.lg_issue_date) { st = 'HOLD'; rc = 'NPL_ANCHOR_DATE_UNDEFINED'; }
+        else if (inp.npl_date >= addMonths(inp.lg_issue_date, months)) st = 'PASS';
+        else { st = 'FAIL'; rc = 'NPL_SEASONING_NOT_MET'; }
+        need(exp.control_status === st && (rc ? (exp.reason_codes || [])[0] === rc : !(exp.reason_codes || []).length), `NPL-001 re-evaluation gives ${st}${rc ? '/' + rc : ''}`);
       }
-      if (exp.rule_id === 'PGS10-RST-002' && inp.restructure_route === 'UNCONTACTABLE_EXCEPTION_PATH' && (t.config || {}).enable_uncontactable_exception === true) {
-        const start = inp.first_uncontactable_date || inp.first_contacted_restructure_failed_date; const ok = inp.claim_submission_date >= addMonths(start, 7); evaluated++;
-        if ((exp.control_status === 'PASS_WITH_SUPPORT') !== ok) E.push(`${id}: exception maturity re-evaluation says ${ok ? 'matured' : 'not matured'}`);
+      if (exp.rule_id === 'PGS10-CLM-001' && inp.claim_submission_date) {
+        let st, rc;
+        if (inp.claim_submission_date < addMonths(inp.lg_issue_date, 12)) { st = 'HOLD'; rc = 'CLAIM_FILING_NOT_YET_OPEN'; }
+        else if (inp.claim_submission_date > addMonths(inp.final_lg_expiry_date, 12)) { if (inp.claim_filing_dates_verified === true) { st = 'FAIL'; rc = 'CLAIM_FILING_WINDOW_EXPIRED'; } else st = 'UNDECIDED'; }
+        else st = 'PASS';
+        need(exp.control_status === st && (rc ? (exp.reason_codes || [])[0] === rc : true), `CLM-001 re-evaluation gives ${st}${rc ? '/' + rc : ''}`);
       }
-      if (exp.rule_id === 'PGS10-CLM-002' && inp.lg_issue_date && inp.claim_submission_date && exp.control_status !== 'HOLD' || (exp.rule_id === 'PGS10-CLM-002' && exp.reason_codes && exp.reason_codes[0] === 'COVERAGE_AGE_BASIS_UNDEFINED')) {
-        const anniv = addMonths(inp.lg_issue_date, 60);
-        const events = [inp.claim_submission_date, inp.npl_date, inp.default_date, inp.demand_date_letter].filter(Boolean);
-        const tiers = new Set(events.map((e) => (e <= anniv ? 'LE' : 'GT'))); evaluated++;
-        if (exp.reason_codes && exp.reason_codes[0] === 'COVERAGE_AGE_BASIS_UNDEFINED') { if (tiers.size < 2) E.push(`${id}: expected basis conflict but tiers agree`); }
-        else if (exp.coverage_ratio_bp) {
-          if (tiers.size > 1) E.push(`${id}: candidate events disagree — should be Safe-Hold`);
-          else { const start = inp.product === 'START_UP' ? 10000 : (tiers.has('LE') ? 7000 : 10000); if (start !== exp.coverage_ratio_bp) E.push(`${id}: coverage ${start} != ${exp.coverage_ratio_bp}`); }
+      if (exp.rule_id === 'PGS10-CLM-002' && inp.product && !exp.reason_codes?.includes('NO_RULE_FOR_PRODUCT')) {
+        let tenor = null;
+        if (inp.guarantee_term_years != null) tenor = { le: inp.guarantee_term_years <= 5 };
+        else if (inp.lg_renewed_or_extended) tenor = null;
+        else if (inp.lg_issue_date && inp.lg_expiry_date) tenor = { le: inp.lg_expiry_date <= addMonths(inp.lg_issue_date, 60) };
+        if (!tenor) need(exp.control_status === 'HOLD' && (exp.reason_codes || [])[0] === 'LG_TENOR_UNDETERMINABLE', 'CLM-002 tenor undeterminable must HOLD LG_TENOR_UNDETERMINABLE');
+        else {
+          const bp = inp.product === 'START_UP' ? 10000 : (tenor.le ? 7000 : 10000);
+          const screen = parseInt(String(inp.screen_coverage_ratio), 10);
+          const st = screen === bp ? 'PASS' : 'HOLD';
+          need(exp.control_status === st && exp.coverage_ratio_bp === bp, `CLM-002 re-evaluation gives ${st}/${bp}`);
         }
       }
+      if (exp.rule_id === 'PGS10-RST-002' && inp.restructure_route === 'UNCONTACTABLE_EXCEPTION_PATH' && (t.config || {}).enable_uncontactable_exception === true) {
+        const start = inp.first_uncontactable_date || inp.first_contacted_restructure_failed_date;
+        need((exp.control_status === 'PASS_WITH_SUPPORT') === (inp.claim_submission_date >= addMonths(start, 7)), 'RST-002 maturity re-evaluation disagrees');
+      }
+      if (exp.rule_id === 'PGS10-STM-001' && inp.statement_period_start !== undefined) {
+        const pays = (inp.transactions || []).some((x) => x.transaction_type === 'PAYMENT');
+        const complete = inp.statement_period_start <= inp.loan_origination_date && inp.statement_period_end >= inp.statement_cutoff_date && inp.statement_has_gap === false;
+        const status = pays ? 'PAYMENTS_FOUND' : complete ? 'NO_PAYMENT_VERIFIED' : 'INCOMPLETE';
+        need(exp.payment_history_status === status, `STM-001 payment_history_status should be ${status}`);
+        need((status === 'INCOMPLETE') === (exp.control_status === 'HOLD'), 'STM-001 status vs payment_history_status');
+      }
     }
+    // FAIL needs verified evidence (DEC-31)
+    (t.expected_rule_results || []).forEach((e) => {
+      if (e.control_status !== 'FAIL') return;
+      if (e.rule_id === 'PGS10-NPL-001' && inp.npl_date_verified !== true) E.push(`${id}: FAIL without npl_date_verified`);
+      if (e.rule_id === 'PGS10-CLM-001' && inp.claim_filing_dates_verified !== true) E.push(`${id}: FAIL without claim_filing_dates_verified`);
+    });
   });
   const c = (f) => gold.tests.filter(f).length;
-  I.push(`${gold.tests.length} tests: ACTIVE ${c((t) => t.activation === 'ACTIVE')}, BLOCKED_PENDING_EVIDENCE ${c((t) => t.activation !== 'ACTIVE')}; FULL_CASE ${c((t) => t.test_scope === 'FULL_CASE')}; AGGREGATION_LOGIC (proposed scope) ${c((t) => t.test_scope === 'AGGREGATION_LOGIC')}`);
+  I.push(`${gold.tests.length} tests: ACTIVE ${c((t) => t.activation === 'ACTIVE')}, BLOCKED_PENDING_EVIDENCE ${c((t) => t.activation !== 'ACTIVE')}; FULL_CASE ${c((t) => t.test_scope === 'FULL_CASE')}; AGGREGATION_ONLY ${c((t) => t.test_scope === 'AGGREGATION_ONLY')}; blocked fixtures asserting: ${c((t) => t.activation !== 'ACTIVE' && ((t.expected_rule_results || []).length || t.expected_case_status !== null))}`);
   I.push(`numeric blocks re-verified: ${verified}; rule/aggregation expectations re-evaluated from spec: ${evaluated}`);
+});
+
+// ------------------------------------------------------------------ 6. conflict register safe-holds (freeze condition)
+gate(6, 'Conflict Register: every unresolved item has a Safe-Hold', (E, I) => {
+  const cr = reg.conflict_register || [];
+  const unresolved = cr.filter((c) => ['OPEN', 'PARTIAL'].includes(c.status));
+  unresolved.forEach((c) => {
+    if (!c.safe_hold || !c.safe_hold.behavior) E.push(`${c.id} (${c.status}) has no safe_hold`);
+    else if (c.safe_hold.reason_code && !reasons.has(c.safe_hold.reason_code)) E.push(`${c.id}: safe_hold reason ${c.safe_hold.reason_code} not in catalogue`);
+  });
+  const computed = cr.filter((c) => c.blocks_freeze && !String(c.status).startsWith('RESOLVED')).map((c) => c.id);
+  if (JSON.stringify(computed) !== JSON.stringify(reg.metadata.freeze_blockers)) E.push(`metadata.freeze_blockers ${JSON.stringify(reg.metadata.freeze_blockers)} != register ${JSON.stringify(computed)}`);
+  results.blockers = computed;
+  I.push(`${cr.length} register items: resolved ${cr.filter((c) => String(c.status).startsWith('RESOLVED')).length}, unresolved with Safe-Hold ${unresolved.length}`);
 });
 
 // ------------------------------------------------------------------ report
@@ -265,7 +326,7 @@ if (process.argv.includes('--json')) {
     r.errors.slice(0, 40).forEach((e) => console.log('   ✗ ' + e));
     if (r.errors.length > 40) console.log(`   … ${r.errors.length - 40} more`);
   });
-  console.log(`\nFreeze blockers (business decisions still open): ${blockers.length ? blockers.join(', ') : 'none'}`);
-  console.log(allPass ? (blockers.length ? '\nRESULT: 5/5 checks pass — NOT READY TO FREEZE (blockers remain)' : '\nRESULT: 5/5 checks pass — READY for Freeze Gate Review') : '\nRESULT: CHECKS FAILED');
+  console.log(`\nFreeze blockers (unresolved items flagged blocks_freeze): ${blockers.length ? blockers.join(', ') : 'none'}`);
+  console.log(allPass ? (blockers.length ? '\nRESULT: all checks pass — NOT READY TO FREEZE (blockers remain)' : '\nRESULT: all 6 checks pass, no blockers — READY FOR FINAL FREEZE GATE REVIEW (not frozen)') : '\nRESULT: CHECKS FAILED');
 }
 process.exit(allPass ? (blockers.length ? 2 : 0) : 1);

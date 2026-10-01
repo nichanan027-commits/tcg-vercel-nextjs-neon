@@ -1,6 +1,6 @@
 # Golden Test Gap Report
 
-**เวอร์ชัน:** 1.2.0-RECONCILIATION-r2 · ไม่แก้ `engine.test.js` หรือ `04_PGS10_GOLDEN_TESTS.json` ทั้งของ D และ P — เป็นรายงานช่องว่างและข้อเสนอเท่านั้น
+**เวอร์ชัน:** 1.2.0-RECONCILIATION-r3 · ไม่แก้ `engine.test.js` หรือ `04_PGS10_GOLDEN_TESTS.json` ทั้งของ D และ P — เป็นรายงานช่องว่างและข้อเสนอเท่านั้น
 
 ## 1. Schema ใหม่ (DEC-13)
 
@@ -50,7 +50,7 @@
 | Rule | P | D | R§30 | T (เสนอ) | มี coverage? |
 |---|---|---|---|---|---|
 | `PGS10-ELIG-001` | 0 | 4 | 0 | 2 | ✅ |
-| `PGS10-ID-001` | 0 | 5 | 1 | 3 | ✅ |
+| `PGS10-ID-001` | 0 | 5 | 1 | 4 | ✅ |
 | `PGS10-DOC-001` | 0 | 4 | 2 | 0 | ✅ |
 | `PGS10-VIS-001` | 12 | 2 | 5 | 2 | ✅ |
 | `PGS10-VIS-002` | 0 | 0 | 0 | 0 | ❌ |
@@ -58,9 +58,9 @@
 | `PGS10-LG-001` | 0 | 1 | 0 | 0 | ✅ |
 | `PGS10-NPL-001` | 0 | 1 | 0 | 4 | ✅ |
 | `PGS10-TXN-001` | 0 | 0 | 0 | 5 | ✅ |
-| `PGS10-STM-001` | 0 | 2 | 0 | 3 | ✅ |
+| `PGS10-STM-001` | 0 | 2 | 0 | 4 | ✅ |
 | `PGS10-STM-002` | 0 | 1 | 1 | 2 | ✅ |
-| `PGS10-DEF-001` | 0 | 4 | 2 | 0 | ✅ |
+| `PGS10-DEF-001` | 0 | 4 | 2 | 1 | ✅ |
 | `PGS10-DEF-002` | 1 | 5 | 1 | 0 | ✅ |
 | `PGS10-FUP-001` | 0 | 1 | 0 | 0 | ✅ |
 | `PGS10-RST-001` | 0 | 1 | 0 | 1 | ✅ |
@@ -75,7 +75,7 @@
 | `PGS10-PST-003` | 0 | 0 | 0 | 0 | ❌ |
 | `PGS10-CUR-001` | 0 | 1 | 1 | 1 | ✅ |
 | `PGS10-CUR-002` | 0 | 3 | 0 | 2 | ✅ |
-| `PGS10-CLM-001` | 0 | 3 | 0 | 0 | ✅ |
+| `PGS10-CLM-001` | 0 | 3 | 0 | 2 | ✅ |
 | `PGS10-CLM-002` | 0 | 4 | 0 | 3 | ✅ |
 | `PGS10-CLM-003` | 0 | 2 | 0 | 0 | ✅ |
 | `PGS10-CLM-004` | 0 | 3 | 1 | 1 | ✅ |
@@ -89,30 +89,30 @@
 ## 4. Unit cases เดิมของ D (78) เมื่อใช้ Canonical
 
 - ทั้ง 78 เป็น RULE_ONLY โดยธรรมชาติ → ย้ายเข้า schema ใหม่ได้เกือบทั้งหมด
-- **16 เคสต้องเปลี่ยนชื่อ reason_code** (เช่น `EXCEPTION_LETTER_MISSING` → `POST_DEFAULT_SUPPORT_MISSING`, `CLAIM_AMOUNT_MISMATCH` → `CLAIM_CALCULATION_MISMATCH`)
+- **18 เคสต้องเปลี่ยนชื่อ reason_code** (เช่น `EXCEPTION_LETTER_MISSING` → `POST_DEFAULT_SUPPORT_MISSING`, `CLAIM_AMOUNT_MISMATCH` → `CLAIM_CALCULATION_MISMATCH`)
 - **1 เคสใช้ `OBSERVATION_CANDIDATE` เป็น control status** → เปลี่ยนเป็น HOLD + NUMERIC_VARIANCE (tolerance ปิด) หรือ OBSERVATION (tolerance เปิด)
 - ต้องแตก Rule: UT-STM-* (TXN-001/STM-001), UT-CUR-* (CUR-001/CUR-002), UT-VIS-* (VIS-001/VIS-002), UT-PST-006 (PST-001/PST-002)
 - UT-COV-004 (ครบ 5 ปีพอดี) ที่ D ไม่ Assert → ตอนนี้ Assert ได้: 70% (DEC-11) = T-20
 - `case_status_if_all_other_controls_pass` ของ D ต้องลบ (ขัดกับ RULE_ONLY)
 
-## 5. Tests ที่เสนอเพิ่ม/เปลี่ยน (42 รายการ) — ทั้งหมดอิงคำตัดสิน ไม่มี Assertion ที่คาดเดา
+## 5. Tests ที่เสนอเพิ่ม/เปลี่ยน (47 รายการ) — ทั้งหมดอิงคำตัดสิน ไม่มี Assertion ที่คาดเดา
 
 ตัวเลข/เอกสารจริงต้องจัดหาเอง; ที่นี่เป็นเงื่อนไขและผลที่ต้องได้เท่านั้น
 
 | ID | เงื่อนไข | scope | Rule | ผล | reason_code | ที่มา |
 |---|---|---|---|---|---|---|
-| T-01 | Start up: npl_date ห่างจาก LG issue ครบ 6 เดือนปฏิทินพอดี | RULE_ONLY | `PGS10-NPL-001` | PASS | — | DEC-01 |
-| T-02 | Start up: npl_date ห่างจาก LG issue 5 เดือน 29 วัน | RULE_ONLY | `PGS10-NPL-001` | HOLD | NPL_SEASONING_NOT_MET | DEC-01 |
+| T-01 | Start up: npl_date ห่างจาก lg_issue_date ครบ 6 เดือนปฏิทินพอดี | RULE_ONLY | `PGS10-NPL-001` | PASS | — | DEC-01, DEC-29 |
+| T-02 | Start up: npl_date verified ห่างจาก lg_issue_date 5 เดือน 29 วัน → FAIL | RULE_ONLY | `PGS10-NPL-001` | FAIL | NPL_SEASONING_NOT_MET | DEC-31 |
 | T-03 | มีเฉพาะ default_date ไม่มี npl_date | RULE_ONLY | `PGS10-NPL-001` | HOLD | NPL_DATE_MISSING | DEC-01 |
 | T-04 | Thai Credit code 6619 และ 6656 นับเป็น PAYMENT | RULE_ONLY | `PGS10-TXN-001` | PASS | — | DEC-02 |
 | T-05 | Thai Credit code 6931 (principal เพิ่ม) ไม่นับเป็น PAYMENT แม้เป็นรายการล่าสุด | RULE_ONLY | `PGS10-STM-001` | PASS | — | DEC-02 |
 | T-06 | code 6921 ปรากฏในช่วงที่กระทบ Last Payment → ไม่มี Mapping | RULE_ONLY | `PGS10-TXN-001` | HOLD | TRANSACTION_CODE_UNMAPPED | DEC-02 |
 | T-07 | code 6680 เช่นเดียวกัน | RULE_ONLY | `PGS10-TXN-001` | HOLD | TRANSACTION_CODE_UNMAPPED | DEC-02 |
 | T-08 | LG 66-037410 ต้องไม่ถูกแก้/รวมกับ 66-067410 | RULE_ONLY | `PGS10-ID-001` | PASS | — | DEC-03 |
-| T-09 | มี Support + Observation ในเคสเดียว | AGGREGATION_LOGIC (เสนอ) | CASE | PASS_WITH_OBSERVATION | support_used=true | DEC-04 |
-| T-10 | มี Support อย่างเดียว | AGGREGATION_LOGIC (เสนอ) | CASE | PASS_WITH_SUPPORT | — | DEC-04 |
+| T-09 | มี Support + Observation ในเคสเดียว | AGGREGATION_ONLY | CASE | PASS_WITH_OBSERVATION | support_used=true | DEC-04 |
+| T-10 | มี Support อย่างเดียว | AGGREGATION_ONLY | CASE | PASS_WITH_SUPPORT | — | DEC-04 |
 | T-11 | CAP-001 ที่ FINAL_APPROVAL ไม่มี paid/pending | RULE_ONLY | `PGS10-CAP-001` | NOT_TESTABLE | PACKAGE_DEFINITION_REQUIRED | DEC-17 |
-| T-12 | Conditional control NOT_APPLICABLE (ไม่มีการปรับโครงสร้าง) ไม่กระทบเคส | AGGREGATION_LOGIC (เสนอ) | `PGS10-RST-003` | NOT_APPLICABLE | — | DEC-06 |
+| T-12 | Conditional control NOT_APPLICABLE (ไม่มีการปรับโครงสร้าง) ไม่กระทบเคส | AGGREGATION_ONLY | `PGS10-RST-003` | NOT_APPLICABLE | — | DEC-06 |
 | T-13 | Historical interest/total ผิด แต่ principal ตรง | RULE_ONLY | `PGS10-HIS-001` | HOLD | HISTORICAL_BALANCE_MISMATCH | DEC-07 |
 | T-14 | Demand principal เท่ากับ as-of; Latest Statement ต่างเพราะชำระหลัง demand | RULE_ONLY | `PGS10-DMD-002` | PASS | — | DEC-08 |
 | T-15 | ไม่มี as-of, derive ไม่ได้ (มี principal-affecting txn หลัง demand ที่ reconstruct ไม่ได้) | RULE_ONLY | `PGS10-DMD-002` | HOLD | DEMAND_PRINCIPAL_AS_OF_DATE_UNVERIFIED | DEC-08, DEC-16 |
@@ -120,8 +120,8 @@
 | T-17 | เงินต้นต่าง 0.01 ต่อให้เปิด tolerance | RULE_ONLY | `PGS10-CUR-001` | HOLD | CURRENT_PRINCIPAL_MISMATCH | DEC-09 |
 | T-18 | claim_amount ต่าง 0.01 ต่อให้เปิด tolerance | RULE_ONLY | `PGS10-CLM-004` | HOLD | CLAIM_CALCULATION_MISMATCH | DEC-09 |
 | T-19 | Contract date: fi_id ≠ THAI_CREDIT | RULE_ONLY | `PGS10-CONTRACT-001` | HOLD | CONTRACT_DATE_BASIS_UNDEFINED | DEC-10 |
-| T-20 | Coverage: ทุก candidate event ไม่เกิน fifth anniversary (claim_submission_date = anniversary พอดี) | RULE_ONLY | `PGS10-CLM-002` | PASS | expected_ratio=7000bp | DEC-11 |
-| T-21 | Coverage: ทุก candidate event เกิน fifth anniversary → 100% | RULE_ONLY | `PGS10-CLM-002` | PASS | expected_ratio=10000bp | DEC-11 |
+| T-20 | Coverage: guarantee_term = 5 ปีพอดี → 70% | RULE_ONLY | `PGS10-CLM-002` | PASS | expected_ratio=7000bp | DEC-11, DEC-30 |
+| T-21 | Coverage: guarantee_term = 6 ปี → 100% | RULE_ONLY | `PGS10-CLM-002` | PASS | expected_ratio=10000bp | DEC-30 |
 | T-22 | Payment หลัง Statement cut-off (66-044366 pattern) | RULE_ONLY | `PGS10-STM-002` | HOLD | PAYMENT_AFTER_STATEMENT_CUTOFF | DEC-12 |
 | T-23 | มี Statement ใหม่ครอบคลุม payment หลัง cut-off | RULE_ONLY | `PGS10-STM-002` | PASS | — | DEC-12 |
 | T-24 | Leading zero เลขบัญชี (loan_account_no ประกาศไม่มีนัยสำคัญ) | RULE_ONLY | `PGS10-ID-001` | PASS | FORMAT_VARIANCE (review_flag=FORMAT_NORMALIZED) | DEC-15 |
@@ -135,14 +135,19 @@
 | T-32 | วันที่ พ.ศ. 15/04/2568 ต้องเก็บเป็น 2025-04-15 พร้อม calendar=BE | RULE_ONLY | `PGS10-TXN-001` | PASS | — | DEC-12 |
 | T-33 | 67-026936 visual regression (GT-001 ใหม่) | RULE_ONLY | `PGS10-VIS-001` | HOLD | CONFIRMATION_LETTER_VISUALLY_INCOMPLETE | DEC-13 |
 | T-34 | GT-013 66-011787 ไม่มีภาพต้นฉบับ | RULE_ONLY | `PGS10-VIS-001` | NOT_TESTABLE | VISUAL_RECHECK_REQUIRED | DEC-06, DEC-13 |
-| T-14b | Demand principal derive ได้ (Statement ครอบคลุม ไม่มี gap ไม่มีรายการกระทบเงินต้นหลัง demand) | RULE_ONLY | `PGS10-DMD-002` | PASS_WITH_SUPPORT | DERIVED_AS_OF_DEMAND | DEC-16 |
-| T-35 | Coverage: candidate event ให้ Tier ต่างกัน (claim หลัง anniversary แต่ npl_date ก่อน) | RULE_ONLY | `PGS10-CLM-002` | HOLD | COVERAGE_AGE_BASIS_UNDEFINED | DEC-22 |
-| T-36 | NPL: มี npl_date แต่ไม่มี guarantee_effective_date และไม่มี Mapping | RULE_ONLY | `PGS10-NPL-001` | HOLD | NPL_ANCHOR_DATE_UNDEFINED | DEC-25 |
+| T-14b | Demand principal derive ได้ (support_code=DERIVED_AS_OF_DEMAND) | RULE_ONLY | `PGS10-DMD-002` | PASS_WITH_SUPPORT | — | DEC-16, DEC-36 |
+| T-35 | Coverage: tenor พิสูจน์ไม่ได้ (ไม่มี guarantee_term และไม่มี expiry) | RULE_ONLY | `PGS10-CLM-002` | HOLD | LG_TENOR_UNDETERMINABLE | DEC-30 |
+| T-36 | NPL: ไม่มี lg_issue_date (anchor) → defensive HOLD | RULE_ONLY | `PGS10-NPL-001` | HOLD | NPL_ANCHOR_DATE_UNDEFINED | DEC-29 |
 | T-37 | Start up: RST-001 ไม่ใช้ ((ข)+(จ)+(ฉ) ไม่มี (ค)) | RULE_ONLY | `PGS10-RST-001` | NOT_APPLICABLE | — | DEC-24 |
-| T-38 | 7-month exception: start + 7 calendar months ถึงกำหนดแล้ว + Certified Tracking + หนังสือบอกกล่าว | RULE_ONLY | `PGS10-RST-002` | PASS_WITH_SUPPORT | UNCONTACTABLE_EXCEPTION_MATURED | DEC-20 |
+| T-38 | 7-month exception ครบเงื่อนไข (support_code=UNCONTACTABLE_7_MONTH_EXCEPTION) | RULE_ONLY | `PGS10-RST-002` | PASS_WITH_SUPPORT | — | DEC-20, DEC-36 |
 | T-39 | Tolerance เปิด: current_interest ต่าง 0.01 แต่ current_total ต่างจาก component อื่นด้วย | RULE_ONLY | `PGS10-CUR-002` | HOLD | CURRENT_BALANCE_MISMATCH | DEC-18 |
 | T-40 | บ้านเลขที่ต่าง / เลขภายในของ Account ต่าง ไม่ Auto-pass | RULE_ONLY | `PGS10-ID-001` | HOLD | VERIFY_REFERENCE_MAPPING | DEC-15 |
-| T-41 | ไม่พบ PAYMENT เลยใน Statement | RULE_ONLY | `PGS10-STM-001` | HOLD | NO_PAYMENT_FOUND | DEC-15 |
+| T-41 | Statement ครบ ไม่เคยมี PAYMENT → NO_PAYMENT_VERIFIED (PASS) | RULE_ONLY | `PGS10-STM-001` | PASS | — | DEC-34 |
+| T-42 | Statement ไม่ครบ (มี gap) ไม่พบ PAYMENT | RULE_ONLY | `PGS10-STM-001` | HOLD | PAYMENT_HISTORY_INCOMPLETE | DEC-34 |
+| T-43 | NO_PAYMENT_VERIFIED → DEF-001 รอ alternative evidence | RULE_ONLY | `PGS10-DEF-001` | HOLD | POLICY_PARAMETER_UNRESOLVED | DEC-34 |
+| T-44 | ยื่นหลังหมดสิทธิ (verified) | RULE_ONLY | `PGS10-CLM-001` | FAIL | CLAIM_FILING_WINDOW_EXPIRED | DEC-31 |
+| T-45 | ยังไม่ถึงเวลายื่น | RULE_ONLY | `PGS10-CLM-001` | HOLD | CLAIM_FILING_NOT_YET_OPEN | DEC-31 |
+| T-46 | loan_account_no Leading Zero — FI ไม่มี profile | RULE_ONLY | `PGS10-ID-001` | HOLD | VERIFY_REFERENCE_MAPPING | DEC-33 |
 
 ## 6. Fixtures เคสจริงที่ยังไม่มีข้อมูล
 

@@ -1,6 +1,6 @@
 # Rule Reconciliation Report
 
-**เวอร์ชัน:** 1.2.0-RECONCILIATION-r2 · **สถานะ:** RECONCILIATION_DRAFT r2 (รวมคำตอบ Q-01…Q-04 และคำตัดสิน DEC-15…28) — **ไม่ใช่การ Freeze**; Spec Candidate อยู่ที่ `pgs10/spec/v1.2.0-candidate/` · **Rule Engine / tests เดิม / Spec ร่าง v1.0 / Pack v1.1.0: ไม่ถูกแก้**
+**เวอร์ชัน:** 1.2.0-RECONCILIATION-r3 · **สถานะ:** RECONCILIATION_DRAFT r2 (รวมคำตอบ Q-01…Q-04 และคำตัดสิน DEC-15…28) — **ไม่ใช่การ Freeze**; Spec Candidate อยู่ที่ `pgs10/spec/v1.2.0-candidate/` · **Rule Engine / tests เดิม / Spec ร่าง v1.0 / Pack v1.1.0: ไม่ถูกแก้**
 
 ชุดนี้ประกอบด้วย 8 รายการ ในโฟลเดอร์ `pgs10/spec/reconciliation/`:
 `Rule_Reconciliation_Report.md` (ไฟล์นี้) · `Canonical_Rule_ID_Map.json` · `Canonical_Reason_Code_Catalogue.json` · `Rule_to_Reason_Mapping.json` · `Policy_Parameter_Table.json` · `Conflict_Register.md` · `Golden_Test_Gap_Report.md` · `Proposed_Changes_for_v1.2.0.md`
@@ -46,6 +46,16 @@
 | DEC-26 | A-04: ปิดเชิง Decision แล้ว เหลือ Editorial Update ของ Master Audit §27 (ไม่นับเป็น Business Ambiguity). |
 | DEC-27 | Reason code ใหม่: อนุมัติ `CONTRACT_DATE_BASIS_UNDEFINED`, `ELIGIBILITY_NOT_BUSINESS_PURPOSE`, `PACKAGE_DEFINITION_REQUIRED`; เพิ่ม `ELIGIBILITY_PROHIBITED_CREDIT_TYPE` (Hire Purchase / Leasing) แยกจาก NOT_BUSINESS_PURPOSE. |
 | DEC-28 | กระบวนการ: สร้าง `v1.2.0 Spec Candidate — NOT FROZEN`; ห้ามแก้ Rule Engine และห้าม Freeze จนกว่าผ่าน Freeze Gate 5 ข้อ: Canonical IDs resolve 100% → Reason Codes resolve 100% → No status/reason mixing → Policy OPEN rules Safe-Hold → Golden tests มี evidence และไม่มี invented expected result. |
+| DEC-29 | A-30 ปิดระดับ `APPROVED_OPERATIONAL`: ใช้ `lg_issue_date` เป็น anchor ของ NPL seasoning โดย**ไม่อ้างว่าเป็น OFFICIAL** (ข้อ 2.5 นับอายุการค้ำจากวันออก LG; หน้า 7 ใช้ 'วันที่ บสย. ค้ำประกัน' ซึ่งไม่ได้ระบุสมการว่าเป็น field เดียวกัน). `guarantee_effective_date` เก็บเป็น field แยกได้เมื่อมี source จริง; ถ้ามีเอกสารนโยบายนิยามต่างออกไป เปลี่ยน Mapping ได้โดยไม่แก้ Rule ID. A-30 ไม่เป็น Freeze Blocker. |
+| DEC-30 | A-12 ปิด: Coverage ใช้ **อายุ/ระยะเวลาตามสัญญาของ LG (contractual LG tenor)** ไม่ใช่ลองคำนวณจาก Claim/NPL/Default/Demand. ลำดับ source: (1) `guarantee_term` ที่ระบุใน LG โดยตรง (2) derive จาก `lg_issue_date` + `lg_expiry_date` (3) พิสูจน์ tenor ไม่ได้ → HOLD `LG_TENOR_UNDETERMINABLE`. `tenor <= 5 ปี` → 70%; `> 5 ปี` → 100%; Start up 100% ทั้งสองช่วง. |
+| DEC-31 | Q-05 FAIL ตัดสินจากคุณสมบัติของ Rule ไม่ใช่ชื่อ reason_code: `policy_disqualifying=true` ∧ `remediable_by_document=false` ∧ `evidence_verified=true` → FAIL. `NPL_SEASONING_NOT_MET` เป็น FAIL ได้เมื่อ npl_date + anchor + Policy ถูก verify ครบ; ไม่มี npl_date (`NPL_DATE_MISSING`) หรือ anchor พิสูจน์ไม่ได้ (`NPL_ANCHOR_DATE_UNDEFINED`) → HOLD. Claim Window: หมดสิทธิแล้ว (verified) → FAIL; ยังไม่ถึงเวลายื่น → HOLD/Pending (แก้ได้ด้วยเวลา). |
+| DEC-32 | Q-06 ยืนยัน: Case 1 = SMEs ≤5 ปี (ก)+(ค)+(จ)+(ฉ); Case 2 = SMEs >5 ปี (ก)+(ง)+(จ)+(ฉ); Case 3 = Small Biz ≤5 ปี (ข)+(ค)+(จ)+(ฉ); Case 4 = Small Biz >5 ปี (ข)+(ง)+(จ)+(ฉ); Case 5 = Start up (ข)+(จ)+(ฉ). ทางออก 7 เดือนใช้เฉพาะ Case 1 และ 3. |
+| DEC-33 | Q-07 Leading Zero: รองรับเฉพาะ `loan_account_no` แบบ **FI-specific normalization profile** (`FI_CONFIGURABLE`) ไม่ใช่ Universal rule; ไม่ขยายไป LG / customer / contract ID (ห้ามตัด 0 นำหน้าอัตโนมัติจนมี evidence ว่าเป็น padding). ต้องเก็บ `raw_value`, `normalized_value`, `normalization_rule`, `fi_profile`. |
+| DEC-34 | A-40 `NO_PAYMENT_FOUND` แยกสองความหมาย: Statement ครบ Origination→Cut-off พิสูจน์ได้ว่าไม่เคยชำระ → `payment_history_status=NO_PAYMENT_VERIFIED`, `last_actual_payment_date=null` (ไม่ HOLD เพราะเหตุไม่มี payment เพียงอย่างเดียว); Statement ไม่ครบ → `INCOMPLETE` → HOLD `PAYMENT_HISTORY_INCOMPLETE`. Default chronology กรณีไม่มี payment ใช้เส้นทาง alternative evidence (due-date / FI evidence) ตาม Rule ที่อนุมัติ. |
+| DEC-35 | อนุมัติ `test_scope=AGGREGATION_ONLY` (แทน AGGREGATION_LOGIC): `fixture_type=SYNTHETIC_LOGIC`, `evidence_required=false`; ทดสอบ Case aggregation โดยไม่ปลอมเป็นเคสจริง. |
+| DEC-36 | Reason/Support code: `NPL_ANCHOR_DATE_UNDEFINED` อนุมัติ (defensive HOLD); `COVERAGE_AGE_BASIS_UNDEFINED` ยกเลิก → `LG_TENOR_UNDETERMINABLE`; `UNCONTACTABLE_EXCEPTION_MATURED` ไม่ใช่ reason_code → `support_code=UNCONTACTABLE_7_MONTH_EXCEPTION`; `POLICY_PARAMETER_UNRESOLVED` อนุมัติเป็น generic Safe-Hold fallback. |
+| DEC-37 | อัปเกรดแหล่งที่มา (ผู้ใช้ยืนยันจากไฟล์โครงการ): Start up 6 เดือน + Case 5 (ข)+(จ)+(ฉ) = OFFICIAL (PGS 10 หน้า 7); Coverage ทุก Product = OFFICIAL (หน้า 5); Thai Credit 6619/6656/6920/6922/6931 = EVIDENCE_SUPPORTED_BANK_SPECIFIC (Statement remark + ledger); LG 66-037410 = SOURCE_VERIFIED_CASE (รายงานติดตาม + Statement). |
+| DEC-38 | Gate hardening: เคส `BLOCKED_PENDING_EVIDENCE` ที่ไม่มี `evidence_ref` **ห้ามมี asserted expected result** (`expected_case_status=null`, `expected_reason_codes=[]`, ไม่มี `expected_rule_results`) — เก็บผลเดิมเป็น `manual_baseline_note` ซึ่งไม่นับเป็น Regression Assertion. เงื่อนไข Freeze: 5/5 checks ผ่าน + ไม่มี asserted result ใน Blocked fixtures + Conflict Register ไม่มีรายการค้างที่ไม่มี Safe-Hold. |
 
 ## 3. ข้อจำกัดของหลักฐาน (สำคัญ)
 
@@ -55,15 +65,15 @@
 
 ## 4. วิธีตรวจ
 
-1. จับคู่ทุก Rule ID และ reason code ของ D และ P เข้ากับชุด Canonical (Master Audit §41 เป็นหลัก — DEC-14) ด้วยตารางที่ตรวจโดยสคริปต์: ทุก ID/ชื่อต้อง resolve ได้ ไม่มี reason code ขึ้นต้น `HOLD_`/`FAIL_` (33 alias, 44 rule alias, 0 unresolved)
+1. จับคู่ทุก Rule ID และ reason code ของ D และ P เข้ากับชุด Canonical (Master Audit §41 เป็นหลัก — DEC-14) ด้วยตารางที่ตรวจโดยสคริปต์: ทุก ID/ชื่อต้อง resolve ได้ ไม่มี reason code ขึ้นต้น `HOLD_`/`FAIL_` (36 alias, 44 rule alias, 0 unresolved)
 2. เทียบเนื้อหาทีละ Rule (ตารางข้อ 6) แล้วตัดสินตาม DEC; ที่ DEC ไม่ครอบคลุมบันทึกเป็นข้อเสนอ/คำถาม
 3. ตรวจตัวเลขซ้ำ (เช่น เงินสมทบ Small Biz รวม 12.50%, 66,477.40 × 70% = 46,534.18)
 
 ## 5. ผลโดยรวม
 
 - Canonical rules **32** รายการ: ตรงกัน `ALIGNED` 13, ตรงหลังคำตัดสิน `ALIGNED_AFTER_DECISION` 9, ต่างกัน `DIFFERS` 7, เติมกลับ `RESTORED` 1, ID ใหม่ `NEW_CANONICAL` 2
-- Reason codes Canonical **83** ตัว (รวม 4 ตัวที่ **เสนอใหม่**: `NPL_ANCHOR_DATE_UNDEFINED`, `COVERAGE_AGE_BASIS_UNDEFINED`, `UNCONTACTABLE_EXCEPTION_MATURED`, `POLICY_PARAMETER_UNRESOLVED`)
-- ทะเบียน Conflict 43 รายการ: RESOLVED 25, ยังไม่ปิด 18, **ขวาง Freeze 1** (ดู `Conflict_Register.md`)
+- Reason codes Canonical **80** ตัว (รวม 2 ตัวที่ **เสนอใหม่**: `CLAIM_FILING_NOT_YET_OPEN`, `CLAIM_FILING_WINDOW_EXPIRED`)
+- ทะเบียน Conflict 46 รายการ: RESOLVED 29, ยังไม่ปิด 17, **ขวาง Freeze 0** (ดู `Conflict_Register.md`)
 - **ID ที่ต้องระวังที่สุด:** 10 รายการเป็น 'ID เดิมความหมายใหม่' เช่น `PGS10-STM-001` (P = Transaction mapping, Canonical = Last Actual Payment), `PGS10-CLM-001` (P = Claim Base, Canonical = Filing Window). ห้าม resolve alias โดยไม่ระบุ `@version`
 
 ## 6. Rule-by-Rule
@@ -73,22 +83,22 @@
 
 | Canonical ID | ชื่อ | requirement | D | P | agreement | DEC | สรุป / ผลที่ใช้ | ค้างอยู่ |
 |---|---|---|---|---|---|---|---|---|
-| `PGS10-ELIG-001` | Project / Product Eligibility | REQUIRED_HARD | ELIG-001 | POL-001, POL-003 (01) | DIFFERS | DEC-12, DEC-19, DEC-27 | รวมของ D และ P: PGS10 rev.5 + Product; สินเชื่อใหม่; วัตถุประสงค์ธุรกิจ (`ELIGIBILITY_NOT_BUSINESS_PURPOSE`); ประเภทต้องห้าม HP/Leasing (`ELIGIBILITY_PROHIBITED_CREDIT_TYPE`); ค้ำต่อครั้ง ≥ 10,000; รวมต่อราย ≤ 40 ล้าน; SSMEs Small Biz ≤ 200,000 / Start up ≤ 100,000. FAIL เฉพาะพิสูจน์ได้ว่าขาดคุณสมบัติที่แก้ไม่ได้ (DEC-19). | A-23 (ปิดแล้ว), Q-05 |
-| `PGS10-ID-001` | Identity Integrity | REQUIRED_HARD | ID-001 | ID-001 (02) | DIFFERS | DEC-03, DEC-12, DEC-15 | ใช้ D + P: Normalization อัตโนมัติเฉพาะ non-semantic format (field-specific) → PASS + review_flag FORMAT_NORMALIZED (DEC-15); เลขภายใน/ชื่อ/วงเงิน/วันที่ LG ไม่ตรง → HOLD (DEC-19: ไม่ใช่ FAIL); LG ห้ามแก้อัตโนมัติ (DEC-03). | Q-07 (field ที่ประกาศ leading-zero ไม่มีนัยสำคัญ) |
+| `PGS10-ELIG-001` | Project / Product Eligibility | REQUIRED_HARD | ELIG-001 | POL-001, POL-003 (01) | DIFFERS | DEC-12, DEC-19, DEC-27, DEC-31 | รวมของ D และ P: PGS10 rev.5 + Product; สินเชื่อใหม่; วัตถุประสงค์ธุรกิจ (`ELIGIBILITY_NOT_BUSINESS_PURPOSE`); ประเภทต้องห้าม HP/Leasing (`ELIGIBILITY_PROHIBITED_CREDIT_TYPE`); ค้ำต่อครั้ง ≥ 10,000; รวมต่อราย ≤ 40 ล้าน; SSMEs Small Biz ≤ 200,000 / Start up ≤ 100,000. FAIL เฉพาะพิสูจน์ได้ว่าขาดคุณสมบัติที่แก้ไม่ได้ (DEC-19). | — |
+| `PGS10-ID-001` | Identity Integrity | REQUIRED_HARD | ID-001 | ID-001 (02) | DIFFERS | DEC-03, DEC-12, DEC-15, DEC-33 | Auto-pass เฉพาะ non-semantic format normalization (FORMAT_NORMALIZED): LG ตัดขีด/ช่องว่าง, ตัวเลขไทย↔อารบิก, `loan_account_no` Leading Zero **เฉพาะ FI ที่มี normalization profile (FI_CONFIGURABLE)**; LG/customer/contract ID ห้ามตัด 0 นำหน้า; เลขภายในต่าง/ชื่อ/วงเงิน/วันที่ต่าง → HOLD (ไม่ใช่ FAIL). | — |
 | `PGS10-DOC-001` | Approval / Contract Page Completeness | REQUIRED_HARD | DOC-001 | DOC-001 (02) | ALIGNED | — | ตรงกัน: นับ 'หน้าเอกสาร' ไม่ใช่หน้า PDF. reason_code แม่ = `APPROVAL_DOCUMENT_INCOMPLETE` (P) + `detail_code` = PAGE_SEQUENCE_GAP \| DOCUMENT_TRUNCATED \| PAGE_UNREADABLE (D). | A-28 |
 | `PGS10-VIS-001` | Confirmation Letter Visual Completeness | CONDITIONAL | VIS-001 (ครอบทุกเอกสาร) | VIS-001 (02) | ALIGNED_AFTER_DECISION | DEC-13, DEC-23 | เฉพาะหนังสือยืนยัน: 11 Atomic elements + multi-page continuity (DEC-23). OCR มีแต่ภาพไม่มี → HOLD `CONFIRMATION_LETTER_VISUALLY_INCOMPLETE`; ไม่มีภาพต้นฉบับ → NOT_TESTABLE `VISUAL_RECHECK_REQUIRED`. | — |
 | `PGS10-VIS-002` | Critical Evidence Visual Authority | CONDITIONAL | VIS-001 (ส่วนเอกสารอื่น) | VIS-002 (02) | NEW_CANONICAL | DEC-14 | แยกออกจาก VIS-001 ตาม P: Visual check ของ Approval sequence / Demand / Tracking / Postal / Returned Envelope / Restructure Agreement. Text Layer ค้นได้แต่ทดแทนไม่ได้. | A-05 (รายการ Critical: ใช้ 7 ประเภทของ M§37 เป็น Safe-Hold) |
 | `PGS10-CONTRACT-001` | Contract / Approval Date | REQUIRED_HARD | CONTRACT-001 | CON-001 (02) | DIFFERS | DEC-10 | P จำกัดกฎเป็น Thai Credit; R§6/M§9 เขียนเป็นกฎทั่วไป → ตัดสิน: Thai Credit only. FI อื่น → HOLD `CONTRACT_DATE_BASIS_UNDEFINED` (รหัสใหม่ที่เสนอ). | A-29 (ใหม่) |
 | `PGS10-LG-001` | Guarantee Validity | REQUIRED_HARD | LG-001 | POL-002 (01) | ALIGNED | — | ทั้ง D และ P ไม่มี Logic ที่เป็นทางการ (M ให้ชื่อเท่านั้น): อายุ LG ≤ 10 ปี, ข้อมูล LG ครบ, ค่าธรรมเนียมต่อเนื่อง. | A-27 |
-| `PGS10-NPL-001` | NPL Date & Seasoning | REQUIRED_HARD | NPL-001 | NPL-001, NPL-002 (01) | ALIGNED_AFTER_DECISION | DEC-01, DEC-25 | Small Biz และ Start up 6 เดือนปฏิทิน (OFFICIAL), SMEs 9 เดือน. ใช้ `npl_date` จากข้อมูล FI เท่านั้น (ไม่มี → HOLD `NPL_DATE_MISSING`). Anchor = `guarantee_effective_date` แยกจาก `lg_issue_date`; ยังไม่มี Mapping ที่อนุมัติ → HOLD `NPL_ANCHOR_DATE_UNDEFINED` (Safe-Hold). | A-30 (Freeze Blocker) |
+| `PGS10-NPL-001` | NPL Date & Seasoning | REQUIRED_HARD | NPL-001 | NPL-001, NPL-002 (01) | ALIGNED_AFTER_DECISION | DEC-01, DEC-29, DEC-31 | 6 เดือนปฏิทิน (Small Biz, Start up) / 9 เดือน (SMEs). ใช้ `npl_date` จากข้อมูล FI ที่ verify แล้ว (ห้าม derive จาก default_date). **Anchor = `lg_issue_date` (APPROVED_OPERATIONAL, ไม่ใช่ OFFICIAL)**. ไม่มี npl_date → HOLD `NPL_DATE_MISSING`; anchor พิสูจน์ไม่ได้ → HOLD `NPL_ANCHOR_DATE_UNDEFINED`; verify ครบแล้วไม่พ้น seasoning → **FAIL** `NPL_SEASONING_NOT_MET`. | — |
 | `PGS10-TXN-001` | Transaction Classification | REQUIRED_HARD | STM-001 (ส่วนจำแนก) | STM-001 (02) | DIFFERS | DEC-02, DEC-12, DEC-14 | ID ใหม่ตาม DEC-14. Types = PAYMENT, DRAWDOWN, INTEREST_ACCRUAL, FEE, ADJUSTMENT, REVERSAL, PRINCIPAL_ADJUSTMENT, UNKNOWN. Code map ต่อ bank_id พร้อม approval_status. 6921/6680 UNVERIFIED (P เคยใส่ 6921 เป็น release โดยไม่มีหลักฐาน). | A-14 |
-| `PGS10-STM-001` | Last Actual Payment | REQUIRED_HARD | STM-001 (ส่วน Last Payment) | STM-002 (02) | ALIGNED | DEC-14 | `max(transaction_date where type=PAYMENT)`. ID ตาม M§41 (P ใช้ STM-002 → alias). | A-15 |
+| `PGS10-STM-001` | Last Actual Payment | REQUIRED_HARD | STM-001 (ส่วน Last Payment) | STM-002 (02) | ALIGNED | DEC-14, DEC-34 | `last_actual_payment_date = max(PAYMENT)` + `payment_history_status`: NO_PAYMENT_VERIFIED (Statement ครบ Origination→Cut-off ไม่มี gap ไม่มี PAYMENT) = PASS ไม่ใช่ Error; INCOMPLETE → HOLD `PAYMENT_HISTORY_INCOMPLETE`. | Q-09 (default evidence เมื่อไม่เคยชำระ) |
 | `PGS10-STM-002` | Statement Cut-off vs Later Payments | REQUIRED_HARD | STM-002 | — (P ไม่มี) | RESTORED | DEC-12 | P ตัดออก (เคส Regression 66-044366). เติมกลับ: มี Payment หลัง cut-off และไม่มี Statement ใหม่ → HOLD `PAYMENT_AFTER_STATEMENT_CUTOFF`. ID นี้ M§41 ไม่ได้กำหนด (ใช้ของ D). | — |
-| `PGS10-DEF-001` | Default Date ≥ Last Actual Payment | REQUIRED_HARD | DEF-001 | DEF-001 (02) | ALIGNED | — | ตรงกัน. `<` → เรียก DEF-002. | — |
+| `PGS10-DEF-001` | Default Date ≥ Last Actual Payment | REQUIRED_HARD | DEF-001 | DEF-001 (02) | ALIGNED | DEC-34 | `default_date >= last_actual_payment_date`. ถ้า NO_PAYMENT_VERIFIED → ต้องใช้ alternative evidence (due-date/FI evidence) ตาม Rule ที่ยังไม่อนุมัติ (PRM-055) → Safe-Hold HOLD `POLICY_PARAMETER_UNRESOLVED`. | Q-09 |
 | `PGS10-DEF-002` | Post-Default Payment Exception | CONDITIONAL | DEF-002 | DEF-002 (02) | ALIGNED_AFTER_DECISION | DEC-04, DEC-13 | ตรงกันในสาระ 5 ข้อ. reason: `EXCEPTION_LETTER_MISSING` (D) → `POST_DEFAULT_SUPPORT_MISSING` (P). Identifier ไม่ลิงก์ → `IDENTIFIER_LINKAGE_UNRESOLVED`. ผ่าน = PASS_WITH_SUPPORT (`support_used=true`). | A-16 |
 | `PGS10-FUP-001` | Follow-up / Tracking Evidence | REQUIRED_HARD | FUP-001 | FUP-001 (02) | ALIGNED | — | ตรงกัน. วันที่ติดตาม ≠ วันปรับโครงสร้าง (L-14). | — |
-| `PGS10-RST-001` | Restructure Requirement / Route | CONDITIONAL | RST-001 | RST-001 (01) | ALIGNED | DEC-20, DEC-24 | Route: `NORMAL_RESTRUCTURE_PATH` \| `UNCONTACTABLE_EXCEPTION_PATH` \| `NOT_REQUIRED` (path ไม่มี (ค): Start up, หลังพ้น 5 ปี). restructure_date=null ไม่ผ่านอัตโนมัติ. | Q-06 |
-| `PGS10-RST-002` | Uncontactable / Unable-to-agree Exception | CONDITIONAL | RST-002 | RST-002 (01), RST-OP-002 (02) | ALIGNED_AFTER_DECISION | DEC-20 | OFFICIAL (หน้า 7 กรณี 1 และ 3): start = first_uncontactable_date หรือ first_contacted_but_restructure_failed_date; maturity = add_calendar_months(start, 7); + Certified Tracking Report + หนังสือบอกกล่าว/บอกเลิก ≥ 1. ไม่ขยายไป Start up. | Q-06 (การจับคู่ 'กรณี 1/3' กับ path) |
+| `PGS10-RST-001` | Restructure Requirement / Route | CONDITIONAL | RST-001 | RST-001 (01) | ALIGNED | DEC-20, DEC-24, DEC-32 | Route: `NORMAL_RESTRUCTURE_PATH` \| `UNCONTACTABLE_EXCEPTION_PATH` \| `NOT_REQUIRED` (path ไม่มี (ค): Start up, หลังพ้น 5 ปี). restructure_date=null ไม่ผ่านอัตโนมัติ. | — |
+| `PGS10-RST-002` | Uncontactable / Unable-to-agree Exception | CONDITIONAL | RST-002 | RST-002 (01), RST-OP-002 (02) | ALIGNED_AFTER_DECISION | DEC-20, DEC-32, DEC-36 | OFFICIAL (หน้า 7 กรณี 1 และ 3): start = first_uncontactable_date หรือ first_contacted_but_restructure_failed_date; maturity = +7 เดือนปฏิทิน; + Certified Tracking Report + หนังสือบอกกล่าว/บอกเลิก ≥ 1 → PASS_WITH_SUPPORT `support_code=UNCONTACTABLE_7_MONTH_EXCEPTION`. ไม่ขยายไป Start up. | — |
 | `PGS10-RST-003` | Restructure Date Evidence | CONDITIONAL | RST-003 | RST-OP-001 (02) | ALIGNED | DEC-14 | L1 เอกสารปรับโครงสร้าง → L2 หัว Statement → L3 หน้าจอ. `CHECK_STATEMENT_HEADER` (D) → `RESTRUCTURE_DATE_SEMANTICS_UNRESOLVED` (P). | — |
 | `PGS10-DMD-001` | Demand Letter Identity & Existence | REQUIRED_HARD | DMD-001 | DMD-001 (02), DMD-POL-001 (01) | ALIGNED | — | ตรงกัน: ผู้กู้/Account/วันที่/วงเงิน/ยอดรวมสอดคล้อง + มีหนังสือ ≥ 1 ฉบับ. | — |
 | `PGS10-DMD-002` | Demand Principal as of Demand Date | REQUIRED_HARD | DMD-002 | DMD-002 (02) | ALIGNED_AFTER_DECISION | DEC-08, DEC-16 | `demand_principal == principal_as_of_demand_date`. ไม่มี Snapshot → `DERIVED_AS_OF_DEMAND` เมื่อพิสูจน์ต่อเนื่อง/ไม่มี gap/ไม่มีรายการกระทบเงินต้นหลัง demand (หรือ reconstruct ได้) → PASS_WITH_SUPPORT; พิสูจน์ไม่ได้ → HOLD `DEMAND_PRINCIPAL_AS_OF_DATE_UNVERIFIED` (ห้ามใช้เหตุผล 'เท่ากันพอดี'). | — |
@@ -99,8 +109,8 @@
 | `PGS10-PST-003` | Postal Linkage | CONDITIONAL | — (D รวมใน PST-001) | PST-004 (02) | NEW_CANONICAL | DEC-14 | ID ใหม่: ใบตอบรับ/ซองต้องเป็นชิ้นเดียวกับที่ส่ง. ไม่ตรง/พิสูจน์ไม่ได้ → HOLD `POSTAL_LINKAGE_UNRESOLVED`. | — |
 | `PGS10-CUR-001` | Current Principal | REQUIRED_HARD | CUR-001 (ส่วน principal) | CUR-001 (02) | ALIGNED_AFTER_DECISION | DEC-09 | Exact, tolerance = 0 เสมอ (ห้ามเปิด tolerance กับ principal). | — |
 | `PGS10-CUR-002` | Current Interest / Total | REQUIRED_HARD | CUR-001 (ส่วน interest/total) | CUR-002 (02) | DIFFERS | DEC-09, DEC-18 | Tolerance ปิด → HOLD `NUMERIC_VARIANCE` + review_flag OBSERVATION_CANDIDATE. ถ้าอนุมัติภายหลัง: ≤ 0.01 บาท เฉพาะ current_interest/current_total ที่มาจาก rounding ของ interest ตัวเดียว; Historical ห้ามใช้. | — |
-| `PGS10-CLM-001` | Claim Filing Window | REQUIRED_HARD | CLM-001 | CLM-POL-001 (01) | ALIGNED | DEC-14 | ID ตาม M§41. ⚠ P 02 ใช้ `CLM-001` แทน Claim Base — ห้าม resolve alias โดยไม่ระบุเวอร์ชัน. | A-21 (Safe-Hold) |
-| `PGS10-CLM-002` | Coverage Ratio | REQUIRED_HARD | CLM-002 | COV-001 (01), CLM-002 (02) | ALIGNED_AFTER_DECISION | DEC-11, DEC-21, DEC-22 | ตัวเลขทั้งหมด OFFICIAL (Smart*/Small Biz 70/100; Start up 100/100). threshold 5 ปี OFFICIAL; `coverage_age_basis` OPEN → Safe-Hold: ผลต้องเหมือนกันทุก candidate event ไม่เช่นนั้น HOLD `COVERAGE_AGE_BASIS_UNDEFINED`. ครบ 5 ปีพอดี = 70% (DEC-11). | A-12 (coverage_age_basis = OPEN, Safe-Hold) |
+| `PGS10-CLM-001` | Claim Filing Window | REQUIRED_HARD | CLM-001 | CLM-POL-001 (01) | ALIGNED | DEC-31 | ตั้งแต่ปีที่ 2 ของอายุ LG ถึง 1 ปีหลัง LG ฉบับสุดท้ายสิ้นอายุ. ยังไม่ถึงเวลา → HOLD `CLAIM_FILING_NOT_YET_OPEN` (Pending); หมดสิทธิและวันที่ verify ครบ → FAIL `CLAIM_FILING_WINDOW_EXPIRED`. | A-21 (Safe-Hold) |
+| `PGS10-CLM-002` | Coverage Ratio | REQUIRED_HARD | CLM-002 | COV-001 (01), CLM-002 (02) | ALIGNED_AFTER_DECISION | DEC-11, DEC-21, DEC-30 | Coverage ตาม **contractual LG tenor** (guarantee_term → lg_issue_date+lg_expiry_date → HOLD `LG_TENOR_UNDETERMINABLE`); ≤5 ปี = 70%, >5 ปี = 100%; Start up 100/100. ไม่ใช้ Claim/NPL/Default/Demand เลือก tier (DEC-30). | Q-10 (LG ที่ถูกต่ออายุ) |
 | `PGS10-CLM-003` | Claim Base | REQUIRED_HARD | CLM-003 | CLM-POL-002 (01), CLM-001 (02) | ALIGNED | DEC-09, DEC-14 | `min(current_principal, current_guarantee_obligation)` + ตรวจ mode. ห้าม tolerance. ⚠ P 02 เรียก `CLM-001`. | A-24 |
 | `PGS10-CLM-004` | Claim Calculation | REQUIRED_HARD | CLM-004 | CLM-POL-003, CLM-003 (02) | ALIGNED | DEC-09, DEC-14 | `round_half_up(base × ratio, 2)` Decimal; เทียบหน้าจอ/คำขอ/ยอดอนุมัติ. ห้าม tolerance. ⚠ P 02 เรียก `CLM-003`. | — |
 | `PGS10-CAP-001` | CLAIM MAX / Package Capacity | REQUIRED_HARD | CAP-001 | CAP-001 (01), CAP-OP-001 (02) | ALIGNED_AFTER_DECISION | DEC-06, DEC-09, DEC-17 | Arithmetic ตรงทุกสตางค์. Stage-aware: PRE_REVIEW NOT_TESTABLE ไม่กระทบ; FINAL_APPROVAL ข้อมูล Package ไม่ครบ → NOT_TESTABLE + case HOLD + `PACKAGE_DEFINITION_REQUIRED` (ไม่ใช่ FAIL). | — |
@@ -130,7 +140,7 @@
 | VIS-001 | ครอบเอกสาร Critical ทุกชนิด | เฉพาะหนังสือยืนยัน; อื่นย้ายไป VIS-002 | M§41, P |
 | STM-001 | รวมจำแนก + Last Payment | แยก `TXN-001` + `STM-001` | DEC-14 |
 | CUR-001 | รวมเงินต้นกับดอกเบี้ย/รวม | แยก `CUR-001` (tolerance=0) / `CUR-002` | DEC-09, P |
-| reason codes | 77 ชื่อ | 83 ชื่อ (รวมชื่อให้ตรง P เมื่อความหมายเท่ากัน) | DEC-05 |
+| reason codes | 77 ชื่อ | 80 ชื่อ (รวมชื่อให้ตรง P เมื่อความหมายเท่ากัน) | DEC-05 |
 | UT-CUR-001 ใน Golden | expected OBSERVATION_CANDIDATE | expected HOLD/NUMERIC_VARIANCE | DEC-09 |
 | ผมไม่ได้ยกประเด็น | 'Thai Credit-only' ของ Contract date | เพิ่มเป็น A-29 (FI อื่น → HOLD) | DEC-10 |
 | FORMAT_VARIANCE (r2) | control_status OBSERVATION | control_status PASS + review_flag FORMAT_NORMALIZED (เฉพาะ field ที่ประกาศ) | DEC-15 |
@@ -148,14 +158,14 @@
 
 ## 10. คำถาม
 
-ตอบแล้ว: Q-01 → ตอบแล้ว → DEC-15, Q-02 → ตอบแล้ว → DEC-16, Q-03 → ตอบแล้ว → DEC-17, Q-04 → ตอบแล้ว → DEC-18
+ตอบแล้ว: Q-01 → DEC-15, Q-02 → DEC-16, Q-03 → DEC-17, Q-04 → DEC-18, Q-05 → DEC-31, Q-06 → DEC-32, Q-07 → DEC-33
 
 คำถามใหม่ (ไม่ขวาง Freeze — Safe-Hold รองรับ):
 
 | ID | คำถาม | ข้อเสนอของผม |
 |---|---|---|
-| Q-05 | (ใหม่) ควร promote รหัสใดเป็น FAIL เพิ่มเติมจาก ELIGIBILITY_*? เช่น NPL_SEASONING_NOT_MET (มี npl_date), ยื่นเกินเวลา (late) | ตอนนี้ยังเป็น HOLD ทั้งหมด (Safe) ตาม DEC-19; ขอให้ระบุถ้าต้องการ FAIL |
-| Q-06 | (ใหม่) 'กรณี 1 และ 3' ของหน้า 7 = SMEs ≤5 ปี และ Small Biz ≤5 ปี ใช่หรือไม่? 'กรณี 5' = Start up? | ผมใช้การตีความนี้ใน RST-001/002 |
-| Q-07 | (ใหม่) ประกาศ `loan_account_no` เป็น field ที่ Leading Zero ไม่มีนัยสำคัญ (Auto-pass FORMAT_NORMALIZED) ถูกต้องหรือไม่? field อื่นที่ควรประกาศ? | ประกาศเฉพาะ loan_account_no ตาม R§5 |
+| Q-08 | Band ≤5/>5 ปีของ Case 1–4 (claim path) นับจากวันที่ยื่นเทียบวันออก LG ใช่หรือไม่ (ต่างจาก Coverage ที่ใช้ contractual tenor)? | สมมติเช่นนั้น (PRM-054) — Safe-Hold: ข้อมูลไม่ครบ → HOLD |
+| Q-09 | Default chronology เมื่อพิสูจน์แล้วว่าไม่เคยชำระ: alternative evidence rule (due-date / FI evidence) ที่อนุมัติคืออะไร? | ตอนนี้ DEF-001 = HOLD (POLICY_PARAMETER_UNRESOLVED) |
+| Q-10 | Coverage tenor ของ LG ที่ถูกต่ออายุ/ขยาย ใช้ term เดิม, term รวม หรือ term ของ LG ฉบับปัจจุบัน? | ตอนนี้ต่ออายุและไม่มี guarantee_term ระบุ → HOLD LG_TENOR_UNDETERMINABLE |
 
-รายการขวาง Freeze ทั้งหมด: A-30.
+รายการขวาง Freeze ทั้งหมด: .

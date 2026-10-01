@@ -1,13 +1,11 @@
 {
   "metadata": {
-    "ruleset_version": "1.2.0-candidate",
+    "ruleset_version": "1.2.0-candidate.2",
     "status": "SPEC_CANDIDATE_NOT_FROZEN",
     "frozen": false,
     "engine_changes_allowed": false,
     "basis": "Reconciliation r2 (DEC-01..DEC-28) + Deployment Pack v1.1.0 + Draft v1.0",
-    "freeze_blockers": [
-      "A-30"
-    ],
+    "freeze_blockers": [],
     "freeze_gate": "รัน `node check_freeze_gate.js` — 5 ข้อต้องผ่านทั้งหมด และ freeze_blockers ต้องว่าง",
     "artifact": "05_PGS10_RULE_REGISTRY",
     "id_policy": "Master Audit §41 IDs เป็น Canonical (DEC-14); ไม่ Renumber; ID เก่าต้องอ้างเป็น '<id>@<version>' เท่านั้น"
@@ -111,8 +109,10 @@
       "decisions": [
         "DEC-12",
         "DEC-19",
-        "DEC-27"
+        "DEC-27",
+        "DEC-31"
       ],
+      "support_codes": [],
       "reasons": [
         {
           "code": "ELIGIBILITY_EXPOSURE_LIMIT_EXCEEDED",
@@ -179,6 +179,8 @@
       },
       "applicable_when": "เสมอ",
       "inputs": [
+        "fi_id",
+        "fi_normalization_profile",
         "lg_no",
         "borrower_name",
         "loan_account_no",
@@ -196,7 +198,7 @@
         {
           "parameter": "PRM-050",
           "source_status": "OPERATIONAL_LOCKED_SCOPED",
-          "behavior": "field ที่ไม่ประกาศ → ต่าง Leading Zero = HOLD",
+          "behavior": "FI ไม่มี profile หรือ field ไม่อยู่ใน eligible_fields → ต่าง Leading Zero = HOLD",
           "reason_code": "VERIFY_REFERENCE_MAPPING"
         }
       ],
@@ -205,8 +207,10 @@
       "decisions": [
         "DEC-03",
         "DEC-12",
-        "DEC-15"
+        "DEC-15",
+        "DEC-33"
       ],
+      "support_codes": [],
       "reasons": [
         {
           "code": "FORMAT_VARIANCE",
@@ -256,6 +260,7 @@
       "evidence": "หนังสืออนุมัติ/สัญญา (หน้าเอกสาร n of X)",
       "upstream_sources": "R#4, M§10",
       "decisions": [],
+      "support_codes": [],
       "reasons": [
         {
           "code": "APPROVAL_DOCUMENT_INCOMPLETE",
@@ -303,6 +308,7 @@
         "DEC-13",
         "DEC-23"
       ],
+      "support_codes": [],
       "reasons": [
         {
           "code": "CONFIRMATION_LETTER_VISUALLY_INCOMPLETE",
@@ -355,6 +361,7 @@
       "decisions": [
         "DEC-14"
       ],
+      "support_codes": [],
       "reasons": [
         {
           "code": "DOCUMENT_VISUALLY_INCOMPLETE",
@@ -403,6 +410,7 @@
       "decisions": [
         "DEC-10"
       ],
+      "support_codes": [],
       "reasons": [
         {
           "code": "CONTRACT_DATE_BASIS_UNDEFINED",
@@ -444,6 +452,7 @@
       "evidence": "LG",
       "upstream_sources": "M§41 (ชื่อเท่านั้น)",
       "decisions": [],
+      "support_codes": [],
       "reasons": [
         {
           "code": "LG_DATA_MISSING",
@@ -479,8 +488,9 @@
       "inputs": [
         "product",
         "npl_date",
-        "guarantee_effective_date",
+        "npl_date_verified",
         "lg_issue_date",
+        "guarantee_effective_date",
         "default_date"
       ],
       "parameters": [
@@ -488,22 +498,32 @@
         "PRM-011",
         "PRM-012",
         "PRM-013",
-        "PRM-014"
+        "PRM-013b",
+        "PRM-014",
+        "PRM-028"
       ],
       "safe_hold": [
         {
           "parameter": "PRM-013",
-          "source_status": "OPEN",
-          "behavior": "ไม่มี guarantee_effective_date ที่ระบุตรงและไม่มี Mapping ที่อนุมัติ → NPL-001 = HOLD",
+          "source_status": "APPROVED_OPERATIONAL",
+          "behavior": "ไม่มี lg_issue_date หรือพิสูจน์ไม่ได้ → NPL-001 = HOLD",
           "reason_code": "NPL_ANCHOR_DATE_UNDEFINED"
+        },
+        {
+          "parameter": "PRM-028",
+          "source_status": "OPEN",
+          "behavior": "ใช้ CALENDAR_MONTH_CLAMP_END_OF_MONTH (ไม่นับวันตั้งต้น); ถ้าผลต่างกันเมื่อเปลี่ยนเป็นวิธีอื่น (นับรวมวัน/ rollover) → HOLD",
+          "reason_code": "POLICY_PARAMETER_UNRESOLVED"
         }
       ],
       "evidence": "ข้อมูล FI (npl_date), LG/ข้อมูลวันที่ค้ำประกัน",
       "upstream_sources": "M§3.1, M§4.1",
       "decisions": [
         "DEC-01",
-        "DEC-25"
+        "DEC-29",
+        "DEC-31"
       ],
+      "support_codes": [],
       "reasons": [
         {
           "code": "NPL_ANCHOR_DATE_UNDEFINED",
@@ -515,7 +535,7 @@
         },
         {
           "code": "NPL_SEASONING_NOT_MET",
-          "control_status": "HOLD"
+          "control_status": "FAIL"
         }
       ],
       "legacy_aliases": [
@@ -554,6 +574,7 @@
         "DEC-12",
         "DEC-14"
       ],
+      "support_codes": [],
       "reasons": [
         {
           "code": "STATEMENT_MISSING",
@@ -589,10 +610,17 @@
       "applicable_when": "เสมอ",
       "inputs": [
         "transactions",
-        "last_actual_payment_date"
+        "last_actual_payment_date",
+        "payment_history_status",
+        "statement_period_start",
+        "statement_period_end",
+        "statement_has_gap",
+        "loan_origination_date",
+        "statement_cutoff_date"
       ],
       "parameters": [
-        "PRM-042"
+        "PRM-042",
+        "PRM-056"
       ],
       "safe_hold": [
         {
@@ -605,11 +633,13 @@
       "evidence": "Statement",
       "upstream_sources": "R#6, M§12",
       "decisions": [
-        "DEC-14"
+        "DEC-14",
+        "DEC-34"
       ],
+      "support_codes": [],
       "reasons": [
         {
-          "code": "NO_PAYMENT_FOUND",
+          "code": "PAYMENT_HISTORY_INCOMPLETE",
           "control_status": "HOLD"
         },
         {
@@ -657,6 +687,7 @@
       "decisions": [
         "DEC-12"
       ],
+      "support_codes": [],
       "reasons": [
         {
           "code": "PAYMENT_AFTER_STATEMENT_CUTOFF",
@@ -677,21 +708,32 @@
       "applicable_when": "เสมอ",
       "inputs": [
         "default_date",
-        "last_actual_payment_date"
+        "last_actual_payment_date",
+        "payment_history_status"
       ],
-      "parameters": [],
-      "safe_hold": [],
+      "parameters": [
+        "PRM-055"
+      ],
+      "safe_hold": [
+        {
+          "parameter": "PRM-055",
+          "source_status": "OPEN",
+          "behavior": "payment_history_status=NO_PAYMENT_VERIFIED → DEF-001 = HOLD จนมี alternative evidence rule",
+          "reason_code": "POLICY_PARAMETER_UNRESOLVED"
+        }
+      ],
       "evidence": "Statement + หน้าจอ",
       "upstream_sources": "R#7, M§13",
-      "decisions": [],
+      "decisions": [
+        "DEC-34"
+      ],
+      "support_codes": [
+        "POST_DEFAULT_PAYMENT_SUPPORTED"
+      ],
       "reasons": [
         {
           "code": "POST_DEFAULT_PAYMENT",
           "control_status": "HOLD"
-        },
-        {
-          "code": "POST_DEFAULT_PAYMENT_SUPPORTED",
-          "control_status": "PASS_WITH_SUPPORT"
         }
       ],
       "legacy_aliases": [
@@ -730,6 +772,9 @@
         "DEC-04",
         "DEC-13"
       ],
+      "support_codes": [
+        "POST_DEFAULT_PAYMENT_SUPPORTED"
+      ],
       "reasons": [
         {
           "code": "CONFIRMATION_CONTENT_INCOMPLETE",
@@ -746,10 +791,6 @@
         {
           "code": "IDENTIFIER_LINKAGE_UNRESOLVED",
           "control_status": "HOLD"
-        },
-        {
-          "code": "POST_DEFAULT_PAYMENT_SUPPORTED",
-          "control_status": "PASS_WITH_SUPPORT"
         },
         {
           "code": "POST_DEFAULT_SUPPORT_MISSING",
@@ -785,6 +826,7 @@
       "evidence": "รายงานติดตามหนี้",
       "upstream_sources": "R#9, M§17",
       "decisions": [],
+      "support_codes": [],
       "reasons": [
         {
           "code": "TRACKING_EVIDENCE_INCOMPLETE",
@@ -816,10 +858,11 @@
         "PRE_REVIEW": "CONDITIONAL",
         "FINAL_APPROVAL": "CONDITIONAL"
       },
-      "applicable_when": "path ที่มีเงื่อนไข (ค): SMEs ≤ 5 ปี และ Small Biz ≤ 5 ปี. Start up → NOT_APPLICABLE (DEC-24)",
+      "applicable_when": "Case 1 (SMEs ≤5 ปี) และ Case 3 (Small Biz ≤5 ปี) — path ที่มีเงื่อนไข (ค); Case 2, 4, 5 → NOT_APPLICABLE",
       "inputs": [
         "product",
         "claim_path",
+        "claim_case_no",
         "restructure_route",
         "restructure_date",
         "restructure_doc_signing_date",
@@ -830,15 +873,25 @@
         "PRM-015",
         "PRM-016",
         "PRM-017",
-        "PRM-052"
+        "PRM-052",
+        "PRM-054"
       ],
-      "safe_hold": [],
+      "safe_hold": [
+        {
+          "parameter": "PRM-054",
+          "source_status": "ASSUMPTION",
+          "behavior": "ไม่มี claim_submission_date หรือ lg_issue_date → claim_path กำหนดไม่ได้ → HOLD",
+          "reason_code": "LG_DATA_MISSING"
+        }
+      ],
       "evidence": "เอกสารปรับโครงสร้าง / รายงานติดตาม",
       "upstream_sources": "M§4.2, M§5, M§6",
       "decisions": [
         "DEC-20",
-        "DEC-24"
+        "DEC-24",
+        "DEC-32"
       ],
+      "support_codes": [],
       "reasons": [
         {
           "code": "RESTRUCTURE_PATH_UNDETERMINED",
@@ -885,7 +938,12 @@
       "evidence": "Certified Tracking Report + หนังสือบอกกล่าว/บอกเลิก",
       "upstream_sources": "M§5, R§32",
       "decisions": [
-        "DEC-20"
+        "DEC-20",
+        "DEC-32",
+        "DEC-36"
+      ],
+      "support_codes": [
+        "UNCONTACTABLE_7_MONTH_EXCEPTION"
       ],
       "reasons": [
         {
@@ -895,10 +953,6 @@
         {
           "code": "TRACKING_REPORT_NOT_CERTIFIED",
           "control_status": "HOLD"
-        },
-        {
-          "code": "UNCONTACTABLE_EXCEPTION_MATURED",
-          "control_status": "PASS_WITH_SUPPORT"
         },
         {
           "code": "UNCONTACTABLE_EXCEPTION_NOT_MET",
@@ -942,11 +996,10 @@
       "decisions": [
         "DEC-14"
       ],
+      "support_codes": [
+        "MATCHED_STATEMENT_HEADER"
+      ],
       "reasons": [
-        {
-          "code": "MATCHED_STATEMENT_HEADER",
-          "control_status": "PASS_WITH_SUPPORT"
-        },
         {
           "code": "RESTRUCTURE_DATE_MISMATCH",
           "control_status": "HOLD"
@@ -991,6 +1044,7 @@
       "evidence": "หนังสือบอกกล่าว",
       "upstream_sources": "R#11, M§19",
       "decisions": [],
+      "support_codes": [],
       "reasons": [
         {
           "code": "DEMAND_IDENTITY_UNCONFIRMED",
@@ -1046,6 +1100,9 @@
         "DEC-08",
         "DEC-16"
       ],
+      "support_codes": [
+        "DERIVED_AS_OF_DEMAND"
+      ],
       "reasons": [
         {
           "code": "DEMAND_PRINCIPAL_AS_OF_DATE_UNVERIFIED",
@@ -1054,10 +1111,6 @@
         {
           "code": "DEMAND_PRINCIPAL_MISMATCH",
           "control_status": "HOLD"
-        },
-        {
-          "code": "DERIVED_AS_OF_DEMAND",
-          "control_status": "PASS_WITH_SUPPORT"
         }
       ],
       "legacy_aliases": [
@@ -1105,6 +1158,7 @@
       "evidence": "หนังสือบอกกล่าว + ใบตอบรับ",
       "upstream_sources": "M§24",
       "decisions": [],
+      "support_codes": [],
       "reasons": [
         {
           "code": "DEMAND_WAITING_PERIOD_NOT_MET",
@@ -1147,6 +1201,7 @@
       "decisions": [
         "DEC-07"
       ],
+      "support_codes": [],
       "reasons": [
         {
           "code": "HISTORICAL_BALANCE_MISMATCH",
@@ -1187,6 +1242,7 @@
       "decisions": [
         "DEC-14"
       ],
+      "support_codes": [],
       "reasons": [
         {
           "code": "POSTAL_ACK_INCOMPLETE",
@@ -1254,6 +1310,7 @@
         "DEC-12",
         "DEC-14"
       ],
+      "support_codes": [],
       "reasons": [
         {
           "code": "ADDRESS_DIFFERS_FROM_LATEST",
@@ -1298,6 +1355,7 @@
       "decisions": [
         "DEC-14"
       ],
+      "support_codes": [],
       "reasons": [
         {
           "code": "POSTAL_LINKAGE_UNRESOLVED",
@@ -1340,6 +1398,7 @@
       "decisions": [
         "DEC-09"
       ],
+      "support_codes": [],
       "reasons": [
         {
           "code": "CURRENT_PRINCIPAL_MISMATCH",
@@ -1403,6 +1462,7 @@
         "DEC-09",
         "DEC-18"
       ],
+      "support_codes": [],
       "reasons": [
         {
           "code": "CURRENT_BALANCE_MISMATCH",
@@ -1444,7 +1504,8 @@
       "inputs": [
         "lg_issue_date",
         "final_lg_expiry_date",
-        "claim_submission_date"
+        "claim_submission_date",
+        "claim_filing_dates_verified"
       ],
       "parameters": [
         "PRM-022",
@@ -1462,12 +1523,17 @@
       "evidence": "LG + แบบคำขอ",
       "upstream_sources": "M§25",
       "decisions": [
-        "DEC-14"
+        "DEC-31"
       ],
+      "support_codes": [],
       "reasons": [
         {
-          "code": "CLAIM_FILING_WINDOW_NOT_MET",
+          "code": "CLAIM_FILING_NOT_YET_OPEN",
           "control_status": "HOLD"
+        },
+        {
+          "code": "CLAIM_FILING_WINDOW_EXPIRED",
+          "control_status": "FAIL"
         }
       ],
       "legacy_aliases": [
@@ -1490,11 +1556,11 @@
       "applicable_when": "เสมอ",
       "inputs": [
         "product",
+        "guarantee_term_years",
         "lg_issue_date",
-        "claim_submission_date",
-        "npl_date",
-        "default_date",
-        "demand_date_letter",
+        "lg_expiry_date",
+        "lg_renewed_or_extended",
+        "contractual_lg_tenor_years",
         "screen_coverage_ratio",
         "coverage_ratio"
       ],
@@ -1504,14 +1570,16 @@
         "PRM-026",
         "PRM-026b",
         "PRM-027",
-        "PRM-027b"
+        "PRM-027b",
+        "PRM-027c",
+        "PRM-028"
       ],
       "safe_hold": [
         {
-          "parameter": "PRM-027",
+          "parameter": "PRM-028",
           "source_status": "OPEN",
-          "behavior": "คำนวณ Tier ตามทุก candidate event ที่มีข้อมูล (claim_submission_date, npl_date, default_date, demand_date) ถ้าให้ Tier เดียวกันทั้งหมดจึงใช้ Tier นั้น; ต่างกัน → HOLD",
-          "reason_code": "COVERAGE_AGE_BASIS_UNDEFINED"
+          "behavior": "ใช้ CALENDAR_MONTH_CLAMP_END_OF_MONTH (ไม่นับวันตั้งต้น); ถ้าผลต่างกันเมื่อเปลี่ยนเป็นวิธีอื่น (นับรวมวัน/ rollover) → HOLD",
+          "reason_code": "POLICY_PARAMETER_UNRESOLVED"
         }
       ],
       "evidence": "LG + แบบคำขอ + ตาราง Coverage",
@@ -1519,15 +1587,16 @@
       "decisions": [
         "DEC-11",
         "DEC-21",
-        "DEC-22"
+        "DEC-30"
       ],
+      "support_codes": [],
       "reasons": [
         {
-          "code": "COVERAGE_AGE_BASIS_UNDEFINED",
+          "code": "COVERAGE_RATIO_MISMATCH",
           "control_status": "HOLD"
         },
         {
-          "code": "COVERAGE_RATIO_MISMATCH",
+          "code": "LG_TENOR_UNDETERMINABLE",
           "control_status": "HOLD"
         },
         {
@@ -1574,6 +1643,7 @@
         "DEC-09",
         "DEC-14"
       ],
+      "support_codes": [],
       "reasons": [
         {
           "code": "CLAIM_BASE_MISMATCH",
@@ -1625,6 +1695,7 @@
         "DEC-09",
         "DEC-14"
       ],
+      "support_codes": [],
       "reasons": [
         {
           "code": "CLAIM_CALCULATION_MISMATCH",
@@ -1680,6 +1751,7 @@
         "DEC-09",
         "DEC-17"
       ],
+      "support_codes": [],
       "reasons": [
         {
           "code": "CLAIM_EXCEEDS_CAP",
@@ -1746,6 +1818,7 @@
       "evidence": "วันที่ทั้งหมดของเคส",
       "upstream_sources": "R#22, M§36",
       "decisions": [],
+      "support_codes": [],
       "reasons": [
         {
           "code": "TIMELINE_CONFLICT",
@@ -1798,8 +1871,8 @@
       "aliases": [],
       "detail_codes": [],
       "review_flag": null,
-      "proposed": true,
-      "owner_status": "PROPOSED_BY_CLAUDE"
+      "proposed": false,
+      "owner_status": "APPROVED_BY_OWNER"
     },
     {
       "code": "RULE_VERSION_CONFLICT",
@@ -1866,30 +1939,35 @@
       "owner_status": "APPROVED_BY_OWNER"
     },
     {
-      "code": "CLAIM_FILING_WINDOW_NOT_MET",
+      "code": "CLAIM_FILING_NOT_YET_OPEN",
       "rules": [
         "PGS10-CLM-001"
       ],
       "control_status": "HOLD",
-      "meaning": "ยื่นนอกช่วงที่อนุญาต",
-      "aliases": [],
-      "detail_codes": [],
-      "review_flag": null,
-      "proposed": false,
-      "owner_status": "CANDIDATE"
-    },
-    {
-      "code": "COVERAGE_AGE_BASIS_UNDEFINED",
-      "rules": [
-        "PGS10-CLM-002"
+      "meaning": "ยังไม่ถึงเวลายื่น Claim (ก่อนปีที่ 2 ของอายุ LG) — แก้ได้ด้วยเวลา จึงเป็น HOLD/Pending",
+      "aliases": [
+        "CLAIM_FILING_WINDOW_NOT_MET"
       ],
-      "control_status": "HOLD",
-      "meaning": "coverage_age_basis ยัง OPEN และ Tier ต่างกันตาม candidate event",
-      "aliases": [],
       "detail_codes": [],
       "review_flag": null,
       "proposed": true,
       "owner_status": "PROPOSED_BY_CLAUDE"
+    },
+    {
+      "code": "CLAIM_FILING_WINDOW_EXPIRED",
+      "rules": [
+        "PGS10-CLM-001"
+      ],
+      "control_status": "FAIL",
+      "meaning": "หมดสิทธิยื่น Claim แล้ว (เกิน 1 ปีหลัง LG ฉบับสุดท้ายสิ้นอายุ) และวันที่ถูก verify ครบ — Proven Policy Ineligibility",
+      "aliases": [],
+      "detail_codes": [],
+      "review_flag": null,
+      "proposed": true,
+      "owner_status": "PROPOSED_BY_CLAUDE",
+      "policy_disqualifying": true,
+      "remediable_by_document": false,
+      "requires_evidence_verified": true
     },
     {
       "code": "COVERAGE_RATIO_MISMATCH",
@@ -1903,6 +1981,21 @@
       "review_flag": null,
       "proposed": false,
       "owner_status": "CANDIDATE"
+    },
+    {
+      "code": "LG_TENOR_UNDETERMINABLE",
+      "rules": [
+        "PGS10-CLM-002"
+      ],
+      "control_status": "HOLD",
+      "meaning": "พิสูจน์ contractual LG tenor ไม่ได้ (ไม่มี guarantee_term ใน LG, ไม่มี lg_issue_date/lg_expiry_date ครบ, หรือ LG ถูกต่ออายุโดยไม่ระบุ term)",
+      "aliases": [
+        "COVERAGE_AGE_BASIS_UNDEFINED"
+      ],
+      "detail_codes": [],
+      "review_flag": null,
+      "proposed": false,
+      "owner_status": "APPROVED_BY_OWNER"
     },
     {
       "code": "NO_RULE_FOR_PRODUCT",
@@ -2069,20 +2162,6 @@
       "owner_status": "CANDIDATE"
     },
     {
-      "code": "POST_DEFAULT_PAYMENT_SUPPORTED",
-      "rules": [
-        "PGS10-DEF-001",
-        "PGS10-DEF-002"
-      ],
-      "control_status": "PASS_WITH_SUPPORT",
-      "meaning": "มีการชำระหลังผิดนัดและหนังสือยืนยันสมบูรณ์ ตรงหน้าจอ",
-      "aliases": [],
-      "detail_codes": [],
-      "review_flag": null,
-      "proposed": false,
-      "owner_status": "CANDIDATE"
-    },
-    {
       "code": "CONFIRMATION_CONTENT_INCOMPLETE",
       "rules": [
         "PGS10-DEF-002"
@@ -2197,19 +2276,6 @@
       "owner_status": "CANDIDATE"
     },
     {
-      "code": "DERIVED_AS_OF_DEMAND",
-      "rules": [
-        "PGS10-DMD-002"
-      ],
-      "control_status": "PASS_WITH_SUPPORT",
-      "meaning": "derive เงินต้น ณ วันบอกกล่าวจาก Statement/Ledger ได้ครบตามเงื่อนไข (ครอบคลุม ไม่มี gap ไม่มีรายการกระทบเงินต้นหลัง demand หรือ reconstruct ได้)",
-      "aliases": [],
-      "detail_codes": [],
-      "review_flag": null,
-      "proposed": false,
-      "owner_status": "APPROVED_BY_OWNER"
-    },
-    {
       "code": "DEMAND_WAITING_PERIOD_NOT_MET",
       "rules": [
         "PGS10-DMD-003"
@@ -2254,7 +2320,10 @@
       "detail_codes": [],
       "review_flag": null,
       "proposed": false,
-      "owner_status": "CANDIDATE"
+      "owner_status": "CANDIDATE",
+      "policy_disqualifying": true,
+      "remediable_by_document": false,
+      "requires_evidence_verified": true
     },
     {
       "code": "ELIGIBILITY_GUARANTEE_BELOW_MINIMUM",
@@ -2267,7 +2336,10 @@
       "detail_codes": [],
       "review_flag": null,
       "proposed": false,
-      "owner_status": "CANDIDATE"
+      "owner_status": "CANDIDATE",
+      "policy_disqualifying": true,
+      "remediable_by_document": false,
+      "requires_evidence_verified": true
     },
     {
       "code": "ELIGIBILITY_NOT_BUSINESS_PURPOSE",
@@ -2280,7 +2352,10 @@
       "detail_codes": [],
       "review_flag": null,
       "proposed": false,
-      "owner_status": "APPROVED_BY_OWNER"
+      "owner_status": "APPROVED_BY_OWNER",
+      "policy_disqualifying": true,
+      "remediable_by_document": false,
+      "requires_evidence_verified": true
     },
     {
       "code": "ELIGIBILITY_NOT_NEW_BUSINESS_LOAN",
@@ -2293,7 +2368,10 @@
       "detail_codes": [],
       "review_flag": null,
       "proposed": false,
-      "owner_status": "CANDIDATE"
+      "owner_status": "CANDIDATE",
+      "policy_disqualifying": true,
+      "remediable_by_document": false,
+      "requires_evidence_verified": true
     },
     {
       "code": "ELIGIBILITY_NOT_PGS10",
@@ -2306,7 +2384,10 @@
       "detail_codes": [],
       "review_flag": null,
       "proposed": false,
-      "owner_status": "CANDIDATE"
+      "owner_status": "CANDIDATE",
+      "policy_disqualifying": true,
+      "remediable_by_document": false,
+      "requires_evidence_verified": true
     },
     {
       "code": "ELIGIBILITY_PRODUCT_EXCLUDED",
@@ -2319,7 +2400,10 @@
       "detail_codes": [],
       "review_flag": null,
       "proposed": false,
-      "owner_status": "CANDIDATE"
+      "owner_status": "CANDIDATE",
+      "policy_disqualifying": true,
+      "remediable_by_document": false,
+      "requires_evidence_verified": true
     },
     {
       "code": "ELIGIBILITY_PROHIBITED_CREDIT_TYPE",
@@ -2334,7 +2418,10 @@
       "detail_codes": [],
       "review_flag": null,
       "proposed": false,
-      "owner_status": "APPROVED_BY_OWNER"
+      "owner_status": "APPROVED_BY_OWNER",
+      "policy_disqualifying": true,
+      "remediable_by_document": false,
+      "requires_evidence_verified": true
     },
     {
       "code": "ELIGIBILITY_UNCONFIRMED",
@@ -2436,7 +2523,7 @@
         "PGS10-ID-001"
       ],
       "control_status": "PASS",
-      "meaning": "ต่างเฉพาะรูปแบบที่ไม่มีนัยเชิงความหมาย (field-specific: LG, ตัวเลขไทย/อารบิก, Leading Zero เฉพาะ field ที่ประกาศ) — เก็บ raw_value และ normalized_value; เคสเป็น PASS_WITH_OBSERVATION",
+      "meaning": "ต่างเฉพาะรูปแบบที่ไม่มีนัยเชิงความหมาย: LG ตัดขีด/ช่องว่าง, ตัวเลขไทย↔อารบิก, และ Leading Zero ของ `loan_account_no` เฉพาะ FI ที่มี normalization profile — เก็บ raw_value/normalized_value/normalization_rule/fi_profile",
       "aliases": [],
       "detail_codes": [],
       "review_flag": "FORMAT_NORMALIZED",
@@ -2514,12 +2601,12 @@
         "PGS10-NPL-001"
       ],
       "control_status": "HOLD",
-      "meaning": "ยังไม่มี Mapping ที่อนุมัติระหว่าง guarantee_effective_date กับ lg_issue_date (A-30) จึงคำนวณ NPL seasoning ไม่ได้",
+      "meaning": "ไม่มี lg_issue_date (anchor ที่อนุมัติ) หรือพิสูจน์ไม่ได้ จึงคำนวณ NPL seasoning ไม่ได้ — defensive HOLD",
       "aliases": [],
       "detail_codes": [],
       "review_flag": null,
-      "proposed": true,
-      "owner_status": "PROPOSED_BY_CLAUDE"
+      "proposed": false,
+      "owner_status": "APPROVED_BY_OWNER"
     },
     {
       "code": "NPL_DATE_MISSING",
@@ -2527,7 +2614,7 @@
         "PGS10-NPL-001"
       ],
       "control_status": "HOLD",
-      "meaning": "ไม่มี npl_date จากข้อมูล FI (ห้าม derive จาก default_date)",
+      "meaning": "ไม่มี npl_date จากข้อมูล FI หรือยังไม่ผ่านการ verify (ห้าม derive จาก default_date)",
       "aliases": [
         "NPL_DATE_MAPPING_UNDEFINED",
         "NPL_MAPPING_REQUIRED",
@@ -2543,13 +2630,16 @@
       "rules": [
         "PGS10-NPL-001"
       ],
-      "control_status": "HOLD",
-      "meaning": "npl_date ยังไม่พ้นระยะ seasoning",
+      "control_status": "FAIL",
+      "meaning": "npl_date + anchor + Policy verify ครบแล้ว และ npl_date ยังไม่พ้นระยะ seasoning — Proven Policy Ineligibility (DEC-31)",
       "aliases": [],
       "detail_codes": [],
       "review_flag": null,
       "proposed": false,
-      "owner_status": "CANDIDATE"
+      "owner_status": "CANDIDATE",
+      "policy_disqualifying": true,
+      "remediable_by_document": false,
+      "requires_evidence_verified": true
     },
     {
       "code": "POSTAL_ACK_INCOMPLETE",
@@ -2705,38 +2795,12 @@
       "owner_status": "CANDIDATE"
     },
     {
-      "code": "UNCONTACTABLE_EXCEPTION_MATURED",
-      "rules": [
-        "PGS10-RST-002"
-      ],
-      "control_status": "PASS_WITH_SUPPORT",
-      "meaning": "ครบเงื่อนไขทางออก: maturity (start + 7 เดือนปฏิทิน) + Certified Tracking Report + หนังสือบอกกล่าว/บอกเลิก ≥ 1",
-      "aliases": [],
-      "detail_codes": [],
-      "review_flag": null,
-      "proposed": true,
-      "owner_status": "PROPOSED_BY_CLAUDE"
-    },
-    {
       "code": "UNCONTACTABLE_EXCEPTION_NOT_MET",
       "rules": [
         "PGS10-RST-002"
       ],
       "control_status": "HOLD",
       "meaning": "เส้นทางยกเว้นยังไม่ครบเงื่อนไข",
-      "aliases": [],
-      "detail_codes": [],
-      "review_flag": null,
-      "proposed": false,
-      "owner_status": "CANDIDATE"
-    },
-    {
-      "code": "MATCHED_STATEMENT_HEADER",
-      "rules": [
-        "PGS10-RST-003"
-      ],
-      "control_status": "PASS_WITH_SUPPORT",
-      "meaning": "ตรงหัว Statement (Level 2)",
       "aliases": [],
       "detail_codes": [],
       "review_flag": null,
@@ -2786,17 +2850,19 @@
       "owner_status": "CANDIDATE"
     },
     {
-      "code": "NO_PAYMENT_FOUND",
+      "code": "PAYMENT_HISTORY_INCOMPLETE",
       "rules": [
         "PGS10-STM-001"
       ],
       "control_status": "HOLD",
-      "meaning": "ไม่พบรายการรับชำระจริงใน Statement — ไม่ใช่ format normalization จึงไม่ Auto-pass ต้องให้ผู้ตรวจยืนยัน",
-      "aliases": [],
+      "meaning": "Statement ไม่ครบ Origination→Cut-off / มี gap จึงไม่รู้ว่ามี payment หรือไม่",
+      "aliases": [
+        "NO_PAYMENT_FOUND"
+      ],
       "detail_codes": [],
       "review_flag": null,
       "proposed": false,
-      "owner_status": "CANDIDATE"
+      "owner_status": "APPROVED_BY_OWNER"
     },
     {
       "code": "UNKNOWN_TRANSACTION_NEAR_DEFAULT",
@@ -2962,7 +3028,9 @@
     "CAP_ARITHMETIC_MISMATCH": "CLAIM_MAX_ARITHMETIC_MISMATCH",
     "CHECK_STATEMENT_HEADER": "RESTRUCTURE_DATE_SEMANTICS_UNRESOLVED",
     "CLAIM_AMOUNT_MISMATCH": "CLAIM_CALCULATION_MISMATCH",
+    "CLAIM_FILING_WINDOW_NOT_MET": "CLAIM_FILING_NOT_YET_OPEN",
     "CONFIRMATION_IDENTIFIER_UNLINKED": "IDENTIFIER_LINKAGE_UNRESOLVED",
+    "COVERAGE_AGE_BASIS_UNDEFINED": "LG_TENOR_UNDETERMINABLE",
     "DELIVERY_PROOF_INCOMPLETE": "POSTAL_ACK_INCOMPLETE",
     "DEMAND_PRINCIPAL_UNRECONCILED": "DEMAND_PRINCIPAL_AS_OF_DATE_UNVERIFIED",
     "DOCUMENT_PAGE_SEQUENCE_GAP": "APPROVAL_DOCUMENT_INCOMPLETE",
@@ -2980,6 +3048,7 @@
     "HOLD_RESTRUCTURE_DATE_SEMANTICS": "RESTRUCTURE_DATE_SEMANTICS_UNRESOLVED",
     "HOLD_TRACKING_EVIDENCE_MISMATCH": "TRACKING_EVIDENCE_MISMATCH",
     "HOLD_TRANSACTION_CODE_UNMAPPED": "TRANSACTION_CODE_UNMAPPED",
+    "NO_PAYMENT_FOUND": "PAYMENT_HISTORY_INCOMPLETE",
     "NPL_DATE_MAPPING_UNDEFINED": "NPL_DATE_MISSING",
     "NPL_MAPPING_REQUIRED": "NPL_DATE_MISSING",
     "PAID_PENDING_MISSING": "PACKAGE_DEFINITION_REQUIRED",
@@ -2999,7 +3068,11 @@
     "FAIL_ELIGIBILITY": "สถานะเดิมของ R§26 — ใช้ FAIL + reason_code ELIGIBILITY_*",
     "PASS_WITH_DOCUMENTARY_SUPPORT": "ชื่อเดิมของ R§26 → PASS_WITH_SUPPORT",
     "OBSERVATION_CANDIDATE (control_status)": "ย้ายเป็น review_flag (DEC-09)",
-    "FORMAT_VARIANCE as control_status OBSERVATION": "DEC-15: ปัจจุบัน control_status=PASS + review_flag=FORMAT_NORMALIZED"
+    "FORMAT_VARIANCE as control_status OBSERVATION": "DEC-15: ปัจจุบัน control_status=PASS + review_flag=FORMAT_NORMALIZED",
+    "POST_DEFAULT_PAYMENT_SUPPORTED": "ไม่ใช่ reason_code (เป็นเหตุผ่านด้วย support) → support_code POST_DEFAULT_PAYMENT_SUPPORTED (DEC-36)",
+    "MATCHED_STATEMENT_HEADER": "ไม่ใช่ reason_code (เป็นเหตุผ่านด้วย support) → support_code MATCHED_STATEMENT_HEADER (DEC-36)",
+    "DERIVED_AS_OF_DEMAND": "ไม่ใช่ reason_code (เป็นเหตุผ่านด้วย support) → support_code DERIVED_AS_OF_DEMAND (DEC-36)",
+    "UNCONTACTABLE_EXCEPTION_MATURED": "ไม่ใช่ reason_code (เป็นเหตุผ่านด้วย support) → support_code UNCONTACTABLE_7_MONTH_EXCEPTION (DEC-36)"
   },
   "same_id_different_meaning_hazards": [
     {
@@ -3068,5 +3141,488 @@
     "MISSING_INPUT",
     "INVALID_INPUT",
     "POLICY_PARAMETER_UNRESOLVED"
+  ],
+  "support_codes": {
+    "POST_DEFAULT_PAYMENT_SUPPORTED": {
+      "rules": [
+        "PGS10-DEF-001",
+        "PGS10-DEF-002"
+      ],
+      "meaning": "มีการชำระหลังผิดนัด และหนังสือยืนยันสมบูรณ์ทางภาพ/เนื้อหา ตรง Default Date หน้าจอ"
+    },
+    "MATCHED_STATEMENT_HEADER": {
+      "rules": [
+        "PGS10-RST-003"
+      ],
+      "meaning": "วันที่ปรับโครงสร้างตรงหัว Statement (Level 2) แม้ไม่ตรงวันลงนามในเอกสาร"
+    },
+    "DERIVED_AS_OF_DEMAND": {
+      "rules": [
+        "PGS10-DMD-002"
+      ],
+      "meaning": "derive เงินต้น ณ วันบอกกล่าวจาก Statement/Ledger ได้ครบเงื่อนไข (ครอบคลุม ไม่มี gap ไม่มีรายการกระทบเงินต้นหลัง demand หรือ reconstruct ได้)"
+    },
+    "UNCONTACTABLE_7_MONTH_EXCEPTION": {
+      "rules": [
+        "PGS10-RST-002"
+      ],
+      "meaning": "ครบเงื่อนไขทางออก (หน้า 7 กรณี 1 และ 3): start + 7 เดือนปฏิทิน + Certified Tracking Report + หนังสือบอกกล่าว/บอกเลิก ≥ 1"
+    }
+  },
+  "fail_criteria": {
+    "policy_disqualifying": true,
+    "remediable_by_document": false,
+    "evidence_verified": true,
+    "note": "FAIL ต่อเมื่อทั้งสามเป็นจริง; ตัดสินจากคุณสมบัติของ Rule ไม่ใช่ prefix ของ reason_code (DEC-31)"
+  },
+  "conflict_register": [
+    {
+      "id": "A-01",
+      "topic": "default_date ≠ npl_date",
+      "status": "RESOLVED",
+      "decision_ref": "DEC-01",
+      "blocks_freeze": false,
+      "safe_hold": null
+    },
+    {
+      "id": "A-02",
+      "topic": "Demand Principal as-of Demand Date",
+      "status": "RESOLVED",
+      "decision_ref": "DEC-08",
+      "blocks_freeze": false,
+      "safe_hold": null
+    },
+    {
+      "id": "A-03",
+      "topic": "Tolerance 0.01 configurable",
+      "status": "RESOLVED",
+      "decision_ref": "DEC-09",
+      "blocks_freeze": false,
+      "safe_hold": null
+    },
+    {
+      "id": "A-04",
+      "topic": "Historical mismatch = HOLD",
+      "status": "RESOLVED_PENDING_SOURCE_EDIT",
+      "decision_ref": "DEC-07, DEC-26",
+      "blocks_freeze": false,
+      "safe_hold": null
+    },
+    {
+      "id": "A-05",
+      "topic": "OCR ห้ามชดเชย Critical Document",
+      "status": "PARTIAL",
+      "decision_ref": "",
+      "blocks_freeze": false,
+      "safe_hold": {
+        "mechanism": "PARAM",
+        "ref": "PRM-038",
+        "behavior": "ใช้ 7 ประเภทของ M§37 เป็น Critical ทั้งหมด (superset)",
+        "reason_code": "DOCUMENT_VISUALLY_INCOMPLETE"
+      }
+    },
+    {
+      "id": "A-06",
+      "topic": "คำศัพท์สถานะ 3 ชุด",
+      "status": "RESOLVED",
+      "decision_ref": "DEC-05",
+      "blocks_freeze": false,
+      "safe_hold": null
+    },
+    {
+      "id": "A-07",
+      "topic": "ขอบเขตของ FAIL",
+      "status": "RESOLVED",
+      "decision_ref": "DEC-19, DEC-31",
+      "blocks_freeze": false,
+      "safe_hold": null
+    },
+    {
+      "id": "A-08",
+      "topic": "ลำดับ Support vs Observation; NOT_TESTABLE",
+      "status": "RESOLVED",
+      "decision_ref": "DEC-04, DEC-06",
+      "blocks_freeze": false,
+      "safe_hold": null
+    },
+    {
+      "id": "A-09",
+      "topic": "NPL Seasoning 6 เดือนเป็นกฎทั่วไปหรือไม่",
+      "status": "RESOLVED",
+      "decision_ref": "DEC-01",
+      "blocks_freeze": false,
+      "safe_hold": null
+    },
+    {
+      "id": "A-10",
+      "topic": "7-month exception ขอบเขต + วันเริ่มนับ",
+      "status": "RESOLVED",
+      "decision_ref": "DEC-20",
+      "blocks_freeze": false,
+      "safe_hold": null
+    },
+    {
+      "id": "A-11",
+      "topic": "Coverage Ratio นอก Small Biz",
+      "status": "RESOLVED",
+      "decision_ref": "DEC-21",
+      "blocks_freeze": false,
+      "safe_hold": null
+    },
+    {
+      "id": "A-12",
+      "topic": "วิธีนับอายุ LG / วิธีนับเดือน-ปี",
+      "status": "RESOLVED",
+      "decision_ref": "DEC-30",
+      "blocks_freeze": false,
+      "safe_hold": null
+    },
+    {
+      "id": "A-13",
+      "topic": "Rule ID ชนกัน/พิมพ์ผิด",
+      "status": "RESOLVED",
+      "decision_ref": "DEC-14",
+      "blocks_freeze": false,
+      "safe_hold": null
+    },
+    {
+      "id": "A-14",
+      "topic": "Transaction taxonomy + นิยาม Payment",
+      "status": "PARTIAL",
+      "decision_ref": "DEC-02, DEC-12",
+      "blocks_freeze": false,
+      "safe_hold": {
+        "mechanism": "CONTROL",
+        "ref": "TXN-001",
+        "behavior": "Code ที่ไม่มี Mapping ที่มีหลักฐาน → HOLD; semantic_type ของ bank map เป็นตัวกำหนดว่าเป็น PAYMENT หรือไม่",
+        "reason_code": "TRANSACTION_CODE_UNMAPPED"
+      }
+    },
+    {
+      "id": "A-15",
+      "topic": "'UNKNOWN ใกล้วันผิดนัด'",
+      "status": "OPEN",
+      "decision_ref": "",
+      "blocks_freeze": false,
+      "safe_hold": {
+        "mechanism": "PARAM",
+        "ref": "PRM-042",
+        "behavior": "UNKNOWN ใด ๆ หลัง PAYMENT ล่าสุด → HOLD",
+        "reason_code": "UNKNOWN_TRANSACTION_NEAR_DEFAULT"
+      }
+    },
+    {
+      "id": "A-16",
+      "topic": "รายการภาพหนังสือยืนยัน 12 vs 10",
+      "status": "RESOLVED",
+      "decision_ref": "DEC-23",
+      "blocks_freeze": false,
+      "safe_hold": null
+    },
+    {
+      "id": "A-17",
+      "topic": "Postal: ประเภทลายมือชื่อ + linkage",
+      "status": "RESOLVED",
+      "decision_ref": "",
+      "blocks_freeze": false,
+      "safe_hold": null
+    },
+    {
+      "id": "A-18",
+      "topic": "Address: ที่อยู่ล่าสุด vs ที่อยู่ใดก็ได้",
+      "status": "PARTIAL",
+      "decision_ref": "DEC-12",
+      "blocks_freeze": false,
+      "safe_hold": {
+        "mechanism": "PARAM",
+        "ref": "PRM-040",
+        "behavior": "เทียบที่อยู่ล่าสุดเมื่อมีเอกสารแจ้งเปลี่ยน; พิสูจน์วันที่มีผลไม่ได้ → HOLD",
+        "reason_code": "ADDRESS_DIFFERS_FROM_LATEST"
+      }
+    },
+    {
+      "id": "A-19",
+      "topic": "Pipeline 3 ฉบับ",
+      "status": "RESOLVED",
+      "decision_ref": "",
+      "blocks_freeze": false,
+      "safe_hold": null
+    },
+    {
+      "id": "A-20",
+      "topic": "Historical Debt เมื่อ Trigger ไม่ใช่ Demand",
+      "status": "OPEN",
+      "decision_ref": "",
+      "blocks_freeze": false,
+      "safe_hold": {
+        "mechanism": "CONTROL_STATUS",
+        "ref": "HIS-001",
+        "behavior": "Reference Event ที่ไม่ใช่ Demand → NOT_TESTABLE (REQUIRED_HARD → case HOLD)",
+        "reason_code": "MISSING_INPUT"
+      }
+    },
+    {
+      "id": "A-21",
+      "topic": "Demand waiting / Filing window นับจากวันใด",
+      "status": "OPEN",
+      "decision_ref": "",
+      "blocks_freeze": false,
+      "safe_hold": {
+        "mechanism": "PARAM",
+        "ref": "PRM-021/PRM-028",
+        "behavior": "ผ่านต่อเมื่อผลเหมือนกันทุก candidate reference/convention ไม่เช่นนั้น HOLD",
+        "reason_code": "POLICY_PARAMETER_UNRESOLVED"
+      }
+    },
+    {
+      "id": "A-22",
+      "topic": "รูปแบบวันที่ พ.ศ./ค.ศ.",
+      "status": "RESOLVED",
+      "decision_ref": "DEC-12",
+      "blocks_freeze": false,
+      "safe_hold": null
+    },
+    {
+      "id": "A-23",
+      "topic": "Start up = รูปแบบ 2; เงื่อนไข Claim ของ Start up",
+      "status": "RESOLVED",
+      "decision_ref": "DEC-01, DEC-24",
+      "blocks_freeze": false,
+      "safe_hold": null
+    },
+    {
+      "id": "A-24",
+      "topic": "current_guarantee_obligation / 'other applicable amounts'",
+      "status": "OPEN",
+      "decision_ref": "",
+      "blocks_freeze": false,
+      "safe_hold": {
+        "mechanism": "CONTROL_STATUS",
+        "ref": "CLM-003/CUR-002",
+        "behavior": "แหล่งของ current_guarantee_obligation / 'other applicable amounts' ไม่ระบุ → NOT_TESTABLE",
+        "reason_code": "MISSING_INPUT"
+      }
+    },
+    {
+      "id": "A-25",
+      "topic": "เคสอยู่หลายกลุ่มใน R§30",
+      "status": "RESOLVED",
+      "decision_ref": "DEC-13",
+      "blocks_freeze": false,
+      "safe_hold": null
+    },
+    {
+      "id": "A-26",
+      "topic": "ตัวเลขเคสจริงสำหรับ FULL_CASE ไม่มี",
+      "status": "OPEN",
+      "decision_ref": "DEC-13",
+      "blocks_freeze": false,
+      "safe_hold": {
+        "mechanism": "BLOCKED",
+        "ref": "04_PGS10_GOLDEN_TESTS",
+        "behavior": "Fixture ที่ไม่มี evidence_ref = BLOCKED_PENDING_EVIDENCE: expected_case_status=null, ไม่ assert ผลใด ๆ (DEC-38)",
+        "reason_code": null
+      }
+    },
+    {
+      "id": "A-27",
+      "topic": "PGS10-LG-001 ไม่มี Logic",
+      "status": "OPEN",
+      "decision_ref": "",
+      "blocks_freeze": false,
+      "safe_hold": {
+        "mechanism": "CONTROL",
+        "ref": "LG-001",
+        "behavior": "ข้อมูล LG ไม่ครบ → HOLD",
+        "reason_code": "LG_DATA_MISSING"
+      }
+    },
+    {
+      "id": "A-28",
+      "topic": "ขอบเขต Page Completeness",
+      "status": "OPEN",
+      "decision_ref": "",
+      "blocks_freeze": false,
+      "safe_hold": {
+        "mechanism": "CONTROL",
+        "ref": "VIS-002",
+        "behavior": "เอกสาร Critical อื่นที่หลายหน้าตรวจภาพต่อเนื่องผ่าน VIS-002; ไม่ครบ → HOLD",
+        "reason_code": "DOCUMENT_VISUALLY_INCOMPLETE"
+      }
+    },
+    {
+      "id": "A-29",
+      "topic": "Contract date rule เป็น Thai Credit-only",
+      "status": "RESOLVED",
+      "decision_ref": "DEC-10",
+      "blocks_freeze": false,
+      "safe_hold": null
+    },
+    {
+      "id": "A-30",
+      "topic": "NPL anchor date",
+      "status": "RESOLVED",
+      "decision_ref": "DEC-29",
+      "blocks_freeze": false,
+      "safe_hold": null
+    },
+    {
+      "id": "A-31",
+      "topic": "Pack ใช้ชื่อ HOLD_* 10 ชื่อและชื่อ reason ไม่ตรง catalogue",
+      "status": "RESOLVED",
+      "decision_ref": "DEC-05",
+      "blocks_freeze": false,
+      "safe_hold": null
+    },
+    {
+      "id": "A-32",
+      "topic": "Rule ID ความหมายต่างกันแต่ ID เหมือนกัน (STM-001/002, CLM-001/003, PST-002/003)",
+      "status": "RESOLVED",
+      "decision_ref": "DEC-14",
+      "blocks_freeze": false,
+      "safe_hold": null
+    },
+    {
+      "id": "A-33",
+      "topic": "Transaction code evidence",
+      "status": "PARTIAL",
+      "decision_ref": "DEC-02",
+      "blocks_freeze": false,
+      "safe_hold": {
+        "mechanism": "CONTROL",
+        "ref": "TXN-001",
+        "behavior": "Code UNVERIFIED (6921, 6680, อื่น ๆ) กระทบ Last Payment → HOLD",
+        "reason_code": "TRANSACTION_CODE_UNMAPPED"
+      }
+    },
+    {
+      "id": "A-34",
+      "topic": "LG ใน Golden Tests ที่ไม่มีในเอกสารอื่น",
+      "status": "PARTIAL",
+      "decision_ref": "DEC-03",
+      "blocks_freeze": false,
+      "safe_hold": {
+        "mechanism": "BLOCKED",
+        "ref": "04_PGS10_GOLDEN_TESTS",
+        "behavior": "LG/เคสที่ยังไม่ผ่านการยืนยัน evidence คงสถานะ BLOCKED_PENDING_EVIDENCE และไม่ถูกใช้ยืนยัน Rule",
+        "reason_code": null
+      }
+    },
+    {
+      "id": "A-35",
+      "topic": "GT-001 (67-026936) ขอบเขต Assertion",
+      "status": "RESOLVED",
+      "decision_ref": "DEC-13",
+      "blocks_freeze": false,
+      "safe_hold": null
+    },
+    {
+      "id": "A-36",
+      "topic": "Controls/เงื่อนไขที่ P ตัดออก",
+      "status": "RESOLVED",
+      "decision_ref": "DEC-12",
+      "blocks_freeze": false,
+      "safe_hold": null
+    },
+    {
+      "id": "A-37",
+      "topic": "ตัวเลขนโยบายที่ P ตัดออก",
+      "status": "RESOLVED",
+      "decision_ref": "",
+      "blocks_freeze": false,
+      "safe_hold": null
+    },
+    {
+      "id": "A-38",
+      "topic": "P: PASS_WITH_OBSERVATION 'เฉพาะหลัง reviewer อนุมัติ' vs FORMAT_VARIANCE อัตโนมัติ",
+      "status": "RESOLVED",
+      "decision_ref": "DEC-15",
+      "blocks_freeze": false,
+      "safe_hold": null
+    },
+    {
+      "id": "A-39",
+      "topic": "หลักฐานที่ผู้ใช้อ้างถึงแต่ session นี้เข้าถึงไม่ได้",
+      "status": "RESOLVED",
+      "decision_ref": "DEC-37",
+      "blocks_freeze": false,
+      "safe_hold": null
+    },
+    {
+      "id": "A-40",
+      "topic": "NO_PAYMENT_FOUND ต้องแยก 'พิสูจน์ว่าไม่เคยชำระ' กับ 'Statement ไม่ครบ'",
+      "status": "RESOLVED",
+      "decision_ref": "DEC-34",
+      "blocks_freeze": false,
+      "safe_hold": null
+    },
+    {
+      "id": "A-41",
+      "topic": "CAP-001 ขึ้นกับ Stage",
+      "status": "RESOLVED",
+      "decision_ref": "DEC-17",
+      "blocks_freeze": false,
+      "safe_hold": null
+    },
+    {
+      "id": "A-42",
+      "topic": "การจับคู่ 'กรณี 1–5' ของหน้า 7 กับ claim path",
+      "status": "RESOLVED",
+      "decision_ref": "DEC-32",
+      "blocks_freeze": false,
+      "safe_hold": null
+    },
+    {
+      "id": "A-43",
+      "topic": "Safe-Hold แบบ 'invariance' ข้าม candidate (Demand waiting reference, date arithmetic) — เลิกใช้กับ Coverage",
+      "status": "OPEN",
+      "decision_ref": "DEC-28",
+      "blocks_freeze": false,
+      "safe_hold": {
+        "mechanism": "PARAM",
+        "ref": "PRM-021/PRM-028",
+        "behavior": "ผ่านต่อเมื่อผลเหมือนกันทุก candidate/convention ไม่เช่นนั้น HOLD",
+        "reason_code": "POLICY_PARAMETER_UNRESOLVED"
+      }
+    },
+    {
+      "id": "A-44",
+      "topic": "Band ≤5/>5 ปี ของ Case 1–4 (claim path) นับจากอะไร — ต่างจาก Coverage (contractual tenor)",
+      "status": "OPEN",
+      "decision_ref": "DEC-30",
+      "blocks_freeze": false,
+      "safe_hold": {
+        "mechanism": "PARAM",
+        "ref": "PRM-054",
+        "behavior": "ข้อมูลวันที่ไม่ครบ → claim_path กำหนดไม่ได้ → HOLD",
+        "reason_code": "LG_DATA_MISSING"
+      }
+    },
+    {
+      "id": "A-45",
+      "topic": "Default chronology เมื่อ NO_PAYMENT_VERIFIED ต้องใช้ alternative evidence (due-date/FI) — ยังไม่มี Rule อนุมัติ",
+      "status": "OPEN",
+      "decision_ref": "DEC-34",
+      "blocks_freeze": false,
+      "safe_hold": {
+        "mechanism": "PARAM",
+        "ref": "PRM-055",
+        "behavior": "NO_PAYMENT_VERIFIED → DEF-001 = HOLD",
+        "reason_code": "POLICY_PARAMETER_UNRESOLVED"
+      }
+    },
+    {
+      "id": "A-46",
+      "topic": "Coverage tenor ของ LG ที่ถูกต่ออายุ/ขยาย",
+      "status": "OPEN",
+      "decision_ref": "DEC-30",
+      "blocks_freeze": false,
+      "safe_hold": {
+        "mechanism": "CONTROL",
+        "ref": "CLM-002",
+        "behavior": "LG ต่ออายุและไม่มี guarantee_term ระบุ → HOLD",
+        "reason_code": "LG_TENOR_UNDETERMINABLE"
+      }
+    }
   ]
 }

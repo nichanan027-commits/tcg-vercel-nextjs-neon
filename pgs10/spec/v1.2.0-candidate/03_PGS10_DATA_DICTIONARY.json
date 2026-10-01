@@ -1,13 +1,11 @@
 {
   "metadata": {
-    "ruleset_version": "1.2.0-candidate",
+    "ruleset_version": "1.2.0-candidate.2",
     "status": "SPEC_CANDIDATE_NOT_FROZEN",
     "frozen": false,
     "engine_changes_allowed": false,
     "basis": "Reconciliation r2 (DEC-01..DEC-28) + Deployment Pack v1.1.0 + Draft v1.0",
-    "freeze_blockers": [
-      "A-30"
-    ],
+    "freeze_blockers": [],
     "freeze_gate": "รัน `node check_freeze_gate.js` — 5 ข้อต้องผ่านทั้งหมด และ freeze_blockers ต้องว่าง",
     "artifact": "03_PGS10_DATA_DICTIONARY",
     "source_precedence": [
@@ -71,6 +69,22 @@
       "REQUIRED_HARD",
       "CONDITIONAL",
       "OPTIONAL"
+    ],
+    "support_code": [
+      "POST_DEFAULT_PAYMENT_SUPPORTED",
+      "MATCHED_STATEMENT_HEADER",
+      "DERIVED_AS_OF_DEMAND",
+      "UNCONTACTABLE_7_MONTH_EXCEPTION"
+    ],
+    "test_scope": [
+      "RULE_ONLY",
+      "FULL_CASE",
+      "AGGREGATION_ONLY"
+    ],
+    "payment_history_status": [
+      "PAYMENTS_FOUND",
+      "NO_PAYMENT_VERIFIED",
+      "INCOMPLETE"
     ],
     "transaction_type": [
       "PAYMENT",
@@ -263,6 +277,15 @@
         "PGS10-CLM-003"
       ]
     },
+    "claim_case_no": {
+      "meaning": "Case ตามหลักเกณฑ์หน้า 6–7 (DEC-32)",
+      "type": "enum:1|2|3|4|5",
+      "source": "DERIVED",
+      "derived": true,
+      "used_by": [
+        "PGS10-RST-001"
+      ]
+    },
     "claim_eligibility_date": {
       "meaning": "วันที่ใช้ตรวจ Demand waiting period",
       "type": "date",
@@ -270,6 +293,14 @@
       "status": "OPEN: ยังไม่นิยาม (A-21)",
       "used_by": [
         "PGS10-DMD-003"
+      ]
+    },
+    "claim_filing_dates_verified": {
+      "meaning": "วันที่ lg_issue / final expiry / claim submission ผ่านการ verify (จำเป็นก่อน FAIL ของ CLM-001)",
+      "type": "boolean",
+      "source": "review",
+      "used_by": [
+        "PGS10-CLM-001"
       ]
     },
     "claim_max": {
@@ -282,7 +313,7 @@
       ]
     },
     "claim_path": {
-      "meaning": "path เงื่อนไขการขอรับเงิน (PRM-052)",
+      "meaning": "path เงื่อนไขการขอรับเงิน = Case 1–5 (PRM-052; band ตาม PRM-054)",
       "type": "enum:SMART_LE_5Y|SMART_GT_5Y|SMALL_BIZ_LE_5Y|SMALL_BIZ_GT_5Y|START_UP_ALL",
       "source": "DERIVED",
       "derived": true,
@@ -299,7 +330,6 @@
       ],
       "used_by": [
         "PGS10-CLM-001",
-        "PGS10-CLM-002",
         "PGS10-RST-001",
         "PGS10-RST-002",
         "PGS10-TIME-001"
@@ -371,6 +401,15 @@
       "source": "contract",
       "used_by": [
         "PGS10-ID-001"
+      ]
+    },
+    "contractual_lg_tenor_years": {
+      "meaning": "contractual LG tenor: guarantee_term → lg_expiry_date − lg_issue_date",
+      "type": "decimal",
+      "source": "DERIVED",
+      "derived": true,
+      "used_by": [
+        "PGS10-CLM-002"
       ]
     },
     "coverage_ratio": {
@@ -457,7 +496,6 @@
       "not_equal_to": "npl_date",
       "notes": "ห้ามใช้แทน npl_date โดยไม่มี Business Mapping ที่อนุมัติ (A-01)",
       "used_by": [
-        "PGS10-CLM-002",
         "PGS10-DEF-001",
         "PGS10-DEF-002",
         "PGS10-NPL-001",
@@ -477,7 +515,6 @@
       "type": "date",
       "source": "demand letter",
       "used_by": [
-        "PGS10-CLM-002",
         "PGS10-DMD-001",
         "PGS10-DMD-002",
         "PGS10-DMD-003"
@@ -614,7 +651,16 @@
       "source": "case form",
       "notes": "ใช้กำหนดว่ากฎ Contract Date ใช้ได้หรือไม่ (THAI_CREDIT)",
       "used_by": [
-        "PGS10-CONTRACT-001"
+        "PGS10-CONTRACT-001",
+        "PGS10-ID-001"
+      ]
+    },
+    "fi_normalization_profile": {
+      "meaning": "โปรไฟล์ normalization ของ FI (เช่น leading zero ของ loan_account_no) — ไม่มี = ไม่ normalize (DEC-33)",
+      "type": "object",
+      "source": "governance config",
+      "used_by": [
+        "PGS10-ID-001"
       ]
     },
     "final_lg_expiry_date": {
@@ -661,11 +707,10 @@
       ]
     },
     "guarantee_effective_date": {
-      "meaning": "วันที่ บสย. ค้ำประกัน (Guarantee effective date) — แยกจาก lg_issue_date",
+      "meaning": "วันที่ บสย. ค้ำประกัน — field แยก (optional) เมื่อมี source จริง; ไม่ใช้เป็น anchor ของ NPL (anchor = lg_issue_date, APPROVED_OPERATIONAL — DEC-29)",
       "type": "date",
       "source": "LG / ข้อมูลการค้ำประกัน",
       "not_equal_by_default": "lg_issue_date",
-      "status": "OPEN: Mapping ↔ lg_issue_date ยังไม่อนุมัติ (A-30, Freeze Blocker)",
       "used_by": [
         "PGS10-NPL-001"
       ]
@@ -676,6 +721,14 @@
       "source": "LG fee record",
       "used_by": [
         "PGS10-LG-001"
+      ]
+    },
+    "guarantee_term_years": {
+      "meaning": "ระยะเวลาการค้ำประกันที่ระบุใน LG โดยตรง (ปี)",
+      "type": "decimal",
+      "source": "LG",
+      "used_by": [
+        "PGS10-CLM-002"
       ]
     },
     "historical_reference_event": {
@@ -732,6 +785,14 @@
         "PGS10-ID-001"
       ]
     },
+    "lg_expiry_date": {
+      "meaning": "วันสิ้นอายุของ LG ฉบับที่ใช้ (ไม่ใช่ final expiry)",
+      "type": "date",
+      "source": "LG",
+      "used_by": [
+        "PGS10-CLM-002"
+      ]
+    },
     "lg_issue_date": {
       "meaning": "วันที่ออก LG",
       "type": "date",
@@ -753,6 +814,14 @@
       "used_by": [
         "PGS10-ID-001",
         "PGS10-LG-001"
+      ]
+    },
+    "lg_renewed_or_extended": {
+      "meaning": "LG ถูกต่ออายุ/ขยาย",
+      "type": "boolean",
+      "source": "LG / system",
+      "used_by": [
+        "PGS10-CLM-002"
       ]
     },
     "loan_account_no": {
@@ -789,6 +858,14 @@
         "PGS10-ID-001"
       ]
     },
+    "loan_origination_date": {
+      "meaning": "วันที่เริ่มต้นสินเชื่อ/เบิกครั้งแรก (ใช้ตรวจว่า Statement ครบ)",
+      "type": "date",
+      "source": "contract / statement",
+      "used_by": [
+        "PGS10-STM-001"
+      ]
+    },
     "loan_purpose_business": {
       "meaning": "สินเชื่อเพื่อวัตถุประสงค์ธุรกิจ",
       "type": "boolean",
@@ -811,7 +888,14 @@
       "not_equal_to": "default_date",
       "status": "OPEN: ยังไม่มีแหล่งที่มา/Mapping ที่อนุมัติ",
       "used_by": [
-        "PGS10-CLM-002",
+        "PGS10-NPL-001"
+      ]
+    },
+    "npl_date_verified": {
+      "meaning": "npl_date ผ่านการ verify จากข้อมูล FI/เอกสาร (จำเป็นก่อน FAIL — DEC-31)",
+      "type": "boolean",
+      "source": "FI data / review",
+      "used_by": [
         "PGS10-NPL-001"
       ]
     },
@@ -830,6 +914,16 @@
       "source": "claim workflow",
       "used_by": [
         "PGS10-TIME-001"
+      ]
+    },
+    "payment_history_status": {
+      "meaning": "สถานะประวัติการชำระจาก Statement (PRM-056)",
+      "type": "enum:PAYMENTS_FOUND|NO_PAYMENT_VERIFIED|INCOMPLETE",
+      "source": "DERIVED",
+      "derived": true,
+      "used_by": [
+        "PGS10-DEF-001",
+        "PGS10-STM-001"
       ]
     },
     "pdf_blank_pages": {
@@ -1187,6 +1281,7 @@
       "type": "date",
       "source": "statement",
       "used_by": [
+        "PGS10-STM-001",
         "PGS10-STM-002"
       ]
     },
@@ -1195,7 +1290,8 @@
       "type": "boolean",
       "source": "statement",
       "used_by": [
-        "PGS10-DMD-002"
+        "PGS10-DMD-002",
+        "PGS10-STM-001"
       ]
     },
     "statement_period_end": {
@@ -1203,7 +1299,8 @@
       "type": "date",
       "source": "statement",
       "used_by": [
-        "PGS10-DMD-002"
+        "PGS10-DMD-002",
+        "PGS10-STM-001"
       ]
     },
     "statement_period_start": {
@@ -1211,8 +1308,15 @@
       "type": "date",
       "source": "statement",
       "used_by": [
-        "PGS10-DMD-002"
+        "PGS10-DMD-002",
+        "PGS10-STM-001"
       ]
+    },
+    "support_code": {
+      "meaning": "เหตุผ่านด้วย support (ไม่ใช่ reason_code)",
+      "type": "enum(support_codes)",
+      "source": "engine output",
+      "used_by": []
     },
     "support_used": {
       "meaning": "เคสผ่านโดยใช้ Documentary Support อย่างน้อยหนึ่ง Control",

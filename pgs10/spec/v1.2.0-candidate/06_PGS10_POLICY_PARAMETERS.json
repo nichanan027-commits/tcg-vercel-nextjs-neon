@@ -1,13 +1,11 @@
 {
   "metadata": {
-    "ruleset_version": "1.2.0-candidate",
+    "ruleset_version": "1.2.0-candidate.2",
     "status": "SPEC_CANDIDATE_NOT_FROZEN",
     "frozen": false,
     "engine_changes_allowed": false,
     "basis": "Reconciliation r2 (DEC-01..DEC-28) + Deployment Pack v1.1.0 + Draft v1.0",
-    "freeze_blockers": [
-      "A-30"
-    ],
+    "freeze_blockers": [],
     "freeze_gate": "รัน `node check_freeze_gate.js` — 5 ข้อต้องผ่านทั้งหมด และ freeze_blockers ต้องว่าง",
     "artifact": "06_PGS10_POLICY_PARAMETERS",
     "source_status_values": {
@@ -172,8 +170,8 @@
       "unit": "calendar months",
       "applies_to": "START_UP",
       "source_status": "OFFICIAL",
-      "source_ref": "หลักเกณฑ์ PGS 10 — SSMEs รูปแบบ 2 ใช้ข้อ (ข) (ตามคำตัดสิน)",
-      "decision_ref": "DEC-01",
+      "source_ref": "หลักเกณฑ์ PGS 10 หน้า 7 — SSMEs รูปแบบ 2 ใช้ข้อ (ข) · owner-verified (ผู้ใช้ยืนยันจากไฟล์โครงการ; ไม่ได้ตรวจซ้ำใน session นี้)",
+      "decision_ref": "DEC-01, DEC-37",
       "config_key": "npl.seasoning_months.START_UP",
       "hardcode_allowed": false,
       "notes": "ยืนยันจากผู้ใช้; ไม่ปรากฏใน M/R โดยตรง",
@@ -196,17 +194,17 @@
     {
       "id": "PRM-013",
       "name": "NPL seasoning anchor date",
-      "value": "guarantee_effective_date (แยกจาก lg_issue_date)",
+      "value": "lg_issue_date",
       "unit": "-",
       "applies_to": "SMALL_BIZ, START_UP",
-      "source_status": "OPEN",
-      "source_ref": "M§4.1 ('วันที่ออก LG') vs DEC-01 ('วันที่ บสย. ค้ำประกัน')",
-      "decision_ref": "DEC-01, DEC-25",
+      "source_status": "APPROVED_OPERATIONAL",
+      "source_ref": "ข้อ 2.5 (อายุการค้ำนับแต่วันที่ออก LG); หน้า 7 ใช้ 'วันที่ บสย. ค้ำประกัน' — ไม่ได้ระบุว่าเป็น field เดียวกัน",
+      "decision_ref": "DEC-01, DEC-29",
       "config_key": "npl.anchor_date",
       "hardcode_allowed": false,
-      "notes": "A-30 Freeze Blocker. Mapping guarantee_effective_date ↔ lg_issue_date ใช้ได้เมื่อ Business Owner ยืนยัน → APPROVED_OPERATIONAL",
+      "notes": "Operational Mapping ไม่ใช่ OFFICIAL; เปลี่ยน Mapping ได้โดยไม่แก้ Rule ID. guarantee_effective_date เก็บแยกได้ (PRM-013b)",
       "safe_hold": {
-        "behavior": "ไม่มี guarantee_effective_date ที่ระบุตรงและไม่มี Mapping ที่อนุมัติ → NPL-001 = HOLD",
+        "behavior": "ไม่มี lg_issue_date หรือพิสูจน์ไม่ได้ → NPL-001 = HOLD",
         "reason_code": "NPL_ANCHOR_DATE_UNDEFINED"
       }
     },
@@ -271,10 +269,10 @@
       "name": "Uncontactable / unable-to-agree exception — months",
       "value": 7,
       "unit": "months",
-      "applies_to": "path ที่มีเงื่อนไข (ค): SMEs ≤ 5 ปี และ Small Biz ≤ 5 ปี (กรณี 1 และ 3) — ไม่ใช้กับ Start up",
+      "applies_to": "Case 1 (SMEs ≤5 ปี) และ Case 3 (Small Biz ≤5 ปี) — ไม่ใช้กับ Start up (Case 5)",
       "source_status": "OFFICIAL",
-      "source_ref": "หลักเกณฑ์ PGS 10 หน้า 7 กรณี 1 และ 3 (user-attested; ต้นฉบับไม่ได้ส่งเข้า session)",
-      "decision_ref": "DEC-20",
+      "source_ref": "หลักเกณฑ์ PGS 10 หน้า 7 กรณี 1 และ 3 · owner-verified (ผู้ใช้ยืนยันจากไฟล์โครงการ; ไม่ได้ตรวจซ้ำใน session นี้)",
+      "decision_ref": "DEC-20, DEC-32, DEC-37",
       "config_key": "restructure.uncontactable_exception_months",
       "hardcode_allowed": false,
       "notes": "unit = calendar months; exception_start_date = first_uncontactable_date OR first_contacted_but_restructure_failed_date; exception_maturity_date = add_calendar_months(start, 7)",
@@ -388,8 +386,8 @@
       "unit": "basis points",
       "applies_to": "START_UP",
       "source_status": "OFFICIAL",
-      "source_ref": "ตารางหลักเกณฑ์ PGS 10 (user-attested), M§7",
-      "decision_ref": "DEC-21",
+      "source_ref": "ตารางหลักเกณฑ์ PGS 10 หน้า 5 · owner-verified (ผู้ใช้ยืนยันจากไฟล์โครงการ; ไม่ได้ตรวจซ้ำใน session นี้)",
+      "decision_ref": "DEC-21, DEC-37",
       "config_key": "coverage.START_UP.bp",
       "hardcode_allowed": false,
       "notes": "Start up = 100% ทั้ง ≤5 ปี และ >5 ปี",
@@ -405,8 +403,8 @@
       "unit": "basis points",
       "applies_to": "SMART_*",
       "source_status": "OFFICIAL",
-      "source_ref": "ตารางหลักเกณฑ์ PGS 10 (user-attested), M§7",
-      "decision_ref": "DEC-21",
+      "source_ref": "ตารางหลักเกณฑ์ PGS 10 หน้า 5 · owner-verified (ผู้ใช้ยืนยันจากไฟล์โครงการ; ไม่ได้ตรวจซ้ำใน session นี้)",
+      "decision_ref": "DEC-21, DEC-37",
       "config_key": "coverage.SMART.*",
       "hardcode_allowed": false,
       "notes": "เดิม OPEN — ปิดโดย DEC-21",
@@ -415,19 +413,16 @@
     {
       "id": "PRM-027",
       "name": "coverage_age_basis",
-      "value": null,
+      "value": "CONTRACTUAL_LG_TENOR",
       "unit": "-",
       "applies_to": "CLM-002",
-      "source_status": "OPEN",
-      "source_ref": "DEC-22; R§32",
-      "decision_ref": "DEC-11, DEC-22",
+      "source_status": "OFFICIAL",
+      "source_ref": "ตารางแบ่ง Coverage ตาม 'อายุหนังสือค้ำประกัน' (หน้า 5) + ข้อ 2.5 (นับจากวันออก LG) · owner-verified (ผู้ใช้ยืนยันจากไฟล์โครงการ; ไม่ได้ตรวจซ้ำใน session นี้)",
+      "decision_ref": "DEC-11, DEC-30",
       "config_key": "coverage.age_basis",
       "hardcode_allowed": false,
-      "notes": "ห้ามถือ claim_date − lg_issue_date เป็น OFFICIAL. Anniversary Rule ใช้ได้เมื่อ Business Owner อนุมัติ → APPROVED_OPERATIONAL",
-      "safe_hold": {
-        "behavior": "คำนวณ Tier ตามทุก candidate event ที่มีข้อมูล (claim_submission_date, npl_date, default_date, demand_date) ถ้าให้ Tier เดียวกันทั้งหมดจึงใช้ Tier นั้น; ต่างกัน → HOLD",
-        "reason_code": "COVERAGE_AGE_BASIS_UNDEFINED"
-      }
+      "notes": "เดิม OPEN — ปิดโดย DEC-30; ไม่ใช้ Event (Claim/NPL/Default/Demand) เลือก tier",
+      "safe_hold": null
     },
     {
       "id": "PRM-028",
@@ -440,7 +435,7 @@
       "decision_ref": "",
       "config_key": "date.arithmetic",
       "hardcode_allowed": false,
-      "notes": "นับรวม/ไม่รวมวันตั้งต้น ยังไม่ยืนยัน",
+      "notes": "ใช้กับ NPL seasoning / Demand waiting / Filing window / tenor ที่ derive จากวันที่ (ค่าเริ่มต้น clamp สิ้นเดือน ไม่นับวันตั้งต้น)",
       "safe_hold": {
         "behavior": "ใช้ CALENDAR_MONTH_CLAMP_END_OF_MONTH (ไม่นับวันตั้งต้น); ถ้าผลต่างกันเมื่อเปลี่ยนเป็นวิธีอื่น (นับรวมวัน/ rollover) → HOLD",
         "reason_code": "POLICY_PARAMETER_UNRESOLVED"
@@ -704,16 +699,20 @@
     },
     {
       "id": "PRM-045",
-      "name": "FAIL scope",
-      "value": "PROVEN_INELIGIBILITY_ONLY",
+      "name": "FAIL criteria",
+      "value": {
+        "policy_disqualifying": true,
+        "remediable_by_document": false,
+        "evidence_verified": true
+      },
       "unit": "-",
       "applies_to": "Case",
       "source_status": "LOCKED",
-      "source_ref": "DEC-19",
-      "decision_ref": "DEC-19",
-      "config_key": "aggregation.fail_scope",
+      "source_ref": "DEC-19, DEC-31",
+      "decision_ref": "DEC-19, DEC-31",
+      "config_key": "aggregation.fail_criteria",
       "hardcode_allowed": false,
-      "notes": "FAIL = พิสูจน์ได้ว่าขาดคุณสมบัติตามนโยบายและแก้ด้วยเอกสารเพิ่มไม่ได้. ข้อเสนอ promote NPL/ยื่นเกินเวลา เป็น FAIL = Q-05 (ยังเป็น HOLD)",
+      "notes": "FAIL ต่อเมื่อทั้งสามเป็นจริง; ไม่ผูกกับชื่อ/prefix ของ reason_code. NPL_SEASONING_NOT_MET (verified) = FAIL; CLAIM_FILING_WINDOW_EXPIRED (verified) = FAIL; ยังไม่ถึงเวลา/ข้อมูลขาด = HOLD",
       "safe_hold": null
     },
     {
@@ -837,19 +836,29 @@
     {
       "unit": "map field→significant",
       "applies_to": "ID-001",
-      "source_ref": "R§5 (ตัวอย่างเลขบัญชี), DEC-15",
-      "decision_ref": "DEC-15",
-      "config_key": "identity.leading_zero_significant",
+      "source_ref": "R§5 (ตัวอย่างเลขบัญชี), DEC-15, DEC-33",
+      "decision_ref": "DEC-15, DEC-33",
+      "config_key": "identity.leading_zero_profiles",
       "hardcode_allowed": false,
-      "notes": "field ที่ไม่อยู่ในตาราง = significant (ไม่ Auto-pass). ประกาศ loan_account_no ตาม R§5 — ขอ owner ยืนยัน Q-07",
+      "notes": "ยังไม่มี profile ของ FI ใดถูกอนุมัติ → ต่าง Leading Zero = HOLD VERIFY_REFERENCE_MAPPING. เก็บ raw_value, normalized_value, normalization_rule, fi_profile",
       "safe_hold": {
-        "behavior": "field ที่ไม่ประกาศ → ต่าง Leading Zero = HOLD",
+        "behavior": "FI ไม่มี profile หรือ field ไม่อยู่ใน eligible_fields → ต่าง Leading Zero = HOLD",
         "reason_code": "VERIFY_REFERENCE_MAPPING"
       },
       "id": "PRM-050",
-      "name": "Leading zero significance by field",
+      "name": "Leading zero normalization (FI-specific profile)",
       "value": {
-        "loan_account_no": false
+        "mechanism": "FI_CONFIGURABLE",
+        "eligible_fields": [
+          "loan_account_no"
+        ],
+        "profiles": {},
+        "never_applies_to": [
+          "lg_no",
+          "customer_id",
+          "contract_no",
+          "borrower_id"
+        ]
       },
       "source_status": "OPERATIONAL_LOCKED_SCOPED"
     },
@@ -873,20 +882,20 @@
     {
       "unit": "map",
       "applies_to": "ELIG/RST/NPL/DMD/CLM",
-      "source_ref": "M§3.1, M§4, M§6; Start up ตาม DEC-24 (หน้า 7 กรณี 5)",
-      "decision_ref": "DEC-24",
+      "source_ref": "หลักเกณฑ์ PGS 10 หน้า 6–7 · owner-verified (ผู้ใช้ยืนยันจากไฟล์โครงการ; ไม่ได้ตรวจซ้ำใน session นี้); M§3.1, M§4",
+      "decision_ref": "DEC-24, DEC-32",
       "config_key": "claim.path_matrix",
       "hardcode_allowed": false,
-      "notes": "ตัวอักษรเงื่อนไขนิยามใน 01 §5. การจับคู่ 'กรณี 1–5' กับ path เป็น Q-06",
+      "notes": "Small Biz >5 ปี รวม (ข) ตามที่ยืนยัน (ต่างจาก M§6 ที่ไม่รวม)",
       "safe_hold": null,
       "id": "PRM-052",
       "name": "Claim path matrix (conditions required)",
       "value": {
-        "SMART_* ≤5y": "(ก)+(ค)+(จ)+(ฉ)",
-        "SMART_* >5y": "(ก)+(ง)+(จ)+(ฉ)",
-        "SMALL_BIZ ≤5y": "(ข)+(ค)+(จ)+(ฉ)",
-        "SMALL_BIZ >5y": "(ง)+(จ)+(ฉ)",
-        "START_UP (all ages)": "(ข)+(จ)+(ฉ)"
+        "Case 1: SMEs ≤5y": "(ก)+(ค)+(จ)+(ฉ)",
+        "Case 2: SMEs >5y": "(ก)+(ง)+(จ)+(ฉ)",
+        "Case 3: SMALL_BIZ ≤5y": "(ข)+(ค)+(จ)+(ฉ)",
+        "Case 4: SMALL_BIZ >5y": "(ข)+(ง)+(จ)+(ฉ)",
+        "Case 5: START_UP": "(ข)+(จ)+(ฉ)"
       },
       "source_status": "OFFICIAL"
     },
@@ -906,6 +915,107 @@
         "no_transaction_gap",
         "no_principal_affecting_txn_after_demand OR reconstructable"
       ],
+      "source_status": "LOCKED"
+    },
+    {
+      "unit": "-",
+      "applies_to": "NPL-001",
+      "source_ref": "DEC-29",
+      "decision_ref": "DEC-29",
+      "config_key": "npl.guarantee_effective_date_optional",
+      "hardcode_allowed": false,
+      "notes": "",
+      "safe_hold": null,
+      "id": "PRM-013b",
+      "name": "guarantee_effective_date (optional separate field)",
+      "value": "เก็บได้เมื่อมี source จริง; ไม่ใช้เป็น anchor",
+      "source_status": "APPROVED_OPERATIONAL"
+    },
+    {
+      "unit": "list",
+      "applies_to": "CLM-002",
+      "source_ref": "DEC-30",
+      "decision_ref": "DEC-30",
+      "config_key": "coverage.tenor_source_hierarchy",
+      "hardcode_allowed": false,
+      "notes": "tenor <= 5 ปี → Tier แรก (70%); ที่ tenor เท่ากับ 5 ปีพอดี = Tier แรก (DEC-11); LG ที่ต่ออายุ → Q-10",
+      "safe_hold": null,
+      "id": "PRM-027c",
+      "name": "contractual LG tenor — source hierarchy",
+      "value": [
+        "1. guarantee_term ใน LG โดยตรง",
+        "2. lg_expiry_date − lg_issue_date",
+        "3. พิสูจน์ไม่ได้ → HOLD LG_TENOR_UNDETERMINABLE"
+      ],
+      "source_status": "APPROVED_OPERATIONAL"
+    },
+    {
+      "unit": "-",
+      "applies_to": "claim_path (Case 1–4)",
+      "source_ref": "M§3.1 ถ้อยคำ 'ขอ Claim ภายใน 5 ปีแรก / เมื่อพ้น 5 ปีแรก' — เป็นเรื่องเวลายื่น ต่างจาก Coverage ที่ใช้ contractual tenor",
+      "decision_ref": "DEC-30",
+      "config_key": "claim.path_age_reference",
+      "hardcode_allowed": false,
+      "notes": "ขอยืนยัน (Q-08): band ของ Case 1/2/3/4 นับจากวันที่ยื่นเทียบวันออก LG",
+      "safe_hold": {
+        "behavior": "ไม่มี claim_submission_date หรือ lg_issue_date → claim_path กำหนดไม่ได้ → HOLD",
+        "reason_code": "LG_DATA_MISSING"
+      },
+      "id": "PRM-054",
+      "name": "claim_path age band reference",
+      "value": "claim_submission_date เทียบ lg_issue_date + 5 ปี ('ขอ Claim ภายใน 5 ปีแรก')",
+      "source_status": "ASSUMPTION"
+    },
+    {
+      "unit": "-",
+      "applies_to": "DEF-001",
+      "source_ref": "DEC-34 (ตาม Rule ที่อนุมัติ)",
+      "decision_ref": "DEC-34",
+      "config_key": "default.alt_evidence",
+      "hardcode_allowed": false,
+      "notes": "ยังไม่มี Rule อนุมัติ (Q-09)",
+      "safe_hold": {
+        "behavior": "payment_history_status=NO_PAYMENT_VERIFIED → DEF-001 = HOLD จนมี alternative evidence rule",
+        "reason_code": "POLICY_PARAMETER_UNRESOLVED"
+      },
+      "id": "PRM-055",
+      "name": "Default-date alternative evidence when NO_PAYMENT_VERIFIED",
+      "value": null,
+      "source_status": "OPEN"
+    },
+    {
+      "unit": "enum",
+      "applies_to": "STM-001",
+      "source_ref": "DEC-34",
+      "decision_ref": "DEC-34",
+      "config_key": "statement.payment_history_status",
+      "hardcode_allowed": false,
+      "notes": "",
+      "safe_hold": null,
+      "id": "PRM-056",
+      "name": "payment_history_status definition",
+      "value": {
+        "NO_PAYMENT_VERIFIED": "Statement ครอบคลุม Origination→Cut-off, ไม่มี gap, ไม่มี PAYMENT",
+        "PAYMENTS_FOUND": "มี PAYMENT อย่างน้อยหนึ่งรายการ",
+        "INCOMPLETE": "นอกจากนั้น"
+      },
+      "source_status": "LOCKED"
+    },
+    {
+      "unit": "-",
+      "applies_to": "Golden tests",
+      "source_ref": "DEC-35",
+      "decision_ref": "DEC-35",
+      "config_key": null,
+      "hardcode_allowed": false,
+      "notes": "",
+      "safe_hold": null,
+      "id": "PRM-057",
+      "name": "AGGREGATION_ONLY fixtures",
+      "value": {
+        "fixture_type": "SYNTHETIC_LOGIC",
+        "evidence_required": false
+      },
       "source_status": "LOCKED"
     }
   ],
@@ -931,7 +1041,7 @@
         "evidence_status": "EVIDENCE_SUPPORTED_BANK_SPECIFIC",
         "effective_from": null,
         "effective_to": null,
-        "evidence_source": "user-attested: Statement remark + ledger behaviour (ไฟล์เคสไม่ได้ส่งเข้า session นี้ — ต้องแนบ doc/page ก่อน Freeze)",
+        "evidence_source": "Statement Thai Credit: remark บนหัว Statement ระบุความหมายของ code + พฤติกรรม ledger (6656 ลด Principal, 6931 เพิ่ม Principal) · owner-verified (ผู้ใช้ยืนยันจากไฟล์โครงการ; ไม่ได้ตรวจซ้ำใน session นี้)",
         "approval_status": "PENDING_APPROVAL",
         "approved_by": null,
         "is_payment": true,
@@ -945,7 +1055,7 @@
         "evidence_status": "EVIDENCE_SUPPORTED_BANK_SPECIFIC",
         "effective_from": null,
         "effective_to": null,
-        "evidence_source": "user-attested: Statement remark + ledger behaviour (ไฟล์เคสไม่ได้ส่งเข้า session นี้ — ต้องแนบ doc/page ก่อน Freeze)",
+        "evidence_source": "Statement Thai Credit: remark บนหัว Statement ระบุความหมายของ code + พฤติกรรม ledger (6656 ลด Principal, 6931 เพิ่ม Principal) · owner-verified (ผู้ใช้ยืนยันจากไฟล์โครงการ; ไม่ได้ตรวจซ้ำใน session นี้)",
         "approval_status": "PENDING_APPROVAL",
         "approved_by": null,
         "is_payment": true,
@@ -959,7 +1069,7 @@
         "evidence_status": "EVIDENCE_SUPPORTED_BANK_SPECIFIC",
         "effective_from": null,
         "effective_to": null,
-        "evidence_source": "user-attested: Statement remark + ledger behaviour (ไฟล์เคสไม่ได้ส่งเข้า session นี้ — ต้องแนบ doc/page ก่อน Freeze)",
+        "evidence_source": "Statement Thai Credit: remark บนหัว Statement ระบุความหมายของ code + พฤติกรรม ledger (6656 ลด Principal, 6931 เพิ่ม Principal) · owner-verified (ผู้ใช้ยืนยันจากไฟล์โครงการ; ไม่ได้ตรวจซ้ำใน session นี้)",
         "approval_status": "PENDING_APPROVAL",
         "approved_by": null,
         "is_payment": false,
@@ -973,7 +1083,7 @@
         "evidence_status": "EVIDENCE_SUPPORTED_BANK_SPECIFIC",
         "effective_from": null,
         "effective_to": null,
-        "evidence_source": "user-attested: Statement remark + ledger behaviour (ไฟล์เคสไม่ได้ส่งเข้า session นี้ — ต้องแนบ doc/page ก่อน Freeze)",
+        "evidence_source": "Statement Thai Credit: remark บนหัว Statement ระบุความหมายของ code + พฤติกรรม ledger (6656 ลด Principal, 6931 เพิ่ม Principal) · owner-verified (ผู้ใช้ยืนยันจากไฟล์โครงการ; ไม่ได้ตรวจซ้ำใน session นี้)",
         "approval_status": "PENDING_APPROVAL",
         "approved_by": null,
         "is_payment": false,
@@ -987,7 +1097,7 @@
         "evidence_status": "EVIDENCE_SUPPORTED_BANK_SPECIFIC",
         "effective_from": null,
         "effective_to": null,
-        "evidence_source": "user-attested: Statement remark + ledger behaviour (ไฟล์เคสไม่ได้ส่งเข้า session นี้ — ต้องแนบ doc/page ก่อน Freeze)",
+        "evidence_source": "Statement Thai Credit: remark บนหัว Statement ระบุความหมายของ code + พฤติกรรม ledger (6656 ลด Principal, 6931 เพิ่ม Principal) · owner-verified (ผู้ใช้ยืนยันจากไฟล์โครงการ; ไม่ได้ตรวจซ้ำใน session นี้)",
         "approval_status": "PENDING_APPROVAL",
         "approved_by": null,
         "is_payment": false,

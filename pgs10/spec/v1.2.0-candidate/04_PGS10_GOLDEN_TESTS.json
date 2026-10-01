@@ -1,20 +1,18 @@
 {
   "metadata": {
-    "ruleset_version": "1.2.0-candidate",
+    "ruleset_version": "1.2.0-candidate.2",
     "status": "SPEC_CANDIDATE_NOT_FROZEN",
     "frozen": false,
     "engine_changes_allowed": false,
     "basis": "Reconciliation r2 (DEC-01..DEC-28) + Deployment Pack v1.1.0 + Draft v1.0",
-    "freeze_blockers": [
-      "A-30"
-    ],
+    "freeze_blockers": [],
     "freeze_gate": "รัน `node check_freeze_gate.js` — 5 ข้อต้องผ่านทั้งหมด และ freeze_blockers ต้องว่าง",
     "artifact": "04_PGS10_GOLDEN_TESTS",
     "schema": {
       "test_scope": [
         "RULE_ONLY",
         "FULL_CASE",
-        "AGGREGATION_LOGIC (เสนอ — ยังไม่อยู่ใน DEC-13)"
+        "AGGREGATION_ONLY (DEC-35; fixture_type=SYNTHETIC_LOGIC, evidence_required=false)"
       ],
       "match_mode": [
         "RULE_ONLY",
@@ -23,7 +21,7 @@
       ],
       "activation": {
         "ACTIVE": "รันได้: input สังเคราะห์/ตัวเลขจากเอกสาร + expected ตาม rule_basis",
-        "BLOCKED_PENDING_EVIDENCE": "เคสจริงที่ยังไม่มี evidence_ref — ไม่มี input และห้ามรัน/ห้ามเติมข้อมูลเอง"
+        "BLOCKED_PENDING_EVIDENCE": "เคสจริงที่ยังไม่มี evidence_ref — ไม่มี input, ไม่มี asserted expected result (DEC-38); ผลเดิมเก็บเป็น manual_baseline_note ซึ่งไม่นับเป็น Regression Assertion"
       },
       "basis": [
         "FROM_DOCUMENT",
@@ -36,7 +34,7 @@
       "Golden case ทดสอบ Rule ที่นิยามไว้แล้ว ไม่ใช้อนุมานกฎ",
       "RULE_ONLY ห้าม Assert case_status",
       "ทุก expected result ต้องมี rule_basis (DEC/M§/R§) — ไม่มีค่าที่คิดเอง",
-      "เคสจริงต้องมี evidence_ref ก่อน ACTIVE; ปัจจุบันทุกเคสจริงเป็น BLOCKED_PENDING_EVIDENCE",
+      "เคสจริงต้องมี evidence_ref ก่อน ACTIVE และก่อนมี asserted result; ปัจจุบันทุกเคสจริงเป็น BLOCKED_PENDING_EVIDENCE (ไม่ assert)",
       "LG ห้ามแก้อัตโนมัติ (DEC-03)"
     ]
   },
@@ -187,7 +185,8 @@
       "expected_rule_results": [
         {
           "rule_id": "PGS10-ID-001",
-          "control_status": "PASS"
+          "control_status": "PASS",
+          "review_flag": "FORMAT_NORMALIZED"
         }
       ],
       "expected_case_status": null,
@@ -216,7 +215,8 @@
       "expected_rule_results": [
         {
           "rule_id": "PGS10-ID-001",
-          "control_status": "PASS"
+          "control_status": "PASS",
+          "review_flag": "FORMAT_NORMALIZED"
         }
       ],
       "expected_case_status": null,
@@ -224,23 +224,31 @@
     },
     {
       "test_id": "UT-ID-003",
-      "title": "เลขบัญชีต่างเฉพาะ Leading Zero (องค์ประกอบอื่นตรงหมด)",
+      "title": "Leading Zero ของ loan_account_no — FI ที่มี normalization profile → PASS + FORMAT_NORMALIZED",
       "test_scope": "RULE_ONLY",
       "match_mode": "RULE_ONLY",
       "activation": "ACTIVE",
       "basis": "FROM_DOCUMENT",
-      "rule_basis": "R§5",
+      "rule_basis": "R§5, DEC-15, DEC-33",
       "lg_no": null,
       "evidence_ref": null,
       "rule_ids": [
         "PGS10-ID-001"
       ],
-      "config": {},
+      "config": {
+        "fi_normalization_profile": {
+          "fi_id": "EXAMPLE_FI_WITH_PROFILE",
+          "loan_account_no": {
+            "leading_zero": "strip"
+          }
+        }
+      },
       "input": {
         "loan_account_no": {
           "screen": "366023002710",
           "statement": "0366023002710"
-        }
+        },
+        "fi_id": "EXAMPLE_FI_WITH_PROFILE"
       },
       "expected_rule_results": [
         {
@@ -836,16 +844,12 @@
         {
           "rule_id": "PGS10-DEF-001",
           "control_status": "PASS_WITH_SUPPORT",
-          "reason_codes": [
-            "POST_DEFAULT_PAYMENT_SUPPORTED"
-          ]
+          "support_code": "POST_DEFAULT_PAYMENT_SUPPORTED"
         },
         {
           "rule_id": "PGS10-DEF-002",
           "control_status": "PASS_WITH_SUPPORT",
-          "reason_codes": [
-            "POST_DEFAULT_PAYMENT_SUPPORTED"
-          ]
+          "support_code": "POST_DEFAULT_PAYMENT_SUPPORTED"
         }
       ],
       "expected_case_status": null,
@@ -1061,9 +1065,7 @@
         {
           "rule_id": "PGS10-RST-003",
           "control_status": "PASS_WITH_SUPPORT",
-          "reason_codes": [
-            "MATCHED_STATEMENT_HEADER"
-          ]
+          "support_code": "MATCHED_STATEMENT_HEADER"
         }
       ],
       "expected_case_status": null,
@@ -1093,39 +1095,6 @@
           "control_status": "HOLD",
           "reason_codes": [
             "RESTRUCTURE_DATE_SEMANTICS_UNRESOLVED"
-          ]
-        }
-      ],
-      "expected_case_status": null,
-      "expected_reason_codes": []
-    },
-    {
-      "test_id": "UT-NPL-001",
-      "title": "มีเฉพาะ default_date ไม่มี npl_date → ห้ามตีความ Default = NPL",
-      "test_scope": "RULE_ONLY",
-      "match_mode": "RULE_ONLY",
-      "activation": "ACTIVE",
-      "basis": "FROM_DOCUMENT",
-      "rule_basis": "M§4.1, DEC-01",
-      "lg_no": null,
-      "evidence_ref": null,
-      "rule_ids": [
-        "PGS10-NPL-001"
-      ],
-      "config": {},
-      "input": {
-        "default_date": "2025-02-10",
-        "npl_date": null,
-        "lg_issue_date": "2024-03-07",
-        "guarantee_effective_date": "2024-03-07",
-        "product": "SMALL_BIZ"
-      },
-      "expected_rule_results": [
-        {
-          "rule_id": "PGS10-NPL-001",
-          "control_status": "HOLD",
-          "reason_codes": [
-            "NPL_DATE_MISSING"
           ]
         }
       ],
@@ -1934,69 +1903,6 @@
       }
     },
     {
-      "test_id": "UT-COV-001",
-      "title": "Small Biz อายุ LG ≤ 5 ปี → 70%",
-      "test_scope": "RULE_ONLY",
-      "match_mode": "RULE_ONLY",
-      "activation": "ACTIVE",
-      "basis": "DERIVED_FROM_LOCKED_RULE",
-      "rule_basis": "R§22",
-      "lg_no": null,
-      "evidence_ref": null,
-      "rule_ids": [
-        "PGS10-CLM-002"
-      ],
-      "config": {},
-      "input": {
-        "product": "SMALL_BIZ",
-        "lg_issue_date": "2024-03-07",
-        "claim_submission_date": "2025-09-15",
-        "screen_coverage_ratio": "7000bp"
-      },
-      "expected_rule_results": [
-        {
-          "rule_id": "PGS10-CLM-002",
-          "control_status": "PASS",
-          "coverage_ratio_bp": 7000
-        }
-      ],
-      "expected_case_status": null,
-      "expected_reason_codes": []
-    },
-    {
-      "test_id": "UT-COV-002",
-      "title": "Small Biz อายุ LG > 5 ปี (เกินชัดเจน) → 100%",
-      "test_scope": "RULE_ONLY",
-      "match_mode": "RULE_ONLY",
-      "activation": "ACTIVE",
-      "basis": "DERIVED_FROM_LOCKED_RULE",
-      "rule_basis": "R§22",
-      "lg_no": null,
-      "evidence_ref": null,
-      "rule_ids": [
-        "PGS10-CLM-002"
-      ],
-      "config": {},
-      "input": {
-        "product": "SMALL_BIZ",
-        "lg_issue_date": "2018-03-07",
-        "claim_submission_date": "2025-09-15",
-        "screen_coverage_ratio": "7000bp"
-      },
-      "expected_rule_results": [
-        {
-          "rule_id": "PGS10-CLM-002",
-          "control_status": "HOLD",
-          "reason_codes": [
-            "COVERAGE_RATIO_MISMATCH"
-          ],
-          "coverage_ratio_bp": 10000
-        }
-      ],
-      "expected_case_status": null,
-      "expected_reason_codes": []
-    },
-    {
       "test_id": "UT-COV-003",
       "title": "Product ที่ไม่อยู่ใน matrix (ค่าที่ไม่รู้จัก) → ไม่มีกฎ → HOLD",
       "test_scope": "RULE_ONLY",
@@ -2012,8 +1918,7 @@
       "config": {},
       "input": {
         "product": "UNLISTED_PRODUCT",
-        "lg_issue_date": "2024-03-07",
-        "claim_submission_date": "2025-09-15"
+        "guarantee_term_years": 3
       },
       "expected_rule_results": [
         {
@@ -2022,36 +1927,6 @@
           "reason_codes": [
             "NO_RULE_FOR_PRODUCT"
           ]
-        }
-      ],
-      "expected_case_status": null,
-      "expected_reason_codes": []
-    },
-    {
-      "test_id": "UT-COV-004",
-      "title": "Coverage: ครบ 5 ปีพอดี (claim_submission_date = fifth anniversary) = 70%",
-      "test_scope": "RULE_ONLY",
-      "match_mode": "RULE_ONLY",
-      "activation": "ACTIVE",
-      "basis": "DERIVED_FROM_LOCKED_RULE",
-      "rule_basis": "DEC-11, DEC-22",
-      "lg_no": null,
-      "evidence_ref": null,
-      "rule_ids": [
-        "PGS10-CLM-002"
-      ],
-      "config": {},
-      "input": {
-        "product": "SMALL_BIZ",
-        "lg_issue_date": "2020-03-07",
-        "claim_submission_date": "2025-03-07",
-        "screen_coverage_ratio": "7000bp"
-      },
-      "expected_rule_results": [
-        {
-          "rule_id": "PGS10-CLM-002",
-          "control_status": "PASS",
-          "coverage_ratio_bp": 7000
         }
       ],
       "expected_case_status": null,
@@ -2322,38 +2197,6 @@
       "note": "Logic ของ LG-001 ถอดจากนโยบาย (A-27); วิธีนับปี A-12"
     },
     {
-      "test_id": "UT-CLM-001",
-      "title": "ยื่นก่อนปีที่ 2 ของอายุ LG",
-      "test_scope": "RULE_ONLY",
-      "match_mode": "RULE_ONLY",
-      "activation": "ACTIVE",
-      "basis": "SYNTHETIC_FROM_RULE",
-      "rule_basis": "M§25",
-      "lg_no": null,
-      "evidence_ref": null,
-      "rule_ids": [
-        "PGS10-CLM-001"
-      ],
-      "config": {},
-      "input": {
-        "lg_issue_date": "2024-03-07",
-        "final_lg_expiry_date": "2029-03-07",
-        "claim_submission_date": "2025-03-06"
-      },
-      "expected_rule_results": [
-        {
-          "rule_id": "PGS10-CLM-001",
-          "control_status": "HOLD",
-          "reason_codes": [
-            "CLAIM_FILING_WINDOW_NOT_MET"
-          ]
-        }
-      ],
-      "expected_case_status": null,
-      "expected_reason_codes": [],
-      "note": "วิธีนับวัน = config (A-12)"
-    },
-    {
       "test_id": "UT-CLM-002",
       "title": "ยื่นภายในช่วงที่อนุญาต",
       "test_scope": "RULE_ONLY",
@@ -2376,37 +2219,6 @@
         {
           "rule_id": "PGS10-CLM-001",
           "control_status": "PASS"
-        }
-      ],
-      "expected_case_status": null,
-      "expected_reason_codes": []
-    },
-    {
-      "test_id": "UT-CLM-003",
-      "title": "ยื่นหลังสิ้นอายุ LG ฉบับสุดท้ายเกิน 1 ปี",
-      "test_scope": "RULE_ONLY",
-      "match_mode": "RULE_ONLY",
-      "activation": "ACTIVE",
-      "basis": "SYNTHETIC_FROM_RULE",
-      "rule_basis": "M§25",
-      "lg_no": null,
-      "evidence_ref": null,
-      "rule_ids": [
-        "PGS10-CLM-001"
-      ],
-      "config": {},
-      "input": {
-        "lg_issue_date": "2018-03-07",
-        "final_lg_expiry_date": "2023-03-07",
-        "claim_submission_date": "2024-04-01"
-      },
-      "expected_rule_results": [
-        {
-          "rule_id": "PGS10-CLM-001",
-          "control_status": "HOLD",
-          "reason_codes": [
-            "CLAIM_FILING_WINDOW_NOT_MET"
-          ]
         }
       ],
       "expected_case_status": null,
@@ -2601,9 +2413,7 @@
         {
           "rule_id": "PGS10-RST-002",
           "control_status": "PASS_WITH_SUPPORT",
-          "reason_codes": [
-            "UNCONTACTABLE_EXCEPTION_MATURED"
-          ]
+          "support_code": "UNCONTACTABLE_7_MONTH_EXCEPTION"
         }
       ],
       "expected_case_status": null,
@@ -2649,7 +2459,7 @@
     {
       "test_id": "UT-STATUS-001",
       "title": "มีทั้ง Observation และ Support → PASS_WITH_OBSERVATION + support_used=true",
-      "test_scope": "AGGREGATION_LOGIC",
+      "test_scope": "AGGREGATION_ONLY",
       "match_mode": "EXACT",
       "activation": "ACTIVE",
       "basis": "SYNTHETIC_FROM_RULE",
@@ -2672,13 +2482,14 @@
       "expected_case_status": "PASS_WITH_OBSERVATION",
       "expected_reason_codes": [],
       "note": "Assert ที่ระดับเคส: ต้องยืนยัน A-08 ก่อน Freeze",
-      "proposed_scope": true,
-      "expected_support_used": true
+      "expected_support_used": true,
+      "fixture_type": "SYNTHETIC_LOGIC",
+      "evidence_required": false
     },
     {
       "test_id": "UT-STATUS-002",
       "title": "Control HOLD ที่มี review_flag OBSERVATION_CANDIDATE (tolerance ปิด) → เคส HOLD",
-      "test_scope": "AGGREGATION_LOGIC",
+      "test_scope": "AGGREGATION_ONLY",
       "match_mode": "EXACT",
       "activation": "ACTIVE",
       "basis": "DERIVED_FROM_LOCKED_RULE",
@@ -2698,12 +2509,13 @@
       "expected_rule_results": [],
       "expected_case_status": "HOLD",
       "expected_reason_codes": [],
-      "proposed_scope": true
+      "fixture_type": "SYNTHETIC_LOGIC",
+      "evidence_required": false
     },
     {
       "test_id": "UT-STATUS-003",
       "title": "FAIL ชนะ HOLD",
-      "test_scope": "AGGREGATION_LOGIC",
+      "test_scope": "AGGREGATION_ONLY",
       "match_mode": "EXACT",
       "activation": "ACTIVE",
       "basis": "DERIVED_FROM_LOCKED_RULE",
@@ -2725,133 +2537,8 @@
       "expected_rule_results": [],
       "expected_case_status": "FAIL",
       "expected_reason_codes": [],
-      "proposed_scope": true
-    },
-    {
-      "test_id": "UT-NPL-002",
-      "title": "Start up: npl_date ห่างจาก anchor ครบ 6 เดือนปฏิทินพอดี",
-      "test_scope": "RULE_ONLY",
-      "match_mode": "RULE_ONLY",
-      "activation": "ACTIVE",
-      "basis": "DERIVED_FROM_LOCKED_RULE",
-      "rule_basis": "DEC-01",
-      "lg_no": null,
-      "evidence_ref": null,
-      "rule_ids": [
-        "PGS10-NPL-001"
-      ],
-      "config": {},
-      "input": {
-        "product": "START_UP",
-        "guarantee_effective_date": "2024-03-07",
-        "lg_issue_date": "2024-03-07",
-        "npl_date": "2024-09-07"
-      },
-      "expected_rule_results": [
-        {
-          "rule_id": "PGS10-NPL-001",
-          "control_status": "PASS"
-        }
-      ],
-      "expected_case_status": null,
-      "expected_reason_codes": [],
-      "note": "anchor = guarantee_effective_date ที่ระบุตรง (ไม่พึ่ง Mapping)"
-    },
-    {
-      "test_id": "UT-NPL-003",
-      "title": "Start up: npl_date ห่างจาก anchor 5 เดือน 29 วัน",
-      "test_scope": "RULE_ONLY",
-      "match_mode": "RULE_ONLY",
-      "activation": "ACTIVE",
-      "basis": "DERIVED_FROM_LOCKED_RULE",
-      "rule_basis": "DEC-01",
-      "lg_no": null,
-      "evidence_ref": null,
-      "rule_ids": [
-        "PGS10-NPL-001"
-      ],
-      "config": {},
-      "input": {
-        "product": "START_UP",
-        "guarantee_effective_date": "2024-03-07",
-        "lg_issue_date": "2024-03-07",
-        "npl_date": "2024-09-06"
-      },
-      "expected_rule_results": [
-        {
-          "rule_id": "PGS10-NPL-001",
-          "control_status": "HOLD",
-          "reason_codes": [
-            "NPL_SEASONING_NOT_MET"
-          ]
-        }
-      ],
-      "expected_case_status": null,
-      "expected_reason_codes": []
-    },
-    {
-      "test_id": "UT-NPL-004",
-      "title": "มี npl_date แต่ไม่มี guarantee_effective_date และไม่มี Mapping → Safe-Hold",
-      "test_scope": "RULE_ONLY",
-      "match_mode": "RULE_ONLY",
-      "activation": "ACTIVE",
-      "basis": "DERIVED_FROM_LOCKED_RULE",
-      "rule_basis": "DEC-25",
-      "lg_no": null,
-      "evidence_ref": null,
-      "rule_ids": [
-        "PGS10-NPL-001"
-      ],
-      "config": {},
-      "input": {
-        "product": "SMALL_BIZ",
-        "guarantee_effective_date": null,
-        "lg_issue_date": "2024-03-07",
-        "npl_date": "2025-01-01"
-      },
-      "expected_rule_results": [
-        {
-          "rule_id": "PGS10-NPL-001",
-          "control_status": "HOLD",
-          "reason_codes": [
-            "NPL_ANCHOR_DATE_UNDEFINED"
-          ]
-        }
-      ],
-      "expected_case_status": null,
-      "expected_reason_codes": []
-    },
-    {
-      "test_id": "UT-NPL-005",
-      "title": "SMEs (Smart Biz) seasoning 9 เดือน: npl_date ห่าง 8 เดือน",
-      "test_scope": "RULE_ONLY",
-      "match_mode": "RULE_ONLY",
-      "activation": "ACTIVE",
-      "basis": "DERIVED_FROM_LOCKED_RULE",
-      "rule_basis": "M§3.1(ก)",
-      "lg_no": null,
-      "evidence_ref": null,
-      "rule_ids": [
-        "PGS10-NPL-001"
-      ],
-      "config": {},
-      "input": {
-        "product": "SMART_BIZ",
-        "guarantee_effective_date": "2024-03-07",
-        "lg_issue_date": "2024-03-07",
-        "npl_date": "2024-11-07"
-      },
-      "expected_rule_results": [
-        {
-          "rule_id": "PGS10-NPL-001",
-          "control_status": "HOLD",
-          "reason_codes": [
-            "NPL_SEASONING_NOT_MET"
-          ]
-        }
-      ],
-      "expected_case_status": null,
-      "expected_reason_codes": []
+      "fixture_type": "SYNTHETIC_LOGIC",
+      "evidence_required": false
     },
     {
       "test_id": "UT-TXN-001",
@@ -3051,41 +2738,6 @@
       "expected_reason_codes": []
     },
     {
-      "test_id": "UT-TXN-006",
-      "title": "ไม่พบ PAYMENT เลยใน Statement → HOLD (ไม่ Auto-pass)",
-      "test_scope": "RULE_ONLY",
-      "match_mode": "RULE_ONLY",
-      "activation": "ACTIVE",
-      "basis": "DERIVED_FROM_LOCKED_RULE",
-      "rule_basis": "DEC-15",
-      "lg_no": null,
-      "evidence_ref": null,
-      "rule_ids": [
-        "PGS10-STM-001"
-      ],
-      "config": {},
-      "input": {
-        "transactions": [
-          {
-            "transaction_date": "2025-01-31",
-            "transaction_type": "INTEREST_ACCRUAL",
-            "transaction_amount": "398.12"
-          }
-        ]
-      },
-      "expected_rule_results": [
-        {
-          "rule_id": "PGS10-STM-001",
-          "control_status": "HOLD",
-          "reason_codes": [
-            "NO_PAYMENT_FOUND"
-          ]
-        }
-      ],
-      "expected_case_status": null,
-      "expected_reason_codes": []
-    },
-    {
       "test_id": "UT-ID-006",
       "title": "เลข LG 66-037410 vs 66-067410 = คนละเคส ห้ามแก้/รวมอัตโนมัติ",
       "test_scope": "RULE_ONLY",
@@ -3243,9 +2895,7 @@
         {
           "rule_id": "PGS10-DMD-002",
           "control_status": "PASS_WITH_SUPPORT",
-          "reason_codes": [
-            "DERIVED_AS_OF_DEMAND"
-          ]
+          "support_code": "DERIVED_AS_OF_DEMAND"
         }
       ],
       "expected_case_status": null,
@@ -3395,134 +3045,6 @@
       "expected_reason_codes": []
     },
     {
-      "test_id": "UT-COV-005",
-      "title": "ทุก candidate event เกิน fifth anniversary → 100%",
-      "test_scope": "RULE_ONLY",
-      "match_mode": "RULE_ONLY",
-      "activation": "ACTIVE",
-      "basis": "DERIVED_FROM_LOCKED_RULE",
-      "rule_basis": "DEC-11, DEC-22",
-      "lg_no": null,
-      "evidence_ref": null,
-      "rule_ids": [
-        "PGS10-CLM-002"
-      ],
-      "config": {},
-      "input": {
-        "product": "SMALL_BIZ",
-        "lg_issue_date": "2018-03-07",
-        "npl_date": "2024-01-01",
-        "default_date": "2023-12-01",
-        "demand_date_letter": "2024-06-01",
-        "claim_submission_date": "2025-09-15",
-        "screen_coverage_ratio": "10000bp"
-      },
-      "expected_rule_results": [
-        {
-          "rule_id": "PGS10-CLM-002",
-          "control_status": "PASS",
-          "coverage_ratio_bp": 10000
-        }
-      ],
-      "expected_case_status": null,
-      "expected_reason_codes": []
-    },
-    {
-      "test_id": "UT-COV-006",
-      "title": "candidate event ให้ Tier ต่างกัน (claim หลัง anniversary แต่ npl/default/demand ก่อน) → Safe-Hold",
-      "test_scope": "RULE_ONLY",
-      "match_mode": "RULE_ONLY",
-      "activation": "ACTIVE",
-      "basis": "DERIVED_FROM_LOCKED_RULE",
-      "rule_basis": "DEC-22",
-      "lg_no": null,
-      "evidence_ref": null,
-      "rule_ids": [
-        "PGS10-CLM-002"
-      ],
-      "config": {},
-      "input": {
-        "product": "SMALL_BIZ",
-        "lg_issue_date": "2020-03-07",
-        "npl_date": "2024-06-01",
-        "default_date": "2024-05-01",
-        "demand_date_letter": "2024-09-01",
-        "claim_submission_date": "2025-09-15",
-        "screen_coverage_ratio": "10000bp"
-      },
-      "expected_rule_results": [
-        {
-          "rule_id": "PGS10-CLM-002",
-          "control_status": "HOLD",
-          "reason_codes": [
-            "COVERAGE_AGE_BASIS_UNDEFINED"
-          ]
-        }
-      ],
-      "expected_case_status": null,
-      "expected_reason_codes": []
-    },
-    {
-      "test_id": "UT-COV-007",
-      "title": "Smart Biz อายุ ≤ 5 ปี = 70% (OFFICIAL)",
-      "test_scope": "RULE_ONLY",
-      "match_mode": "RULE_ONLY",
-      "activation": "ACTIVE",
-      "basis": "FROM_DOCUMENT",
-      "rule_basis": "DEC-21",
-      "lg_no": null,
-      "evidence_ref": null,
-      "rule_ids": [
-        "PGS10-CLM-002"
-      ],
-      "config": {},
-      "input": {
-        "product": "SMART_BIZ",
-        "lg_issue_date": "2024-03-07",
-        "claim_submission_date": "2025-09-15",
-        "screen_coverage_ratio": "7000bp"
-      },
-      "expected_rule_results": [
-        {
-          "rule_id": "PGS10-CLM-002",
-          "control_status": "PASS",
-          "coverage_ratio_bp": 7000
-        }
-      ],
-      "expected_case_status": null,
-      "expected_reason_codes": []
-    },
-    {
-      "test_id": "UT-COV-008",
-      "title": "Start up = 100% แม้อายุ ≤ 5 ปี",
-      "test_scope": "RULE_ONLY",
-      "match_mode": "RULE_ONLY",
-      "activation": "ACTIVE",
-      "basis": "FROM_DOCUMENT",
-      "rule_basis": "DEC-21",
-      "lg_no": null,
-      "evidence_ref": null,
-      "rule_ids": [
-        "PGS10-CLM-002"
-      ],
-      "config": {},
-      "input": {
-        "product": "START_UP",
-        "lg_issue_date": "2024-03-07",
-        "claim_submission_date": "2025-09-15",
-        "screen_coverage_ratio": "10000bp"
-      },
-      "expected_rule_results": [
-        {
-          "rule_id": "PGS10-CLM-002",
-          "control_status": "PASS",
-          "coverage_ratio_bp": 10000
-        }
-      ],
-      "expected_case_status": null,
-      "expected_reason_codes": []
-    },
-    {
       "test_id": "UT-RST-007",
       "title": "Start up: RST-001 ไม่ใช้ (path (ข)+(จ)+(ฉ) ไม่มี (ค))",
       "test_scope": "RULE_ONLY",
@@ -3621,7 +3143,7 @@
     {
       "test_id": "UT-STATUS-004",
       "title": "PRE_REVIEW: CAP-001 NOT_TESTABLE ไม่ทำให้เคส HOLD",
-      "test_scope": "AGGREGATION_LOGIC",
+      "test_scope": "AGGREGATION_ONLY",
       "match_mode": "EXACT",
       "activation": "ACTIVE",
       "basis": "DERIVED_FROM_LOCKED_RULE",
@@ -3644,12 +3166,13 @@
       "expected_rule_results": [],
       "expected_case_status": "PASS",
       "expected_reason_codes": [],
-      "proposed_scope": true
+      "fixture_type": "SYNTHETIC_LOGIC",
+      "evidence_required": false
     },
     {
       "test_id": "UT-STATUS-005",
       "title": "FINAL_APPROVAL: CAP-001 NOT_TESTABLE → เคส HOLD",
-      "test_scope": "AGGREGATION_LOGIC",
+      "test_scope": "AGGREGATION_ONLY",
       "match_mode": "EXACT",
       "activation": "ACTIVE",
       "basis": "DERIVED_FROM_LOCKED_RULE",
@@ -3672,12 +3195,13 @@
       "expected_rule_results": [],
       "expected_case_status": "HOLD",
       "expected_reason_codes": [],
-      "proposed_scope": true
+      "fixture_type": "SYNTHETIC_LOGIC",
+      "evidence_required": false
     },
     {
       "test_id": "UT-STATUS-006",
       "title": "FORMAT_NORMALIZED อย่างเดียว → PASS_WITH_OBSERVATION",
-      "test_scope": "AGGREGATION_LOGIC",
+      "test_scope": "AGGREGATION_ONLY",
       "match_mode": "EXACT",
       "activation": "ACTIVE",
       "basis": "DERIVED_FROM_LOCKED_RULE",
@@ -3697,12 +3221,13 @@
       "expected_rule_results": [],
       "expected_case_status": "PASS_WITH_OBSERVATION",
       "expected_reason_codes": [],
-      "proposed_scope": true
+      "fixture_type": "SYNTHETIC_LOGIC",
+      "evidence_required": false
     },
     {
       "test_id": "UT-STATUS-007",
       "title": "Support อย่างเดียว → PASS_WITH_SUPPORT (support_used=true)",
-      "test_scope": "AGGREGATION_LOGIC",
+      "test_scope": "AGGREGATION_ONLY",
       "match_mode": "EXACT",
       "activation": "ACTIVE",
       "basis": "DERIVED_FROM_LOCKED_RULE",
@@ -3721,13 +3246,14 @@
       "expected_rule_results": [],
       "expected_case_status": "PASS_WITH_SUPPORT",
       "expected_reason_codes": [],
-      "proposed_scope": true,
-      "expected_support_used": true
+      "expected_support_used": true,
+      "fixture_type": "SYNTHETIC_LOGIC",
+      "evidence_required": false
     },
     {
       "test_id": "UT-STATUS-008",
       "title": "REQUIRED_HARD NOT_TESTABLE (ไม่ใช่ CAP) → เคส HOLD; CONDITIONAL NOT_APPLICABLE → ไม่กระทบ",
-      "test_scope": "AGGREGATION_LOGIC",
+      "test_scope": "AGGREGATION_ONLY",
       "match_mode": "EXACT",
       "activation": "ACTIVE",
       "basis": "DERIVED_FROM_LOCKED_RULE",
@@ -3749,7 +3275,8 @@
       "expected_rule_results": [],
       "expected_case_status": "HOLD",
       "expected_reason_codes": [],
-      "proposed_scope": true
+      "fixture_type": "SYNTHETIC_LOGIC",
+      "evidence_required": false
     },
     {
       "test_id": "UT-VIS-003",
@@ -4034,24 +3561,29 @@
         "status": "BLOCKED_PENDING_EVIDENCE",
         "document": null,
         "pages": [],
-        "note": "ภาพหน้าหนังสือเริ่มกลางตารางชำระ; ไม่ล็อก HISTORICAL_BALANCE_MISMATCH จนมี evidence (DEC-13)"
+        "note": "ภาพหน้าหนังสือเริ่มกลางตารางชำระ; ไม่ล็อก HISTORICAL_BALANCE_MISMATCH จนมี evidence (DEC-13)",
+        "asserted": false
       },
       "rule_ids": [
         "PGS10-VIS-001"
       ],
       "config": {},
       "input": null,
-      "expected_rule_results": [
-        {
-          "rule_id": "PGS10-VIS-001",
-          "control_status": "HOLD",
-          "reason_codes": [
-            "CONFIRMATION_LETTER_VISUALLY_INCOMPLETE"
-          ]
-        }
-      ],
+      "expected_rule_results": [],
       "expected_case_status": null,
-      "expected_reason_codes": []
+      "expected_reason_codes": [],
+      "manual_baseline_note": {
+        "note": "ผลจากการตรวจ manual/ความจำก่อนหน้า — ไม่นับเป็น Regression Assertion จนกว่าจะมี evidence_ref",
+        "rule_results": [
+          {
+            "rule_id": "PGS10-VIS-001",
+            "control_status": "HOLD",
+            "reason_codes": [
+              "CONFIRMATION_LETTER_VISUALLY_INCOMPLETE"
+            ]
+          }
+        ]
+      }
     },
     {
       "test_id": "RC-GT-002",
@@ -4068,24 +3600,29 @@
         "document": null,
         "pages": [],
         "note": null,
-        "lg_origin": "Pack v1.1.0 เท่านั้น — ยังไม่มีคำยืนยันใน session"
+        "lg_origin": "Pack v1.1.0 เท่านั้น — ยังไม่มีคำยืนยันใน session",
+        "asserted": false
       },
       "rule_ids": [
         "PGS10-VIS-001"
       ],
       "config": {},
       "input": null,
-      "expected_rule_results": [
-        {
-          "rule_id": "PGS10-VIS-001",
-          "control_status": "HOLD",
-          "reason_codes": [
-            "CONFIRMATION_LETTER_VISUALLY_INCOMPLETE"
-          ]
-        }
-      ],
+      "expected_rule_results": [],
       "expected_case_status": null,
-      "expected_reason_codes": []
+      "expected_reason_codes": [],
+      "manual_baseline_note": {
+        "note": "ผลจากการตรวจ manual/ความจำก่อนหน้า — ไม่นับเป็น Regression Assertion จนกว่าจะมี evidence_ref",
+        "rule_results": [
+          {
+            "rule_id": "PGS10-VIS-001",
+            "control_status": "HOLD",
+            "reason_codes": [
+              "CONFIRMATION_LETTER_VISUALLY_INCOMPLETE"
+            ]
+          }
+        ]
+      }
     },
     {
       "test_id": "RC-GT-003",
@@ -4102,24 +3639,29 @@
         "document": null,
         "pages": [],
         "note": null,
-        "lg_origin": "Pack v1.1.0 เท่านั้น — ยังไม่มีคำยืนยันใน session"
+        "lg_origin": "Pack v1.1.0 เท่านั้น — ยังไม่มีคำยืนยันใน session",
+        "asserted": false
       },
       "rule_ids": [
         "PGS10-VIS-001"
       ],
       "config": {},
       "input": null,
-      "expected_rule_results": [
-        {
-          "rule_id": "PGS10-VIS-001",
-          "control_status": "HOLD",
-          "reason_codes": [
-            "CONFIRMATION_LETTER_VISUALLY_INCOMPLETE"
-          ]
-        }
-      ],
+      "expected_rule_results": [],
       "expected_case_status": null,
-      "expected_reason_codes": []
+      "expected_reason_codes": [],
+      "manual_baseline_note": {
+        "note": "ผลจากการตรวจ manual/ความจำก่อนหน้า — ไม่นับเป็น Regression Assertion จนกว่าจะมี evidence_ref",
+        "rule_results": [
+          {
+            "rule_id": "PGS10-VIS-001",
+            "control_status": "HOLD",
+            "reason_codes": [
+              "CONFIRMATION_LETTER_VISUALLY_INCOMPLETE"
+            ]
+          }
+        ]
+      }
     },
     {
       "test_id": "RC-GT-004",
@@ -4136,7 +3678,8 @@
         "document": null,
         "pages": [],
         "note": null,
-        "lg_origin": "Pack v1.1.0 เท่านั้น — ยังไม่มีคำยืนยันใน session"
+        "lg_origin": "Pack v1.1.0 เท่านั้น — ยังไม่มีคำยืนยันใน session",
+        "asserted": false
       },
       "rule_ids": [
         "PGS10-VIS-001",
@@ -4144,24 +3687,28 @@
       ],
       "config": {},
       "input": null,
-      "expected_rule_results": [
-        {
-          "rule_id": "PGS10-VIS-001",
-          "control_status": "HOLD",
-          "reason_codes": [
-            "CONFIRMATION_LETTER_VISUALLY_INCOMPLETE"
-          ]
-        },
-        {
-          "rule_id": "PGS10-PST-001",
-          "control_status": "HOLD",
-          "reason_codes": [
-            "POSTAL_ACK_INCOMPLETE"
-          ]
-        }
-      ],
+      "expected_rule_results": [],
       "expected_case_status": null,
-      "expected_reason_codes": []
+      "expected_reason_codes": [],
+      "manual_baseline_note": {
+        "note": "ผลจากการตรวจ manual/ความจำก่อนหน้า — ไม่นับเป็น Regression Assertion จนกว่าจะมี evidence_ref",
+        "rule_results": [
+          {
+            "rule_id": "PGS10-VIS-001",
+            "control_status": "HOLD",
+            "reason_codes": [
+              "CONFIRMATION_LETTER_VISUALLY_INCOMPLETE"
+            ]
+          },
+          {
+            "rule_id": "PGS10-PST-001",
+            "control_status": "HOLD",
+            "reason_codes": [
+              "POSTAL_ACK_INCOMPLETE"
+            ]
+          }
+        ]
+      }
     },
     {
       "test_id": "RC-GT-005",
@@ -4178,21 +3725,26 @@
         "document": null,
         "pages": [],
         "note": null,
-        "lg_origin": "Pack v1.1.0 เท่านั้น — ยังไม่มีคำยืนยันใน session"
+        "lg_origin": "Pack v1.1.0 เท่านั้น — ยังไม่มีคำยืนยันใน session",
+        "asserted": false
       },
       "rule_ids": [
         "PGS10-VIS-001"
       ],
       "config": {},
       "input": null,
-      "expected_rule_results": [
-        {
-          "rule_id": "PGS10-VIS-001",
-          "control_status": "PASS"
-        }
-      ],
+      "expected_rule_results": [],
       "expected_case_status": null,
-      "expected_reason_codes": []
+      "expected_reason_codes": [],
+      "manual_baseline_note": {
+        "note": "ผลจากการตรวจ manual/ความจำก่อนหน้า — ไม่นับเป็น Regression Assertion จนกว่าจะมี evidence_ref",
+        "rule_results": [
+          {
+            "rule_id": "PGS10-VIS-001",
+            "control_status": "PASS"
+          }
+        ]
+      }
     },
     {
       "test_id": "RC-GT-006",
@@ -4209,21 +3761,26 @@
         "document": null,
         "pages": [],
         "note": null,
-        "lg_origin": "Pack v1.1.0 เท่านั้น — ยังไม่มีคำยืนยันใน session"
+        "lg_origin": "Pack v1.1.0 เท่านั้น — ยังไม่มีคำยืนยันใน session",
+        "asserted": false
       },
       "rule_ids": [
         "PGS10-VIS-001"
       ],
       "config": {},
       "input": null,
-      "expected_rule_results": [
-        {
-          "rule_id": "PGS10-VIS-001",
-          "control_status": "PASS"
-        }
-      ],
+      "expected_rule_results": [],
       "expected_case_status": null,
-      "expected_reason_codes": []
+      "expected_reason_codes": [],
+      "manual_baseline_note": {
+        "note": "ผลจากการตรวจ manual/ความจำก่อนหน้า — ไม่นับเป็น Regression Assertion จนกว่าจะมี evidence_ref",
+        "rule_results": [
+          {
+            "rule_id": "PGS10-VIS-001",
+            "control_status": "PASS"
+          }
+        ]
+      }
     },
     {
       "test_id": "RC-GT-007",
@@ -4240,21 +3797,26 @@
         "document": null,
         "pages": [],
         "note": null,
-        "lg_origin": "Pack v1.1.0 เท่านั้น — ยังไม่มีคำยืนยันใน session"
+        "lg_origin": "Pack v1.1.0 เท่านั้น — ยังไม่มีคำยืนยันใน session",
+        "asserted": false
       },
       "rule_ids": [
         "PGS10-VIS-001"
       ],
       "config": {},
       "input": null,
-      "expected_rule_results": [
-        {
-          "rule_id": "PGS10-VIS-001",
-          "control_status": "PASS"
-        }
-      ],
+      "expected_rule_results": [],
       "expected_case_status": null,
-      "expected_reason_codes": []
+      "expected_reason_codes": [],
+      "manual_baseline_note": {
+        "note": "ผลจากการตรวจ manual/ความจำก่อนหน้า — ไม่นับเป็น Regression Assertion จนกว่าจะมี evidence_ref",
+        "rule_results": [
+          {
+            "rule_id": "PGS10-VIS-001",
+            "control_status": "PASS"
+          }
+        ]
+      }
     },
     {
       "test_id": "RC-GT-008",
@@ -4271,24 +3833,29 @@
         "document": null,
         "pages": [],
         "note": "visual document complete, but contract/reference identifier requires reconciliation before final pass",
-        "lg_origin": "Pack v1.1.0 เท่านั้น — ยังไม่มีคำยืนยันใน session"
+        "lg_origin": "Pack v1.1.0 เท่านั้น — ยังไม่มีคำยืนยันใน session",
+        "asserted": false
       },
       "rule_ids": [
         "PGS10-VIS-001"
       ],
       "config": {},
       "input": null,
-      "expected_rule_results": [
-        {
-          "rule_id": "PGS10-VIS-001",
-          "control_status": "PASS"
-        }
-      ],
+      "expected_rule_results": [],
       "expected_case_status": null,
       "expected_reason_codes": [],
-      "pending_assertion": {
-        "reason_code": "IDENTIFIER_LINKAGE_UNRESOLVED",
-        "note": "ต้องกำหนด Rule ที่ให้ reason นี้ (เสนอ DEF-002) ก่อนเปิดใช้"
+      "manual_baseline_note": {
+        "note": "ผลจากการตรวจ manual/ความจำก่อนหน้า — ไม่นับเป็น Regression Assertion จนกว่าจะมี evidence_ref",
+        "rule_results": [
+          {
+            "rule_id": "PGS10-VIS-001",
+            "control_status": "PASS"
+          }
+        ],
+        "pending": {
+          "reason_code": "IDENTIFIER_LINKAGE_UNRESOLVED",
+          "note": "ต้องกำหนด Rule ที่ให้ reason นี้ (เสนอ DEF-002) ก่อนเปิดใช้"
+        }
       }
     },
     {
@@ -4306,24 +3873,30 @@
         "document": null,
         "pages": [],
         "note": "v1.1 locked correction: historical debt field copied current balance is HOLD even when claim base is unaffected",
-        "status_of_lg": "USER_ATTESTED_REAL_CASE (DEC-03: ห้ามแก้เป็น 66-067410)"
+        "status_of_lg": "USER_ATTESTED_REAL_CASE (DEC-03: ห้ามแก้เป็น 66-067410)",
+        "asserted": false,
+        "lg_verified": "SOURCE_VERIFIED_CASE (รายงานติดตาม + Statement หลักประกัน C19-66037410; owner-verified)"
       },
       "rule_ids": [
         "PGS10-HIS-001"
       ],
       "config": {},
       "input": null,
-      "expected_rule_results": [
-        {
-          "rule_id": "PGS10-HIS-001",
-          "control_status": "HOLD",
-          "reason_codes": [
-            "HISTORICAL_BALANCE_MISMATCH"
-          ]
-        }
-      ],
+      "expected_rule_results": [],
       "expected_case_status": null,
-      "expected_reason_codes": []
+      "expected_reason_codes": [],
+      "manual_baseline_note": {
+        "note": "ผลจากการตรวจ manual/ความจำก่อนหน้า — ไม่นับเป็น Regression Assertion จนกว่าจะมี evidence_ref",
+        "rule_results": [
+          {
+            "rule_id": "PGS10-HIS-001",
+            "control_status": "HOLD",
+            "reason_codes": [
+              "HISTORICAL_BALANCE_MISMATCH"
+            ]
+          }
+        ]
+      }
     },
     {
       "test_id": "RC-GT-010",
@@ -4340,21 +3913,26 @@
         "document": null,
         "pages": [],
         "note": null,
-        "lg_origin": "Pack v1.1.0 เท่านั้น — ยังไม่มีคำยืนยันใน session"
+        "lg_origin": "Pack v1.1.0 เท่านั้น — ยังไม่มีคำยืนยันใน session",
+        "asserted": false
       },
       "rule_ids": [
         "PGS10-VIS-001"
       ],
       "config": {},
       "input": null,
-      "expected_rule_results": [
-        {
-          "rule_id": "PGS10-VIS-001",
-          "control_status": "PASS"
-        }
-      ],
+      "expected_rule_results": [],
       "expected_case_status": null,
-      "expected_reason_codes": []
+      "expected_reason_codes": [],
+      "manual_baseline_note": {
+        "note": "ผลจากการตรวจ manual/ความจำก่อนหน้า — ไม่นับเป็น Regression Assertion จนกว่าจะมี evidence_ref",
+        "rule_results": [
+          {
+            "rule_id": "PGS10-VIS-001",
+            "control_status": "PASS"
+          }
+        ]
+      }
     },
     {
       "test_id": "RC-GT-011",
@@ -4371,21 +3949,26 @@
         "document": null,
         "pages": [],
         "note": null,
-        "lg_origin": "Pack v1.1.0 เท่านั้น — ยังไม่มีคำยืนยันใน session"
+        "lg_origin": "Pack v1.1.0 เท่านั้น — ยังไม่มีคำยืนยันใน session",
+        "asserted": false
       },
       "rule_ids": [
         "PGS10-VIS-001"
       ],
       "config": {},
       "input": null,
-      "expected_rule_results": [
-        {
-          "rule_id": "PGS10-VIS-001",
-          "control_status": "PASS"
-        }
-      ],
+      "expected_rule_results": [],
       "expected_case_status": null,
-      "expected_reason_codes": []
+      "expected_reason_codes": [],
+      "manual_baseline_note": {
+        "note": "ผลจากการตรวจ manual/ความจำก่อนหน้า — ไม่นับเป็น Regression Assertion จนกว่าจะมี evidence_ref",
+        "rule_results": [
+          {
+            "rule_id": "PGS10-VIS-001",
+            "control_status": "PASS"
+          }
+        ]
+      }
     },
     {
       "test_id": "RC-GT-012",
@@ -4402,21 +3985,26 @@
         "document": null,
         "pages": [],
         "note": null,
-        "lg_origin": "Pack v1.1.0 เท่านั้น — ยังไม่มีคำยืนยันใน session"
+        "lg_origin": "Pack v1.1.0 เท่านั้น — ยังไม่มีคำยืนยันใน session",
+        "asserted": false
       },
       "rule_ids": [
         "PGS10-VIS-001"
       ],
       "config": {},
       "input": null,
-      "expected_rule_results": [
-        {
-          "rule_id": "PGS10-VIS-001",
-          "control_status": "PASS"
-        }
-      ],
+      "expected_rule_results": [],
       "expected_case_status": null,
-      "expected_reason_codes": []
+      "expected_reason_codes": [],
+      "manual_baseline_note": {
+        "note": "ผลจากการตรวจ manual/ความจำก่อนหน้า — ไม่นับเป็น Regression Assertion จนกว่าจะมี evidence_ref",
+        "rule_results": [
+          {
+            "rule_id": "PGS10-VIS-001",
+            "control_status": "PASS"
+          }
+        ]
+      }
     },
     {
       "test_id": "RC-GT-013",
@@ -4433,24 +4021,29 @@
         "document": null,
         "pages": [],
         "note": "original image page was not available for independent re-render under the new visual-completeness rule",
-        "lg_origin": "Pack v1.1.0 เท่านั้น — ยังไม่มีคำยืนยันใน session"
+        "lg_origin": "Pack v1.1.0 เท่านั้น — ยังไม่มีคำยืนยันใน session",
+        "asserted": false
       },
       "rule_ids": [
         "PGS10-VIS-001"
       ],
       "config": {},
       "input": null,
-      "expected_rule_results": [
-        {
-          "rule_id": "PGS10-VIS-001",
-          "control_status": "NOT_TESTABLE",
-          "reason_codes": [
-            "VISUAL_RECHECK_REQUIRED"
-          ]
-        }
-      ],
+      "expected_rule_results": [],
       "expected_case_status": null,
-      "expected_reason_codes": []
+      "expected_reason_codes": [],
+      "manual_baseline_note": {
+        "note": "ผลจากการตรวจ manual/ความจำก่อนหน้า — ไม่นับเป็น Regression Assertion จนกว่าจะมี evidence_ref",
+        "rule_results": [
+          {
+            "rule_id": "PGS10-VIS-001",
+            "control_status": "NOT_TESTABLE",
+            "reason_codes": [
+              "VISUAL_RECHECK_REQUIRED"
+            ]
+          }
+        ]
+      }
     },
     {
       "test_id": "RF-66-100217-ID-001",
@@ -4464,25 +4057,30 @@
       "evidence_ref": {
         "status": "BLOCKED_PENDING_EVIDENCE",
         "document": null,
-        "pages": []
+        "pages": [],
+        "asserted": false
       },
       "rule_ids": [
         "PGS10-ID-001"
       ],
       "config": {},
       "input": null,
-      "expected_rule_results": [
-        {
-          "rule_id": "PGS10-ID-001",
-          "control_status": "PASS",
-          "reason_codes": [
-            "FORMAT_VARIANCE"
-          ],
-          "review_flag": "FORMAT_NORMALIZED"
-        }
-      ],
+      "expected_rule_results": [],
       "expected_case_status": null,
-      "expected_reason_codes": []
+      "expected_reason_codes": [],
+      "manual_baseline_note": {
+        "note": "ผลจากการตรวจ manual/ความจำก่อนหน้า — ไม่นับเป็น Regression Assertion จนกว่าจะมี evidence_ref",
+        "rule_results": [
+          {
+            "rule_id": "PGS10-ID-001",
+            "control_status": "PASS",
+            "reason_codes": [
+              "FORMAT_VARIANCE"
+            ],
+            "review_flag": "FORMAT_NORMALIZED"
+          }
+        ]
+      }
     },
     {
       "test_id": "RF-67-035527-DEF-002",
@@ -4496,24 +4094,27 @@
       "evidence_ref": {
         "status": "BLOCKED_PENDING_EVIDENCE",
         "document": null,
-        "pages": []
+        "pages": [],
+        "asserted": false
       },
       "rule_ids": [
         "PGS10-DEF-002"
       ],
       "config": {},
       "input": null,
-      "expected_rule_results": [
-        {
-          "rule_id": "PGS10-DEF-002",
-          "control_status": "PASS_WITH_SUPPORT",
-          "reason_codes": [
-            "POST_DEFAULT_PAYMENT_SUPPORTED"
-          ]
-        }
-      ],
+      "expected_rule_results": [],
       "expected_case_status": null,
-      "expected_reason_codes": []
+      "expected_reason_codes": [],
+      "manual_baseline_note": {
+        "note": "ผลจากการตรวจ manual/ความจำก่อนหน้า — ไม่นับเป็น Regression Assertion จนกว่าจะมี evidence_ref",
+        "rule_results": [
+          {
+            "rule_id": "PGS10-DEF-002",
+            "control_status": "PASS_WITH_SUPPORT",
+            "support_code": "POST_DEFAULT_PAYMENT_SUPPORTED"
+          }
+        ]
+      }
     },
     {
       "test_id": "RF-66-029105-PST-001",
@@ -4527,21 +4128,26 @@
       "evidence_ref": {
         "status": "BLOCKED_PENDING_EVIDENCE",
         "document": null,
-        "pages": []
+        "pages": [],
+        "asserted": false
       },
       "rule_ids": [
         "PGS10-PST-001"
       ],
       "config": {},
       "input": null,
-      "expected_rule_results": [
-        {
-          "rule_id": "PGS10-PST-001",
-          "control_status": "PASS"
-        }
-      ],
+      "expected_rule_results": [],
       "expected_case_status": null,
-      "expected_reason_codes": []
+      "expected_reason_codes": [],
+      "manual_baseline_note": {
+        "note": "ผลจากการตรวจ manual/ความจำก่อนหน้า — ไม่นับเป็น Regression Assertion จนกว่าจะมี evidence_ref",
+        "rule_results": [
+          {
+            "rule_id": "PGS10-PST-001",
+            "control_status": "PASS"
+          }
+        ]
+      }
     },
     {
       "test_id": "RF-67-037131-PST-001",
@@ -4555,21 +4161,26 @@
       "evidence_ref": {
         "status": "BLOCKED_PENDING_EVIDENCE",
         "document": null,
-        "pages": []
+        "pages": [],
+        "asserted": false
       },
       "rule_ids": [
         "PGS10-PST-001"
       ],
       "config": {},
       "input": null,
-      "expected_rule_results": [
-        {
-          "rule_id": "PGS10-PST-001",
-          "control_status": "PASS"
-        }
-      ],
+      "expected_rule_results": [],
       "expected_case_status": null,
-      "expected_reason_codes": []
+      "expected_reason_codes": [],
+      "manual_baseline_note": {
+        "note": "ผลจากการตรวจ manual/ความจำก่อนหน้า — ไม่นับเป็น Regression Assertion จนกว่าจะมี evidence_ref",
+        "rule_results": [
+          {
+            "rule_id": "PGS10-PST-001",
+            "control_status": "PASS"
+          }
+        ]
+      }
     },
     {
       "test_id": "RF-66-073840-PST-001",
@@ -4583,21 +4194,26 @@
       "evidence_ref": {
         "status": "BLOCKED_PENDING_EVIDENCE",
         "document": null,
-        "pages": []
+        "pages": [],
+        "asserted": false
       },
       "rule_ids": [
         "PGS10-PST-001"
       ],
       "config": {},
       "input": null,
-      "expected_rule_results": [
-        {
-          "rule_id": "PGS10-PST-001",
-          "control_status": "PASS"
-        }
-      ],
+      "expected_rule_results": [],
       "expected_case_status": null,
-      "expected_reason_codes": []
+      "expected_reason_codes": [],
+      "manual_baseline_note": {
+        "note": "ผลจากการตรวจ manual/ความจำก่อนหน้า — ไม่นับเป็น Regression Assertion จนกว่าจะมี evidence_ref",
+        "rule_results": [
+          {
+            "rule_id": "PGS10-PST-001",
+            "control_status": "PASS"
+          }
+        ]
+      }
     },
     {
       "test_id": "RF-66-067410-DOC-001",
@@ -4611,24 +4227,29 @@
       "evidence_ref": {
         "status": "BLOCKED_PENDING_EVIDENCE",
         "document": null,
-        "pages": []
+        "pages": [],
+        "asserted": false
       },
       "rule_ids": [
         "PGS10-DOC-001"
       ],
       "config": {},
       "input": null,
-      "expected_rule_results": [
-        {
-          "rule_id": "PGS10-DOC-001",
-          "control_status": "HOLD",
-          "reason_codes": [
-            "APPROVAL_DOCUMENT_INCOMPLETE"
-          ]
-        }
-      ],
+      "expected_rule_results": [],
       "expected_case_status": null,
-      "expected_reason_codes": []
+      "expected_reason_codes": [],
+      "manual_baseline_note": {
+        "note": "ผลจากการตรวจ manual/ความจำก่อนหน้า — ไม่นับเป็น Regression Assertion จนกว่าจะมี evidence_ref",
+        "rule_results": [
+          {
+            "rule_id": "PGS10-DOC-001",
+            "control_status": "HOLD",
+            "reason_codes": [
+              "APPROVAL_DOCUMENT_INCOMPLETE"
+            ]
+          }
+        ]
+      }
     },
     {
       "test_id": "RF-66-045431-DOC-001",
@@ -4642,24 +4263,29 @@
       "evidence_ref": {
         "status": "BLOCKED_PENDING_EVIDENCE",
         "document": null,
-        "pages": []
+        "pages": [],
+        "asserted": false
       },
       "rule_ids": [
         "PGS10-DOC-001"
       ],
       "config": {},
       "input": null,
-      "expected_rule_results": [
-        {
-          "rule_id": "PGS10-DOC-001",
-          "control_status": "HOLD",
-          "reason_codes": [
-            "APPROVAL_DOCUMENT_INCOMPLETE"
-          ]
-        }
-      ],
+      "expected_rule_results": [],
       "expected_case_status": null,
-      "expected_reason_codes": []
+      "expected_reason_codes": [],
+      "manual_baseline_note": {
+        "note": "ผลจากการตรวจ manual/ความจำก่อนหน้า — ไม่นับเป็น Regression Assertion จนกว่าจะมี evidence_ref",
+        "rule_results": [
+          {
+            "rule_id": "PGS10-DOC-001",
+            "control_status": "HOLD",
+            "reason_codes": [
+              "APPROVAL_DOCUMENT_INCOMPLETE"
+            ]
+          }
+        ]
+      }
     },
     {
       "test_id": "RF-66-044366-STM-002",
@@ -4673,24 +4299,29 @@
       "evidence_ref": {
         "status": "BLOCKED_PENDING_EVIDENCE",
         "document": null,
-        "pages": []
+        "pages": [],
+        "asserted": false
       },
       "rule_ids": [
         "PGS10-STM-002"
       ],
       "config": {},
       "input": null,
-      "expected_rule_results": [
-        {
-          "rule_id": "PGS10-STM-002",
-          "control_status": "HOLD",
-          "reason_codes": [
-            "PAYMENT_AFTER_STATEMENT_CUTOFF"
-          ]
-        }
-      ],
+      "expected_rule_results": [],
       "expected_case_status": null,
-      "expected_reason_codes": []
+      "expected_reason_codes": [],
+      "manual_baseline_note": {
+        "note": "ผลจากการตรวจ manual/ความจำก่อนหน้า — ไม่นับเป็น Regression Assertion จนกว่าจะมี evidence_ref",
+        "rule_results": [
+          {
+            "rule_id": "PGS10-STM-002",
+            "control_status": "HOLD",
+            "reason_codes": [
+              "PAYMENT_AFTER_STATEMENT_CUTOFF"
+            ]
+          }
+        ]
+      }
     },
     {
       "test_id": "RF-66-076705-HIS-001",
@@ -4704,24 +4335,29 @@
       "evidence_ref": {
         "status": "BLOCKED_PENDING_EVIDENCE",
         "document": null,
-        "pages": []
+        "pages": [],
+        "asserted": false
       },
       "rule_ids": [
         "PGS10-HIS-001"
       ],
       "config": {},
       "input": null,
-      "expected_rule_results": [
-        {
-          "rule_id": "PGS10-HIS-001",
-          "control_status": "HOLD",
-          "reason_codes": [
-            "HISTORICAL_BALANCE_MISMATCH"
-          ]
-        }
-      ],
+      "expected_rule_results": [],
       "expected_case_status": null,
-      "expected_reason_codes": []
+      "expected_reason_codes": [],
+      "manual_baseline_note": {
+        "note": "ผลจากการตรวจ manual/ความจำก่อนหน้า — ไม่นับเป็น Regression Assertion จนกว่าจะมี evidence_ref",
+        "rule_results": [
+          {
+            "rule_id": "PGS10-HIS-001",
+            "control_status": "HOLD",
+            "reason_codes": [
+              "HISTORICAL_BALANCE_MISMATCH"
+            ]
+          }
+        ]
+      }
     },
     {
       "test_id": "RF-66-067410-HIS-001",
@@ -4735,24 +4371,29 @@
       "evidence_ref": {
         "status": "BLOCKED_PENDING_EVIDENCE",
         "document": null,
-        "pages": []
+        "pages": [],
+        "asserted": false
       },
       "rule_ids": [
         "PGS10-HIS-001"
       ],
       "config": {},
       "input": null,
-      "expected_rule_results": [
-        {
-          "rule_id": "PGS10-HIS-001",
-          "control_status": "HOLD",
-          "reason_codes": [
-            "HISTORICAL_BALANCE_MISMATCH"
-          ]
-        }
-      ],
+      "expected_rule_results": [],
       "expected_case_status": null,
-      "expected_reason_codes": []
+      "expected_reason_codes": [],
+      "manual_baseline_note": {
+        "note": "ผลจากการตรวจ manual/ความจำก่อนหน้า — ไม่นับเป็น Regression Assertion จนกว่าจะมี evidence_ref",
+        "rule_results": [
+          {
+            "rule_id": "PGS10-HIS-001",
+            "control_status": "HOLD",
+            "reason_codes": [
+              "HISTORICAL_BALANCE_MISMATCH"
+            ]
+          }
+        ]
+      }
     },
     {
       "test_id": "RF-66-021663-HIS-001",
@@ -4766,24 +4407,29 @@
       "evidence_ref": {
         "status": "BLOCKED_PENDING_EVIDENCE",
         "document": null,
-        "pages": []
+        "pages": [],
+        "asserted": false
       },
       "rule_ids": [
         "PGS10-HIS-001"
       ],
       "config": {},
       "input": null,
-      "expected_rule_results": [
-        {
-          "rule_id": "PGS10-HIS-001",
-          "control_status": "HOLD",
-          "reason_codes": [
-            "HISTORICAL_BALANCE_MISMATCH"
-          ]
-        }
-      ],
+      "expected_rule_results": [],
       "expected_case_status": null,
-      "expected_reason_codes": []
+      "expected_reason_codes": [],
+      "manual_baseline_note": {
+        "note": "ผลจากการตรวจ manual/ความจำก่อนหน้า — ไม่นับเป็น Regression Assertion จนกว่าจะมี evidence_ref",
+        "rule_results": [
+          {
+            "rule_id": "PGS10-HIS-001",
+            "control_status": "HOLD",
+            "reason_codes": [
+              "HISTORICAL_BALANCE_MISMATCH"
+            ]
+          }
+        ]
+      }
     },
     {
       "test_id": "RF-67-005985-HIS-001",
@@ -4797,24 +4443,29 @@
       "evidence_ref": {
         "status": "BLOCKED_PENDING_EVIDENCE",
         "document": null,
-        "pages": []
+        "pages": [],
+        "asserted": false
       },
       "rule_ids": [
         "PGS10-HIS-001"
       ],
       "config": {},
       "input": null,
-      "expected_rule_results": [
-        {
-          "rule_id": "PGS10-HIS-001",
-          "control_status": "HOLD",
-          "reason_codes": [
-            "HISTORICAL_BALANCE_MISMATCH"
-          ]
-        }
-      ],
+      "expected_rule_results": [],
       "expected_case_status": null,
-      "expected_reason_codes": []
+      "expected_reason_codes": [],
+      "manual_baseline_note": {
+        "note": "ผลจากการตรวจ manual/ความจำก่อนหน้า — ไม่นับเป็น Regression Assertion จนกว่าจะมี evidence_ref",
+        "rule_results": [
+          {
+            "rule_id": "PGS10-HIS-001",
+            "control_status": "HOLD",
+            "reason_codes": [
+              "HISTORICAL_BALANCE_MISMATCH"
+            ]
+          }
+        ]
+      }
     },
     {
       "test_id": "RF-66-047662-HIS-001",
@@ -4828,24 +4479,29 @@
       "evidence_ref": {
         "status": "BLOCKED_PENDING_EVIDENCE",
         "document": null,
-        "pages": []
+        "pages": [],
+        "asserted": false
       },
       "rule_ids": [
         "PGS10-HIS-001"
       ],
       "config": {},
       "input": null,
-      "expected_rule_results": [
-        {
-          "rule_id": "PGS10-HIS-001",
-          "control_status": "HOLD",
-          "reason_codes": [
-            "HISTORICAL_BALANCE_MISMATCH"
-          ]
-        }
-      ],
+      "expected_rule_results": [],
       "expected_case_status": null,
-      "expected_reason_codes": []
+      "expected_reason_codes": [],
+      "manual_baseline_note": {
+        "note": "ผลจากการตรวจ manual/ความจำก่อนหน้า — ไม่นับเป็น Regression Assertion จนกว่าจะมี evidence_ref",
+        "rule_results": [
+          {
+            "rule_id": "PGS10-HIS-001",
+            "control_status": "HOLD",
+            "reason_codes": [
+              "HISTORICAL_BALANCE_MISMATCH"
+            ]
+          }
+        ]
+      }
     },
     {
       "test_id": "RF-66-098079-HIS-001",
@@ -4859,24 +4515,29 @@
       "evidence_ref": {
         "status": "BLOCKED_PENDING_EVIDENCE",
         "document": null,
-        "pages": []
+        "pages": [],
+        "asserted": false
       },
       "rule_ids": [
         "PGS10-HIS-001"
       ],
       "config": {},
       "input": null,
-      "expected_rule_results": [
-        {
-          "rule_id": "PGS10-HIS-001",
-          "control_status": "HOLD",
-          "reason_codes": [
-            "HISTORICAL_BALANCE_MISMATCH"
-          ]
-        }
-      ],
+      "expected_rule_results": [],
       "expected_case_status": null,
-      "expected_reason_codes": []
+      "expected_reason_codes": [],
+      "manual_baseline_note": {
+        "note": "ผลจากการตรวจ manual/ความจำก่อนหน้า — ไม่นับเป็น Regression Assertion จนกว่าจะมี evidence_ref",
+        "rule_results": [
+          {
+            "rule_id": "PGS10-HIS-001",
+            "control_status": "HOLD",
+            "reason_codes": [
+              "HISTORICAL_BALANCE_MISMATCH"
+            ]
+          }
+        ]
+      }
     },
     {
       "test_id": "RF-66-029105-HIS-001",
@@ -4890,24 +4551,29 @@
       "evidence_ref": {
         "status": "BLOCKED_PENDING_EVIDENCE",
         "document": null,
-        "pages": []
+        "pages": [],
+        "asserted": false
       },
       "rule_ids": [
         "PGS10-HIS-001"
       ],
       "config": {},
       "input": null,
-      "expected_rule_results": [
-        {
-          "rule_id": "PGS10-HIS-001",
-          "control_status": "HOLD",
-          "reason_codes": [
-            "HISTORICAL_BALANCE_MISMATCH"
-          ]
-        }
-      ],
+      "expected_rule_results": [],
       "expected_case_status": null,
-      "expected_reason_codes": []
+      "expected_reason_codes": [],
+      "manual_baseline_note": {
+        "note": "ผลจากการตรวจ manual/ความจำก่อนหน้า — ไม่นับเป็น Regression Assertion จนกว่าจะมี evidence_ref",
+        "rule_results": [
+          {
+            "rule_id": "PGS10-HIS-001",
+            "control_status": "HOLD",
+            "reason_codes": [
+              "HISTORICAL_BALANCE_MISMATCH"
+            ]
+          }
+        ]
+      }
     },
     {
       "test_id": "RF-67-023862-HIS-001",
@@ -4921,24 +4587,29 @@
       "evidence_ref": {
         "status": "BLOCKED_PENDING_EVIDENCE",
         "document": null,
-        "pages": []
+        "pages": [],
+        "asserted": false
       },
       "rule_ids": [
         "PGS10-HIS-001"
       ],
       "config": {},
       "input": null,
-      "expected_rule_results": [
-        {
-          "rule_id": "PGS10-HIS-001",
-          "control_status": "HOLD",
-          "reason_codes": [
-            "HISTORICAL_BALANCE_MISMATCH"
-          ]
-        }
-      ],
+      "expected_rule_results": [],
       "expected_case_status": null,
-      "expected_reason_codes": []
+      "expected_reason_codes": [],
+      "manual_baseline_note": {
+        "note": "ผลจากการตรวจ manual/ความจำก่อนหน้า — ไม่นับเป็น Regression Assertion จนกว่าจะมี evidence_ref",
+        "rule_results": [
+          {
+            "rule_id": "PGS10-HIS-001",
+            "control_status": "HOLD",
+            "reason_codes": [
+              "HISTORICAL_BALANCE_MISMATCH"
+            ]
+          }
+        ]
+      }
     },
     {
       "test_id": "RF-67-037131-HIS-001",
@@ -4952,24 +4623,29 @@
       "evidence_ref": {
         "status": "BLOCKED_PENDING_EVIDENCE",
         "document": null,
-        "pages": []
+        "pages": [],
+        "asserted": false
       },
       "rule_ids": [
         "PGS10-HIS-001"
       ],
       "config": {},
       "input": null,
-      "expected_rule_results": [
-        {
-          "rule_id": "PGS10-HIS-001",
-          "control_status": "HOLD",
-          "reason_codes": [
-            "HISTORICAL_BALANCE_MISMATCH"
-          ]
-        }
-      ],
+      "expected_rule_results": [],
       "expected_case_status": null,
-      "expected_reason_codes": []
+      "expected_reason_codes": [],
+      "manual_baseline_note": {
+        "note": "ผลจากการตรวจ manual/ความจำก่อนหน้า — ไม่นับเป็น Regression Assertion จนกว่าจะมี evidence_ref",
+        "rule_results": [
+          {
+            "rule_id": "PGS10-HIS-001",
+            "control_status": "HOLD",
+            "reason_codes": [
+              "HISTORICAL_BALANCE_MISMATCH"
+            ]
+          }
+        ]
+      }
     },
     {
       "test_id": "RF-66-073840-HIS-001",
@@ -4983,24 +4659,29 @@
       "evidence_ref": {
         "status": "BLOCKED_PENDING_EVIDENCE",
         "document": null,
-        "pages": []
+        "pages": [],
+        "asserted": false
       },
       "rule_ids": [
         "PGS10-HIS-001"
       ],
       "config": {},
       "input": null,
-      "expected_rule_results": [
-        {
-          "rule_id": "PGS10-HIS-001",
-          "control_status": "HOLD",
-          "reason_codes": [
-            "HISTORICAL_BALANCE_MISMATCH"
-          ]
-        }
-      ],
+      "expected_rule_results": [],
       "expected_case_status": null,
-      "expected_reason_codes": []
+      "expected_reason_codes": [],
+      "manual_baseline_note": {
+        "note": "ผลจากการตรวจ manual/ความจำก่อนหน้า — ไม่นับเป็น Regression Assertion จนกว่าจะมี evidence_ref",
+        "rule_results": [
+          {
+            "rule_id": "PGS10-HIS-001",
+            "control_status": "HOLD",
+            "reason_codes": [
+              "HISTORICAL_BALANCE_MISMATCH"
+            ]
+          }
+        ]
+      }
     },
     {
       "test_id": "RF-67-026936-HIS-001",
@@ -5014,24 +4695,29 @@
       "evidence_ref": {
         "status": "BLOCKED_PENDING_EVIDENCE",
         "document": null,
-        "pages": []
+        "pages": [],
+        "asserted": false
       },
       "rule_ids": [
         "PGS10-HIS-001"
       ],
       "config": {},
       "input": null,
-      "expected_rule_results": [
-        {
-          "rule_id": "PGS10-HIS-001",
-          "control_status": "HOLD",
-          "reason_codes": [
-            "HISTORICAL_BALANCE_MISMATCH"
-          ]
-        }
-      ],
+      "expected_rule_results": [],
       "expected_case_status": null,
-      "expected_reason_codes": []
+      "expected_reason_codes": [],
+      "manual_baseline_note": {
+        "note": "ผลจากการตรวจ manual/ความจำก่อนหน้า — ไม่นับเป็น Regression Assertion จนกว่าจะมี evidence_ref",
+        "rule_results": [
+          {
+            "rule_id": "PGS10-HIS-001",
+            "control_status": "HOLD",
+            "reason_codes": [
+              "HISTORICAL_BALANCE_MISMATCH"
+            ]
+          }
+        ]
+      }
     },
     {
       "test_id": "RF-66-021663-VIS-001",
@@ -5045,24 +4731,29 @@
       "evidence_ref": {
         "status": "BLOCKED_PENDING_EVIDENCE",
         "document": null,
-        "pages": []
+        "pages": [],
+        "asserted": false
       },
       "rule_ids": [
         "PGS10-VIS-001"
       ],
       "config": {},
       "input": null,
-      "expected_rule_results": [
-        {
-          "rule_id": "PGS10-VIS-001",
-          "control_status": "HOLD",
-          "reason_codes": [
-            "CONFIRMATION_LETTER_VISUALLY_INCOMPLETE"
-          ]
-        }
-      ],
+      "expected_rule_results": [],
       "expected_case_status": null,
-      "expected_reason_codes": []
+      "expected_reason_codes": [],
+      "manual_baseline_note": {
+        "note": "ผลจากการตรวจ manual/ความจำก่อนหน้า — ไม่นับเป็น Regression Assertion จนกว่าจะมี evidence_ref",
+        "rule_results": [
+          {
+            "rule_id": "PGS10-VIS-001",
+            "control_status": "HOLD",
+            "reason_codes": [
+              "CONFIRMATION_LETTER_VISUALLY_INCOMPLETE"
+            ]
+          }
+        ]
+      }
     },
     {
       "test_id": "RF-66-047662-VIS-001",
@@ -5076,24 +4767,29 @@
       "evidence_ref": {
         "status": "BLOCKED_PENDING_EVIDENCE",
         "document": null,
-        "pages": []
+        "pages": [],
+        "asserted": false
       },
       "rule_ids": [
         "PGS10-VIS-001"
       ],
       "config": {},
       "input": null,
-      "expected_rule_results": [
-        {
-          "rule_id": "PGS10-VIS-001",
-          "control_status": "HOLD",
-          "reason_codes": [
-            "CONFIRMATION_LETTER_VISUALLY_INCOMPLETE"
-          ]
-        }
-      ],
+      "expected_rule_results": [],
       "expected_case_status": null,
-      "expected_reason_codes": []
+      "expected_reason_codes": [],
+      "manual_baseline_note": {
+        "note": "ผลจากการตรวจ manual/ความจำก่อนหน้า — ไม่นับเป็น Regression Assertion จนกว่าจะมี evidence_ref",
+        "rule_results": [
+          {
+            "rule_id": "PGS10-VIS-001",
+            "control_status": "HOLD",
+            "reason_codes": [
+              "CONFIRMATION_LETTER_VISUALLY_INCOMPLETE"
+            ]
+          }
+        ]
+      }
     },
     {
       "test_id": "RF-67-023862-VIS-001",
@@ -5107,19 +4803,784 @@
       "evidence_ref": {
         "status": "BLOCKED_PENDING_EVIDENCE",
         "document": null,
-        "pages": []
+        "pages": [],
+        "asserted": false
       },
       "rule_ids": [
         "PGS10-VIS-001"
       ],
       "config": {},
       "input": null,
+      "expected_rule_results": [],
+      "expected_case_status": null,
+      "expected_reason_codes": [],
+      "manual_baseline_note": {
+        "note": "ผลจากการตรวจ manual/ความจำก่อนหน้า — ไม่นับเป็น Regression Assertion จนกว่าจะมี evidence_ref",
+        "rule_results": [
+          {
+            "rule_id": "PGS10-VIS-001",
+            "control_status": "HOLD",
+            "reason_codes": [
+              "CONFIRMATION_LETTER_VISUALLY_INCOMPLETE"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "test_id": "UT-NPL-001",
+      "title": "มีเฉพาะ default_date ไม่มี npl_date → ห้ามตีความ Default = NPL",
+      "test_scope": "RULE_ONLY",
+      "match_mode": "RULE_ONLY",
+      "activation": "ACTIVE",
+      "basis": "FROM_DOCUMENT",
+      "rule_basis": "M§4.1, DEC-01",
+      "lg_no": null,
+      "evidence_ref": null,
+      "rule_ids": [
+        "PGS10-NPL-001"
+      ],
+      "config": {},
+      "input": {
+        "default_date": "2025-02-10",
+        "npl_date": null,
+        "npl_date_verified": false,
+        "lg_issue_date": "2024-03-07",
+        "product": "SMALL_BIZ"
+      },
       "expected_rule_results": [
         {
-          "rule_id": "PGS10-VIS-001",
+          "rule_id": "PGS10-NPL-001",
           "control_status": "HOLD",
           "reason_codes": [
-            "CONFIRMATION_LETTER_VISUALLY_INCOMPLETE"
+            "NPL_DATE_MISSING"
+          ]
+        }
+      ],
+      "expected_case_status": null,
+      "expected_reason_codes": []
+    },
+    {
+      "test_id": "UT-NPL-002",
+      "title": "Start up: npl_date ห่างจาก lg_issue_date ครบ 6 เดือนปฏิทินพอดี",
+      "test_scope": "RULE_ONLY",
+      "match_mode": "RULE_ONLY",
+      "activation": "ACTIVE",
+      "basis": "DERIVED_FROM_LOCKED_RULE",
+      "rule_basis": "DEC-01, DEC-29",
+      "lg_no": null,
+      "evidence_ref": null,
+      "rule_ids": [
+        "PGS10-NPL-001"
+      ],
+      "config": {},
+      "input": {
+        "product": "START_UP",
+        "lg_issue_date": "2024-03-07",
+        "npl_date": "2024-09-07",
+        "npl_date_verified": true
+      },
+      "expected_rule_results": [
+        {
+          "rule_id": "PGS10-NPL-001",
+          "control_status": "PASS"
+        }
+      ],
+      "expected_case_status": null,
+      "expected_reason_codes": []
+    },
+    {
+      "test_id": "UT-NPL-003",
+      "title": "Start up: npl_date verified ห่างจาก lg_issue_date 5 เดือน 29 วัน → FAIL (Proven Policy Ineligibility)",
+      "test_scope": "RULE_ONLY",
+      "match_mode": "RULE_ONLY",
+      "activation": "ACTIVE",
+      "basis": "DERIVED_FROM_LOCKED_RULE",
+      "rule_basis": "DEC-31",
+      "lg_no": null,
+      "evidence_ref": null,
+      "rule_ids": [
+        "PGS10-NPL-001"
+      ],
+      "config": {},
+      "input": {
+        "product": "START_UP",
+        "lg_issue_date": "2024-03-07",
+        "npl_date": "2024-09-06",
+        "npl_date_verified": true
+      },
+      "expected_rule_results": [
+        {
+          "rule_id": "PGS10-NPL-001",
+          "control_status": "FAIL",
+          "reason_codes": [
+            "NPL_SEASONING_NOT_MET"
+          ]
+        }
+      ],
+      "expected_case_status": null,
+      "expected_reason_codes": []
+    },
+    {
+      "test_id": "UT-NPL-004",
+      "title": "ไม่มี lg_issue_date (anchor ที่อนุมัติ) → defensive HOLD",
+      "test_scope": "RULE_ONLY",
+      "match_mode": "RULE_ONLY",
+      "activation": "ACTIVE",
+      "basis": "DERIVED_FROM_LOCKED_RULE",
+      "rule_basis": "DEC-29",
+      "lg_no": null,
+      "evidence_ref": null,
+      "rule_ids": [
+        "PGS10-NPL-001"
+      ],
+      "config": {},
+      "input": {
+        "product": "SMALL_BIZ",
+        "lg_issue_date": null,
+        "guarantee_effective_date": "2024-03-07",
+        "npl_date": "2025-01-01",
+        "npl_date_verified": true
+      },
+      "expected_rule_results": [
+        {
+          "rule_id": "PGS10-NPL-001",
+          "control_status": "HOLD",
+          "reason_codes": [
+            "NPL_ANCHOR_DATE_UNDEFINED"
+          ]
+        }
+      ],
+      "expected_case_status": null,
+      "expected_reason_codes": [],
+      "note": "guarantee_effective_date มีแต่ไม่ใช้เป็น anchor (PRM-013b)"
+    },
+    {
+      "test_id": "UT-NPL-005",
+      "title": "SMEs (Smart Biz) seasoning 9 เดือน: npl_date verified ห่าง 8 เดือน → FAIL",
+      "test_scope": "RULE_ONLY",
+      "match_mode": "RULE_ONLY",
+      "activation": "ACTIVE",
+      "basis": "DERIVED_FROM_LOCKED_RULE",
+      "rule_basis": "M§3.1(ก), DEC-31",
+      "lg_no": null,
+      "evidence_ref": null,
+      "rule_ids": [
+        "PGS10-NPL-001"
+      ],
+      "config": {},
+      "input": {
+        "product": "SMART_BIZ",
+        "lg_issue_date": "2024-03-07",
+        "npl_date": "2024-11-07",
+        "npl_date_verified": true
+      },
+      "expected_rule_results": [
+        {
+          "rule_id": "PGS10-NPL-001",
+          "control_status": "FAIL",
+          "reason_codes": [
+            "NPL_SEASONING_NOT_MET"
+          ]
+        }
+      ],
+      "expected_case_status": null,
+      "expected_reason_codes": []
+    },
+    {
+      "test_id": "UT-NPL-006",
+      "title": "npl_date ยังไม่ verify → ไม่ FAIL ให้ HOLD",
+      "test_scope": "RULE_ONLY",
+      "match_mode": "RULE_ONLY",
+      "activation": "ACTIVE",
+      "basis": "DERIVED_FROM_LOCKED_RULE",
+      "rule_basis": "DEC-31",
+      "lg_no": null,
+      "evidence_ref": null,
+      "rule_ids": [
+        "PGS10-NPL-001"
+      ],
+      "config": {},
+      "input": {
+        "product": "START_UP",
+        "lg_issue_date": "2024-03-07",
+        "npl_date": "2024-04-01",
+        "npl_date_verified": false
+      },
+      "expected_rule_results": [
+        {
+          "rule_id": "PGS10-NPL-001",
+          "control_status": "HOLD",
+          "reason_codes": [
+            "NPL_DATE_MISSING"
+          ]
+        }
+      ],
+      "expected_case_status": null,
+      "expected_reason_codes": []
+    },
+    {
+      "test_id": "UT-COV-001",
+      "title": "Coverage: guarantee_term 3 ปี (Small Biz) = 70%",
+      "test_scope": "RULE_ONLY",
+      "match_mode": "RULE_ONLY",
+      "activation": "ACTIVE",
+      "basis": "DERIVED_FROM_LOCKED_RULE",
+      "rule_basis": "DEC-30",
+      "lg_no": null,
+      "evidence_ref": null,
+      "rule_ids": [
+        "PGS10-CLM-002"
+      ],
+      "config": {},
+      "input": {
+        "product": "SMALL_BIZ",
+        "guarantee_term_years": 3,
+        "screen_coverage_ratio": "7000bp"
+      },
+      "expected_rule_results": [
+        {
+          "rule_id": "PGS10-CLM-002",
+          "control_status": "PASS",
+          "coverage_ratio_bp": 7000
+        }
+      ],
+      "expected_case_status": null,
+      "expected_reason_codes": []
+    },
+    {
+      "test_id": "UT-COV-002",
+      "title": "Coverage: LG 10 ปี (derive จาก lg_issue_date + lg_expiry_date) = 100% แต่หน้าจอ 70% → HOLD",
+      "test_scope": "RULE_ONLY",
+      "match_mode": "RULE_ONLY",
+      "activation": "ACTIVE",
+      "basis": "DERIVED_FROM_LOCKED_RULE",
+      "rule_basis": "DEC-30",
+      "lg_no": null,
+      "evidence_ref": null,
+      "rule_ids": [
+        "PGS10-CLM-002"
+      ],
+      "config": {},
+      "input": {
+        "product": "SMALL_BIZ",
+        "lg_issue_date": "2018-03-07",
+        "lg_expiry_date": "2028-03-07",
+        "screen_coverage_ratio": "7000bp"
+      },
+      "expected_rule_results": [
+        {
+          "rule_id": "PGS10-CLM-002",
+          "control_status": "HOLD",
+          "reason_codes": [
+            "COVERAGE_RATIO_MISMATCH"
+          ],
+          "coverage_ratio_bp": 10000
+        }
+      ],
+      "expected_case_status": null,
+      "expected_reason_codes": []
+    },
+    {
+      "test_id": "UT-COV-004",
+      "title": "Coverage: guarantee_term = 5 ปีพอดี = 70%",
+      "test_scope": "RULE_ONLY",
+      "match_mode": "RULE_ONLY",
+      "activation": "ACTIVE",
+      "basis": "DERIVED_FROM_LOCKED_RULE",
+      "rule_basis": "DEC-11, DEC-30",
+      "lg_no": null,
+      "evidence_ref": null,
+      "rule_ids": [
+        "PGS10-CLM-002"
+      ],
+      "config": {},
+      "input": {
+        "product": "SMALL_BIZ",
+        "guarantee_term_years": 5,
+        "screen_coverage_ratio": "7000bp"
+      },
+      "expected_rule_results": [
+        {
+          "rule_id": "PGS10-CLM-002",
+          "control_status": "PASS",
+          "coverage_ratio_bp": 7000
+        }
+      ],
+      "expected_case_status": null,
+      "expected_reason_codes": []
+    },
+    {
+      "test_id": "UT-COV-005",
+      "title": "Coverage: guarantee_term = 6 ปี = 100%",
+      "test_scope": "RULE_ONLY",
+      "match_mode": "RULE_ONLY",
+      "activation": "ACTIVE",
+      "basis": "DERIVED_FROM_LOCKED_RULE",
+      "rule_basis": "DEC-30",
+      "lg_no": null,
+      "evidence_ref": null,
+      "rule_ids": [
+        "PGS10-CLM-002"
+      ],
+      "config": {},
+      "input": {
+        "product": "SMALL_BIZ",
+        "guarantee_term_years": 6,
+        "screen_coverage_ratio": "10000bp"
+      },
+      "expected_rule_results": [
+        {
+          "rule_id": "PGS10-CLM-002",
+          "control_status": "PASS",
+          "coverage_ratio_bp": 10000
+        }
+      ],
+      "expected_case_status": null,
+      "expected_reason_codes": []
+    },
+    {
+      "test_id": "UT-COV-006",
+      "title": "tenor พิสูจน์ไม่ได้ (ไม่มี guarantee_term และไม่มี lg_expiry_date) → HOLD",
+      "test_scope": "RULE_ONLY",
+      "match_mode": "RULE_ONLY",
+      "activation": "ACTIVE",
+      "basis": "DERIVED_FROM_LOCKED_RULE",
+      "rule_basis": "DEC-30",
+      "lg_no": null,
+      "evidence_ref": null,
+      "rule_ids": [
+        "PGS10-CLM-002"
+      ],
+      "config": {},
+      "input": {
+        "product": "SMALL_BIZ",
+        "lg_issue_date": "2024-03-07",
+        "screen_coverage_ratio": "7000bp"
+      },
+      "expected_rule_results": [
+        {
+          "rule_id": "PGS10-CLM-002",
+          "control_status": "HOLD",
+          "reason_codes": [
+            "LG_TENOR_UNDETERMINABLE"
+          ]
+        }
+      ],
+      "expected_case_status": null,
+      "expected_reason_codes": []
+    },
+    {
+      "test_id": "UT-COV-007",
+      "title": "Smart Biz tenor ≤ 5 ปี = 70% (OFFICIAL)",
+      "test_scope": "RULE_ONLY",
+      "match_mode": "RULE_ONLY",
+      "activation": "ACTIVE",
+      "basis": "FROM_DOCUMENT",
+      "rule_basis": "DEC-21, DEC-30",
+      "lg_no": null,
+      "evidence_ref": null,
+      "rule_ids": [
+        "PGS10-CLM-002"
+      ],
+      "config": {},
+      "input": {
+        "product": "SMART_BIZ",
+        "guarantee_term_years": 5,
+        "screen_coverage_ratio": "7000bp"
+      },
+      "expected_rule_results": [
+        {
+          "rule_id": "PGS10-CLM-002",
+          "control_status": "PASS",
+          "coverage_ratio_bp": 7000
+        }
+      ],
+      "expected_case_status": null,
+      "expected_reason_codes": []
+    },
+    {
+      "test_id": "UT-COV-008",
+      "title": "Start up = 100% ทั้ง tenor 3 ปี และ 10 ปี",
+      "test_scope": "RULE_ONLY",
+      "match_mode": "RULE_ONLY",
+      "activation": "ACTIVE",
+      "basis": "FROM_DOCUMENT",
+      "rule_basis": "DEC-21",
+      "lg_no": null,
+      "evidence_ref": null,
+      "rule_ids": [
+        "PGS10-CLM-002"
+      ],
+      "config": {},
+      "input": {
+        "product": "START_UP",
+        "guarantee_term_years": 3,
+        "screen_coverage_ratio": "10000bp"
+      },
+      "expected_rule_results": [
+        {
+          "rule_id": "PGS10-CLM-002",
+          "control_status": "PASS",
+          "coverage_ratio_bp": 10000
+        }
+      ],
+      "expected_case_status": null,
+      "expected_reason_codes": []
+    },
+    {
+      "test_id": "UT-COV-009",
+      "title": "LG ถูกต่ออายุและไม่มี guarantee_term ระบุ → HOLD (Safe-Hold Q-10)",
+      "test_scope": "RULE_ONLY",
+      "match_mode": "RULE_ONLY",
+      "activation": "ACTIVE",
+      "basis": "DERIVED_FROM_LOCKED_RULE",
+      "rule_basis": "DEC-30",
+      "lg_no": null,
+      "evidence_ref": null,
+      "rule_ids": [
+        "PGS10-CLM-002"
+      ],
+      "config": {},
+      "input": {
+        "product": "SMALL_BIZ",
+        "lg_issue_date": "2020-03-07",
+        "lg_expiry_date": "2027-03-07",
+        "lg_renewed_or_extended": true,
+        "guarantee_term_years": null,
+        "screen_coverage_ratio": "10000bp"
+      },
+      "expected_rule_results": [
+        {
+          "rule_id": "PGS10-CLM-002",
+          "control_status": "HOLD",
+          "reason_codes": [
+            "LG_TENOR_UNDETERMINABLE"
+          ]
+        }
+      ],
+      "expected_case_status": null,
+      "expected_reason_codes": []
+    },
+    {
+      "test_id": "UT-COV-010",
+      "title": "Coverage ไม่ผูกกับ event: claim/NPL/default/demand หลัง anniversary แต่ tenor 3 ปี → ยังเป็น 70%",
+      "test_scope": "RULE_ONLY",
+      "match_mode": "RULE_ONLY",
+      "activation": "ACTIVE",
+      "basis": "DERIVED_FROM_LOCKED_RULE",
+      "rule_basis": "DEC-30",
+      "lg_no": null,
+      "evidence_ref": null,
+      "rule_ids": [
+        "PGS10-CLM-002"
+      ],
+      "config": {},
+      "input": {
+        "product": "SMALL_BIZ",
+        "guarantee_term_years": 3,
+        "screen_coverage_ratio": "7000bp"
+      },
+      "expected_rule_results": [
+        {
+          "rule_id": "PGS10-CLM-002",
+          "control_status": "PASS",
+          "coverage_ratio_bp": 7000
+        }
+      ],
+      "expected_case_status": null,
+      "expected_reason_codes": [],
+      "note": "ยืนยันว่าไม่มีการเลือก tier จาก event (เลิก heuristic เดิม)"
+    },
+    {
+      "test_id": "UT-CLM-001",
+      "title": "ยื่นก่อนปีที่ 2 ของอายุ LG → HOLD/Pending",
+      "test_scope": "RULE_ONLY",
+      "match_mode": "RULE_ONLY",
+      "activation": "ACTIVE",
+      "basis": "DERIVED_FROM_LOCKED_RULE",
+      "rule_basis": "M§25, DEC-31",
+      "lg_no": null,
+      "evidence_ref": null,
+      "rule_ids": [
+        "PGS10-CLM-001"
+      ],
+      "config": {},
+      "input": {
+        "lg_issue_date": "2024-03-07",
+        "final_lg_expiry_date": "2029-03-07",
+        "claim_submission_date": "2025-03-06",
+        "claim_filing_dates_verified": true
+      },
+      "expected_rule_results": [
+        {
+          "rule_id": "PGS10-CLM-001",
+          "control_status": "HOLD",
+          "reason_codes": [
+            "CLAIM_FILING_NOT_YET_OPEN"
+          ]
+        }
+      ],
+      "expected_case_status": null,
+      "expected_reason_codes": [],
+      "note": "แก้ได้ด้วยเวลา"
+    },
+    {
+      "test_id": "UT-CLM-003",
+      "title": "ยื่นหลังหมดสิทธิ (เกิน 1 ปีหลัง LG ฉบับสุดท้ายสิ้นอายุ) และวันที่ verify แล้ว → FAIL",
+      "test_scope": "RULE_ONLY",
+      "match_mode": "RULE_ONLY",
+      "activation": "ACTIVE",
+      "basis": "DERIVED_FROM_LOCKED_RULE",
+      "rule_basis": "M§25, DEC-31",
+      "lg_no": null,
+      "evidence_ref": null,
+      "rule_ids": [
+        "PGS10-CLM-001"
+      ],
+      "config": {},
+      "input": {
+        "lg_issue_date": "2018-03-07",
+        "final_lg_expiry_date": "2023-03-07",
+        "claim_submission_date": "2024-04-01",
+        "claim_filing_dates_verified": true
+      },
+      "expected_rule_results": [
+        {
+          "rule_id": "PGS10-CLM-001",
+          "control_status": "FAIL",
+          "reason_codes": [
+            "CLAIM_FILING_WINDOW_EXPIRED"
+          ]
+        }
+      ],
+      "expected_case_status": null,
+      "expected_reason_codes": []
+    },
+    {
+      "test_id": "UT-TXN-006",
+      "title": "Statement ครบ Origination→Cut-off ไม่มี gap และไม่เคยมี PAYMENT → NO_PAYMENT_VERIFIED (PASS ไม่ใช่ Error)",
+      "test_scope": "RULE_ONLY",
+      "match_mode": "RULE_ONLY",
+      "activation": "ACTIVE",
+      "basis": "DERIVED_FROM_LOCKED_RULE",
+      "rule_basis": "DEC-34",
+      "lg_no": null,
+      "evidence_ref": null,
+      "rule_ids": [
+        "PGS10-STM-001"
+      ],
+      "config": {},
+      "input": {
+        "loan_origination_date": "2024-03-07",
+        "statement_period_start": "2024-03-07",
+        "statement_period_end": "2025-08-31",
+        "statement_cutoff_date": "2025-08-31",
+        "statement_has_gap": false,
+        "transactions": [
+          {
+            "transaction_date": "2024-03-07",
+            "transaction_type": "DRAWDOWN",
+            "transaction_amount": "80000.00"
+          },
+          {
+            "transaction_date": "2025-01-31",
+            "transaction_type": "INTEREST_ACCRUAL",
+            "transaction_amount": "398.12"
+          }
+        ]
+      },
+      "expected_rule_results": [
+        {
+          "rule_id": "PGS10-STM-001",
+          "control_status": "PASS",
+          "payment_history_status": "NO_PAYMENT_VERIFIED",
+          "last_actual_payment_date": null
+        }
+      ],
+      "expected_case_status": null,
+      "expected_reason_codes": []
+    },
+    {
+      "test_id": "UT-TXN-007",
+      "title": "Statement มี gap และไม่พบ PAYMENT → INCOMPLETE → HOLD",
+      "test_scope": "RULE_ONLY",
+      "match_mode": "RULE_ONLY",
+      "activation": "ACTIVE",
+      "basis": "DERIVED_FROM_LOCKED_RULE",
+      "rule_basis": "DEC-34",
+      "lg_no": null,
+      "evidence_ref": null,
+      "rule_ids": [
+        "PGS10-STM-001"
+      ],
+      "config": {},
+      "input": {
+        "loan_origination_date": "2024-03-07",
+        "statement_period_start": "2024-03-07",
+        "statement_period_end": "2025-08-31",
+        "statement_cutoff_date": "2025-08-31",
+        "statement_has_gap": true,
+        "transactions": [
+          {
+            "transaction_date": "2025-01-31",
+            "transaction_type": "INTEREST_ACCRUAL",
+            "transaction_amount": "398.12"
+          }
+        ]
+      },
+      "expected_rule_results": [
+        {
+          "rule_id": "PGS10-STM-001",
+          "control_status": "HOLD",
+          "reason_codes": [
+            "PAYMENT_HISTORY_INCOMPLETE"
+          ],
+          "payment_history_status": "INCOMPLETE"
+        }
+      ],
+      "expected_case_status": null,
+      "expected_reason_codes": []
+    },
+    {
+      "test_id": "UT-TXN-008",
+      "title": "Statement เริ่มหลังวัน Origination และไม่พบ PAYMENT → INCOMPLETE → HOLD",
+      "test_scope": "RULE_ONLY",
+      "match_mode": "RULE_ONLY",
+      "activation": "ACTIVE",
+      "basis": "DERIVED_FROM_LOCKED_RULE",
+      "rule_basis": "DEC-34",
+      "lg_no": null,
+      "evidence_ref": null,
+      "rule_ids": [
+        "PGS10-STM-001"
+      ],
+      "config": {},
+      "input": {
+        "loan_origination_date": "2024-03-07",
+        "statement_period_start": "2024-09-01",
+        "statement_period_end": "2025-08-31",
+        "statement_cutoff_date": "2025-08-31",
+        "statement_has_gap": false,
+        "transactions": [
+          {
+            "transaction_date": "2025-01-31",
+            "transaction_type": "INTEREST_ACCRUAL",
+            "transaction_amount": "398.12"
+          }
+        ]
+      },
+      "expected_rule_results": [
+        {
+          "rule_id": "PGS10-STM-001",
+          "control_status": "HOLD",
+          "reason_codes": [
+            "PAYMENT_HISTORY_INCOMPLETE"
+          ],
+          "payment_history_status": "INCOMPLETE"
+        }
+      ],
+      "expected_case_status": null,
+      "expected_reason_codes": []
+    },
+    {
+      "test_id": "UT-DEF-007",
+      "title": "NO_PAYMENT_VERIFIED → Default chronology ต้องใช้ alternative evidence (ยังไม่มี Rule) → Safe-Hold",
+      "test_scope": "RULE_ONLY",
+      "match_mode": "RULE_ONLY",
+      "activation": "ACTIVE",
+      "basis": "DERIVED_FROM_LOCKED_RULE",
+      "rule_basis": "DEC-34",
+      "lg_no": null,
+      "evidence_ref": null,
+      "rule_ids": [
+        "PGS10-DEF-001"
+      ],
+      "config": {},
+      "input": {
+        "default_date": "2024-06-10",
+        "last_actual_payment_date": null,
+        "payment_history_status": "NO_PAYMENT_VERIFIED"
+      },
+      "expected_rule_results": [
+        {
+          "rule_id": "PGS10-DEF-001",
+          "control_status": "HOLD",
+          "reason_codes": [
+            "POLICY_PARAMETER_UNRESOLVED"
+          ]
+        }
+      ],
+      "expected_case_status": null,
+      "expected_reason_codes": []
+    },
+    {
+      "test_id": "UT-ID-009",
+      "title": "Leading Zero ของ loan_account_no — FI ไม่มี profile → ไม่ Auto-pass",
+      "test_scope": "RULE_ONLY",
+      "match_mode": "RULE_ONLY",
+      "activation": "ACTIVE",
+      "basis": "DERIVED_FROM_LOCKED_RULE",
+      "rule_basis": "DEC-33",
+      "lg_no": null,
+      "evidence_ref": null,
+      "rule_ids": [
+        "PGS10-ID-001"
+      ],
+      "config": {},
+      "input": {
+        "fi_id": "FI_WITHOUT_PROFILE",
+        "loan_account_no": {
+          "screen": "366023002710",
+          "statement": "0366023002710"
+        }
+      },
+      "expected_rule_results": [
+        {
+          "rule_id": "PGS10-ID-001",
+          "control_status": "HOLD",
+          "reason_codes": [
+            "VERIFY_REFERENCE_MAPPING"
+          ]
+        }
+      ],
+      "expected_case_status": null,
+      "expected_reason_codes": []
+    },
+    {
+      "test_id": "UT-ID-010",
+      "title": "Leading Zero ของ lg_no ห้ามตัดแม้ FI มี profile ของ loan_account_no",
+      "test_scope": "RULE_ONLY",
+      "match_mode": "RULE_ONLY",
+      "activation": "ACTIVE",
+      "basis": "DERIVED_FROM_LOCKED_RULE",
+      "rule_basis": "DEC-33",
+      "lg_no": null,
+      "evidence_ref": null,
+      "rule_ids": [
+        "PGS10-ID-001"
+      ],
+      "config": {
+        "fi_normalization_profile": {
+          "fi_id": "EXAMPLE_FI_WITH_PROFILE",
+          "loan_account_no": {
+            "leading_zero": "strip"
+          }
+        }
+      },
+      "input": {
+        "fi_id": "EXAMPLE_FI_WITH_PROFILE",
+        "lg_no": {
+          "screen": "66037410",
+          "document": "066037410"
+        }
+      },
+      "expected_rule_results": [
+        {
+          "rule_id": "PGS10-ID-001",
+          "control_status": "HOLD",
+          "reason_codes": [
+            "IDENTITY_MISMATCH"
           ]
         }
       ],

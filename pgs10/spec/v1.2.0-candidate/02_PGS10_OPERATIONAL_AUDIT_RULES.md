@@ -1,6 +1,6 @@
-# 02 · PGS 10 Operational Audit Rules — v1.2.0-candidate (NOT FROZEN)
+# 02 · PGS 10 Operational Audit Rules — v1.2.0-candidate.2 (NOT FROZEN)
 
-**Ruleset:** PGS10 1.2.0-candidate · กฎตรวจเชิงปฏิบัติการ (เอกสาร / Statement / ไปรษณีย์ / ภาพ / Cross-document) — **ไม่แทนที่นโยบายใน 01**; ไม่มี UI/System design
+**Ruleset:** PGS10 1.2.0-candidate.2 · กฎตรวจเชิงปฏิบัติการ (เอกสาร / Statement / ไปรษณีย์ / ภาพ / Cross-document) — **ไม่แทนที่นโยบายใน 01**; ไม่มี UI/System design
 ID ทั้งหมดเป็น Canonical (Master Audit §41); ID เก่าต้องอ้างเป็น `id@version` (ดู `05_PGS10_RULE_REGISTRY.json`)
 
 ## 0. Locked rules ที่ใช้ทุก Control
@@ -11,23 +11,23 @@ ID ทั้งหมดเป็น Canonical (Master Audit §41); ID เก่
 | L-03 | Historical mismatch (ต้น/ดอก/รวม ค่าใดค่าหนึ่ง) → HOLD `HISTORICAL_BALANCE_MISMATCH` ไม่ว่ากระทบ Claim Base หรือไม่ | DEC-07 |
 | L-04 | Demand Principal เทียบ `principal_as_of_demand_date`; ห้ามใช้ 'ยอดล่าสุดเท่ากันพอดี' | DEC-08, DEC-16 |
 | L-05 | tolerance ปิด; ส่วนต่าง → `NUMERIC_VARIANCE` + OBSERVATION_CANDIDATE; ห้าม tolerance กับ principal/claim_base/coverage/claim_amount/claim_max/historical | DEC-09, DEC-18 |
-| L-06 | `default_date` ≠ `npl_date`; `lg_issue_date` ≠ `guarantee_effective_date` (จนกว่าจะอนุมัติ Mapping) | DEC-01, DEC-25 |
+| L-06 | `default_date` ≠ `npl_date`; NPL anchor = `lg_issue_date` (APPROVED_OPERATIONAL, ไม่ใช่ OFFICIAL); `guarantee_effective_date` เป็น field แยก | DEC-01, DEC-29 |
 | L-07 | ห้ามเดา / ห้ามแก้ข้อมูลต้นทาง / ห้าม auto-correct หรือ merge เลข LG — แสดงค่าทั้งสองด้านและหลักฐานทั้งสองแหล่ง | DEC-03 |
 | L-08 | Auto-pass เฉพาะ non-semantic format normalization ที่เป็น field-specific (FORMAT_NORMALIZED) | DEC-15 |
 | L-09 | Decimal (สตางค์) + ROUND_HALF_UP; คำนวณ Claim ใหม่เองไม่เชื่อหน้าจอ | R§23 |
 | L-10 | PDF Page ≠ Document Page; วันที่ติดตาม ≠ วันปรับโครงสร้าง | R§7, R§12 |
-| L-11 | HOLD ≠ FAIL; FAIL เฉพาะ Proven Policy Ineligibility ที่แก้ด้วยเอกสารเพิ่มไม่ได้ | DEC-19 |
+| L-11 | HOLD ≠ FAIL; FAIL = policy_disqualifying ∧ ¬remediable_by_document ∧ evidence_verified (ไม่ผูกกับ prefix ของ reason_code) | DEC-19, DEC-31 |
 | L-12 | กฎขัดกัน/ตัดสินไม่ได้ → HOLD `RULE_VERSION_CONFLICT` และรายงาน Conflict | V, DEC-28 |
 
 ## 1. Status model
 - `case_status` ∈ PASS · PASS_WITH_SUPPORT · PASS_WITH_OBSERVATION · HOLD · FAIL — **ห้ามค่าอื่น และห้ามสร้าง `HOLD_*`**; รายละเอียดอยู่ที่ `reason_code`
 - `control_status` ∈ PASS · PASS_WITH_SUPPORT · OBSERVATION · HOLD · FAIL · NOT_APPLICABLE · NOT_TESTABLE
-- `review_flag` ∈ OBSERVATION_CANDIDATE · FORMAT_NORMALIZED; `support_used` (boolean ระดับเคส); `review_stage` ∈ PRE_REVIEW · FINAL_APPROVAL
+- `review_flag` ∈ OBSERVATION_CANDIDATE · FORMAT_NORMALIZED; `support_code` = เหตุที่ Control ผ่านด้วย support (**ไม่ใช่ reason_code**); `support_used` (boolean ระดับเคส); `review_stage` ∈ PRE_REVIEW · FINAL_APPROVAL
 - ลำดับรวมผล: (1) มี FAIL → **FAIL** (2) มี HOLD หรือ NOT_TESTABLE ของ Control ที่ REQUIRED_HARD ใน stage นั้น → **HOLD** (3) มี OBSERVATION หรือ FORMAT_NORMALIZED → **PASS_WITH_OBSERVATION** (+`support_used=true` ถ้ามี Support) (4) มี PASS_WITH_SUPPORT → **PASS_WITH_SUPPORT** (5) มิฉะนั้น **PASS**
 - NOT_TESTABLE ของ OPTIONAL/CONDITIONAL ที่ไม่ applicable ไม่กระทบเคส
 
 ## 2. ผลลัพธ์ต่อ Control และ Provenance
-`rule_id, control_status, reason_code, review_flag, expected_value, observed_value, evidence[{document_type, page, page_type: document_page|pdf_page}], required_action, rule_version` · ทุกฟิลด์เก็บ `raw_value`/`normalized_value`, `source_document`, `source_page`, `visible_on_rendered_page`, `extraction_method`, `confidence`
+`rule_id, control_status, reason_code | support_code, review_flag, expected_value, observed_value, evidence[{document_type, page, page_type: document_page|pdf_page}], required_action, rule_version` · ทุกฟิลด์เก็บ `raw_value`/`normalized_value`, `source_document`, `source_page`, `visible_on_rendered_page`, `extraction_method`, `confidence`
 
 ## 3. Pipeline (ไม่ Short-circuit — ตรวจทุก Control ที่ Applicable)
 Program → Identity → Document Completeness → Visual Completeness → Contract → LG/NPL → Transaction Classification → Last Actual Payment → Statement Cut-off → Default → Post-Default Exception → Tracking → Restructure (Route / Exception / Date) → Demand → Historical Debt → Postal → Address → Current Debt → Filing Window → Coverage → Claim Base → Claim Amount → Claim Max → Timeline → Final
@@ -36,7 +36,7 @@ Program → Identity → Document Completeness → Visual Completeness → Contr
 ## 4. Controls (32)
 
 ### PGS10-ELIG-001 · Project / Product Eligibility
-**Requirement:** REQUIRED_HARD · **ใช้เมื่อ:** เสมอ · **ที่มา:** R#1, M§2 · **Decisions:** DEC-12, DEC-19, DEC-27 · **Legacy aliases:** `PGS10-POL-001@v1.1.0`, `PGS10-POL-003@v1.1.0`
+**Requirement:** REQUIRED_HARD · **ใช้เมื่อ:** เสมอ · **ที่มา:** R#1, M§2 · **Decisions:** DEC-12, DEC-19, DEC-27, DEC-31 · **Legacy aliases:** `PGS10-POL-001@v1.1.0`, `PGS10-POL-003@v1.1.0`
 **Inputs:** `pgs_phase`, `pgs_revision`, `product`, `loan_is_new_business`, `loan_purpose_business`, `loan_is_hire_purchase_or_leasing`, `total_exposure_per_borrower`, `guarantee_amount_this_transaction`
 **Logic:**
 - ต้องระบุ PGS ระยะ / รุ่นปรับปรุง / Product ได้ชัด (ระยะ 10, ปรับปรุงครั้งที่ 5)
@@ -61,21 +61,22 @@ Program → Identity → Document Completeness → Visual Completeness → Contr
 | `PRODUCT_UNKNOWN` | HOLD | ระบุ Product ไม่ได้ | CANDIDATE |
 
 ### PGS10-ID-001 · Identity Integrity
-**Requirement:** REQUIRED_HARD · **ใช้เมื่อ:** เสมอ · **ที่มา:** R#2, M§8 · **Decisions:** DEC-03, DEC-12, DEC-15 · **Legacy aliases:** `PGS10-ID-001@v1.1.0`
-**Inputs:** `lg_no`, `borrower_name`, `loan_account_no`, `contract_no`, `lender_branch`, `loan_limit`, `lg_issue_date`
+**Requirement:** REQUIRED_HARD · **ใช้เมื่อ:** เสมอ · **ที่มา:** R#2, M§8 · **Decisions:** DEC-03, DEC-12, DEC-15, DEC-33 · **Legacy aliases:** `PGS10-ID-001@v1.1.0`
+**Inputs:** `fi_id`, `fi_normalization_profile`, `lg_no`, `borrower_name`, `loan_account_no`, `contract_no`, `lender_branch`, `loan_limit`, `lg_issue_date`
 **Logic:**
 - ต้องเป็นลูกหนี้ / LG / บัญชีเดียวกันทั้งชุดเอกสาร
-- **Auto-normalize ได้เฉพาะ non-semantic format และเป็น field-specific (DEC-15):** LG ตัดขีด/ช่องว่าง (`67-026936` = `67026936`); ตัวเลขไทย↔อารบิก; Leading Zero เฉพาะ field ที่ประกาศใน PRM-050 (ปัจจุบัน: `loan_account_no`) → `control_status=PASS`, `review_flag=FORMAT_NORMALIZED`, เก็บ raw_value + normalized_value
+- **Auto-normalize ได้เฉพาะ non-semantic format และเป็น field-specific (DEC-15):** LG ตัดขีด/ช่องว่าง (`67-026936` = `67026936`); ตัวเลขไทย↔อารบิก → `control_status=PASS`, `review_flag=FORMAT_NORMALIZED`; เก็บ `raw_value`, `normalized_value`, `normalization_rule`, `fi_profile`
+- **Leading Zero (DEC-33):** ทำได้เฉพาะ `loan_account_no` และเฉพาะ FI ที่มี normalization profile (`FI_CONFIGURABLE`, PRM-050) — FI ไม่มี profile → HOLD `VERIFY_REFERENCE_MAPPING`; **LG / customer / contract ID ห้ามตัด 0 นำหน้า** จนมี evidence ว่าเป็น padding
 - ต่างที่ตัวเลขภายใน (`208023002116` vs `208023002135`) → HOLD `VERIFY_REFERENCE_MAPPING` (ห้ามแก้เอง)
 - ชื่อ / วงเงิน / วันที่ LG / เลข LG ไม่ตรง → HOLD `IDENTITY_MISMATCH` (ไม่ใช่ FAIL — DEC-19)
 - **ห้ามแก้/รวมเลข LG อัตโนมัติ** (DEC-03): `66-037410` และ `66-067410` เป็นคนละเคส
 **Safe-Hold (พารามิเตอร์ที่ยัง OPEN):**
-- `PRM-050` (OPERATIONAL_LOCKED_SCOPED): field ที่ไม่ประกาศ → ต่าง Leading Zero = HOLD → `VERIFY_REFERENCE_MAPPING`
+- `PRM-050` (OPERATIONAL_LOCKED_SCOPED): FI ไม่มี profile หรือ field ไม่อยู่ใน eligible_fields → ต่าง Leading Zero = HOLD → `VERIFY_REFERENCE_MAPPING`
 **Evidence:** ทุกเอกสารที่เทียบ (บันทึก raw_value และ normalized_value)
 
 | reason_code | control_status | ความหมาย | สถานะรหัส |
 |---|---|---|---|
-| `FORMAT_VARIANCE` | PASS + flag `FORMAT_NORMALIZED` | ต่างเฉพาะรูปแบบที่ไม่มีนัยเชิงความหมาย (field-specific: LG, ตัวเลขไทย/อารบิก, Leading Zero เฉพาะ field ที่ประกาศ) — เก็บ raw_value และ normalized_value; เคสเป็น PASS_WITH_OBSERVATION | APPROVED_BY_OWNER |
+| `FORMAT_VARIANCE` | PASS + flag `FORMAT_NORMALIZED` | ต่างเฉพาะรูปแบบที่ไม่มีนัยเชิงความหมาย: LG ตัดขีด/ช่องว่าง, ตัวเลขไทย↔อารบิก, และ Leading Zero ของ `loan_account_no` เฉพาะ FI ที่มี normalization profile — เก็บ raw_value/normalized_value/normalization_rule/fi_profile | APPROVED_BY_OWNER |
 | `IDENTIFIER_LINKAGE_UNRESOLVED` | HOLD | Identifier ในหนังสือ/เอกสารไม่ลิงก์กลับเคสได้ | CANDIDATE |
 | `IDENTITY_MISMATCH` | HOLD | LG/ชื่อ/วงเงิน/วันที่ LG ไม่ตรงกันข้ามเอกสาร (ห้ามแก้เลขเอง — DEC-03) | CANDIDATE |
 | `VERIFY_REFERENCE_MAPPING` | HOLD | เลขบัญชี/สัญญาต่างที่ตัวเลขภายใน ต้องพิสูจน์ Mapping | CANDIDATE |
@@ -152,22 +153,24 @@ Program → Identity → Document Completeness → Visual Completeness → Contr
 | `LG_TENOR_EXCEEDED` | HOLD | อายุ LG เกิน 10 ปี | CANDIDATE |
 
 ### PGS10-NPL-001 · NPL Date & Seasoning
-**Requirement:** REQUIRED_HARD · **ใช้เมื่อ:** เสมอ · **ที่มา:** M§3.1, M§4.1 · **Decisions:** DEC-01, DEC-25 · **Legacy aliases:** `PGS10-NPL-001@v1.1.0`, `PGS10-NPL-002@v1.1.0`
-**Inputs:** `product`, `npl_date`, `guarantee_effective_date`, `lg_issue_date`, `default_date`
+**Requirement:** REQUIRED_HARD · **ใช้เมื่อ:** เสมอ · **ที่มา:** M§3.1, M§4.1 · **Decisions:** DEC-01, DEC-29, DEC-31 · **Legacy aliases:** `PGS10-NPL-001@v1.1.0`, `PGS10-NPL-002@v1.1.0`
+**Inputs:** `product`, `npl_date`, `npl_date_verified`, `lg_issue_date`, `guarantee_effective_date`, `default_date`
 **Logic:**
-- `npl_date` เป็นฟิลด์จากข้อมูล FI **ห้าม derive จาก `default_date`** (`allow_default_date_as_npl_date=false`) — ไม่มี → HOLD `NPL_DATE_MISSING`
-- seasoning: Small Biz และ Start up ≥ 6 เดือนปฏิทิน (เงื่อนไข (ข)); SMEs (Smart Biz/One/Green/Plus & Top up) ≥ 9 เดือนปฏิทิน (เงื่อนไข (ก)); `npl_date ≥ anchor + n เดือน`
-- **anchor = `guarantee_effective_date` (แยกจาก `lg_issue_date`)** — ห้ามอนุมานว่าเป็นวันเดียวกัน; ยังไม่มี Mapping ที่อนุมัติ → HOLD `NPL_ANCHOR_DATE_UNDEFINED` (Safe-Hold; **A-30 = Freeze Blocker**)
-- ไม่ผ่าน seasoning → HOLD `NPL_SEASONING_NOT_MET` (การ promote เป็น FAIL = Q-05)
+- `npl_date` เป็นฟิลด์จากข้อมูล FI ที่ verify แล้ว (`npl_date_verified`) **ห้าม derive จาก `default_date`** (`allow_default_date_as_npl_date=false`) — ไม่มี/ยังไม่ verify → HOLD `NPL_DATE_MISSING`
+- seasoning: Small Biz และ Start up ≥ 6 เดือนปฏิทิน (เงื่อนไข (ข)); SMEs (Smart Biz/One/Green/Plus & Top up) ≥ 9 เดือนปฏิทิน (เงื่อนไข (ก)); เงื่อนไข: `npl_date ≥ add_calendar_months(anchor, n)`
+- **anchor = `lg_issue_date` (APPROVED_OPERATIONAL — ไม่ใช่ OFFICIAL; DEC-29)**; `guarantee_effective_date` เก็บแยกได้เมื่อมี source จริงแต่ไม่ใช้เป็น anchor; เปลี่ยน Mapping ได้โดยไม่แก้ Rule ID
+- ไม่มี `lg_issue_date` หรือพิสูจน์ไม่ได้ → HOLD `NPL_ANCHOR_DATE_UNDEFINED` (defensive HOLD)
+- **FAIL:** `npl_date` verified + anchor verified + Policy ครบ แต่ยังไม่พ้น seasoning → **FAIL `NPL_SEASONING_NOT_MET`** (policy_disqualifying ∧ แก้ด้วยเอกสารเพิ่มไม่ได้ ∧ evidence_verified — DEC-31)
 **Safe-Hold (พารามิเตอร์ที่ยัง OPEN):**
-- `PRM-013` (OPEN): ไม่มี guarantee_effective_date ที่ระบุตรงและไม่มี Mapping ที่อนุมัติ → NPL-001 = HOLD → `NPL_ANCHOR_DATE_UNDEFINED`
+- `PRM-013` (APPROVED_OPERATIONAL): ไม่มี lg_issue_date หรือพิสูจน์ไม่ได้ → NPL-001 = HOLD → `NPL_ANCHOR_DATE_UNDEFINED`
+- `PRM-028` (OPEN): ใช้ CALENDAR_MONTH_CLAMP_END_OF_MONTH (ไม่นับวันตั้งต้น); ถ้าผลต่างกันเมื่อเปลี่ยนเป็นวิธีอื่น (นับรวมวัน/ rollover) → HOLD → `POLICY_PARAMETER_UNRESOLVED`
 **Evidence:** ข้อมูล FI (npl_date), LG/ข้อมูลวันที่ค้ำประกัน
 
 | reason_code | control_status | ความหมาย | สถานะรหัส |
 |---|---|---|---|
-| `NPL_ANCHOR_DATE_UNDEFINED` | HOLD | ยังไม่มี Mapping ที่อนุมัติระหว่าง guarantee_effective_date กับ lg_issue_date (A-30) จึงคำนวณ NPL seasoning ไม่ได้ | PROPOSED_BY_CLAUDE |
-| `NPL_DATE_MISSING` | HOLD | ไม่มี npl_date จากข้อมูล FI (ห้าม derive จาก default_date) | APPROVED_BY_OWNER |
-| `NPL_SEASONING_NOT_MET` | HOLD | npl_date ยังไม่พ้นระยะ seasoning | CANDIDATE |
+| `NPL_ANCHOR_DATE_UNDEFINED` | HOLD | ไม่มี lg_issue_date (anchor ที่อนุมัติ) หรือพิสูจน์ไม่ได้ จึงคำนวณ NPL seasoning ไม่ได้ — defensive HOLD | APPROVED_BY_OWNER |
+| `NPL_DATE_MISSING` | HOLD | ไม่มี npl_date จากข้อมูล FI หรือยังไม่ผ่านการ verify (ห้าม derive จาก default_date) | APPROVED_BY_OWNER |
+| `NPL_SEASONING_NOT_MET` | FAIL | npl_date + anchor + Policy verify ครบแล้ว และ npl_date ยังไม่พ้นระยะ seasoning — Proven Policy Ineligibility (DEC-31) | CANDIDATE |
 
 ### PGS10-TXN-001 · Transaction Classification
 **Requirement:** REQUIRED_HARD · **ใช้เมื่อ:** เสมอ (มี Statement) · **ที่มา:** R#6, M§11 · **Decisions:** DEC-02, DEC-12, DEC-14 · **Legacy aliases:** `PGS10-STM-001@v1.1.0`, `PGS10-STM-001@draft1.0`
@@ -185,19 +188,19 @@ Program → Identity → Document Completeness → Visual Completeness → Contr
 | `TRANSACTION_CODE_UNMAPPED` | HOLD | Transaction code ที่อาจกระทบ Last Payment/Principal ไม่มี Mapping ที่อนุมัติ (DEC-02) | APPROVED_BY_OWNER |
 
 ### PGS10-STM-001 · Last Actual Payment
-**Requirement:** REQUIRED_HARD · **ใช้เมื่อ:** เสมอ · **ที่มา:** R#6, M§12 · **Decisions:** DEC-14 · **Legacy aliases:** `PGS10-STM-002@v1.1.0`, `PGS10-STM-001@draft1.0`
-**Inputs:** `transactions`, `last_actual_payment_date`
+**Requirement:** REQUIRED_HARD · **ใช้เมื่อ:** เสมอ · **ที่มา:** R#6, M§12 · **Decisions:** DEC-14, DEC-34 · **Legacy aliases:** `PGS10-STM-002@v1.1.0`, `PGS10-STM-001@draft1.0`
+**Inputs:** `transactions`, `last_actual_payment_date`, `payment_history_status`, `statement_period_start`, `statement_period_end`, `statement_has_gap`, `loan_origination_date`, `statement_cutoff_date`
 **Logic:**
 - `last_actual_payment_date = max(transaction_date WHERE type = PAYMENT)` — ไม่นับ interest accrual, fee, adjustment, reversal, drawdown/release, principal adjustment, system posting ที่ไม่มีเงินรับจริง
+- `payment_history_status`: **PAYMENTS_FOUND** (มี PAYMENT) · **NO_PAYMENT_VERIFIED** (Statement ครอบคลุม Origination→Cut-off ไม่มี gap และไม่มี PAYMENT → `last_actual_payment_date = null`, control = PASS, **ไม่ใช่ Error**) · **INCOMPLETE** (นอกจากนั้น) → HOLD `PAYMENT_HISTORY_INCOMPLETE`
 - มี UNKNOWN หลัง PAYMENT ล่าสุด → HOLD `UNKNOWN_TRANSACTION_NEAR_DEFAULT` (Safe-Hold PRM-042)
-- ไม่พบ PAYMENT เลย → HOLD `NO_PAYMENT_FOUND` (ไม่ Auto-pass — DEC-15)
 **Safe-Hold (พารามิเตอร์ที่ยัง OPEN):**
 - `PRM-042` (OPEN): UNKNOWN ใด ๆ หลัง PAYMENT ล่าสุด → HOLD → `UNKNOWN_TRANSACTION_NEAR_DEFAULT`
 **Evidence:** Statement
 
 | reason_code | control_status | ความหมาย | สถานะรหัส |
 |---|---|---|---|
-| `NO_PAYMENT_FOUND` | HOLD | ไม่พบรายการรับชำระจริงใน Statement — ไม่ใช่ format normalization จึงไม่ Auto-pass ต้องให้ผู้ตรวจยืนยัน | CANDIDATE |
+| `PAYMENT_HISTORY_INCOMPLETE` | HOLD | Statement ไม่ครบ Origination→Cut-off / มี gap จึงไม่รู้ว่ามี payment หรือไม่ | APPROVED_BY_OWNER |
 | `STATEMENT_MISSING` | NOT_TESTABLE | ไม่มี Statement | CANDIDATE |
 | `UNKNOWN_TRANSACTION_NEAR_DEFAULT` | HOLD | มีรายการ UNKNOWN ที่อาจเป็นเงินรับจริง ไม่เดา | CANDIDATE |
 
@@ -214,17 +217,20 @@ Program → Identity → Document Completeness → Visual Completeness → Contr
 | `PAYMENT_AFTER_STATEMENT_CUTOFF` | HOLD | มีการชำระหลัง Statement cut-off และยังไม่มี Statement ใหม่ (Regression 66-044366) | CANDIDATE |
 
 ### PGS10-DEF-001 · Default Date ≥ Last Actual Payment
-**Requirement:** REQUIRED_HARD · **ใช้เมื่อ:** เสมอ · **ที่มา:** R#7, M§13 · **Decisions:** — · **Legacy aliases:** `PGS10-DEF-001@v1.1.0`
-**Inputs:** `default_date`, `last_actual_payment_date`
+**Requirement:** REQUIRED_HARD · **ใช้เมื่อ:** เสมอ · **ที่มา:** R#7, M§13 · **Decisions:** DEC-34 · **Legacy aliases:** `PGS10-DEF-001@v1.1.0`
+**Inputs:** `default_date`, `last_actual_payment_date`, `payment_history_status`
 **Logic:**
 - `default_date >= last_actual_payment_date` → PASS (เท่ากันผ่าน); `<` → เรียก DEF-002 (ไม่ Fail ทันที)
-- ไม่มี Last Actual Payment → NOT_APPLICABLE
+- `payment_history_status = NO_PAYMENT_VERIFIED` → ต้องใช้ alternative evidence (due-date / FI evidence) ตาม Rule ที่อนุมัติ — **ยังไม่มี Rule (PRM-055)** → Safe-Hold: HOLD `POLICY_PARAMETER_UNRESOLVED`
+- ไม่พบ Statement ให้เทียบ (INCOMPLETE) → STM-001 เป็นผู้ HOLD; DEF-001 = NOT_APPLICABLE
+**Safe-Hold (พารามิเตอร์ที่ยัง OPEN):**
+- `PRM-055` (OPEN): payment_history_status=NO_PAYMENT_VERIFIED → DEF-001 = HOLD จนมี alternative evidence rule → `POLICY_PARAMETER_UNRESOLVED`
 **Evidence:** Statement + หน้าจอ
 
 | reason_code | control_status | ความหมาย | สถานะรหัส |
 |---|---|---|---|
 | `POST_DEFAULT_PAYMENT` | HOLD | default_date < last_actual_payment_date → เข้า DEF-002 (สถานะตามผล DEF-002) | CANDIDATE |
-| `POST_DEFAULT_PAYMENT_SUPPORTED` | PASS_WITH_SUPPORT | มีการชำระหลังผิดนัดและหนังสือยืนยันสมบูรณ์ ตรงหน้าจอ | CANDIDATE |
+| `POST_DEFAULT_PAYMENT_SUPPORTED` (support_code) | PASS_WITH_SUPPORT | มีการชำระหลังผิดนัด และหนังสือยืนยันสมบูรณ์ทางภาพ/เนื้อหา ตรง Default Date หน้าจอ | APPROVED |
 
 ### PGS10-DEF-002 · Post-Default Payment Exception
 **Requirement:** CONDITIONAL · **ใช้เมื่อ:** default_date < last_actual_payment_date · **ที่มา:** R#8, M§14, M§16 · **Decisions:** DEC-04, DEC-13 · **Legacy aliases:** `PGS10-DEF-002@v1.1.0`
@@ -232,7 +238,7 @@ Program → Identity → Document Completeness → Visual Completeness → Contr
 **Logic:**
 - ใช้เมื่อ `default_date < last_actual_payment_date`
 - ลำดับตรวจ: (1) ไม่มีหนังสือ → HOLD `POST_DEFAULT_SUPPORT_MISSING` (2) VIS-001 ไม่ผ่าน → HOLD `CONFIRMATION_LETTER_VISUALLY_INCOMPLETE` (3) Default Date ในหนังสือ ≠ หน้าจอ → HOLD `CONFIRMED_DEFAULT_DATE_MISMATCH` (4) ไม่ระบุสาระ (ชำระหลังผิดนัด / ไม่เปลี่ยน Default Date) → HOLD `CONFIRMATION_CONTENT_INCOMPLETE` (5) Identifier ไม่ลิงก์กลับเคส → HOLD `IDENTIFIER_LINKAGE_UNRESOLVED`
-- ผ่านทั้งหมด → `PASS_WITH_SUPPORT` reason `POST_DEFAULT_PAYMENT_SUPPORTED` (case `support_used=true`)
+- ผ่านทั้งหมด → `PASS_WITH_SUPPORT` `support_code=POST_DEFAULT_PAYMENT_SUPPORTED` (case `support_used=true`)
 **Evidence:** หนังสือยืนยันการชำระหลังวันผิดนัด (ภาพจริง) + Statement + หน้าจอ
 
 | reason_code | control_status | ความหมาย | สถานะรหัส |
@@ -241,8 +247,8 @@ Program → Identity → Document Completeness → Visual Completeness → Contr
 | `CONFIRMATION_LETTER_VISUALLY_INCOMPLETE` | HOLD | หนังสือยืนยันการชำระหลังผิดนัดไม่สมบูรณ์ทางภาพ | CANDIDATE |
 | `CONFIRMED_DEFAULT_DATE_MISMATCH` | HOLD | Default Date ในหนังสือ ≠ หน้าจอ | CANDIDATE |
 | `IDENTIFIER_LINKAGE_UNRESOLVED` | HOLD | Identifier ในหนังสือ/เอกสารไม่ลิงก์กลับเคสได้ | CANDIDATE |
-| `POST_DEFAULT_PAYMENT_SUPPORTED` | PASS_WITH_SUPPORT | มีการชำระหลังผิดนัดและหนังสือยืนยันสมบูรณ์ ตรงหน้าจอ | CANDIDATE |
 | `POST_DEFAULT_SUPPORT_MISSING` | HOLD | ไม่มีหนังสือยืนยันการชำระหลังวันผิดนัด | CANDIDATE |
+| `POST_DEFAULT_PAYMENT_SUPPORTED` (support_code) | PASS_WITH_SUPPORT | มีการชำระหลังผิดนัด และหนังสือยืนยันสมบูรณ์ทางภาพ/เนื้อหา ตรง Default Date หน้าจอ | APPROVED |
 
 ### PGS10-FUP-001 · Follow-up / Tracking Evidence
 **Requirement:** REQUIRED_HARD · **ใช้เมื่อ:** เสมอ · **ที่มา:** R#9, M§17 · **Decisions:** — · **Legacy aliases:** `PGS10-FUP-001@v1.1.0`
@@ -259,12 +265,15 @@ Program → Identity → Document Completeness → Visual Completeness → Contr
 | `TRACKING_REPORT_MISSING` | HOLD | ไม่มีรายงานติดตาม | CANDIDATE |
 
 ### PGS10-RST-001 · Restructure Requirement / Route
-**Requirement:** CONDITIONAL · **ใช้เมื่อ:** path ที่มีเงื่อนไข (ค): SMEs ≤ 5 ปี และ Small Biz ≤ 5 ปี. Start up → NOT_APPLICABLE (DEC-24) · **ที่มา:** M§4.2, M§5, M§6 · **Decisions:** DEC-20, DEC-24 · **Legacy aliases:** `PGS10-RST-001@v1.1.0`
-**Inputs:** `product`, `claim_path`, `restructure_route`, `restructure_date`, `restructure_doc_signing_date`, `last_actual_payment_date`, `claim_submission_date`
+**Requirement:** CONDITIONAL · **ใช้เมื่อ:** Case 1 (SMEs ≤5 ปี) และ Case 3 (Small Biz ≤5 ปี) — path ที่มีเงื่อนไข (ค); Case 2, 4, 5 → NOT_APPLICABLE · **ที่มา:** M§4.2, M§5, M§6 · **Decisions:** DEC-20, DEC-24, DEC-32 · **Legacy aliases:** `PGS10-RST-001@v1.1.0`
+**Inputs:** `product`, `claim_path`, `claim_case_no`, `restructure_route`, `restructure_date`, `restructure_doc_signing_date`, `last_actual_payment_date`, `claim_submission_date`
 **Logic:**
-- ใช้กับ path ที่มีเงื่อนไข (ค): SMEs ≤ 5 ปี และ Small Biz ≤ 5 ปี; **Start up (เงื่อนไข (ข)+(จ)+(ฉ)) และ path หลังพ้น 5 ปี → NOT_APPLICABLE** (DEC-24)
+- ใช้กับ **Case 1 (SMEs ≤ 5 ปี) และ Case 3 (Small Biz ≤ 5 ปี)** — path ที่มีเงื่อนไข (ค); Case 2, 4, 5 (รวม Start up) → NOT_APPLICABLE (DEC-32)
+- band ≤5/>5 ปีของ Case นับจากวันที่ยื่นเทียบวันออก LG (PRM-054, ASSUMPTION — Q-08); ข้อมูลไม่ครบ → HOLD `LG_DATA_MISSING`
 - ระบุ `restructure_route`: `NORMAL_RESTRUCTURE_PATH` (ปรับโครงสร้าง ≥ 1 ครั้ง + พ้น 3 เดือนหลังวันทำสัญญาปรับโครงสร้าง + ไม่ชำระติดต่อกันอีก 3 เดือน) | `UNCONTACTABLE_EXCEPTION_PATH` (→ RST-002)
 - `restructure_date = null` **ไม่ผ่านอัตโนมัติ** → HOLD `RESTRUCTURE_PATH_UNDETERMINED`; ไม่ครบเงื่อนไข → HOLD `RESTRUCTURE_REQUIREMENT_NOT_MET`
+**Safe-Hold (พารามิเตอร์ที่ยัง OPEN):**
+- `PRM-054` (ASSUMPTION): ไม่มี claim_submission_date หรือ lg_issue_date → claim_path กำหนดไม่ได้ → HOLD → `LG_DATA_MISSING`
 **Evidence:** เอกสารปรับโครงสร้าง / รายงานติดตาม
 
 | reason_code | control_status | ความหมาย | สถานะรหัส |
@@ -273,36 +282,36 @@ Program → Identity → Document Completeness → Visual Completeness → Contr
 | `RESTRUCTURE_REQUIREMENT_NOT_MET` | HOLD | เส้นทางปกติยังไม่ครบเงื่อนไข | CANDIDATE |
 
 ### PGS10-RST-002 · Uncontactable / Unable-to-agree Exception
-**Requirement:** CONDITIONAL · **ใช้เมื่อ:** route=UNCONTACTABLE_EXCEPTION_PATH (ใช้ได้เฉพาะ path ที่มี (ค) = กรณี 1 และ 3 — DEC-20) · **ที่มา:** M§5, R§32 · **Decisions:** DEC-20 · **Legacy aliases:** `PGS10-RST-002@v1.1.0`, `PGS10-RST-OP-002@v1.1.0`
+**Requirement:** CONDITIONAL · **ใช้เมื่อ:** route=UNCONTACTABLE_EXCEPTION_PATH (ใช้ได้เฉพาะ path ที่มี (ค) = กรณี 1 และ 3 — DEC-20) · **ที่มา:** M§5, R§32 · **Decisions:** DEC-20, DEC-32, DEC-36 · **Legacy aliases:** `PGS10-RST-002@v1.1.0`, `PGS10-RST-OP-002@v1.1.0`
 **Inputs:** `restructure_route`, `first_uncontactable_date`, `first_contacted_restructure_failed_date`, `exception_start_date`, `exception_maturity_date`, `certified_tracking_report_present`, `demand_or_termination_letter_count`, `claim_submission_date`
 **Logic:**
-- OFFICIAL (หน้า 7 กรณี 1 และ 3; DEC-20): ติดต่อไม่ได้ **หรือ** ติดต่อได้แต่ตกลงปรับเงื่อนไข/โครงสร้างไม่ได้
+- OFFICIAL (หน้า 7 **กรณี 1 และ 3** — DEC-20/32): ติดต่อไม่ได้ **หรือ** ติดต่อได้แต่ตกลงปรับเงื่อนไข/โครงสร้างไม่ได้
 - `exception_start_date = first_uncontactable_date OR first_contacted_but_restructure_failed_date`; `exception_maturity_date = add_calendar_months(exception_start_date, 7)`
-- ต้อง `claim_submission_date ≥ exception_maturity_date` + Certified Tracking Report + หนังสือบอกกล่าว/บอกเลิก ≥ 1 → PASS_WITH_SUPPORT `UNCONTACTABLE_EXCEPTION_MATURED`
-- ไม่ครบ → HOLD `UNCONTACTABLE_EXCEPTION_NOT_MET` / `TRACKING_REPORT_NOT_CERTIFIED`; config ปิด → HOLD `EXCEPTION_ROUTE_NOT_CONFIGURED`; **ไม่ขยายไป Start up**
+- ต้อง `claim_submission_date ≥ exception_maturity_date` + Certified Tracking Report + หนังสือบอกกล่าว/บอกเลิก ≥ 1 → PASS_WITH_SUPPORT `support_code=UNCONTACTABLE_7_MONTH_EXCEPTION`
+- ไม่ครบ → HOLD `UNCONTACTABLE_EXCEPTION_NOT_MET` / `TRACKING_REPORT_NOT_CERTIFIED`; config ปิด → HOLD `EXCEPTION_ROUTE_NOT_CONFIGURED`; **ไม่ขยายไป Start up (Case 5)**
 **Evidence:** Certified Tracking Report + หนังสือบอกกล่าว/บอกเลิก
 
 | reason_code | control_status | ความหมาย | สถานะรหัส |
 |---|---|---|---|
 | `EXCEPTION_ROUTE_NOT_CONFIGURED` | HOLD | เลือกเส้นทางยกเว้นแต่ Config ปิดอยู่ | CANDIDATE |
 | `TRACKING_REPORT_NOT_CERTIFIED` | HOLD | รายงานติดตามไม่ใช่ Certified | CANDIDATE |
-| `UNCONTACTABLE_EXCEPTION_MATURED` | PASS_WITH_SUPPORT | ครบเงื่อนไขทางออก: maturity (start + 7 เดือนปฏิทิน) + Certified Tracking Report + หนังสือบอกกล่าว/บอกเลิก ≥ 1 | PROPOSED_BY_CLAUDE |
 | `UNCONTACTABLE_EXCEPTION_NOT_MET` | HOLD | เส้นทางยกเว้นยังไม่ครบเงื่อนไข | CANDIDATE |
+| `UNCONTACTABLE_7_MONTH_EXCEPTION` (support_code) | PASS_WITH_SUPPORT | ครบเงื่อนไขทางออก (หน้า 7 กรณี 1 และ 3): start + 7 เดือนปฏิทิน + Certified Tracking Report + หนังสือบอกกล่าว/บอกเลิก ≥ 1 | APPROVED |
 
 ### PGS10-RST-003 · Restructure Date Evidence
 **Requirement:** CONDITIONAL · **ใช้เมื่อ:** มีการปรับโครงสร้างหนี้ · **ที่มา:** R#10, M§18 · **Decisions:** DEC-14 · **Legacy aliases:** `PGS10-RST-OP-001@v1.1.0`
 **Inputs:** `restructure_date`, `restructure_doc_signing_date`, `restructure_doc_approval_date`, `restructure_doc_effective_date`, `restructure_stmt_header_date`
 **Logic:**
 - Source: L1 เอกสารปรับโครงสร้างโดยตรง → L2 หัว Statement ใบแรก → L3 หน้าจอ; แยก วันที่ลงนาม / อนุมัติ / มีผล / เริ่มบัญชี ก่อนสรุป mismatch
-- ตรง L1 → PASS; ตรง L2 → PASS_WITH_SUPPORT `MATCHED_STATEMENT_HEADER`; ไม่ตรง L1 และยังไม่ตรวจ L2 → HOLD `RESTRUCTURE_DATE_SEMANTICS_UNRESOLVED`; ไม่ตรงทั้งคู่ → HOLD `RESTRUCTURE_DATE_MISMATCH`; ไม่มีหลักฐาน → HOLD `RESTRUCTURE_EVIDENCE_MISSING`
+- ตรง L1 → PASS; ตรง L2 → PASS_WITH_SUPPORT `support_code=MATCHED_STATEMENT_HEADER`; ไม่ตรง L1 และยังไม่ตรวจ L2 → HOLD `RESTRUCTURE_DATE_SEMANTICS_UNRESOLVED`; ไม่ตรงทั้งคู่ → HOLD `RESTRUCTURE_DATE_MISMATCH`; ไม่มีหลักฐาน → HOLD `RESTRUCTURE_EVIDENCE_MISSING`
 **Evidence:** สัญญา/ข้อตกลง/หนังสืออนุมัติปรับโครงสร้าง + หัว Statement ใบแรก
 
 | reason_code | control_status | ความหมาย | สถานะรหัส |
 |---|---|---|---|
-| `MATCHED_STATEMENT_HEADER` | PASS_WITH_SUPPORT | ตรงหัว Statement (Level 2) | CANDIDATE |
 | `RESTRUCTURE_DATE_MISMATCH` | HOLD | ไม่ตรงทั้งเอกสารและหัว Statement | CANDIDATE |
 | `RESTRUCTURE_DATE_SEMANTICS_UNRESOLVED` | HOLD | ความหมายของวันที่ (ลงนาม/อนุมัติ/มีผล/เริ่มบัญชี) ยังไม่ถูกแยก ต้องตรวจหัว Statement | CANDIDATE |
 | `RESTRUCTURE_EVIDENCE_MISSING` | HOLD | ไม่มีเอกสารปรับโครงสร้าง/หัว Statement | CANDIDATE |
+| `MATCHED_STATEMENT_HEADER` (support_code) | PASS_WITH_SUPPORT | วันที่ปรับโครงสร้างตรงหัว Statement (Level 2) แม้ไม่ตรงวันลงนามในเอกสาร | APPROVED |
 
 ### PGS10-DMD-001 · Demand Letter Identity & Existence
 **Requirement:** REQUIRED_HARD · **ใช้เมื่อ:** เสมอ · **ที่มา:** R#11, M§19 · **Decisions:** — · **Legacy aliases:** `PGS10-DMD-POL-001@v1.1.0`, `PGS10-DMD-001@v1.1.0`
@@ -324,14 +333,14 @@ Program → Identity → Document Completeness → Visual Completeness → Contr
 - Canonical: `demand_principal == principal_as_of_demand_date` (แยกจาก `current_principal == latest_statement_principal`); เทียบเฉพาะเงินต้น ห้ามใช้ดอกเบี้ย
 - มี Snapshot ตรงวัน (`DIRECT_SNAPSHOT`) → ตรง = PASS
 - ไม่มี Snapshot → **derive ได้ (`DERIVED_AS_OF_DEMAND`) เมื่อพิสูจน์ครบ:** (1) Statement/Ledger ครอบคลุม Demand Date (2) ไม่มี gap ในช่วงรายการ (3) หลัง Demand Date ไม่มีรายการกระทบเงินต้น หรือมีแต่ reconstruct ย้อนกลับได้แน่นอน → PASS_WITH_SUPPORT `DERIVED_AS_OF_DEMAND`
-- พิสูจน์ไม่ได้ → HOLD `DEMAND_PRINCIPAL_AS_OF_DATE_UNVERIFIED` — **ห้ามใช้เหตุผลว่า 'ยอดล่าสุดเท่ากันพอดี'**; พิสูจน์ได้แต่ยอดต่าง → HOLD `DEMAND_PRINCIPAL_MISMATCH`
+- ไม่มี Snapshot → **derive ได้ (`support_code=DERIVED_AS_OF_DEMAND`) เมื่อพิสูจน์ครบ:** (1) Statement/Ledger ครอบคลุม Demand Date (2) ไม่มี gap ในช่วงรายการ (3) หลัง Demand Date ไม่มีรายการกระทบเงินต้น หรือมีแต่ reconstruct ย้อนกลับได้แน่นอน → PASS_WITH_SUPPORT
 **Evidence:** หนังสือบอกกล่าว + Statement/Ledger ที่ครอบคลุม Demand Date
 
 | reason_code | control_status | ความหมาย | สถานะรหัส |
 |---|---|---|---|
 | `DEMAND_PRINCIPAL_AS_OF_DATE_UNVERIFIED` | HOLD | พิสูจน์เงินต้น ณ วันบอกกล่าวไม่ได้ (ไม่มี Snapshot และ derive ไม่ได้: Statement ไม่ครอบคลุม/มี gap/มีรายการกระทบเงินต้นหลัง demand ที่ reconstruct ไม่ได้) | APPROVED_BY_OWNER |
 | `DEMAND_PRINCIPAL_MISMATCH` | HOLD | เงินต้นบอกกล่าว ≠ Statement ณ วันบอกกล่าว (พิสูจน์ได้ว่าต่าง) | CANDIDATE |
-| `DERIVED_AS_OF_DEMAND` | PASS_WITH_SUPPORT | derive เงินต้น ณ วันบอกกล่าวจาก Statement/Ledger ได้ครบตามเงื่อนไข (ครอบคลุม ไม่มี gap ไม่มีรายการกระทบเงินต้นหลัง demand หรือ reconstruct ได้) | APPROVED_BY_OWNER |
+| `DERIVED_AS_OF_DEMAND` (support_code) | PASS_WITH_SUPPORT | derive เงินต้น ณ วันบอกกล่าวจาก Statement/Ledger ได้ครบเงื่อนไข (ครอบคลุม ไม่มี gap ไม่มีรายการกระทบเงินต้นหลัง demand หรือ reconstruct ได้) | APPROVED |
 
 ### PGS10-DMD-003 · Demand Waiting Period
 **Requirement:** CONDITIONAL · **ใช้เมื่อ:** ไม่ใช่เส้นทางล้มละลาย · **ที่มา:** M§24 · **Decisions:** — · **Legacy aliases:** `PGS10-DMD-POL-002@v1.1.0`
@@ -438,35 +447,37 @@ Program → Identity → Document Completeness → Visual Completeness → Contr
 | `VARIANCE_WITHIN_APPROVED_TOLERANCE` | OBSERVATION | ส่วนต่างอยู่ใน tolerance ที่อนุมัติ (เปิด Config แล้ว/มี reviewer override) และเงินต้นตรง | CANDIDATE |
 
 ### PGS10-CLM-001 · Claim Filing Window
-**Requirement:** REQUIRED_HARD · **ใช้เมื่อ:** เสมอ · **ที่มา:** M§25 · **Decisions:** DEC-14 · **Legacy aliases:** `PGS10-CLM-POL-001@v1.1.0`
-**Inputs:** `lg_issue_date`, `final_lg_expiry_date`, `claim_submission_date`
+**Requirement:** REQUIRED_HARD · **ใช้เมื่อ:** เสมอ · **ที่มา:** M§25 · **Decisions:** DEC-31 · **Legacy aliases:** `PGS10-CLM-POL-001@v1.1.0`
+**Inputs:** `lg_issue_date`, `final_lg_expiry_date`, `claim_submission_date`, `claim_filing_dates_verified`
 **Logic:**
-- `claim_submission_date ≥ lg_issue_date + 1 ปี` (ตั้งแต่ปีที่ 2) และ `≤ final_lg_expiry_date + 1 ปี`
-- Safe-Hold ตาม PRM-028 (วิธีนับเดือน/ปี); ไม่ผ่าน → HOLD `CLAIM_FILING_WINDOW_NOT_MET`
+- ช่วงยื่นที่อนุญาต: `claim_submission_date ≥ lg_issue_date + 1 ปี` (ตั้งแต่ปีที่ 2) และ `≤ final_lg_expiry_date + 1 ปี`; นับเดือน/ปีตาม PRM-028 (Safe-Hold)
+- **ยังไม่ถึงเวลายื่น** → HOLD/Pending `CLAIM_FILING_NOT_YET_OPEN` (แก้ได้ด้วยเวลา)
+- **หมดสิทธิแล้ว** และวันที่ถูก verify ครบ (`claim_filing_dates_verified`) → **FAIL `CLAIM_FILING_WINDOW_EXPIRED`**; วันที่ไม่ verify → HOLD
 **Safe-Hold (พารามิเตอร์ที่ยัง OPEN):**
 - `PRM-028` (OPEN): ใช้ CALENDAR_MONTH_CLAMP_END_OF_MONTH (ไม่นับวันตั้งต้น); ถ้าผลต่างกันเมื่อเปลี่ยนเป็นวิธีอื่น (นับรวมวัน/ rollover) → HOLD → `POLICY_PARAMETER_UNRESOLVED`
 **Evidence:** LG + แบบคำขอ
 
 | reason_code | control_status | ความหมาย | สถานะรหัส |
 |---|---|---|---|
-| `CLAIM_FILING_WINDOW_NOT_MET` | HOLD | ยื่นนอกช่วงที่อนุญาต | CANDIDATE |
+| `CLAIM_FILING_NOT_YET_OPEN` | HOLD | ยังไม่ถึงเวลายื่น Claim (ก่อนปีที่ 2 ของอายุ LG) — แก้ได้ด้วยเวลา จึงเป็น HOLD/Pending | PROPOSED_BY_CLAUDE |
+| `CLAIM_FILING_WINDOW_EXPIRED` | FAIL | หมดสิทธิยื่น Claim แล้ว (เกิน 1 ปีหลัง LG ฉบับสุดท้ายสิ้นอายุ) และวันที่ถูก verify ครบ — Proven Policy Ineligibility | PROPOSED_BY_CLAUDE |
 
 ### PGS10-CLM-002 · Coverage Ratio
-**Requirement:** REQUIRED_HARD · **ใช้เมื่อ:** เสมอ · **ที่มา:** R#19, M§7 · **Decisions:** DEC-11, DEC-21, DEC-22 · **Legacy aliases:** `PGS10-COV-001@v1.1.0`, `PGS10-CLM-002@v1.1.0`
-**Inputs:** `product`, `lg_issue_date`, `claim_submission_date`, `npl_date`, `default_date`, `demand_date_letter`, `screen_coverage_ratio`, `coverage_ratio`
+**Requirement:** REQUIRED_HARD · **ใช้เมื่อ:** เสมอ · **ที่มา:** R#19, M§7 · **Decisions:** DEC-11, DEC-21, DEC-30 · **Legacy aliases:** `PGS10-COV-001@v1.1.0`, `PGS10-CLM-002@v1.1.0`
+**Inputs:** `product`, `guarantee_term_years`, `lg_issue_date`, `lg_expiry_date`, `lg_renewed_or_extended`, `contractual_lg_tenor_years`, `screen_coverage_ratio`, `coverage_ratio`
 **Logic:**
-- Lookup จาก Product + อายุ LG: Smart Biz / Smart One / Smart Green / Smart Plus & Top up / Small Biz → 70% (อายุ ≤ 5 ปี), 100% (> 5 ปี); Start up → 100% ทั้งสองช่วง (OFFICIAL — DEC-21)
-- เปรียบเทียบด้วย `<=` กับ fifth anniversary (ครบ 5 ปีพอดี = 70%) — DEC-11; threshold 5 ปี OFFICIAL (PRM-027b)
-- **`coverage_age_basis` = OPEN (DEC-22):** ห้ามถือ `claim_submission_date − lg_issue_date` เป็น OFFICIAL — คำนวณ Tier ตามทุก candidate event ที่มีข้อมูล (claim_submission_date, npl_date, default_date, demand_date); Tier เดียวกันทั้งหมด → ใช้ Tier นั้น; ต่างกัน → HOLD `COVERAGE_AGE_BASIS_UNDEFINED`
+- Coverage ใช้ **อายุ/ระยะเวลาตามสัญญาของ LG (contractual LG tenor)** — ไม่ใช่อายุ ณ Claim/NPL/Default/Demand (DEC-30)
+- ลำดับ source ของ tenor: (1) `guarantee_term_years` ที่ระบุใน LG โดยตรง (2) `lg_expiry_date − lg_issue_date` (calendar; PRM-028) (3) พิสูจน์ไม่ได้ → HOLD `LG_TENOR_UNDETERMINABLE`; LG ที่ถูกต่ออายุและไม่มี term ระบุ → HOLD `LG_TENOR_UNDETERMINABLE` (Q-10)
+- Smart Biz · Smart One · Smart Green · Smart Plus & Top up · Small Biz: tenor ≤ 5 ปี → 70%, > 5 ปี → 100%; **Start up → 100% ทั้งสองช่วง** (OFFICIAL — DEC-21). tenor เท่ากับ 5 ปีพอดี = 70% (DEC-11)
 - อัตราหน้าจอ ≠ อัตราตามกฎ → HOLD `COVERAGE_RATIO_MISMATCH`; Product ไม่อยู่ใน matrix → HOLD `NO_RULE_FOR_PRODUCT`
 **Safe-Hold (พารามิเตอร์ที่ยัง OPEN):**
-- `PRM-027` (OPEN): คำนวณ Tier ตามทุก candidate event ที่มีข้อมูล (claim_submission_date, npl_date, default_date, demand_date) ถ้าให้ Tier เดียวกันทั้งหมดจึงใช้ Tier นั้น; ต่างกัน → HOLD → `COVERAGE_AGE_BASIS_UNDEFINED`
+- `PRM-028` (OPEN): ใช้ CALENDAR_MONTH_CLAMP_END_OF_MONTH (ไม่นับวันตั้งต้น); ถ้าผลต่างกันเมื่อเปลี่ยนเป็นวิธีอื่น (นับรวมวัน/ rollover) → HOLD → `POLICY_PARAMETER_UNRESOLVED`
 **Evidence:** LG + แบบคำขอ + ตาราง Coverage
 
 | reason_code | control_status | ความหมาย | สถานะรหัส |
 |---|---|---|---|
-| `COVERAGE_AGE_BASIS_UNDEFINED` | HOLD | coverage_age_basis ยัง OPEN และ Tier ต่างกันตาม candidate event | PROPOSED_BY_CLAUDE |
 | `COVERAGE_RATIO_MISMATCH` | HOLD | อัตราหน้าจอ ≠ อัตราตามกฎ | CANDIDATE |
+| `LG_TENOR_UNDETERMINABLE` | HOLD | พิสูจน์ contractual LG tenor ไม่ได้ (ไม่มี guarantee_term ใน LG, ไม่มี lg_issue_date/lg_expiry_date ครบ, หรือ LG ถูกต่ออายุโดยไม่ระบุ term) | APPROVED_BY_OWNER |
 | `NO_RULE_FOR_PRODUCT` | HOLD | ไม่มีกฎ Coverage ที่ยืนยันสำหรับ Product นี้ | CANDIDATE |
 
 ### PGS10-CLM-003 · Claim Base

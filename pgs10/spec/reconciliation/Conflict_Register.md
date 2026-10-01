@@ -1,10 +1,10 @@
 # Conflict Register
 
-**เวอร์ชัน:** 1.2.0-RECONCILIATION-r2 · ต่อยอดจากภาคผนวก A ของ `02_PGS10_OPERATIONAL_AUDIT_RULES.md` (A-01…A-28) + รายการใหม่จาก Pack v1.1.0 และคำตัดสิน (A-29…A-43)
+**เวอร์ชัน:** 1.2.0-RECONCILIATION-r3 · ต่อยอดจากภาคผนวก A ของ `02_PGS10_OPERATIONAL_AUDIT_RULES.md` (A-01…A-28) + รายการใหม่จาก Pack v1.1.0 และคำตัดสิน (A-29…A-46)
 
 สถานะ: `RESOLVED` ปิดแล้วด้วย DEC · `RESOLVED_PENDING_SOURCE_EDIT` ตัดสินแล้วแต่เอกสารต้นทางต้องแก้ · `PARTIAL` ปิดบางส่วน · `OPEN` ยังไม่ตัดสิน
 
-สรุป: RESOLVED 25, RESOLVED_PENDING_SOURCE_EDIT 1, PARTIAL 6, OPEN 11 · **ขวาง Freeze 1** รายการ
+สรุป: RESOLVED 29, RESOLVED_PENDING_SOURCE_EDIT 1, PARTIAL 5, OPEN 11 · **ขวาง Freeze 0** รายการ
 
 | ID | ประเด็น | ประเภท | แหล่ง | สถานะ | DEC | ผลที่ใช้ตอนนี้ | ขวาง Freeze? |
 |---|---|---|---|---|---|---|---|
@@ -14,12 +14,12 @@
 | A-04 | Historical mismatch = HOLD | SOURCE-ERROR | R§16 vs M§27 | RESOLVED_PENDING_SOURCE_EDIT | DEC-07, DEC-26 | ปิดเชิง Decision (HOLD HISTORICAL_BALANCE_MISMATCH); เหลือ Editorial Update Master Audit §27 — ไม่ใช่ Business Ambiguity | — |
 | A-05 | OCR ห้ามชดเชย Critical Document | AMBIGUOUS | R§8, M§37, P VIS-002 | PARTIAL | — | หลักการปิดแล้ว; รายการ Critical Document ใช้ 7 ประเภทของ M§37 เป็น Safe-Hold (PRM-038) | — |
 | A-06 | คำศัพท์สถานะ 3 ชุด | CONFLICT | R§26, M§38, V, P | RESOLVED | DEC-05 | Case 5 State + control_status 7 ค่า + reason_code; ห้าม HOLD_* (P ใช้ 10 ชื่อ — ดู A-31) | — |
-| A-07 | ขอบเขตของ FAIL | CONFLICT | R§26, M§39, P ID-001 | RESOLVED | DEC-19 | FAIL = Proven Policy Ineligibility ที่แก้ด้วยเอกสารเพิ่มไม่ได้; Document/Data/Evidence = HOLD (รวมกรณี 'คนละบุคคล' ของ P). ข้อเสนอ promote บางรหัสเป็น FAIL = Q-05 | — |
+| A-07 | ขอบเขตของ FAIL | CONFLICT | R§26, M§39, P ID-001 | RESOLVED | DEC-19, DEC-31 | FAIL = policy_disqualifying ∧ ¬remediable_by_document ∧ evidence_verified (DEC-19, DEC-31); ไม่ผูกกับ prefix ของ reason_code. NPL_SEASONING_NOT_MET / CLAIM_FILING_WINDOW_EXPIRED เป็น FAIL ได้เมื่อ verify ครบ; ไม่ครบ = HOLD | — |
 | A-08 | ลำดับ Support vs Observation; NOT_TESTABLE | AMBIGUOUS | D, P §13 | RESOLVED | DEC-04, DEC-06 | PASS_WITH_OBSERVATION + support_used=true; REQUIRED_HARD NOT_TESTABLE → HOLD | — |
 | A-09 | NPL Seasoning 6 เดือนเป็นกฎทั่วไปหรือไม่ | CONFLICT | M§4.1 vs R§32 | RESOLVED | DEC-01 | Small Biz และ Start up = 6 เดือน OFFICIAL | — |
 | A-10 | 7-month exception ขอบเขต + วันเริ่มนับ | CONFLICT/AMBIGUOUS | M§5, R§32, P RST-002 | RESOLVED | DEC-20 | OFFICIAL: 7 เดือน calendar; start = first_uncontactable_date OR first_contacted_but_restructure_failed_date; ใช้เฉพาะ path ที่มี (ค) (กรณี 1 และ 3); ไม่ขยายไป Start up. เหลือ Q-06 | — |
 | A-11 | Coverage Ratio นอก Small Biz | CONFLICT | R§22/§32 vs M§7 | RESOLVED | DEC-21 | Coverage เป็น OFFICIAL ทุก Product (Smart*/Small Biz 70/100; Start up 100/100) | — |
-| A-12 | วิธีนับอายุ LG / วิธีนับเดือน-ปี | AMBIGUOUS | R§32, M§25 | OPEN | DEC-11, DEC-22 | threshold 5 ปี OFFICIAL, boundary ปิดแล้ว; coverage_age_basis OPEN + Safe-Hold (invariance ข้าม candidate event → ไม่เช่นนั้น HOLD COVERAGE_AGE_BASIS_UNDEFINED). ไม่ขวาง Freeze เพราะมี Safe-Hold — ขอยืนยัน (การตีความของผม) | — |
+| A-12 | วิธีนับอายุ LG / วิธีนับเดือน-ปี | AMBIGUOUS | R§32, M§25 | RESOLVED | DEC-30 | Coverage ใช้ contractual LG tenor (guarantee_term → lg_issue_date+lg_expiry_date → HOLD LG_TENOR_UNDETERMINABLE); ยกเลิก heuristic invariance ข้าม event. เหลือ Q-10 (LG ที่ถูกต่ออายุ) ซึ่งมี Safe-Hold | — |
 | A-13 | Rule ID ชนกัน/พิมพ์ผิด | SOURCE-ERROR | M§41, M§29, P | RESOLVED | DEC-14 | ใช้ Master IDs + legacy_aliases (Canonical_Rule_ID_Map) | — |
 | A-14 | Transaction taxonomy + นิยาม Payment | CONFLICT/AMBIGUOUS | R§9, M§11, P | PARTIAL | DEC-02, DEC-12 | types = union (รวม REVERSAL, PRINCIPAL_ADJUSTMENT); code map ต่อ bank_id + Safe-Hold TRANSACTION_CODE_UNMAPPED. ยังไม่ชัด: เงินรับที่ตัดดอกเบี้ยอย่างเดียว — ให้ semantic_type ใน bank map เป็นตัวกำหนด | — |
 | A-15 | 'UNKNOWN ใกล้วันผิดนัด' | AMBIGUOUS | R§9 | OPEN | — | Safe-Hold: UNKNOWN ใด ๆ หลัง PAYMENT ล่าสุด → HOLD (PRM-042) | — |
@@ -33,36 +33,39 @@
 | A-23 | Start up = รูปแบบ 2; เงื่อนไข Claim ของ Start up | AMBIGUOUS | R§4, M§2-6 | RESOLVED | DEC-01, DEC-24 | Start up (รูปแบบ 2, กรณี 5) = (ข)+(จ)+(ฉ); ไม่รับ (ค); (ข) = NPL 6 เดือน | — |
 | A-24 | current_guarantee_obligation / 'other applicable amounts' | AMBIGUOUS | R§18-19 | OPEN | — | ต้องระบุแหล่งที่มา/องค์ประกอบ | — |
 | A-25 | เคสอยู่หลายกลุ่มใน R§30 | AMBIGUOUS | R§30 | RESOLVED | DEC-13 | แก้ด้วย RULE_ONLY schema (1 เคสมีได้หลาย Rule test) | — |
-| A-26 | ตัวเลขเคสจริงสำหรับ FULL_CASE ไม่มี | AMBIGUOUS | R§30 | OPEN | DEC-13 | Golden ที่อ้างเคสจริงเป็น `BLOCKED_PENDING_EVIDENCE` (ไม่ Assert) จนมี evidence_ref; FULL_CASE ต้องมี Evidence Package ครบ | — |
+| A-26 | ตัวเลขเคสจริงสำหรับ FULL_CASE ไม่มี | AMBIGUOUS | R§30 | OPEN | DEC-13 | Golden เคสจริง = BLOCKED_PENDING_EVIDENCE: ไม่มี input และไม่มี asserted result (DEC-38); ผลเดิมเก็บเป็น manual_baseline_note | — |
 | A-27 | PGS10-LG-001 ไม่มี Logic | AMBIGUOUS | M§41 | OPEN | — | ถอดจาก POL-LG; ขอยืนยัน | — |
 | A-28 | ขอบเขต Page Completeness | AMBIGUOUS | R§7, M§10 | OPEN | — | ใช้เฉพาะอนุมัติ/สัญญา | — |
 | A-29 | Contract date rule เป็น Thai Credit-only | CONFLICT | R§6/M§9 (ทั่วไป) vs P CON-001 (Thai Credit) | RESOLVED | DEC-10 | Thai Credit revolving-loan เท่านั้น; FI อื่น → HOLD CONTRACT_DATE_BASIS_UNDEFINED (รหัสที่เสนอใหม่ — ขอยืนยัน); fi_id ต้องเป็น input | — |
-| A-30 | NPL anchor date | AMBIGUOUS | M§4.1 (วันที่ออก LG) vs DEC-01/M§3.1 (วันที่ บสย. ค้ำประกัน) | OPEN | DEC-25 | แยก guarantee_effective_date / lg_issue_date; ห้ามอนุมาน; ต้องให้ Business Owner ยืนยัน Mapping → APPROVED_OPERATIONAL. ระหว่างนี้ NPL-001 = Safe-Hold HOLD NPL_ANCHOR_DATE_UNDEFINED. **Freeze Blocker เดียวที่เหลือ** | ใช่ |
+| A-30 | NPL anchor date | AMBIGUOUS | M§4.1 (วันที่ออก LG) vs DEC-01/M§3.1 (วันที่ บสย. ค้ำประกัน) | RESOLVED | DEC-29 | APPROVED_OPERATIONAL: anchor = lg_issue_date (ไม่อ้าง OFFICIAL); guarantee_effective_date เก็บแยกได้; เปลี่ยน Mapping ได้โดยไม่แก้ Rule ID | — |
 | A-31 | Pack ใช้ชื่อ HOLD_* 10 ชื่อและชื่อ reason ไม่ตรง catalogue | CONFLICT | P 01/02 vs P 03 | RESOLVED | DEC-05 | alias map ครบ; catalogue ใหม่ไม่มี HOLD_* | — |
 | A-32 | Rule ID ความหมายต่างกันแต่ ID เหมือนกัน (STM-001/002, CLM-001/003, PST-002/003) | CONFLICT | P vs M§41 vs D | RESOLVED | DEC-14 | alias ต้องมี @version เสมอ; ดู hazards ใน Canonical_Rule_ID_Map | — |
 | A-33 | Transaction code evidence | AMBIGUOUS | P 03, DEC-02, R§32 | PARTIAL | DEC-02 | 5 codes EVIDENCE_SUPPORTED_BANK_SPECIFIC (user-attested); 6921/6680 UNVERIFIED → Safe-Hold TRANSACTION_CODE_UNMAPPED; ต้องเติม effective_from/to + doc/page ก่อน Production (ไม่ขวาง Freeze) | — |
-| A-34 | LG ใน Golden Tests ที่ไม่มีในเอกสารอื่น | AMBIGUOUS | P 04 | PARTIAL | DEC-03 | 66-037410 ปิดแล้ว = เคสจริง (DEC-03; คนละรายกับ 66-067410). อีก 6 LG ที่เหลือ: Test เป็น BLOCKED_PENDING_EVIDENCE จนมีการยืนยัน | — |
+| A-34 | LG ใน Golden Tests ที่ไม่มีในเอกสารอื่น | AMBIGUOUS | P 04 | PARTIAL | DEC-03 | 66-037410 = SOURCE_VERIFIED_CASE (DEC-37; คนละรายกับ 66-067410). อีก 6 LG ที่เหลือ: BLOCKED_PENDING_EVIDENCE ไม่มี asserted result | — |
 | A-35 | GT-001 (67-026936) ขอบเขต Assertion | CONFLICT | P GT-001 vs V vs R§30 | RESOLVED | DEC-13 | RULE_ONLY VIS-001; ไม่ล็อก HISTORICAL_BALANCE_MISMATCH | — |
 | A-36 | Controls/เงื่อนไขที่ P ตัดออก | CONFLICT | P vs R | RESOLVED | DEC-12 | เติมกลับตามรายการ DEC-12 (Proposed_Changes) | — |
 | A-37 | ตัวเลขนโยบายที่ P ตัดออก | CONFLICT | P 01 vs M | RESOLVED | — | เก็บใน Policy_Parameter_Table พร้อม source_status (ไม่ฝังใน 01) | — |
 | A-38 | P: PASS_WITH_OBSERVATION 'เฉพาะหลัง reviewer อนุมัติ' vs FORMAT_VARIANCE อัตโนมัติ | AMBIGUOUS | P 01 §14, R§5 | RESOLVED | DEC-15 | Auto-pass เฉพาะ FORMAT_NORMALIZED (non-semantic, field-specific); NUMERIC_VARIANCE และอื่น ๆ = HOLD/reviewer | — |
-| A-39 | หลักฐานที่ผู้ใช้อ้างถึงแต่ session นี้เข้าถึงไม่ได้ | LIMITATION | DEC-02, DEC-03 | PARTIAL | DEC-02, DEC-03 | ผู้ใช้ยืนยันหลักฐานเพิ่ม (Statement remark, ledger behavior, LG 66037410 ในรายงานติดตาม) แต่ไฟล์ยังไม่ถึง session นี้ → คง `user-attested`; เติม doc/page เมื่อสะดวก (ไม่ขวาง Freeze) | — |
-| A-40 | NO_PAYMENT_FOUND เดิมเป็น Observation อัตโนมัติ | CONSEQUENCE | D STM-001 vs DEC-15 | RESOLVED | DEC-15 | ไม่ใช่ format normalization จึงไม่ Auto-pass → HOLD (การตีความของผมตาม DEC-15 — ขอยืนยัน) | — |
+| A-39 | หลักฐานที่ผู้ใช้อ้างถึงแต่ session นี้เข้าถึงไม่ได้ | LIMITATION | DEC-02, DEC-03 | RESOLVED | DEC-37 | ผู้ใช้ยืนยันว่า verify จากไฟล์โครงการแล้ว (หน้า 5, 7; Statement remark/ledger; LG 66037410) → ป้าย OWNER-VERIFIED; ผมไม่ได้ตรวจไฟล์ต้นฉบับเอง (บันทึกในพารามิเตอร์) | — |
+| A-40 | NO_PAYMENT_FOUND ต้องแยก 'พิสูจน์ว่าไม่เคยชำระ' กับ 'Statement ไม่ครบ' | CONSEQUENCE | D STM-001 vs DEC-15 | RESOLVED | DEC-34 | payment_history_status: NO_PAYMENT_VERIFIED (PASS) / INCOMPLETE (HOLD PAYMENT_HISTORY_INCOMPLETE). ส่วน Default chronology เมื่อไม่เคยชำระ → A-45 | — |
 | A-41 | CAP-001 ขึ้นกับ Stage | CONSEQUENCE | DEC-17 | RESOLVED | DEC-17 | เพิ่ม input `review_stage` (PRE_REVIEW \| FINAL_APPROVAL); requirement_by_stage | — |
-| A-42 | การจับคู่ 'กรณี 1–5' ของหน้า 7 กับ claim path | AMBIGUOUS | DEC-20, DEC-24 | OPEN | DEC-20 | ผมตีความว่า 'กรณี 1 และ 3' = path ที่มีเงื่อนไข (ค) คือ SMEs ≤5 ปี และ Small Biz ≤5 ปี, 'กรณี 5' = Start up (ต้นฉบับหน้า 7 ไม่ได้ส่งเข้า session) → Q-06 | — |
-| A-43 | Safe-Hold ด้วย 'invariance' ข้าม candidate (coverage age, demand waiting, date arithmetic) | DESIGN | DEC-22, DEC-28 | OPEN | DEC-28 | การออกแบบ Safe-Hold ของผมเอง เพื่อไม่ให้ทุกเคส HOLD — ขอ owner ยืนยันแนวทาง | — |
+| A-42 | การจับคู่ 'กรณี 1–5' ของหน้า 7 กับ claim path | AMBIGUOUS | DEC-20, DEC-24 | RESOLVED | DEC-32 | Case 1/3/5 ยืนยันแล้ว (DEC-32); Small Biz >5 ปี รวม (ข) | — |
+| A-43 | Safe-Hold แบบ 'invariance' ข้าม candidate (Demand waiting reference, date arithmetic) — เลิกใช้กับ Coverage | DESIGN | DEC-22, DEC-28 | OPEN | DEC-28 | ยังใช้กับ PRM-021/028 เท่านั้น (ผ่านต่อเมื่อผลเหมือนกันทุก candidate/convention) ไม่เช่นนั้น HOLD — การออกแบบของผม ขอยืนยัน | — |
+| A-44 | Band ≤5/>5 ปี ของ Case 1–4 (claim path) นับจากอะไร — ต่างจาก Coverage (contractual tenor) | AMBIGUOUS | M§3.1 vs DEC-30 | OPEN | DEC-30 | สมมติ: เวลายื่นเทียบวันออก LG (PRM-054, ASSUMPTION) — Q-08. Safe-Hold: ข้อมูลไม่ครบ → HOLD LG_DATA_MISSING | — |
+| A-45 | Default chronology เมื่อ NO_PAYMENT_VERIFIED ต้องใช้ alternative evidence (due-date/FI) — ยังไม่มี Rule อนุมัติ | AMBIGUOUS | DEC-34 | OPEN | DEC-34 | Safe-Hold: DEF-001 = HOLD POLICY_PARAMETER_UNRESOLVED (PRM-055) — Q-09 | — |
+| A-46 | Coverage tenor ของ LG ที่ถูกต่ออายุ/ขยาย | AMBIGUOUS | DEC-30, LG-001 | OPEN | DEC-30 | Safe-Hold: LG ต่ออายุและไม่มี guarantee_term ที่ระบุ → HOLD LG_TENOR_UNDETERMINABLE — Q-10 | — |
 
 ## คำถาม
 
-ตอบแล้ว: Q-01 → ตอบแล้ว → DEC-15, Q-02 → ตอบแล้ว → DEC-16, Q-03 → ตอบแล้ว → DEC-17, Q-04 → ตอบแล้ว → DEC-18
+ตอบแล้ว: Q-01 → DEC-15, Q-02 → DEC-16, Q-03 → DEC-17, Q-04 → DEC-18, Q-05 → DEC-31, Q-06 → DEC-32, Q-07 → DEC-33
 
 คำถามใหม่จากรอบ r2 (ไม่ขวาง Freeze):
 
 | ID | คำถาม | ข้อเสนอ |
 |---|---|---|
-| Q-05 | (ใหม่) ควร promote รหัสใดเป็น FAIL เพิ่มเติมจาก ELIGIBILITY_*? เช่น NPL_SEASONING_NOT_MET (มี npl_date), ยื่นเกินเวลา (late) | ตอนนี้ยังเป็น HOLD ทั้งหมด (Safe) ตาม DEC-19; ขอให้ระบุถ้าต้องการ FAIL |
-| Q-06 | (ใหม่) 'กรณี 1 และ 3' ของหน้า 7 = SMEs ≤5 ปี และ Small Biz ≤5 ปี ใช่หรือไม่? 'กรณี 5' = Start up? | ผมใช้การตีความนี้ใน RST-001/002 |
-| Q-07 | (ใหม่) ประกาศ `loan_account_no` เป็น field ที่ Leading Zero ไม่มีนัยสำคัญ (Auto-pass FORMAT_NORMALIZED) ถูกต้องหรือไม่? field อื่นที่ควรประกาศ? | ประกาศเฉพาะ loan_account_no ตาม R§5 |
+| Q-08 | Band ≤5/>5 ปีของ Case 1–4 (claim path) นับจากวันที่ยื่นเทียบวันออก LG ใช่หรือไม่ (ต่างจาก Coverage ที่ใช้ contractual tenor)? | สมมติเช่นนั้น (PRM-054) — Safe-Hold: ข้อมูลไม่ครบ → HOLD |
+| Q-09 | Default chronology เมื่อพิสูจน์แล้วว่าไม่เคยชำระ: alternative evidence rule (due-date / FI evidence) ที่อนุมัติคืออะไร? | ตอนนี้ DEF-001 = HOLD (POLICY_PARAMETER_UNRESOLVED) |
+| Q-10 | Coverage tenor ของ LG ที่ถูกต่ออายุ/ขยาย ใช้ term เดิม, term รวม หรือ term ของ LG ฉบับปัจจุบัน? | ตอนนี้ต่ออายุและไม่มี guarantee_term ระบุ → HOLD LG_TENOR_UNDETERMINABLE |
 
 ## ต้องแก้ในเอกสารต้นทาง (Master Audit / Rulebook)
 
