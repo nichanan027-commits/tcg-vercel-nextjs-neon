@@ -25,7 +25,8 @@
   const TYPES = [
     ['APPROVAL_SEQUENCE', 'หนังสืออนุมัติสินเชื่อ / สัญญา', true, /อนุมัติ|สัญญา|approv|contract/i],
     ['LG', 'หนังสือค้ำประกัน (LG)', false, /\blg\b|ค้ำประกัน|guarantee/i],
-    ['SCREEN', 'หน้าจอระบบ (WebCSR / Loan Overview)', false, /screen|webcsr|overview|หน้าจอ|profile/i],
+    ['SCREEN', 'หน้าจอ บสย. (ข้อมูล LG / การเคลม)', false, /screen|หน้าจอ|บสย/i],
+    ['BANK_SCREEN', 'หน้าจอธนาคาร (WebCSR / Loan Overview)', false, /webcsr|overview|profile/i],
     ['STATEMENT', 'Statement บัญชีเงินกู้', false, /statement|สเตทเมนต์|ledger/i],
     ['PAYOFF', 'Payoff Quote / ยอดหนี้ปัจจุบัน', false, /payoff|ยอดหนี้|ปิดบัญชี/i],
     ['CONFIRMATION_LETTER', 'หนังสือยืนยันการชำระหลังผิดนัด', true, /ยืนยัน|confirm/i],
@@ -229,5 +230,5 @@
   let rzT; window.addEventListener('resize', () => { clearTimeout(rzT); rzT = setTimeout(() => { const f = cur(); if (f && f.kind !== 'other') show(); }, 200); });
 
   renderList(); show();
-  window.PGS10_DOCS = { addFiles, count: () => files.length };
+  window.PGS10_DOCS = { addFiles, count: () => files.length, TYPES, TYPE_LABEL, _int: { cur, stage, loadPdfLib, renderViewerBar, panel, viewer, getFiles: () => files } };
 })();

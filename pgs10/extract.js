@@ -1,0 +1,312 @@
+/*
+ * PGS 10 Claim Checker — AI-assisted reading of case documents (stages 2 + 3).
+ *
+ *  - Stage 2: if a PDF page has a text layer its text is sent along as a hint (scans such as bank/WebCSR prints usually have none).
+ *  - Stage 3: the rendered page image is sent to Claude (runtime capability `sample`, viewer's own account, per-call consent) and Claude
+ *    returns SUGGESTED values. Nothing reaches the form until the reviewer presses “ใช้ค่า”; every accepted value keeps provenance
+ *    (file, page, method, confidence, quote) which is exported with the case JSON.
+ *  - The image outranks any text layer (Rulebook): the reviewer must still look at the page. This never produces a verdict.
+ *  - Bank-specific knowledge lives in FI_PROFILES (prototype of the “FI Evidence Adapter”): label equivalences + transaction-code map.
+ *    The GSB profile comes from ONE real case (LG 67-011373) and is marked UNVERIFIED as a general mapping.
+ * All DOM is built with textContent (document text is arbitrary).
+ */
+(function () {
+  'use strict';
+  const D = window.PGS10_DOCS, UI = window.PGS10_UI;
+  if (!D || !UI) return;
+  const I = D._int;
+  const el = (tag, attrs, kids) => {
+    const n = document.createElement(tag);
+    Object.entries(attrs || {}).forEach(([k, v]) => {
+      if (v == null || v === false) return;
+      if (k === 'class') n.className = v;
+      else if (k === 'text') n.textContent = v;
+      else if (k === 'on') Object.entries(v).forEach(([e, fn]) => n.addEventListener(e, fn));
+      else n.setAttribute(k, v === true ? '' : v);
+    });
+    [].concat(kids || []).forEach((c) => c != null && n.append(c));
+    return n;
+  };
+
+  // ------------------------------------------------------------ what can be read from which document type  [key, Thai label, hint]
+  const ID = (c) => [[`id_lg_${c}`, 'เลข LG'], [`id_name_${c}`, 'ชื่อผู้กู้'], [`id_acct_${c}`, 'เลขบัญชีสินเชื่อ'], [`id_limit_${c}`, 'วงเงินสินเชื่อ'], [`id_lgdate_${c}`, 'วันที่ LG']];
+  const DOC_FIELDS = {
+    SCREEN: { fields: [...ID('screen'), ['default_date_screen', 'วันที่ผิดนัดชำระหนี้'], ['fup_screen_date', 'วันที่ติดตามให้ชำระหนี้/ปรับโครงสร้างหนี้'], ['rst_screen_date', 'วันที่ทำสัญญาปรับโครงสร้างหนี้'],
+      ['dmd_date_screen', 'วันที่บอกเลิกสัญญา/บอกกล่าวชำระหนี้ (1)'], ['tl_bank_submission_date', 'วันที่ธนาคารส่งคำขอ'], ['tl_complete_docs_date', 'วันที่ได้รับเอกสารครบถ้วน'], ['tl_payment_approval_date', 'วันที่อนุมัติเสนอจ่าย'],
+      ['guarantee_exposure', 'ภาระค้ำประกันปัจจุบัน'], ['hist_principal', 'สภาพหนี้ ณ วันฟ้อง/วันออกหนังสือบอกกล่าว: เงินต้น'], ['hist_interest', '… ดอกเบี้ย'], ['hist_total', '… รวม'],
+      ['cur_screen_principal', 'สภาพหนี้ ณ ปัจจุบัน: เงินต้น'], ['cur_screen_interest', '… ดอกเบี้ย'], ['cur_screen_total', '… รวม'],
+      ['cb_screen_base', 'ภาระค้ำประกันที่นำมาคำนวณ (ฐานคำนวณ)'], ['cr_screen_ratio', 'สัดส่วน (%)'], ['claim_amount_screen', 'จำนวนเงินจ่ายค่าประกันชดเชย']],
+      note: 'หน้าจอของ บสย. (ข้อมูลหนังสือค้ำประกัน / สภาพหนี้ / รายละเอียดวงเงิน). ช่องที่ว่างบนหน้าจอให้ข้าม ห้ามเดา' },
+    BANK_SCREEN: { fields: [...ID('statement').filter((x) => x[0].startsWith('id_acct') || x[0].startsWith('id_name')), ['cur_stmt_principal', 'เงินต้นคงเหลือ (Current/Principal Balance)']],
+      note: 'หน้าจอระบบของธนาคาร (เช่น WebCSR Loan Account Overview). วันที่ผิดนัดไม่ได้อยู่ในหน้าจอนี้' },
+    PAYOFF: { fields: [['id_acct_statement', 'เลขบัญชี'], ['id_name_statement', 'ชื่อผู้กู้'], ['cur_stmt_principal', 'เงินต้นคงเหลือ (Principal Balance)'], ['cur_stmt_interest', 'ดอกเบี้ยค้างรับ (Interest due)'], ['cur_stmt_other', 'ค่าปรับ/ค่าธรรมเนียมอื่น (Late charges / fees)']],
+      note: 'ใบสอบถามยอดชำระปิดบัญชี. ถ้าไม่ได้แยกชัดเจนให้ใส่เฉพาะที่เห็นจริง. ยอด Net Payoff ให้บันทึกใน observations (ไม่มีช่องรับ)' },
+    STATEMENT: { fields: [...ID('statement').filter((x) => x[0].startsWith('id_acct') || x[0].startsWith('id_name')), ['stm_cutoff_date', 'Statement ถึงวันที่ (วันสุดท้ายที่ Statement ครอบคลุม — ถ้าระบุชัดเจนเท่านั้น)']],
+      tx: true, note: 'Loan Account Statement: อ่านทุกบรรทัดรายการ (ทั้งแถวจำนวนเงินและแถวเงินต้น/ดอกเบี้ย) ลงใน transactions; อย่าคำนวณเอง' },
+    LG: { fields: [['id_lg_lg', 'เลขที่หนังสือค้ำประกัน'], ['id_name_lg', 'ผู้ขอสินเชื่อ/ผู้กู้'], ['id_limit_lg', 'วงเงินสินเชื่อที่ค้ำ'], ['id_lgdate_lg', 'วันที่ออกหนังสือค้ำประกัน']],
+      note: 'หนังสือค้ำประกัน (LG). ระยะเวลาค้ำประกัน (เช่น "3 ปี") ไม่มีช่องในแบบฟอร์ม — ใส่ใน observations พร้อมคำที่เขียนจริง' },
+    APPROVAL_SEQUENCE: { fields: [['approval_date', 'วันที่ทำสัญญา/วันที่แจ้งผลอนุมัติ (ตามที่ระบุในเอกสาร ระบุว่าเป็นวันไหนใน quote)'], ['id_name_approval', 'ชื่อผู้กู้'], ['id_acct_approval', 'เลขบัญชีสินเชื่อ (ถ้ามี)'], ['id_limit_approval', 'วงเงินกู้'], ['id_lg_approval', 'เลขที่หนังสือค้ำประกันที่อ้างถึง'], ['id_lgdate_approval', 'วันที่ออกหนังสือค้ำประกันที่อ้างถึง']],
+      note: 'หนังสืออนุมัติ/สัญญากู้. ระบุลำดับหน้าของเอกสาร (เช่น "1 of X", "—2—") ใน observations' },
+    DEMAND_LETTER: { fields: [['dmd_date_letter', 'วันที่ของหนังสือบอกกล่าว'], ['dmd_principal', 'เงินต้นที่เรียกให้ชำระ'], ['dmd_interest', 'ดอกเบี้ย (เฉพาะที่ระบุว่าดอกเบี้ย; เบี้ยปรับให้แยกใน observations)'], ['dmd_total', 'ยอดรวมทั้งสิ้น'], ['demand_contract_date', 'วันที่ของสัญญาที่อ้างถึงในหนังสือ'], ['id_name_demand', 'ผู้รับ/ผู้กู้'], ['id_acct_demand', 'เลขบัญชีสินเชื่อ'], ['id_limit_demand', 'วงเงินกู้'], ['id_lg_demand', 'เลขที่หนังสือค้ำประกันที่อ้างถึง'], ['id_lgdate_demand', 'วันที่หนังสือค้ำประกันที่อ้างถึง']],
+      note: 'หนังสือบอกกล่าว/บอกเลิกสัญญา. "นับถึงวันที่ …" (as-of date ของยอดหนี้) ให้ใส่ใน observations' },
+    TRACKING_REPORT: { fields: [['fup_report_date', 'วันที่ติดตาม'], ['fup_method', 'วิธีติดตาม'], ['fup_result', 'ผลติดตาม/รายละเอียดการติดตาม']],
+      note: 'รายงานความคืบหน้าการติดตามหนี้ (อาจหมุน 90° — อ่านตามทิศที่ถูกต้อง). ถ้ามีการระบุผู้ติดต่อ/เบอร์ ให้ข้ามข้อมูลส่วนบุคคลนั้น' },
+    POSTAL_ACK: { fields: [['pst_send_date', 'วันที่ส่ง (ตราประทับไปรษณีย์ของต้นทาง)'], ['pst_received_date', 'วันที่ผู้รับลงนามรับ (ถ้ามีเขียนชัดเจน)'], ['addr_postal_house', 'ที่อยู่ผู้รับ: บ้านเลขที่'], ['addr_postal_moo', 'หมู่'], ['addr_postal_tambon', 'ตำบล/แขวง'], ['addr_postal_amphoe', 'อำเภอ/เขต'], ['addr_postal_province', 'จังหวัด'], ['addr_postal_zip', 'รหัสไปรษณีย์']],
+      note: 'ใบตอบรับ/ซอง/ตราไปรษณีย์. ผลการส่ง (ส่งสำเร็จ/ตีกลับ) และลายมือชื่อให้บรรยายสิ่งที่เห็นใน observations เท่านั้น — ห้ามสรุปเอง' },
+    CLAIM_FORM: { fields: [['claim_app_date', 'วันที่ของแบบคำขอรับเงินค่าประกันชดเชย']],
+      note: 'แบบคำขอรับเงินค่าประกันชดเชย. วันผิดนัด วันที่บอกกล่าว สภาพหนี้ ณ วันยื่น และ checkbox ที่ติ๊กไว้ ให้ใส่ใน observations ตามที่เห็น' },
+  };
+
+  // ------------------------------------------------------------ FI profiles (prototype of the FI Evidence Adapter)
+  const FI_PROFILES = {
+    GSB: {
+      label: 'ธนาคารออมสิน (GSB)',
+      hint: [
+        'เอกสารธนาคารออมสิน: WebCSR "Loan Account Overview", "สอบถามยอดเงินชำระปิดบัญชี (Payoff Quote)", "Loan Account Statement".',
+        'ความหมายของป้ายชื่อ: Current Balance / Principal Balance = เงินต้นคงเหลือ; ดอกเบี้ยค้างรับ = ดอกเบี้ยที่ค้าง; Total Late Charges = ค่าปรับ; Payoff Amount / Net Payoff Amount = ยอดชำระปิดบัญชีรวม (เงินต้น+ดอกเบี้ย+ค่าปรับ).',
+        'Statement คอลัมน์: วันที่ / วันที่มีผล, คำย่อ (รหัสรายการ), รายการ, เลขที่ตั๋ว/เช็ค, วันครบกำหนด, จำนวนเงิน, คงเหลือ; แถวที่สองของแต่ละรายการแสดง ค่าธรรมเนียม / ดอกเบี้ยผิดนัด / ดอกเบี้ยปกติ / เงินต้น.',
+        'รหัสที่พบ: CMP = ชำระหนี้อัตโนมัติ; CMDTR = จ่ายเงินกู้โดยโอน; "-" = บรรทัดยอดคงเหลือ (ไม่ใช่รายการเงิน); B/F = ยอดยกมา; C/F = ยอดยกไป. "Collection Records" ไม่ใช่รายการชำระ.',
+      ].join('\n'),
+      txn: { CMP: 'PAYMENT' }, // everything else -> UNKNOWN (Safe-Hold). Evidence: one case only.
+      txnNote: 'รหัส CMP → PAYMENT มาจากเคสเดียว (UNVERIFIED เป็น mapping ทั่วไป); รหัสอื่น → UNKNOWN',
+      noRow: new Set(['B/F', 'C/F', '-']),
+    },
+    TCG: { label: 'ไทยเครดิต (Thai Credit)', hint: 'เอกสารธนาคารไทยเครดิต: ไม่มี mapping สำเร็จรูปในหน้านี้ — อ่านตามที่เขียนจริง', txn: {}, txnNote: 'ไม่มี mapping — ทุกรหัส → UNKNOWN', noRow: new Set(['B/F', 'C/F', '-']) },
+    OTHER: { label: 'อื่น ๆ (ไม่มี mapping)', hint: 'ไม่มีข้อมูล mapping ของธนาคารนี้ — อ่านตามที่เขียนจริง', txn: {}, txnNote: 'ไม่มี mapping — ทุกรหัส → UNKNOWN', noRow: new Set(['B/F', 'C/F', '-']) },
+  };
+
+  // ------------------------------------------------------------ provenance (exported with the case JSON)
+  const prov = [];
+  window.PGS10_PROV = { list: () => prov.slice() };
+
+  // ------------------------------------------------------------ helpers
+  const THAI_DIGITS = /[๐-๙]/g;
+  const toArabic = (s) => String(s).replace(THAI_DIGITS, (d) => String('๐๑๒๓๔๕๖๗๘๙'.indexOf(d)));
+  // CE -> BE for the form (the form is BE dd/mm/yyyy); everything else is passed through as read
+  function formDate(v, cal) {
+    const m = /^(\d{1,2})\/(\d{1,2})\/(\d{4})$/.exec(toArabic(v).trim());
+    if (!m) return { value: String(v), converted: false, bad: true };
+    let y = +m[3];
+    const isCE = cal === 'CE' || (cal !== 'BE' && y < 2400);
+    if (isCE) y += 543;
+    return { value: `${m[1].padStart(2, '0')}/${m[2].padStart(2, '0')}/${y}`, converted: isCE, bad: false };
+  }
+  const isDateKey = (k) => /date|_date_|^id_lgdate|^tl_|^approval_date|^claim_app_date|^fup_screen_date|^fup_report_date|^rst_/.test(k) && !/_ratio$/.test(k);
+
+  // ------------------------------------------------------------ capture the current page (or the part on screen) as an image
+  const TARGET_PX = 1.2e6, MAX_PX = 25e6;
+  async function pageSource(f) {
+    if (f.kind === 'image') {
+      const bmp = await createImageBitmap(f.blob);
+      return { w: bmp.width, h: bmp.height, draw: (ctx, sx, sy, sw, sh, dw, dh) => ctx.drawImage(bmp, sx, sy, sw, sh, 0, 0, dw, dh), swap: !!(f.rot % 180), rot: f.rot, kind: 'image' };
+    }
+    const lib = await I.loadPdfLib();
+    if (!f.pdf) f.pdf = await lib.getDocument({ data: new Uint8Array(await f.blob.arrayBuffer()) }).promise;
+    const page = await f.pdf.getPage(f.page);
+    return { page, kind: 'pdf' };
+  }
+  async function capture(f, scope) {
+    const src = await pageSource(f);
+    // visible fraction of the displayed page (0..1) — whole page when scope = 'page'
+    let fx0 = 0, fy0 = 0, fx1 = 1, fy1 = 1;
+    const shown = I.stage.querySelector('canvas,img');
+    if (scope === 'visible' && shown) {
+      const sr = I.stage.getBoundingClientRect(), cr = shown.getBoundingClientRect();
+      fx0 = Math.max(0, (sr.left - cr.left) / cr.width); fy0 = Math.max(0, (sr.top - cr.top) / cr.height);
+      fx1 = Math.min(1, (sr.right - cr.left) / cr.width); fy1 = Math.min(1, (sr.bottom - cr.top) / cr.height);
+      if (fx1 - fx0 < 0.05 || fy1 - fy0 < 0.05) { fx0 = fy0 = 0; fx1 = fy1 = 1; }
+    }
+    const frac = (fx1 - fx0) * (fy1 - fy0);
+    let full = document.createElement('canvas');
+    if (src.kind === 'pdf') {
+      const base = src.page.getViewport({ scale: 1, rotation: f.rot });
+      let scale = Math.sqrt((TARGET_PX / frac) / (base.width * base.height));
+      scale = Math.min(scale, Math.sqrt(MAX_PX / (base.width * base.height)));
+      const vp = src.page.getViewport({ scale, rotation: f.rot });
+      full.width = Math.floor(vp.width); full.height = Math.floor(vp.height);
+      await src.page.render({ canvasContext: full.getContext('2d'), viewport: vp }).promise;
+    } else {
+      const rw = src.swap ? src.h : src.w, rh = src.swap ? src.w : src.h;
+      let k = Math.min(1, Math.sqrt(MAX_PX / (rw * rh)));
+      full.width = Math.floor(rw * k); full.height = Math.floor(rh * k);
+      const ctx = full.getContext('2d');
+      ctx.translate(full.width / 2, full.height / 2); ctx.rotate((f.rot * Math.PI) / 180);
+      const dw = src.swap ? full.height : full.width, dh = src.swap ? full.width : full.height;
+      ctx.translate(-dw / 2, -dh / 2); src.draw(ctx, 0, 0, src.w, src.h, dw, dh);
+    }
+    let out = full;
+    if (frac < 1) {
+      out = document.createElement('canvas');
+      out.width = Math.max(1, Math.floor(full.width * (fx1 - fx0))); out.height = Math.max(1, Math.floor(full.height * (fy1 - fy0)));
+      out.getContext('2d').drawImage(full, full.width * fx0, full.height * fy0, out.width, out.height, 0, 0, out.width, out.height);
+    }
+    const blob = await new Promise((res) => out.toBlob(res, 'image/png'));
+    return { blob, width: out.width, height: out.height, fraction: frac };
+  }
+  async function textLayer(f) {
+    if (f.kind !== 'pdf') return null;
+    try {
+      const lib = await I.loadPdfLib();
+      if (!f.pdf) f.pdf = await lib.getDocument({ data: new Uint8Array(await f.blob.arrayBuffer()) }).promise;
+      const tc = await (await f.pdf.getPage(f.page)).getTextContent();
+      const t = tc.items.map((x) => x.str).join(' ').replace(/\s+/g, ' ').trim();
+      return t.length >= 30 ? t.slice(0, 4000) : '';
+    } catch (e) { return null; }
+  }
+
+  // ------------------------------------------------------------ prompt
+  function buildPrompt(f, spec, fi, text) {
+    const keys = spec.fields.map(([k, l]) => `- ${k}: ${l}`).join('\n');
+    return [
+      'คุณอ่านภาพหน้าเอกสารภาษาไทยหนึ่งหน้า เพื่อช่วยผู้ตรวจเคสค้ำประกัน (PGS 10) ผู้ตรวจจะยืนยันทุกค่าเอง — งานของคุณคือ "อ่านตามที่เขียน" ไม่ใช่ตีความหรือตัดสิน',
+      `ประเภทเอกสารที่ผู้ใช้ระบุ: ${D.TYPE_LABEL[f.type]} (ไฟล์ ${f.name}, หน้า ${f.page}). ภาพอาจเอียง/หมุน/สแกนไม่ชัด/มีลายมือ`,
+      spec.note, `ข้อมูลรูปแบบเอกสารของ ${fi.label}:\n${fi.hint}`,
+      text ? `ข้อความจาก text layer ของหน้านี้ (ใช้ประกอบเท่านั้น หากขัดกับภาพ ให้เชื่อภาพและบอกใน observations):\n"""${text}"""` : 'หน้านี้ไม่มี text layer (สแกน/ภาพ) — อ่านจากภาพอย่างเดียว',
+      'ฟิลด์ที่ขอ (ใช้ key ตามนี้เท่านั้น):\n' + keys,
+      spec.tx ? 'และให้อ่านรายการเดินบัญชีทุกบรรทัดลง "transactions".' : '',
+      'กติกา:',
+      '1. ใส่เฉพาะค่าที่เห็นชัดเจน. ถ้าไม่เห็น/ไม่แน่ใจ/ช่องว่าง ให้ "ไม่ใส่ key นั้น" แล้วบอกใน observations. ห้ามเดา ห้ามคำนวณ ห้ามปัดเศษ ห้ามแก้ตัวเลขให้ตรงกัน ห้ามนำค่าจากฟิลด์หนึ่งไปใส่อีกฟิลด์.',
+      '2. ตัวเลขเงิน: คัดลอกตามที่พิมพ์ (คงจุลภาค/ทศนิยม) เช่น "25,833.35". ข้อความ: คัดลอกตามที่เขียน.',
+      '3. วันที่: ใส่เป็น dd/mm/yyyy (แปลงชื่อเดือนไทยเป็นเลขเดือน, แปลงเลขไทยเป็นอารบิก แต่ **ห้ามเปลี่ยนปี**) แล้วระบุ "calendar": "BE" ถ้าปีเป็น พ.ศ. (≥ 2400), "CE" ถ้าเป็น ค.ศ.',
+      '4. "quote" = ข้อความสั้น ๆ ที่เห็นบนเอกสารรอบค่านั้น (ไม่เกิน 80 ตัวอักษร) เพื่อให้ผู้ตรวจค้นหาเจอ; "confidence" = high | medium | low (ลายมือ/เบลอ/ขอบตัด = low).',
+      '5. observations = สิ่งที่ผู้ตรวจควรรู้ในหน้านี้ที่ไม่มีช่องรับ หรือความผิดปกติที่เห็น (เช่น วันที่หัวเอกสารหลังวันที่พิมพ์, ตัวเลขไม่รวมกัน, หน้าถูกตัด, ตราประทับอ่านไม่ออก) — บรรยายสิ่งที่เห็น ไม่สรุปว่าผ่าน/ไม่ผ่านเกณฑ์.',
+      'ตอบเป็น JSON อย่างเดียว ตามรูปแบบ:',
+      '{"readable": true, "fields": [{"key": "...", "value": "...", "calendar": "BE|CE|null", "confidence": "high|medium|low", "quote": "..."}], ' +
+        (spec.tx ? '"transactions": [{"date": "dd/mm/yyyy", "raw_code": "...", "description": "...", "amount": "...", "balance": "...", "confidence": "high|medium|low"}], ' : '') +
+        '"observations": ["..."]}',
+      '"readable": false ถ้าหน้านี้อ่านไม่ได้เลย.',
+    ].filter(Boolean).join('\n\n');
+  }
+
+  // ------------------------------------------------------------ UI
+  const box = el('section', { class: 'xt' });
+  I.panel.append(box);
+  const fiSel = el('select', { 'aria-label': 'รูปแบบเอกสารของธนาคาร' }, Object.entries(FI_PROFILES).map(([k, v]) => el('option', { value: k, text: v.label })));
+  const scopeSel = el('select', { 'aria-label': 'ส่วนที่จะส่งให้ AI อ่าน' }, [el('option', { value: 'page', text: 'ทั้งหน้า' }), el('option', { value: 'visible', text: 'เฉพาะส่วนที่เห็นบนจอ (ละเอียดกว่า — ซูมก่อน)' })]);
+  const runBtn = el('button', { type: 'button', class: 'primary', text: 'อ่านหน้านี้ด้วย AI' });
+  const stopBtn = el('button', { type: 'button', class: 'ghost', text: 'หยุด', hidden: true });
+  const status = el('p', { class: 'xstatus muted', role: 'status', 'aria-live': 'polite' });
+  const results = el('div', { class: 'xres' });
+  const consentChk = el('input', { type: 'checkbox', id: 'xConsent' });
+  box.append(
+    el('h3', { text: 'อ่านเอกสารด้วย AI (ทดลอง)' }),
+    el('p', { class: 'muted xnote', text: 'ภาพของหน้าที่เลือกจะถูกส่งให้ Claude ประมวลผลผ่านบัญชีของผู้เปิดหน้านี้ (ไม่ถูกเก็บโดยหน้านี้) ผลเป็น “ค่าแนะนำ” — ต้องกด “ใช้ค่า” ทีละรายการ และต้องดูภาพประกอบเสมอ' }),
+    el('label', { class: 'chk' }, [consentChk, el('span', { text: 'ยืนยัน: อนุญาตให้ส่งภาพหน้าเอกสารนี้ไปให้ AI อ่าน' })]),
+    el('div', { class: 'xrow' }, [el('label', { class: 'f' }, [el('span', { text: 'รูปแบบเอกสารธนาคาร' }), fiSel]), el('label', { class: 'f' }, [el('span', { text: 'ส่วนที่ส่ง' }), scopeSel])]),
+    el('div', { class: 'xrow' }, [runBtn, stopBtn]), status, results);
+
+  let sample = null, canImages = false, ctl = null;
+  function setStatus(t, bad) { status.textContent = t || ''; status.classList.toggle('bad', !!bad); }
+  (async () => {
+    try {
+      sample = window.claude && (await window.claude.use('sample'));
+      if (sample) { const lim = await sample.limits().catch(() => null); canImages = !!(lim && lim.images); }
+    } catch (e) { sample = null; }
+    if (!sample || !canImages) {
+      runBtn.disabled = true; consentChk.disabled = true;
+      setStatus(!sample ? 'ฟีเจอร์นี้ใช้ได้เฉพาะเมื่อเปิดหน้านี้ผ่านลิงก์ที่เผยแพร่ใน claude.ai (ต้องมีสิทธิ์เรียก Claude) — ตอนนี้ยังใช้ดูเอกสารและกรอกเองได้ตามปกติ' : 'มุมมองนี้ส่งภาพให้ AI ไม่ได้ — ใช้ดูเอกสารและกรอกเองได้ตามปกติ', false);
+    }
+  })();
+
+  runBtn.addEventListener('click', async () => {
+    const f = I.cur();
+    results.replaceChildren();
+    if (!f || f.kind === 'other') return setStatus('เลือกเอกสาร PDF หรือรูปภาพก่อน', true);
+    if (!f.type || !DOC_FIELDS[f.type]) return setStatus('เลือก “ประเภทเอกสาร” ของไฟล์นี้ในรายการด้านบนก่อน (ยังไม่รองรับประเภท: ' + (f.type ? D.TYPE_LABEL[f.type] : 'ไม่ได้เลือก') + ')', true);
+    if (!consentChk.checked) return setStatus('ติ๊กยืนยันการส่งภาพให้ AI ก่อน', true);
+    const spec = DOC_FIELDS[f.type], fi = FI_PROFILES[fiSel.value];
+    ctl = new AbortController(); runBtn.disabled = true; stopBtn.hidden = false;
+    try {
+      setStatus('กำลังเตรียมภาพหน้า ' + f.page + '…');
+      const [cap, text] = await Promise.all([capture(f, scopeSel.value), textLayer(f)]);
+      setStatus('กำลังให้ AI อ่าน (ใช้เวลาประมาณ 10–60 วินาที)…');
+      const out = await sample.json(buildPrompt(f, spec, fi, text), { images: cap.blob, signal: ctl.signal, cache: false });
+      renderResults(f, spec, fi, out, { text: text === null ? 'unknown' : text ? 'yes' : 'no', scope: scopeSel.value, w: cap.width, h: cap.height });
+      setStatus('AI อ่านเสร็จ — ตรวจเทียบกับภาพก่อนกด “ใช้ค่า” (ภาพที่ส่งขนาด ' + cap.width + '×' + cap.height + ' px; ถ้าตัวเลขเล็กมาก ให้ซูมแล้วเลือก “เฉพาะส่วนที่เห็นบนจอ”)');
+    } catch (e) {
+      const m = { cancelled: 'ยกเลิกแล้ว', not_granted: 'ไม่ได้รับอนุญาตให้ใช้ Claude ในหน้านี้', rate_limited: 'เรียกบ่อยเกินไปหรือถึงขีดจำกัดการใช้งาน — ลองใหม่ภายหลัง', image_rejected: 'ภาพถูกปฏิเสธ (ชนิด/ขนาดไม่รองรับ)', invalid_json: 'AI ตอบในรูปแบบที่อ่านไม่ได้ — ลองใหม่ หรือเลือกเฉพาะส่วนที่เห็นบนจอ', refused: 'AI ไม่ตอบคำขอนี้', session_expired: 'ต้องเข้าสู่ระบบ claude.ai ใหม่' }[e && e.code] || 'เรียก AI ไม่สำเร็จ (' + ((e && e.code) || (e && e.message) || 'unknown') + ')';
+      setStatus(m, e && e.code !== 'cancelled');
+    } finally { runBtn.disabled = !sample || !canImages; stopBtn.hidden = true; ctl = null; }
+  });
+  stopBtn.addEventListener('click', () => ctl && ctl.abort());
+
+  // ------------------------------------------------------------ suggestions
+  const CONF = { high: 'สูง', medium: 'กลาง', low: 'ต่ำ' };
+  function renderResults(f, spec, fi, out, meta) {
+    const labels = Object.fromEntries(spec.fields);
+    const head = el('p', { class: 'xhead', text: `${f.name} · หน้า ${f.page} · ${D.TYPE_LABEL[f.type]} · text layer: ${meta.text === 'yes' ? 'มี (ส่งประกอบ)' : meta.text === 'no' ? 'ไม่มี (สแกน)' : 'ไม่ทราบ'}` });
+    const parts = [head];
+    if (out && out.readable === false) parts.push(el('p', { class: 'xwarn', text: 'AI รายงานว่าอ่านหน้านี้ไม่ได้' }));
+    const rows = (Array.isArray(out && out.fields) ? out.fields : []).filter((x) => x && labels[x.key] && x.value != null && String(x.value).trim() !== '');
+    const emptyKeys = [];
+    if (rows.length) {
+      const tb = el('tbody');
+      rows.forEach((r) => {
+        const dk = isDateKey(r.key);
+        const fd = dk ? formDate(r.value, r.calendar) : { value: String(r.value), converted: false, bad: false };
+        const cur = UI.getField(r.key);
+        const same = cur != null && cur.trim() === fd.value;
+        const btn = el('button', { type: 'button', class: 'ghost', text: same ? 'ตรงกับฟอร์ม' : cur ? 'ใช้ค่า (แทนที่)' : 'ใช้ค่า', disabled: same || fd.bad || null });
+        btn.addEventListener('click', () => {
+          if (!UI.setField(r.key, fd.value)) return;
+          prov.push({ field: r.key, value: fd.value, source_file: f.name, source_page: f.page, doc_type: f.type, fi: fiSel.value, method: 'AI_VISION_SUGGESTION_REVIEWER_ACCEPTED', confidence: r.confidence || null, quote: r.quote || null, calendar_read: r.calendar || null, converted_ce_to_be: fd.converted, scope: meta.scope, accepted_at: new Date().toISOString() });
+          btn.textContent = '✓ ใช้แล้ว'; btn.disabled = true;
+        });
+        if (!cur) emptyKeys.push([r, fd, btn]);
+        tb.append(el('tr', { class: 'c-' + (r.confidence || 'low') }, [
+          el('td', { text: labels[r.key] }),
+          el('td', {}, [el('strong', { text: fd.value }), fd.converted ? el('small', { class: 'muted', text: ` (ในเอกสารเป็น ค.ศ. ${r.value} → แปลง +543)` }) : null, fd.bad ? el('small', { class: 'xwarn', text: ' รูปแบบวันที่ไม่ถูกต้อง' }) : null]),
+          el('td', { text: cur ? cur : '—' }),
+          el('td', { text: CONF[r.confidence] || '?' }),
+          el('td', { class: 'q', text: r.quote || '' }),
+          el('td', {}, [btn]),
+        ]));
+      });
+      parts.push(el('div', { class: 'tblwrap' }, [el('table', { class: 'in xt-tbl' }, [
+        el('thead', {}, [el('tr', {}, ['ช่อง', 'ค่าที่อ่านได้', 'ค่าในฟอร์มตอนนี้', 'มั่นใจ', 'ข้อความบนเอกสาร', ''].map((h) => el('th', { text: h })))]), tb])]));
+      if (emptyKeys.length > 1) parts.push(el('button', { type: 'button', class: 'ghost', text: `ใช้ค่าทั้งหมดที่ช่องยังว่าง (${emptyKeys.length})`, on: { click: (e) => { emptyKeys.forEach(([, , b]) => !b.disabled && b.click()); e.target.disabled = true; } } }));
+    } else if (!(out && out.readable === false)) parts.push(el('p', { class: 'muted', text: 'ไม่พบค่าสำหรับฟิลด์ของเอกสารประเภทนี้ในหน้านี้' }));
+
+    const tx = Array.isArray(out && out.transactions) ? out.transactions.filter((t) => t && (t.amount != null || t.raw_code)) : [];
+    if (spec.tx && tx.length) parts.push(txBlock(f, fi, tx));
+    const obs = (Array.isArray(out && out.observations) ? out.observations : []).filter((x) => typeof x === 'string' && x.trim());
+    if (obs.length) parts.push(el('div', { class: 'xobs' }, [el('strong', { text: 'ข้อสังเกตจาก AI (ไม่ใช่ผลตรวจ — ตรวจเทียบภาพ):' }), el('ul', {}, obs.map((o) => el('li', { text: o })))]));
+    parts.push(el('p', { class: 'muted xnote', text: 'ค่าที่ AI ไม่ใส่ = มองไม่เห็นหรือไม่แน่ใจ — ให้ดูภาพแล้วกรอกเอง. ค่าที่ “ใช้แล้ว” จะถูกบันทึกที่มา (ไฟล์/หน้า/วิธี/ความมั่นใจ) ไว้ในไฟล์ JSON ที่ดาวน์โหลด' }));
+    results.replaceChildren(...parts);
+  }
+
+  function txBlock(f, fi, tx) {
+    const items = tx.map((t) => {
+      const code = String(t.raw_code || '').trim();
+      const type = fi.txn[code] || 'UNKNOWN';
+      const skip = fi.noRow.has(code) || t.amount == null || String(t.amount).trim() === '';
+      const fd = formDate(t.date || '', t.calendar);
+      return { t, code, type, fd, row: { date: fd.value, type, amount: String(t.amount || '').trim(), desc: (code + ' ' + (t.description || '')).trim() }, pick: !skip && type === 'PAYMENT', skip };
+    });
+    const tb = el('tbody');
+    items.forEach((it) => {
+      it.chk = el('input', { type: 'checkbox', checked: it.pick || null, disabled: it.skip || it.fd.bad || null, 'aria-label': 'เพิ่มรายการ ' + it.row.desc });
+      tb.append(el('tr', { class: it.skip ? 'skip' : '' }, [
+        el('td', {}, [it.chk]), el('td', { text: it.fd.value }), el('td', { text: it.code || '—' }), el('td', { text: it.t.description || '' }),
+        el('td', { text: it.t.amount != null ? String(it.t.amount) : '' }), el('td', { text: it.skip ? 'ไม่ใช่รายการเงิน' : it.type + (it.type === 'UNKNOWN' ? ' (ไม่มี mapping)' : '') }),
+        el('td', { text: CONF[it.t.confidence] || '?' }),
+      ]));
+    });
+    const addBtn = el('button', { type: 'button', class: 'ghost', text: 'เพิ่มรายการที่เลือกลงตาราง Statement (หัวข้อ 4)' });
+    addBtn.addEventListener('click', () => {
+      const chosen = items.filter((i) => i.chk.checked && !i.chk.disabled);
+      const n = UI.addTransactions(chosen.map((i) => i.row));
+      chosen.forEach((i) => prov.push({ field: 'transactions[]', value: i.row, source_file: f.name, source_page: f.page, doc_type: f.type, fi: fiSel.value, method: 'AI_VISION_SUGGESTION_REVIEWER_ACCEPTED', confidence: i.t.confidence || null, raw_code: i.code || null, type_basis: fi.txn[i.code] ? 'FI_PROFILE_UNVERIFIED' : 'DEFAULT_UNKNOWN', accepted_at: new Date().toISOString() }));
+      addBtn.textContent = n + ' รายการถูกเพิ่ม (ข้ามรายการที่ซ้ำ)'; addBtn.disabled = true;
+    });
+    return el('div', { class: 'xtx' }, [
+      el('strong', { text: 'รายการเดินบัญชีที่ AI อ่านได้' }),
+      el('p', { class: 'muted', text: fi.txnNote + ' — รายการที่เลือกไว้ล่วงหน้าเฉพาะที่เป็น PAYMENT ตาม mapping; รายการประเภทอื่นเลือกเองหลังตรวจ' }),
+      el('div', { class: 'tblwrap' }, [el('table', { class: 'in xt-tbl' }, [el('thead', {}, [el('tr', {}, ['', 'วันที่', 'รหัส', 'รายการ', 'จำนวนเงิน', 'ประเภทที่จะใส่', 'มั่นใจ'].map((h) => el('th', { text: h })))]), tb])]),
+      addBtn,
+    ]);
+  }
+
+  // refresh enable state when document changes
+  window.PGS10_EXTRACT = { DOC_FIELDS, FI_PROFILES, formDate };
+})();

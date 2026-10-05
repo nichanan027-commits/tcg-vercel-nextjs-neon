@@ -360,7 +360,7 @@
   function downloadJson() {
     if (!lastRun) return;
     const lg = String(lastRun.data.id_lg_screen || 'case').replace(/[^\w.-]+/g, '_');
-    const blob = new Blob([JSON.stringify({ rule_version: E.RULE_VERSION, exported_at: new Date().toISOString(), input: lastRun.data, result: lastRun.audit }, null, 2)], { type: 'application/json' });
+    const blob = new Blob([JSON.stringify({ rule_version: E.RULE_VERSION, exported_at: new Date().toISOString(), input: lastRun.data, result: lastRun.audit, provenance: window.PGS10_PROV ? window.PGS10_PROV.list() : [] }, null, 2)], { type: 'application/json' });
     const a = el('a', { href: URL.createObjectURL(blob), download: `pgs10-${lg}.json` });
     document.body.append(a);
     a.click();
@@ -381,6 +381,27 @@
   $('#btnImport').addEventListener('click', () => $('#fileImport').click());
   // JSON import is shared with the documents panel (docs.js routes dropped / selected JSON files here)
   window.PGS10_UI = {
+    getField: (k) => { const n = form.querySelector(`[data-k="${k}"]`); return n ? n.value : null; },
+    setField(k, v) {
+      const n = form.querySelector(`[data-k="${k}"]`);
+      if (!n || n.type === 'checkbox') return false;
+      n.value = v;
+      n.dispatchEvent(new Event('input', { bubbles: true }));
+      n.dispatchEvent(new Event('change', { bubbles: true }));
+      return true;
+    },
+    addTransactions(rows) {
+      const t = tableEl('transactions');
+      const existing = [...t.querySelectorAll('tbody tr')].map((tr) => { const r = {}; tr.querySelectorAll('[data-c]').forEach((n) => { r[n.getAttribute('data-c')] = n.value; }); return r; });
+      if (existing.length === 1 && !Object.values(existing[0]).some((v) => v && v !== 'PAYMENT')) { t._clear(); existing.length = 0; }
+      let added = 0;
+      rows.forEach((r) => {
+        if (existing.some((e) => e.date === r.date && e.type === r.type && String(e.amount).replace(/,/g, '') === String(r.amount).replace(/,/g, ''))) return;
+        t._addRow(r); added++;
+      });
+      form.dispatchEvent(new Event('input', { bubbles: true }));
+      return added;
+    },
     importJson(t) {
       try {
         const j = JSON.parse(t);

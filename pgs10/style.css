@@ -53,8 +53,8 @@ table.in input,table.in select{padding:5px 6px}
 .ev{margin-top:2px}
 
 /* ---- results ---- */
-.side{position:sticky;top:76px}
-.result{max-height:calc(100vh - 140px);overflow:auto;background:var(--panel);border:1px solid var(--line);border-radius:0 0 12px 12px;padding:14px}
+.side{position:sticky;top:var(--topH,76px)}
+.result{max-height:calc(100vh - var(--topH,76px) - 56px);overflow:auto;background:var(--panel);border:1px solid var(--line);border-radius:0 0 12px 12px;padding:14px}
 @media (max-width:980px){.side{position:static}.result{max-height:none}}
 .tabs{display:flex;gap:4px}
 .tabs button{border-radius:10px 10px 0 0;border-bottom:none;background:var(--na-bg);padding:8px 14px}
@@ -121,3 +121,16 @@ table.in input,table.in select{padding:5px 6px}
 .foot{margin-top:12px;display:flex;gap:8px;flex-wrap:wrap}
 .foot small{color:var(--muted);flex-basis:100%}
 .vh{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+
+/* AI reading (extract.js) */
+.xt{margin-top:12px;border:1px solid var(--line);border-radius:10px;padding:10px 12px;background:var(--panel)}
+.xt h3{margin:0 0 4px;font-size:15px}
+.xnote{font-size:12.5px;margin:4px 0}
+.xrow{display:flex;flex-wrap:wrap;gap:8px;align-items:end;margin:8px 0}.xrow .f{flex:1;min-width:150px}
+.xstatus{min-height:1.3em;margin:6px 0;font-size:13px}.xstatus.bad,.xwarn{color:var(--fail)}
+.xhead{font-size:12.5px;color:var(--muted);margin:10px 0 4px}
+.xt-tbl td,.xt-tbl th{font-size:12.5px;vertical-align:top}.xt-tbl .q{color:var(--muted);max-width:180px}
+.xt-tbl tr.c-low td:first-child{box-shadow:inset 3px 0 0 var(--fail)}.xt-tbl tr.c-medium td:first-child{box-shadow:inset 3px 0 0 var(--accent)}
+.xt-tbl tr.skip td{color:var(--muted)}
+.xobs{margin:10px 0;padding:8px 10px;border:1px dashed var(--line);border-radius:8px;font-size:13px}.xobs ul{margin:4px 0 0;padding-left:18px}
+.xtx{margin-top:10px}
