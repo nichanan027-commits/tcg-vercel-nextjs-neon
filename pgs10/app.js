@@ -379,10 +379,9 @@
   $('#btnRun').addEventListener('click', () => run(true));
   $('#btnClear').addEventListener('click', () => { writeForm({}); $('#sampleSel').value = ''; autoRun = false; lastRun = null; $('#result').replaceChildren(el('div', { class: 'empty' }, [el('p', { text: 'ล้างฟอร์มแล้ว' })])); SECTIONS.forEach((s) => { sectionEls[s.id].st.hidden = true; }); });
   $('#btnImport').addEventListener('click', () => $('#fileImport').click());
-  $('#fileImport').addEventListener('change', (e) => {
-    const f = e.target.files[0];
-    if (!f) return;
-    f.text().then((t) => {
+  // JSON import is shared with the documents panel (docs.js routes dropped / selected JSON files here)
+  window.PGS10_UI = {
+    importJson(t) {
       try {
         const j = JSON.parse(t);
         writeForm(j.input || j);
@@ -390,7 +389,10 @@
       } catch (err) {
         alert('อ่านไฟล์ JSON ไม่ได้: ' + err.message);
       }
-    });
+    },
+  };
+  $('#fileImport').addEventListener('change', (e) => {
+    if (window.PGS10_DOCS) window.PGS10_DOCS.addFiles(e.target.files);
     e.target.value = '';
   });
   // after the first run, re-check as the reviewer edits

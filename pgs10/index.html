@@ -11,15 +11,15 @@
 <header class="top">
   <div>
     <h1>PGS 10 Claim Checker <span class="tag">Prototype</span></h1>
-    <p class="sub">Rule Engine ตาม <span id="ruleVersion"></span> · กรอกข้อมูลเอง (ยังไม่อ่าน PDF) · ข้อมูลไม่ถูกส่งออกจากเบราว์เซอร์และไม่ถูกบันทึกอัตโนมัติ</p>
+    <p class="sub">Rule Engine ตาม <span id="ruleVersion"></span> · กรอกข้อมูลเอง · เปิดเอกสารเคส (PDF/รูป) ดูข้างฟอร์มได้ แต่ระบบไม่ดึงข้อมูลจากเอกสารให้ · ข้อมูลและไฟล์ไม่ถูกส่งออกจากเบราว์เซอร์และไม่ถูกบันทึกอัตโนมัติ</p>
   </div>
   <div class="tools">
     <label class="sr">ตัวอย่างเคส
       <select id="sampleSel"><option value="">— โหลดเคสตัวอย่าง (สมมติ) —</option></select>
     </label>
     <button type="button" id="btnClear" class="ghost">ล้างฟอร์ม</button>
-    <button type="button" id="btnImport" class="ghost">นำเข้า JSON</button>
-    <input type="file" id="fileImport" accept="application/json,.json" hidden>
+    <button type="button" id="btnImport" class="ghost">นำเข้าไฟล์</button>
+    <input type="file" id="fileImport" multiple hidden>
     <button type="button" id="btnRun" class="primary">ตรวจสอบ</button>
   </div>
 </header>
@@ -27,17 +27,26 @@
 <main class="layout">
   <form id="form" autocomplete="off" onsubmit="return false"></form>
 
-  <aside id="result" class="result" aria-live="polite">
-    <div class="empty">
-      <p><strong>ยังไม่ได้ตรวจ</strong></p>
-      <p>กรอกข้อมูลทางซ้าย (หรือโหลดเคสตัวอย่างด้านบน) แล้วกด “ตรวจสอบ” — ผลจะแสดงทั้ง 22 Controls พร้อมเหตุผลและหลักฐานที่ใช้</p>
-      <p class="muted">HOLD ≠ FAIL: ข้อมูลไม่ครบ/เอกสารไม่สมบูรณ์ = พักการพิจารณา ไม่ใช่ตัดสินว่าผิดหลักเกณฑ์</p>
+  <div class="side">
+    <div class="tabs" role="tablist">
+      <button type="button" role="tab" id="tabResult" aria-selected="true" aria-controls="result">ผลตรวจ</button>
+      <button type="button" role="tab" id="tabDocs" aria-selected="false" aria-controls="docs">เอกสารเคส <span id="docCount" class="badge" hidden></span></button>
     </div>
-  </aside>
+  <aside id="result" class="result" aria-live="polite">
+      <div class="empty">
+        <p><strong>ยังไม่ได้ตรวจ</strong></p>
+        <p>กรอกข้อมูลทางซ้าย (หรือโหลดเคสตัวอย่างด้านบน) แล้วกด “ตรวจสอบ” — ผลจะแสดงทั้ง 22 Controls พร้อมเหตุผลและหลักฐานที่ใช้</p>
+        <p class="muted">HOLD ≠ FAIL: ข้อมูลไม่ครบ/เอกสารไม่สมบูรณ์ = พักการพิจารณา ไม่ใช่ตัดสินว่าผิดหลักเกณฑ์</p>
+      </div>
+    </aside>
+    <section id="docs" class="result" role="tabpanel" aria-labelledby="tabDocs" hidden></section>
+  </div>
 </main>
 
 <script src="engine.js"></script>
 <script src="samples.js"></script>
 <script src="app.js"></script>
+<script src="docs.js"></script>
+<script src="tabs.js"></script>
 </body>
 </html>
