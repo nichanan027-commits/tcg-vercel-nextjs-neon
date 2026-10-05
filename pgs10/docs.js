@@ -112,6 +112,7 @@
     if (skippedJson) alert('นำเข้า JSON ได้ครั้งละ 1 ไฟล์ — ข้ามอีก ' + skippedJson + ' ไฟล์');
     if (firstDoc) { select(firstDoc.id); window.PGS10_TABS && window.PGS10_TABS.show('docs'); }
     renderList();
+    if (firstDoc && window.PGS10_EXTRACT && window.PGS10_EXTRACT.auto) window.PGS10_EXTRACT.auto(firstDoc);
   }
   function remove(id) {
     const i = files.findIndex((f) => f.id === id);

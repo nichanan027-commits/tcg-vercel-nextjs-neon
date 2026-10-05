@@ -105,7 +105,8 @@
     const page = await f.pdf.getPage(f.page);
     return { page, kind: 'pdf' };
   }
-  async function capture(f, scope) {
+  async function capture(f, scope, px) {
+    const TARGET = px || TARGET_PX;
     const src = await pageSource(f);
     // visible fraction of the displayed page (0..1) — whole page when scope = 'page'
     let fx0 = 0, fy0 = 0, fx1 = 1, fy1 = 1;
@@ -120,7 +121,7 @@
     let full = document.createElement('canvas');
     if (src.kind === 'pdf') {
       const base = src.page.getViewport({ scale: 1, rotation: f.rot });
-      let scale = Math.sqrt((TARGET_PX / frac) / (base.width * base.height));
+      let scale = Math.sqrt((TARGET / frac) / (base.width * base.height));
       scale = Math.min(scale, Math.sqrt(MAX_PX / (base.width * base.height)));
       const vp = src.page.getViewport({ scale, rotation: f.rot });
       full.width = Math.floor(vp.width); full.height = Math.floor(vp.height);
@@ -254,42 +255,94 @@
     ].join('\n\n');
   }
 
-  allBtn.addEventListener('click', async () => {
-    const f = I.cur();
+  // two passes so a 20+ page bundle finishes in minutes: (A) quick classification of every page, (B) full read of the pages whose type has fields
+  const POOL = 2, MAX_PAGES = 60, FATAL = ['cancelled', 'not_granted', 'rate_limited', 'session_expired', 'sampling_disabled', 'capability_disabled'];
+  const TYPE_KEYS = Object.keys(DOC_FIELDS);
+  function buildClassifyPrompt(f, p) {
+    return ['จัดประเภทหน้าเอกสารภาษาไทยหนึ่งหน้า (ไฟล์ ' + f.name + ' หน้า ' + p + ') ที่อยู่ในชุดเอกสารเคสค้ำประกัน PGS 10. ภาพอาจเอียง/หมุน/สแกน.',
+      'ประเภท:\n' + TYPE_KEYS.map((t) => `- ${t}: ${D.TYPE_LABEL[t]}. ${DOC_FIELDS[t].note}`).join('\n') + '\n- OTHER: เอกสารอื่น (บัตรประชาชน/KYC, แผนที่, ข้อความสัญญาล้วน, ใบปะหน้า ฯลฯ)\n- UNREADABLE: อ่านไม่ได้เลย',
+      'ถ้าเป็นหน้าต่อของเอกสารที่เห็นเป็นตาราง Statement ให้เป็น STATEMENT. ตอบ JSON อย่างเดียว: {"doc_type": "<ชื่อประเภท>"}'].join('\n\n');
+  }
+  async function runPool(items, n, worker, signal) {
+    let i = 0, fatal = null;
+    await Promise.all(Array.from({ length: Math.min(n, items.length) }, async () => {
+      while (!fatal && i < items.length && !signal.aborted) { const it = items[i++]; try { await worker(it); } catch (e) { if (e && FATAL.includes(e.code)) fatal = e; } }
+    }));
+    if (fatal) throw fatal;
+    if (signal.aborted) throw { code: 'cancelled' };
+  }
+  async function runBatch(f, auto) {
     results.replaceChildren();
-    if (!f || f.kind === 'other') return setStatus('เลือกเอกสาร PDF หรือรูปภาพก่อน', true);
-    if (!consentChk.checked) return setStatus('ติ๊กยืนยันการส่งภาพให้ AI ก่อน', true);
     const fi = FI_PROFILES[fiSel.value];
     ctl = new AbortController(); runBtn.disabled = allBtn.disabled = true; stopBtn.hidden = false;
     const pages = [];
     try {
       if (f.kind === 'pdf' && !f.pdf) { const lib = await I.loadPdfLib(); f.pdf = await lib.getDocument({ data: new Uint8Array(await f.blob.arrayBuffer()) }).promise; f.pages = f.pdf.numPages; }
-      const n = f.kind === 'pdf' ? f.pdf.numPages : 1, keepPage = f.page;
-      for (let p = 1; p <= n; p++) {
-        if (ctl.signal.aborted) throw { code: 'cancelled' };
-        setStatus(`กำลังอ่านหน้า ${p}/${n}… (ประมาณ 10–60 วินาทีต่อหน้า; กด “หยุด” ได้)`);
-        f.page = p;
+      const n = Math.min(f.kind === 'pdf' ? f.pdf.numPages : 1, MAX_PAGES);
+      const cls = {}; let done = 0;
+      // pass A — classify (fast tier, smaller image)
+      await runPool(Array.from({ length: n }, (_, i) => i + 1), POOL, async (p) => {
+        const g = Object.assign({}, f, { page: p });
         try {
-          const [cap, text] = await Promise.all([capture(f, 'page'), textLayer(f)]);
-          const out = await sample.json(buildBatchPrompt(f, p, fi, text), { images: cap.blob, signal: ctl.signal, cache: false });
-          pages.push({ page: p, out, text: text === null ? 'unknown' : text ? 'yes' : 'no', w: cap.width, h: cap.height });
-        } catch (e) {
-          if (e && ['cancelled', 'not_granted', 'rate_limited', 'session_expired', 'sampling_disabled', 'capability_disabled'].includes(e.code)) { f.page = keepPage; pages.push({ page: p, error: e.code, stop: true }); throw e; }
-          pages.push({ page: p, error: (e && e.code) || 'error' });
-        }
-      }
-      f.page = keepPage;
-      setStatus(`อ่านครบ ${n} หน้า — ตรวจสรุปด้านล่างแล้วกด “ใช้ค่าที่มั่นใจ แล้วตรวจสอบ”`);
+          const cap = await capture(g, 'page', 0.5e6);
+          const o = await sample.json(buildClassifyPrompt(f, p), { images: cap.blob, signal: ctl.signal, cache: false, modelTier: 'quick' });
+          cls[p] = o && o.doc_type;
+        } catch (e) { if (e && FATAL.includes(e.code)) throw e; cls[p] = null; }
+        setStatus(`จัดประเภทหน้า ${++done}/${n}…`);
+      }, ctl.signal);
+      // pass B — read the pages that have fields to fill
+      const todo = Object.keys(cls).map(Number).filter((p) => DOC_FIELDS[cls[p]]).sort((x, y) => x - y);
+      done = 0;
+      const out = {};
+      await runPool(todo, POOL, async (p) => {
+        const g = Object.assign({}, f, { page: p, type: cls[p] });
+        try {
+          const [cap, text] = await Promise.all([capture(g, 'page'), textLayer(g)]);
+          const o = await sample.json(buildPrompt(g, DOC_FIELDS[cls[p]], fi, text), { images: cap.blob, signal: ctl.signal, cache: false });
+          out[p] = { page: p, out: Object.assign({}, o, { doc_type: cls[p] }), text: text === null ? 'unknown' : text ? 'yes' : 'no', w: cap.width, h: cap.height };
+        } catch (e) { if (e && FATAL.includes(e.code)) throw e; out[p] = { page: p, error: (e && e.code) || 'error' }; }
+        setStatus(`อ่านรายละเอียดหน้าที่มีข้อมูล ${++done}/${todo.length}…`);
+      }, ctl.signal);
+      for (let p = 1; p <= n; p++) pages.push(out[p] || (cls[p] ? { page: p, out: { doc_type: cls[p] === 'UNREADABLE' ? 'UNREADABLE' : 'OTHER' } } : { page: p, error: 'classify_failed' }));
+      setStatus(auto ? 'อ่านครบแล้ว — กำลังใส่ค่าและตรวจ…' : `อ่านครบ ${n} หน้า — ตรวจสรุปด้านล่างแล้วกด “ใช้ค่าที่มั่นใจ แล้วตรวจสอบ”`);
     } catch (e) {
-      const stopped = pages.filter((x) => !x.error).length;
-      setStatus((e && e.code === 'cancelled' ? 'หยุดแล้ว' : 'หยุดกลางทาง (' + ((e && e.code) || (e && e.message) || 'error') + ')') + ` — อ่านสำเร็จ ${stopped} หน้า; แสดงผลเท่าที่อ่านได้`, !(e && e.code === 'cancelled'));
+      const ok = Object.keys(pages).length;
+      setStatus((e && e.code === 'cancelled' ? 'หยุดแล้ว' : 'หยุดกลางทาง (' + ((e && e.code) || (e && e.message) || 'error') + ')') + ' — ไม่มีการใส่ค่าให้อัตโนมัติ', !(e && e.code === 'cancelled'));
+      auto = false;
     } finally {
       runBtn.disabled = allBtn.disabled = !sample || !canImages; stopBtn.hidden = true; ctl = null;
-      if (pages.some((x) => !x.error)) renderBatch(f, fi, pages);
+      if (pages.some((x) => !x.error)) renderBatch(f, fi, pages, auto);
     }
+  }
+  allBtn.addEventListener('click', () => {
+    const f = I.cur();
+    if (!f || f.kind === 'other') return setStatus('เลือกเอกสาร PDF หรือรูปภาพก่อน', true);
+    if (!consentChk.checked) return setStatus('ติ๊กยืนยันการส่งภาพให้ AI ก่อน', true);
+    runBatch(f, false);
   });
 
-  function renderBatch(f, fi, pages) {
+  // “throw the file in and get a result”: remembered consent + auto toggle (browser storage is only a convenience; may be unavailable)
+  const store = { get: (k) => { try { return localStorage.getItem(k); } catch (e) { return null; } }, set: (k, v) => { try { localStorage.setItem(k, v); } catch (e) { /* ignore */ } } };
+  const autoChk = el('input', { type: 'checkbox', id: 'xAuto' });
+  box.insertBefore(el('label', { class: 'chk' }, [autoChk, el('span', { text: 'นำเข้าไฟล์แล้วอ่าน + ตรวจให้อัตโนมัติ' })]), box.querySelector('.xrow'));
+  if (store.get('pgs10.ai.consent') === '1') { consentChk.checked = true; autoChk.checked = store.get('pgs10.ai.auto') !== '0'; }
+  consentChk.addEventListener('change', () => store.set('pgs10.ai.consent', consentChk.checked ? '1' : '0'));
+  autoChk.addEventListener('change', () => store.set('pgs10.ai.auto', autoChk.checked ? '1' : '0'));
+  let pendingAuto = null;
+  function auto(f) {
+    if (!f || f.kind === 'other' || !sample || !canImages) return;
+    if (!consentChk.checked) {
+      pendingAuto = f;
+      const go = el('button', { type: 'button', class: 'primary', text: 'ตกลง — ส่งภาพให้ AI อ่านและตรวจให้เลย' });
+      go.addEventListener('click', () => { consentChk.checked = true; autoChk.checked = true; store.set('pgs10.ai.consent', '1'); store.set('pgs10.ai.auto', '1'); if (pendingAuto) runBatch(pendingAuto, true); pendingAuto = null; });
+      results.replaceChildren(el('div', { class: 'xconsent' }, [el('p', { text: 'ระบบจะส่งภาพทุกหน้าของไฟล์ “' + f.name + '” ไปให้ Claude ประมวลผล (ผ่านบัญชีของผู้เปิดหน้านี้) แล้วใส่ค่าและตรวจให้อัตโนมัติ จำการยืนยันนี้ไว้ในเบราว์เซอร์' }), go]));
+      return setStatus('รอการยืนยันครั้งแรก');
+    }
+    if (autoChk.checked) runBatch(f, true);
+  }
+  window.PGS10_EXTRACT = { DOC_FIELDS, FI_PROFILES, formDate, auto };
+
+  function renderBatch(f, fi, pages, autoApply) {
     const cand = {}; // key -> [{value, fd, page, type, conf, quote}]
     const txAll = [];
     const perPage = pages.map((pg) => {
@@ -357,6 +410,15 @@
     });
     parts.push(el('div', { class: 'xrow' }, [goBtn]), el('p', { class: 'muted xnote', text: 'ปุ่มนี้ใช้เฉพาะค่าที่ “ไม่ขัดกันระหว่างหน้า ความมั่นใจไม่ต่ำ และช่องยังว่าง” — ค่าที่ขัดกันหรือต่างจากฟอร์มต้องเลือกเองทีละค่า. ผลตรวจจะยังมี “ตรวจไม่ได้/พัก” ในข้อที่ต้องให้ผู้ตรวจยืนยันจากภาพ (เช่น เอกสารครบถ้วนทางภาพ) และช่องที่ AI อ่านไม่ได้ — เป็นไปตามหลัก ไม่ใช่ข้อผิดพลาด' }));
     results.replaceChildren(...parts);
+    if (autoApply) {
+      const added = applicable.filter((r) => apply(r.key, r.pick, 'AI_VISION_BATCH_AUTO_APPLIED')).length;
+      const txBtn = results.querySelector('.xtx button');
+      if (txBtn && !txBtn.disabled) txBtn.click();
+      goBtn.textContent = `ใช้แล้ว ${added} ค่า (อัตโนมัติ)`; goBtn.disabled = true;
+      const skipped = rows.length - added - rows.filter((r) => r.state === 'same').length;
+      setStatus(`ใส่ค่าให้อัตโนมัติ ${added} ค่า` + (skipped > 0 ? ` · ข้าม ${skipped} ค่า (ขัดกันระหว่างหน้า / ต่างจากฟอร์ม / มั่นใจต่ำ — ดูตารางในแท็บนี้)` : '') + ' · ผลตรวจอยู่ในแท็บ “ผลตรวจ”');
+      document.querySelector('#btnRun').click(); window.PGS10_TABS && window.PGS10_TABS.show('result');
+    }
   }
 
   // ------------------------------------------------------------ suggestions
@@ -436,6 +498,4 @@
     ]);
   }
 
-  // refresh enable state when document changes
-  window.PGS10_EXTRACT = { DOC_FIELDS, FI_PROFILES, formDate };
 })();

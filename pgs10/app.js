@@ -335,7 +335,12 @@
       el('button', { type: 'button', text: 'ดาวน์โหลดผล + ข้อมูล (JSON)', on: { click: downloadJson } }),
       el('small', { text: 'ไฟล์ JSON มีข้อมูลที่กรอกทั้งหมด (อาจมีชื่อผู้กู้/เลขบัญชี) — เก็บตามระดับชั้นความลับของเคส' }),
     ]);
-    box.append(banner, chips, list, foot);
+    const nAi = window.PGS10_PROV ? window.PGS10_PROV.list().filter((x) => x.field !== 'transactions[]').length : 0;
+    const aiBanner = nAi ? el('div', { class: 'aibanner' }, [
+      el('strong', { text: `ผลนี้ใช้ค่าที่ AI อ่านจากเอกสาร ${nAi} ค่า — ยังไม่มีผู้ตรวจยืนยันกับภาพ` }),
+      el('span', { text: ' · ช่อง “ภาพจริงเห็นครบ” ไม่ได้ถูกใส่ให้ (ข้อที่ต้องตรวจภาพจึงยังเป็น “ตรวจไม่ได้”) · ช่องที่ AI อ่านไม่ได้/ไม่แน่ใจเว้นว่างไว้ · ดูที่มาของค่าในแท็บ “เอกสารเคส” หรือในไฟล์ JSON ที่ดาวน์โหลด' }),
+    ]) : null;
+    box.append(...(aiBanner ? [aiBanner] : []), banner, chips, list, foot);
 
     // per-section badge in the form
     SECTIONS.forEach((s) => {

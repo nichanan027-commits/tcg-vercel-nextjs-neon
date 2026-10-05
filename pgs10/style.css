@@ -136,3 +136,5 @@ table.in input,table.in select{padding:5px 6px}
 .xtx{margin-top:10px}
 .xt-tbl tr.s-conflict td:first-child,.xt-tbl tr.s-differs td:first-child{box-shadow:inset 3px 0 0 var(--fail)}.xt-tbl tr.s-low td:first-child{box-shadow:inset 3px 0 0 var(--accent)}.xt-tbl tr.s-same td{color:var(--muted)}
 .xpages{margin:8px 0;font-size:13px}.xpages ul{margin:4px 0;padding-left:18px}.lnk{padding:0 6px;font-size:12.5px}
+.aibanner{border:1px solid var(--accent);background:var(--na-bg);border-radius:10px;padding:8px 12px;margin-bottom:10px;font-size:13px}
+.xconsent{margin:10px 0;padding:12px;border:1px solid var(--accent);border-radius:10px;background:var(--na-bg)}
