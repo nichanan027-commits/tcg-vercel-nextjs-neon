@@ -134,3 +134,5 @@ table.in input,table.in select{padding:5px 6px}
 .xt-tbl tr.skip td{color:var(--muted)}
 .xobs{margin:10px 0;padding:8px 10px;border:1px dashed var(--line);border-radius:8px;font-size:13px}.xobs ul{margin:4px 0 0;padding-left:18px}
 .xtx{margin-top:10px}
+.xt-tbl tr.s-conflict td:first-child,.xt-tbl tr.s-differs td:first-child{box-shadow:inset 3px 0 0 var(--fail)}.xt-tbl tr.s-low td:first-child{box-shadow:inset 3px 0 0 var(--accent)}.xt-tbl tr.s-same td{color:var(--muted)}
+.xpages{margin:8px 0;font-size:13px}.xpages ul{margin:4px 0;padding-left:18px}.lnk{padding:0 6px;font-size:12.5px}

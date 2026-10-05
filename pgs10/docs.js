@@ -230,5 +230,5 @@
   let rzT; window.addEventListener('resize', () => { clearTimeout(rzT); rzT = setTimeout(() => { const f = cur(); if (f && f.kind !== 'other') show(); }, 200); });
 
   renderList(); show();
-  window.PGS10_DOCS = { addFiles, count: () => files.length, TYPES, TYPE_LABEL, _int: { cur, stage, loadPdfLib, renderViewerBar, panel, viewer, getFiles: () => files } };
+  window.PGS10_DOCS = { addFiles, count: () => files.length, TYPES, TYPE_LABEL, goto: (n) => go(n), _int: { cur, stage, loadPdfLib, renderViewerBar, panel, viewer, getFiles: () => files } };
 })();

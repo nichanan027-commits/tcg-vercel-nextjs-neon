@@ -184,6 +184,7 @@
   const fiSel = el('select', { 'aria-label': 'รูปแบบเอกสารของธนาคาร' }, Object.entries(FI_PROFILES).map(([k, v]) => el('option', { value: k, text: v.label })));
   const scopeSel = el('select', { 'aria-label': 'ส่วนที่จะส่งให้ AI อ่าน' }, [el('option', { value: 'page', text: 'ทั้งหน้า' }), el('option', { value: 'visible', text: 'เฉพาะส่วนที่เห็นบนจอ (ละเอียดกว่า — ซูมก่อน)' })]);
   const runBtn = el('button', { type: 'button', class: 'primary', text: 'อ่านหน้านี้ด้วย AI' });
+  const allBtn = el('button', { type: 'button', text: 'อ่านทั้งไฟล์ (ทุกหน้า) แล้วสรุป' });
   const stopBtn = el('button', { type: 'button', class: 'ghost', text: 'หยุด', hidden: true });
   const status = el('p', { class: 'xstatus muted', role: 'status', 'aria-live': 'polite' });
   const results = el('div', { class: 'xres' });
@@ -193,7 +194,7 @@
     el('p', { class: 'muted xnote', text: 'ภาพของหน้าที่เลือกจะถูกส่งให้ Claude ประมวลผลผ่านบัญชีของผู้เปิดหน้านี้ (ไม่ถูกเก็บโดยหน้านี้) ผลเป็น “ค่าแนะนำ” — ต้องกด “ใช้ค่า” ทีละรายการ และต้องดูภาพประกอบเสมอ' }),
     el('label', { class: 'chk' }, [consentChk, el('span', { text: 'ยืนยัน: อนุญาตให้ส่งภาพหน้าเอกสารนี้ไปให้ AI อ่าน' })]),
     el('div', { class: 'xrow' }, [el('label', { class: 'f' }, [el('span', { text: 'รูปแบบเอกสารธนาคาร' }), fiSel]), el('label', { class: 'f' }, [el('span', { text: 'ส่วนที่ส่ง' }), scopeSel])]),
-    el('div', { class: 'xrow' }, [runBtn, stopBtn]), status, results);
+    el('div', { class: 'xrow' }, [runBtn, allBtn, stopBtn]), status, results);
 
   let sample = null, canImages = false, ctl = null;
   function setStatus(t, bad) { status.textContent = t || ''; status.classList.toggle('bad', !!bad); }
@@ -203,7 +204,7 @@
       if (sample) { const lim = await sample.limits().catch(() => null); canImages = !!(lim && lim.images); }
     } catch (e) { sample = null; }
     if (!sample || !canImages) {
-      runBtn.disabled = true; consentChk.disabled = true;
+      runBtn.disabled = true; allBtn.disabled = true; consentChk.disabled = true;
       setStatus(!sample ? 'ฟีเจอร์นี้ใช้ได้เฉพาะเมื่อเปิดหน้านี้ผ่านลิงก์ที่เผยแพร่ใน claude.ai (ต้องมีสิทธิ์เรียก Claude) — ตอนนี้ยังใช้ดูเอกสารและกรอกเองได้ตามปกติ' : 'มุมมองนี้ส่งภาพให้ AI ไม่ได้ — ใช้ดูเอกสารและกรอกเองได้ตามปกติ', false);
     }
   })();
@@ -226,9 +227,137 @@
     } catch (e) {
       const m = { cancelled: 'ยกเลิกแล้ว', not_granted: 'ไม่ได้รับอนุญาตให้ใช้ Claude ในหน้านี้', rate_limited: 'เรียกบ่อยเกินไปหรือถึงขีดจำกัดการใช้งาน — ลองใหม่ภายหลัง', image_rejected: 'ภาพถูกปฏิเสธ (ชนิด/ขนาดไม่รองรับ)', invalid_json: 'AI ตอบในรูปแบบที่อ่านไม่ได้ — ลองใหม่ หรือเลือกเฉพาะส่วนที่เห็นบนจอ', refused: 'AI ไม่ตอบคำขอนี้', session_expired: 'ต้องเข้าสู่ระบบ claude.ai ใหม่' }[e && e.code] || 'เรียก AI ไม่สำเร็จ (' + ((e && e.code) || (e && e.message) || 'unknown') + ')';
       setStatus(m, e && e.code !== 'cancelled');
-    } finally { runBtn.disabled = !sample || !canImages; stopBtn.hidden = true; ctl = null; }
+    } finally { runBtn.disabled = allBtn.disabled = !sample || !canImages; stopBtn.hidden = true; ctl = null; }
   });
   stopBtn.addEventListener('click', () => ctl && ctl.abort());
+
+
+  // ------------------------------------------------------------ whole file: classify every page, read it, and consolidate
+  // Real case bundles are ONE PDF holding many document types (claim form, LG, contract, WebCSR, statements, demand letter, postal slip…),
+  // so the document type is decided per page by the AI (shown to the reviewer), not by a tag on the file.
+  const CAT = Object.entries(DOC_FIELDS).map(([t, sp]) => `* ${t} — ${D.TYPE_LABEL[t]}: ${sp.fields.map(([k, l]) => `${k} (${l})`).join('; ')}${sp.tx ? '; + transactions' : ''}. ${sp.note}`).join('\n');
+  function buildBatchPrompt(f, pageNo, fi, text) {
+    return [
+      'คุณอ่านภาพหน้าเอกสารภาษาไทยหนึ่งหน้า (จากไฟล์ที่รวมเอกสารหลายชนิดของเคสค้ำประกัน PGS 10) ผู้ตรวจจะยืนยันทุกค่าเอง — งานของคุณคือ "จัดประเภทหน้า" และ "อ่านตามที่เขียน" ไม่ใช่ตีความหรือตัดสิน',
+      `ไฟล์ ${f.name}, หน้า ${pageNo}. ภาพอาจเอียง/หมุน/สแกนไม่ชัด/มีลายมือ`,
+      `ข้อมูลรูปแบบเอกสารของ ${fi.label}:\n${fi.hint}`,
+      text ? `ข้อความจาก text layer (ใช้ประกอบ ถ้าขัดกับภาพให้เชื่อภาพและบอกใน observations):\n"""${text}"""` : 'หน้านี้ไม่มี text layer — อ่านจากภาพอย่างเดียว',
+      'ประเภทเอกสารที่ระบบรู้จัก และฟิลด์ที่ขอของแต่ละประเภท:\n' + CAT,
+      'ขั้นตอน: (1) เลือก "doc_type" ให้ตรงที่สุดจากรายการด้านบน; ถ้าเป็นเอกสารประเภทอื่น (เช่น KYC, แผนที่, ข้อความสัญญาล้วน, ใบปะหน้า) ให้ "OTHER"; ถ้าอ่านไม่ได้เลย ให้ "UNREADABLE". (2) อ่านเฉพาะฟิลด์ของประเภทที่เลือก (ใช้ key ตามรายการเท่านั้น).',
+      'กติกา:',
+      '1. ใส่เฉพาะค่าที่เห็นชัดเจน ถ้าไม่เห็น/ไม่แน่ใจ/ช่องว่าง ให้ไม่ใส่ key นั้น. ห้ามเดา ห้ามคำนวณ ห้ามปัดเศษ ห้ามแก้ตัวเลขให้ตรงกัน ห้ามนำค่าจากฟิลด์หนึ่งไปใส่อีกฟิลด์ ห้ามนำค่าจากหน้าอื่นมาใส่.',
+      '2. ตัวเลขเงิน/ข้อความ: คัดลอกตามที่เขียน (คงจุลภาค/ทศนิยม).',
+      '3. วันที่: dd/mm/yyyy (แปลงชื่อเดือนไทยเป็นเลข เลขไทยเป็นอารบิก **ห้ามเปลี่ยนปี**) และระบุ "calendar": "BE" ถ้า ≥ 2400 หรือ "CE" ถ้าเป็น ค.ศ.',
+      '4. "quote" = ข้อความสั้น ๆ รอบค่านั้นบนเอกสาร (≤ 80 ตัวอักษร); "confidence" = high | medium | low (ลายมือ/เบลอ/ขอบตัด = low).',
+      '5. observations = สิ่งที่ผู้ตรวจควรรู้ที่ไม่มีช่องรับ หรือความผิดปกติที่เห็น (วันที่หัวเอกสารหลังวันที่พิมพ์, ตัวเลขไม่รวมกัน, หน้าถูกตัด) — บรรยายสิ่งที่เห็น ไม่สรุปว่าผ่าน/ไม่ผ่านเกณฑ์.',
+      'ตอบเป็น JSON อย่างเดียว: {"doc_type": "...", "readable": true, "fields": [{"key": "...", "value": "...", "calendar": "BE|CE|null", "confidence": "high|medium|low", "quote": "..."}], "transactions": [{"date": "dd/mm/yyyy", "raw_code": "...", "description": "...", "amount": "...", "balance": "...", "confidence": "high|medium|low"}], "observations": ["..."]}  (transactions เฉพาะหน้า Statement)',
+    ].join('\n\n');
+  }
+
+  allBtn.addEventListener('click', async () => {
+    const f = I.cur();
+    results.replaceChildren();
+    if (!f || f.kind === 'other') return setStatus('เลือกเอกสาร PDF หรือรูปภาพก่อน', true);
+    if (!consentChk.checked) return setStatus('ติ๊กยืนยันการส่งภาพให้ AI ก่อน', true);
+    const fi = FI_PROFILES[fiSel.value];
+    ctl = new AbortController(); runBtn.disabled = allBtn.disabled = true; stopBtn.hidden = false;
+    const pages = [];
+    try {
+      if (f.kind === 'pdf' && !f.pdf) { const lib = await I.loadPdfLib(); f.pdf = await lib.getDocument({ data: new Uint8Array(await f.blob.arrayBuffer()) }).promise; f.pages = f.pdf.numPages; }
+      const n = f.kind === 'pdf' ? f.pdf.numPages : 1, keepPage = f.page;
+      for (let p = 1; p <= n; p++) {
+        if (ctl.signal.aborted) throw { code: 'cancelled' };
+        setStatus(`กำลังอ่านหน้า ${p}/${n}… (ประมาณ 10–60 วินาทีต่อหน้า; กด “หยุด” ได้)`);
+        f.page = p;
+        try {
+          const [cap, text] = await Promise.all([capture(f, 'page'), textLayer(f)]);
+          const out = await sample.json(buildBatchPrompt(f, p, fi, text), { images: cap.blob, signal: ctl.signal, cache: false });
+          pages.push({ page: p, out, text: text === null ? 'unknown' : text ? 'yes' : 'no', w: cap.width, h: cap.height });
+        } catch (e) {
+          if (e && ['cancelled', 'not_granted', 'rate_limited', 'session_expired', 'sampling_disabled', 'capability_disabled'].includes(e.code)) { f.page = keepPage; pages.push({ page: p, error: e.code, stop: true }); throw e; }
+          pages.push({ page: p, error: (e && e.code) || 'error' });
+        }
+      }
+      f.page = keepPage;
+      setStatus(`อ่านครบ ${n} หน้า — ตรวจสรุปด้านล่างแล้วกด “ใช้ค่าที่มั่นใจ แล้วตรวจสอบ”`);
+    } catch (e) {
+      const stopped = pages.filter((x) => !x.error).length;
+      setStatus((e && e.code === 'cancelled' ? 'หยุดแล้ว' : 'หยุดกลางทาง (' + ((e && e.code) || (e && e.message) || 'error') + ')') + ` — อ่านสำเร็จ ${stopped} หน้า; แสดงผลเท่าที่อ่านได้`, !(e && e.code === 'cancelled'));
+    } finally {
+      runBtn.disabled = allBtn.disabled = !sample || !canImages; stopBtn.hidden = true; ctl = null;
+      if (pages.some((x) => !x.error)) renderBatch(f, fi, pages);
+    }
+  });
+
+  function renderBatch(f, fi, pages) {
+    const cand = {}; // key -> [{value, fd, page, type, conf, quote}]
+    const txAll = [];
+    const perPage = pages.map((pg) => {
+      if (pg.error) return { page: pg.page, type: null, error: pg.error, n: 0, obs: [] };
+      const o = pg.out || {}, type = DOC_FIELDS[o.doc_type] ? o.doc_type : (o.doc_type === 'UNREADABLE' ? 'UNREADABLE' : 'OTHER');
+      let n = 0;
+      if (type !== 'OTHER' && type !== 'UNREADABLE') {
+        const allowed = new Set(DOC_FIELDS[type].fields.map(([k]) => k));
+        (Array.isArray(o.fields) ? o.fields : []).forEach((r) => {
+          if (!r || !allowed.has(r.key) || r.value == null || String(r.value).trim() === '') return;
+          const fd = isDateKey(r.key) ? formDate(r.value, r.calendar) : { value: String(r.value).trim(), converted: false, bad: false };
+          if (fd.bad) return;
+          (cand[r.key] = cand[r.key] || []).push({ value: fd.value, fd, page: pg.page, type, conf: r.confidence || 'low', quote: r.quote || '', calendar: r.calendar || null }); n++;
+        });
+        if (DOC_FIELDS[type].tx) (Array.isArray(o.transactions) ? o.transactions : []).forEach((t) => { if (t && (t.amount != null || t.raw_code)) txAll.push({ t, page: pg.page }); });
+      }
+      return { page: pg.page, type, n, obs: (Array.isArray(o.observations) ? o.observations : []).filter((x) => typeof x === 'string' && x.trim()) };
+    });
+    const labelOf = (k) => { for (const sp of Object.values(DOC_FIELDS)) { const hit = sp.fields.find(([kk]) => kk === k); if (hit) return hit[1]; } return k; };
+    const apply = (key, c, how) => {
+      if (!UI.setField(key, c.value)) return false;
+      prov.push({ field: key, value: c.value, source_file: f.name, source_page: c.page, doc_type: c.type, fi: fiSel.value, method: how, confidence: c.conf, quote: c.quote || null, calendar_read: c.calendar, converted_ce_to_be: c.fd.converted, scope: 'page', accepted_at: new Date().toISOString() });
+      return true;
+    };
+    // classify each key: consistent (all pages agree) / conflict / low-only / already filled differently
+    const rows = Object.entries(cand).map(([key, list]) => {
+      const vals = [...new Set(list.map((c) => c.value))], cur = (UI.getField(key) || '').trim();
+      const best = list.find((c) => c.conf !== 'low') || null;
+      let state = vals.length > 1 ? 'conflict' : !best ? 'low' : cur && cur !== vals[0] ? 'differs' : cur === vals[0] ? 'same' : 'ready';
+      return { key, list, vals, cur, state, pick: best || list[0] };
+    });
+    const parts = [el('p', { class: 'xhead', text: `${f.name} · สรุปจาก ${pages.filter((x) => !x.error).length}/${pages.length} หน้า` })];
+    // per page strip
+    parts.push(el('details', { class: 'xpages' }, [el('summary', { text: 'หน้าที่ AI จัดประเภทให้ (ตรวจว่าตรงกับภาพ)' }), el('ul', {}, perPage.map((p) => el('li', {}, [
+      el('button', { type: 'button', class: 'ghost lnk', text: 'หน้า ' + p.page, on: { click: () => { f.page = p.page; I.renderViewerBar(); window.PGS10_DOCS.goto && window.PGS10_DOCS.goto(p.page); } } }),
+      el('span', { text: ' — ' + (p.error ? 'อ่านไม่สำเร็จ (' + p.error + ')' : p.type === 'OTHER' ? 'เอกสารอื่น (ไม่มีฟิลด์)' : p.type === 'UNREADABLE' ? 'อ่านไม่ได้' : D.TYPE_LABEL[p.type] + ' · ' + p.n + ' ค่า') }),
+      p.obs.length ? el('ul', {}, p.obs.map((o) => el('li', { class: 'muted', text: o }))) : null,
+    ])))]));
+    const stLabel = { ready: 'พร้อมใช้', same: 'ตรงกับฟอร์ม', differs: 'ต่างจากฟอร์ม', conflict: 'ขัดกันระหว่างหน้า', low: 'มั่นใจต่ำ' };
+    const tb = el('tbody'); const applicable = [];
+    rows.forEach((r) => {
+      const btns = r.state === 'same' ? [] : r.list.map((c) => { const b = el('button', { type: 'button', class: 'ghost', text: `ใช้ค่านี้ (น.${c.page})` }); b.addEventListener('click', () => { if (apply(r.key, c, 'AI_VISION_BATCH_REVIEWER_PICKED')) { b.textContent = '✓ ใช้แล้ว'; b.disabled = true; } }); return b; });
+      if (r.state === 'ready') applicable.push(r);
+      tb.append(el('tr', { class: 's-' + r.state }, [
+        el('td', { text: labelOf(r.key) }),
+        el('td', {}, r.list.map((c) => el('div', {}, [el('strong', { text: c.value }), el('small', { class: 'muted', text: ` น.${c.page} · ${CONF[c.conf] || '?'}${c.fd.converted ? ' · ค.ศ.→พ.ศ.' : ''}${c.quote ? ' · “' + c.quote + '”' : ''}` })]))),
+        el('td', { text: r.cur || '—' }), el('td', { text: stLabel[r.state] }), el('td', {}, btns),
+      ]));
+    });
+    if (rows.length) parts.push(el('div', { class: 'tblwrap' }, [el('table', { class: 'in xt-tbl' }, [el('thead', {}, [el('tr', {}, ['ช่อง', 'ค่าที่อ่านได้ (หน้า · ความมั่นใจ)', 'ค่าในฟอร์มตอนนี้', 'สถานะ', ''].map((h) => el('th', { text: h })))]), tb])]));
+    // transactions (PAYMENT rows by profile are pre-selected; dedupe by date+amount+code)
+    let txPick = [];
+    if (txAll.length) {
+      const seen = new Set(), uniq = txAll.filter(({ t }) => { const k = [t.date, t.raw_code, t.amount].join('|'); if (seen.has(k)) return false; seen.add(k); return true; });
+      parts.push(txBlock(f, fi, uniq.map((u) => u.t)));
+      txPick = uniq;
+    }
+    const obsAll = perPage.filter((p) => p.obs.length).length;
+    if (obsAll) parts.push(el('p', { class: 'muted xnote', text: `มีข้อสังเกตจาก AI ใน ${obsAll} หน้า (เปิด “หน้าที่ AI จัดประเภทให้” ด้านบน) — ไม่ใช่ผลตรวจ` }));
+    const goBtn = el('button', { type: 'button', class: 'primary', text: `ใช้ค่าที่มั่นใจ (${applicable.length}) แล้วตรวจสอบ` });
+    goBtn.addEventListener('click', () => {
+      const added = applicable.filter((r) => apply(r.key, r.pick, 'AI_VISION_BATCH_REVIEWER_ACCEPTED_BULK')).length;
+      goBtn.textContent = `ใช้แล้ว ${added} ค่า — ข้ามค่าที่ขัดกัน/ต่างจากฟอร์ม/มั่นใจต่ำ`; goBtn.disabled = true;
+      document.querySelector('#btnRun').click(); window.PGS10_TABS && window.PGS10_TABS.show('result');
+    });
+    parts.push(el('div', { class: 'xrow' }, [goBtn]), el('p', { class: 'muted xnote', text: 'ปุ่มนี้ใช้เฉพาะค่าที่ “ไม่ขัดกันระหว่างหน้า ความมั่นใจไม่ต่ำ และช่องยังว่าง” — ค่าที่ขัดกันหรือต่างจากฟอร์มต้องเลือกเองทีละค่า. ผลตรวจจะยังมี “ตรวจไม่ได้/พัก” ในข้อที่ต้องให้ผู้ตรวจยืนยันจากภาพ (เช่น เอกสารครบถ้วนทางภาพ) และช่องที่ AI อ่านไม่ได้ — เป็นไปตามหลัก ไม่ใช่ข้อผิดพลาด' }));
+    results.replaceChildren(...parts);
+  }
 
   // ------------------------------------------------------------ suggestions
   const CONF = { high: 'สูง', medium: 'กลาง', low: 'ต่ำ' };
