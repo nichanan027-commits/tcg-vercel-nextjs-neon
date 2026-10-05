@@ -850,6 +850,32 @@
       "requires_evidence_verified": true
     },
     {
+      "code": "CONSECUTIVE_NON_PAYMENT_NOT_MET",
+      "rules": [
+        "PGS10-NPY-001"
+      ],
+      "control_status": "HOLD",
+      "meaning": "มีรายการ PAYMENT ภายใน 3 เดือนปฏิทินนับจาก default_date จึงยังไม่ครบเงื่อนไข (ง) (HOLD ไม่ใช่ FAIL จนกว่าเจ้าของกำหนด — Q-11)",
+      "aliases": [],
+      "detail_codes": [],
+      "review_flag": null,
+      "proposed": true,
+      "owner_status": "PROPOSED_BY_CLAUDE"
+    },
+    {
+      "code": "NON_PAYMENT_PERIOD_NOT_ELAPSED",
+      "rules": [
+        "PGS10-NPY-001"
+      ],
+      "control_status": "HOLD",
+      "meaning": "วันที่ยื่น Claim ยังไม่ถึง default_date + 3 เดือนปฏิทิน (แก้ได้ด้วยเวลา)",
+      "aliases": [],
+      "detail_codes": [],
+      "review_flag": null,
+      "proposed": true,
+      "owner_status": "PROPOSED_BY_CLAUDE"
+    },
+    {
       "code": "POSTAL_ACK_INCOMPLETE",
       "rules": [
         "PGS10-PST-001"

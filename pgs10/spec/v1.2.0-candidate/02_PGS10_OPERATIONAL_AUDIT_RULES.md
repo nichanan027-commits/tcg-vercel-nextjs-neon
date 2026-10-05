@@ -33,7 +33,7 @@ ID ทั้งหมดเป็น Canonical (Master Audit §41); ID เก่
 Program → Identity → Document Completeness → Visual Completeness → Contract → LG/NPL → Transaction Classification → Last Actual Payment → Statement Cut-off → Default → Post-Default Exception → Tracking → Restructure (Route / Exception / Date) → Demand → Historical Debt → Postal → Address → Current Debt → Filing Window → Coverage → Claim Base → Claim Amount → Claim Max → Timeline → Final
 พึ่งพา: Address → Postal · Transaction → Last Payment → Default → Exception → Timeline · Claim Base + Coverage → Claim Amount → Claim Max
 
-## 4. Controls (32)
+## 4. Controls (33)
 
 ### PGS10-ELIG-001 · Project / Product Eligibility
 **Requirement:** REQUIRED_HARD · **ใช้เมื่อ:** เสมอ · **ที่มา:** R#1, M§2 · **Decisions:** DEC-12, DEC-19, DEC-27, DEC-31 · **Legacy aliases:** `PGS10-POL-001@v1.1.0`, `PGS10-POL-003@v1.1.0`
@@ -312,6 +312,25 @@ Program → Identity → Document Completeness → Visual Completeness → Contr
 | `RESTRUCTURE_DATE_SEMANTICS_UNRESOLVED` | HOLD | ความหมายของวันที่ (ลงนาม/อนุมัติ/มีผล/เริ่มบัญชี) ยังไม่ถูกแยก ต้องตรวจหัว Statement | CANDIDATE |
 | `RESTRUCTURE_EVIDENCE_MISSING` | HOLD | ไม่มีเอกสารปรับโครงสร้าง/หัว Statement | CANDIDATE |
 | `MATCHED_STATEMENT_HEADER` (support_code) | PASS_WITH_SUPPORT | วันที่ปรับโครงสร้างตรงหัว Statement (Level 2) แม้ไม่ตรงวันลงนามในเอกสาร | APPROVED |
+
+### PGS10-NPY-001 · Consecutive Non-payment (ง)
+**Requirement:** REQUIRED_HARD · **ใช้เมื่อ:** Case 2, 4, 5 (เงื่อนไข (ง)); Case 1 และ 3 → NOT_APPLICABLE · **ที่มา:** PGS10 หน้า 7 (ง); M§6 · **Decisions:** DEC-44, DEC-45 · **Legacy aliases:** —
+**Inputs:** `product`, `claim_path`, `claim_case_no`, `default_date`, `claim_submission_date`, `first_payment_after_default_date`, `payment_history_status`
+**Logic:**
+- ใช้กับ **Case 2 (SMEs >5 ปี), Case 4 (Small Biz >5 ปี), Case 5 (Start up)** — เงื่อนไข (ง) (หลักเกณฑ์หน้า 7); Case 1 และ 3 → NOT_APPLICABLE (ใช้ (ค) ผ่าน RST-001)
+- `non_payment_period_end = add_calendar_months(default_date, PRM-057 = 3)` (วิธีนับตาม PRM-028)
+- `default_date` หรือ `claim_submission_date` ไม่มี → NOT_TESTABLE `MISSING_INPUT` (REQUIRED_HARD → เคส HOLD ตาม stage); `payment_history_status = INCOMPLETE` → NOT_TESTABLE (STM-001 เป็นผู้ HOLD)
+- `claim_submission_date < non_payment_period_end` → HOLD `NON_PAYMENT_PERIOD_NOT_ELAPSED` (แก้ได้ด้วยเวลา)
+- `first_payment_after_default_date` มีค่าและ `<= non_payment_period_end` → HOLD `CONSECUTIVE_NON_PAYMENT_NOT_MET` (**ไม่ FAIL** จนเจ้าของกำหนด — Q-11)
+- นอกนั้น → PASS (ข้อเสนอของ Claude: ยังไม่ได้บังคับว่าต้องไม่ชำระต่อเนื่องจนถึงวันยื่น — Q-11)
+**Safe-Hold (พารามิเตอร์ที่ยัง OPEN):**
+- `PRM-028` (OPEN): ใช้ CALENDAR_MONTH_CLAMP_END_OF_MONTH (ไม่นับวันตั้งต้น); ถ้าผลต่างกันเมื่อเปลี่ยนเป็นวิธีอื่น (นับรวมวัน/ rollover) → HOLD → `POLICY_PARAMETER_UNRESOLVED`
+**Evidence:** Statement ครบ Origination→Cut-off + หน้าจอ (default_date) + แบบคำขอ (claim_submission_date)
+
+| reason_code | control_status | ความหมาย | สถานะรหัส |
+|---|---|---|---|
+| `CONSECUTIVE_NON_PAYMENT_NOT_MET` | HOLD | มีรายการ PAYMENT ภายใน 3 เดือนปฏิทินนับจาก default_date จึงยังไม่ครบเงื่อนไข (ง) (HOLD ไม่ใช่ FAIL จนกว่าเจ้าของกำหนด — Q-11) | PROPOSED_BY_CLAUDE |
+| `NON_PAYMENT_PERIOD_NOT_ELAPSED` | HOLD | วันที่ยื่น Claim ยังไม่ถึง default_date + 3 เดือนปฏิทิน (แก้ได้ด้วยเวลา) | PROPOSED_BY_CLAUDE |
 
 ### PGS10-DMD-001 · Demand Letter Identity & Existence
 **Requirement:** REQUIRED_HARD · **ใช้เมื่อ:** เสมอ · **ที่มา:** R#11, M§19 · **Decisions:** — · **Legacy aliases:** `PGS10-DMD-POL-001@v1.1.0`, `PGS10-DMD-001@v1.1.0`

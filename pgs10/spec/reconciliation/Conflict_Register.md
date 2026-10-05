@@ -1,10 +1,10 @@
 # Conflict Register
 
-**เวอร์ชัน:** 1.2.0-RECONCILIATION-r4 · ต่อยอดจากภาคผนวก A ของ `02_PGS10_OPERATIONAL_AUDIT_RULES.md` (A-01…A-28) + รายการใหม่จาก Pack v1.1.0 และคำตัดสิน (A-29…A-46)
+**เวอร์ชัน:** 1.2.0-RECONCILIATION-r4 · ต่อยอดจากภาคผนวก A ของ `02_PGS10_OPERATIONAL_AUDIT_RULES.md` (A-01…A-28) + รายการใหม่จาก Pack v1.1.0 และคำตัดสิน (A-29…A-47)
 
 สถานะ: `RESOLVED` ปิดแล้วด้วย DEC · `RESOLVED_PENDING_SOURCE_EDIT` ตัดสินแล้วแต่เอกสารต้นทางต้องแก้ · `PARTIAL` ปิดบางส่วน · `OPEN` ยังไม่ตัดสิน
 
-สรุป: RESOLVED 30, RESOLVED_PENDING_SOURCE_EDIT 1, PARTIAL 5, OPEN 10 · **ขวาง Freeze 0** รายการ
+สรุป: RESOLVED 30, RESOLVED_PENDING_SOURCE_EDIT 1, PARTIAL 6, OPEN 10 · **ขวาง Freeze 0** รายการ
 
 | ID | ประเด็น | ประเภท | แหล่ง | สถานะ | DEC | ผลที่ใช้ตอนนี้ | ขวาง Freeze? |
 |---|---|---|---|---|---|---|---|
@@ -30,7 +30,7 @@
 | A-20 | Historical Debt เมื่อ Trigger ไม่ใช่ Demand | AMBIGUOUS | R, M | OPEN | — | ตรวจเฉพาะ Reference=Demand; อื่น ๆ → NOT_TESTABLE (REQUIRED_HARD → case HOLD) | — |
 | A-21 | Demand waiting / Filing window นับจากวันใด | AMBIGUOUS | M§24-25 | OPEN | — | OPEN + Safe-Hold: invariance ข้าม candidate reference/convention (PRM-021/028) ไม่เช่นนั้น HOLD | — |
 | A-22 | รูปแบบวันที่ พ.ศ./ค.ศ. | SOURCE-ERROR | M§29 | RESOLVED | DEC-12 | ISO CE + calendar metadata (PRM-031) | — |
-| A-23 | Start up = รูปแบบ 2; เงื่อนไข Claim ของ Start up | AMBIGUOUS | R§4, M§2-6 | RESOLVED | DEC-01, DEC-24 | Start up (รูปแบบ 2, กรณี 5) = (ข)+(จ)+(ฉ); ไม่รับ (ค); (ข) = NPL 6 เดือน | — |
+| A-23 | Start up = รูปแบบ 2; เงื่อนไข Claim ของ Start up | AMBIGUOUS | R§4, M§2-6 | RESOLVED | DEC-01, DEC-24, DEC-44 | Start up (รูปแบบ 2, กรณี 5) = (ข)+(ง)+(จ)+(ฉ) ตามหน้า 7 (DEC-44); ไม่รับ (ค); (ข) = NPL 6 เดือน | — |
 | A-24 | current_guarantee_obligation / 'other applicable amounts' | AMBIGUOUS | R§18-19 | OPEN | — | ต้องระบุแหล่งที่มา/องค์ประกอบ | — |
 | A-25 | เคสอยู่หลายกลุ่มใน R§30 | AMBIGUOUS | R§30 | RESOLVED | DEC-13 | แก้ด้วย RULE_ONLY schema (1 เคสมีได้หลาย Rule test) | — |
 | A-26 | ตัวเลขเคสจริงสำหรับ FULL_CASE ไม่มี | AMBIGUOUS | R§30 | OPEN | DEC-13 | Golden เคสจริง = BLOCKED_PENDING_EVIDENCE: ไม่มี input และไม่มี asserted result (DEC-38); ผลเดิมเก็บเป็น manual_baseline_note | — |
@@ -54,6 +54,7 @@
 | A-44 | Band ≤5/>5 ปี ของ Case 1–4 (claim path) นับจากอะไร — ต่างจาก Coverage (contractual tenor) | AMBIGUOUS | M§3.1 vs DEC-30 | RESOLVED | DEC-39 | ยืนยัน (DEC-39): band นับจากวันที่ยื่นเทียบวันออก LG; PRM-054 = APPROVED_OPERATIONAL. ข้อมูลไม่ครบ → HOLD LG_DATA_MISSING | — |
 | A-45 | Default chronology เมื่อ NO_PAYMENT_VERIFIED ต้องใช้ alternative evidence (due-date/FI) — ยังไม่มี Rule อนุมัติ | AMBIGUOUS | DEC-34 | OPEN | DEC-34, DEC-40 | Safe-Hold ยืนยันโดยเจ้าของ (DEC-40): DEF-001 = HOLD POLICY_PARAMETER_UNRESOLVED จนกว่าจะมี alternative evidence rule (PRM-055) — Q-09 | — |
 | A-46 | Coverage tenor ของ LG ที่ถูกต่ออายุ/ขยาย | AMBIGUOUS | DEC-30, LG-001 | OPEN | DEC-30, DEC-41 | Safe-Hold ยืนยันโดยเจ้าของ (DEC-41): LG ต่ออายุและไม่มี guarantee_term ที่ระบุ → HOLD LG_TENOR_UNDETERMINABLE — Q-10 | — |
+| A-47 | เงื่อนไข (ง) ไม่ชำระหนี้ติดต่อกัน 3 เดือน — ไม่มี control ใน Candidate ก่อน DEC-44 (กระทบ Case 2, 4, 5) และนิยามการตรวจยังไม่ผ่านการยืนยัน | GAP | PGS10 หน้า 7 (ง); M§6; DEC-44 | PARTIAL | DEC-45 | เพิ่ม PGS10-NPY-001: ผ่านเมื่อไม่มี PAYMENT ภายใน [default_date, default_date+3 เดือนปฏิทิน] และยื่นหลังครบกำหนด. มี PAYMENT ในช่วง → HOLD CONSECUTIVE_NON_PAYMENT_NOT_MET (ไม่ FAIL); ยื่นก่อนครบ → HOLD NON_PAYMENT_PERIOD_NOT_ELAPSED — Q-11 | — |
 
 ## คำถาม
 

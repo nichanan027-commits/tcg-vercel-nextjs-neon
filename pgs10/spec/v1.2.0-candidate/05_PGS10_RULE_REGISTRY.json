@@ -1832,6 +1832,57 @@
           "note": "Chronology"
         }
       ]
+    },
+    {
+      "id": "PGS10-NPY-001",
+      "name": "Consecutive Non-payment (ง)",
+      "kind": "POLICY",
+      "requirement": "REQUIRED_HARD",
+      "requirement_by_stage": {
+        "PRE_REVIEW": "REQUIRED_HARD",
+        "FINAL_APPROVAL": "REQUIRED_HARD"
+      },
+      "applicable_when": "Case 2, 4, 5 (เงื่อนไข (ง)); Case 1 และ 3 → NOT_APPLICABLE",
+      "inputs": [
+        "product",
+        "claim_path",
+        "claim_case_no",
+        "default_date",
+        "claim_submission_date",
+        "first_payment_after_default_date",
+        "payment_history_status"
+      ],
+      "parameters": [
+        "PRM-057",
+        "PRM-028",
+        "PRM-052"
+      ],
+      "safe_hold": [
+        {
+          "parameter": "PRM-028",
+          "source_status": "OPEN",
+          "behavior": "ใช้ CALENDAR_MONTH_CLAMP_END_OF_MONTH (ไม่นับวันตั้งต้น); ถ้าผลต่างกันเมื่อเปลี่ยนเป็นวิธีอื่น (นับรวมวัน/ rollover) → HOLD",
+          "reason_code": "POLICY_PARAMETER_UNRESOLVED"
+        }
+      ],
+      "evidence": "Statement ครบ Origination→Cut-off + หน้าจอ (default_date) + แบบคำขอ (claim_submission_date)",
+      "upstream_sources": "PGS10 หน้า 7 (ง); M§6",
+      "decisions": [
+        "DEC-44",
+        "DEC-45"
+      ],
+      "support_codes": [],
+      "reasons": [
+        {
+          "code": "CONSECUTIVE_NON_PAYMENT_NOT_MET",
+          "control_status": "HOLD"
+        },
+        {
+          "code": "NON_PAYMENT_PERIOD_NOT_ELAPSED",
+          "control_status": "HOLD"
+        }
+      ],
+      "legacy_aliases": []
     }
   ],
   "reason_codes": [
@@ -2642,6 +2693,32 @@
       "requires_evidence_verified": true
     },
     {
+      "code": "CONSECUTIVE_NON_PAYMENT_NOT_MET",
+      "rules": [
+        "PGS10-NPY-001"
+      ],
+      "control_status": "HOLD",
+      "meaning": "มีรายการ PAYMENT ภายใน 3 เดือนปฏิทินนับจาก default_date จึงยังไม่ครบเงื่อนไข (ง) (HOLD ไม่ใช่ FAIL จนกว่าเจ้าของกำหนด — Q-11)",
+      "aliases": [],
+      "detail_codes": [],
+      "review_flag": null,
+      "proposed": true,
+      "owner_status": "PROPOSED_BY_CLAUDE"
+    },
+    {
+      "code": "NON_PAYMENT_PERIOD_NOT_ELAPSED",
+      "rules": [
+        "PGS10-NPY-001"
+      ],
+      "control_status": "HOLD",
+      "meaning": "วันที่ยื่น Claim ยังไม่ถึง default_date + 3 เดือนปฏิทิน (แก้ได้ด้วยเวลา)",
+      "aliases": [],
+      "detail_codes": [],
+      "review_flag": null,
+      "proposed": true,
+      "owner_status": "PROPOSED_BY_CLAUDE"
+    },
+    {
       "code": "POSTAL_ACK_INCOMPLETE",
       "rules": [
         "PGS10-PST-001"
@@ -3386,7 +3463,7 @@
       "id": "A-23",
       "topic": "Start up = รูปแบบ 2; เงื่อนไข Claim ของ Start up",
       "status": "RESOLVED",
-      "decision_ref": "DEC-01, DEC-24",
+      "decision_ref": "DEC-01, DEC-24, DEC-44",
       "blocks_freeze": false,
       "safe_hold": null
     },
@@ -3622,6 +3699,19 @@
         "ref": "CLM-002",
         "behavior": "LG ต่ออายุและไม่มี guarantee_term ระบุ → HOLD",
         "reason_code": "LG_TENOR_UNDETERMINABLE"
+      }
+    },
+    {
+      "id": "A-47",
+      "topic": "เงื่อนไข (ง) ไม่ชำระหนี้ติดต่อกัน 3 เดือน — ไม่มี control ใน Candidate ก่อน DEC-44 (กระทบ Case 2, 4, 5) และนิยามการตรวจยังไม่ผ่านการยืนยัน",
+      "status": "PARTIAL",
+      "decision_ref": "DEC-45",
+      "blocks_freeze": false,
+      "safe_hold": {
+        "mechanism": "CONTROL",
+        "ref": "NPY-001",
+        "behavior": "ไม่ผ่านด้วยเหตุใดก็เป็น HOLD (ไม่ FAIL); ข้อมูลไม่ครบ → HOLD MISSING_INPUT",
+        "reason_code": "CONSECUTIVE_NON_PAYMENT_NOT_MET"
       }
     }
   ]

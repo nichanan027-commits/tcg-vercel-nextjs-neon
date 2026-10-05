@@ -3046,12 +3046,12 @@
     },
     {
       "test_id": "UT-RST-007",
-      "title": "Start up: RST-001 ไม่ใช้ (path (ข)+(จ)+(ฉ) ไม่มี (ค))",
+      "title": "Start up (กรณี 5 = (ข)+(ง)+(จ)+(ฉ)): RST-001 ไม่ใช้ เพราะไม่มี (ค)",
       "test_scope": "RULE_ONLY",
       "match_mode": "RULE_ONLY",
       "activation": "ACTIVE",
       "basis": "DERIVED_FROM_LOCKED_RULE",
-      "rule_basis": "DEC-24",
+      "rule_basis": "PGS10 หน้า 7 กรณี 5, DEC-44",
       "lg_no": null,
       "evidence_ref": null,
       "rule_ids": [
@@ -5581,6 +5581,239 @@
           "control_status": "HOLD",
           "reason_codes": [
             "IDENTITY_MISMATCH"
+          ]
+        }
+      ],
+      "expected_case_status": null,
+      "expected_reason_codes": []
+    },
+    {
+      "test_id": "UT-NPY-001",
+      "title": "Start up (Case 5): ไม่มี PAYMENT หลัง default และยื่นหลังครบ 3 เดือน → PASS",
+      "test_scope": "RULE_ONLY",
+      "match_mode": "RULE_ONLY",
+      "activation": "ACTIVE",
+      "basis": "DERIVED_FROM_LOCKED_RULE",
+      "rule_basis": "PGS10 หน้า 7 (ง), DEC-44/45",
+      "lg_no": null,
+      "evidence_ref": null,
+      "rule_ids": [
+        "PGS10-NPY-001"
+      ],
+      "config": {},
+      "input": {
+        "product": "START_UP",
+        "claim_path": "START_UP_ALL",
+        "claim_case_no": 5,
+        "default_date": "2024-06-10",
+        "payment_history_status": "NO_PAYMENT_VERIFIED",
+        "first_payment_after_default_date": null,
+        "claim_submission_date": "2025-03-01"
+      },
+      "expected_rule_results": [
+        {
+          "rule_id": "PGS10-NPY-001",
+          "control_status": "PASS"
+        }
+      ],
+      "expected_case_status": null,
+      "expected_reason_codes": []
+    },
+    {
+      "test_id": "UT-NPY-002",
+      "title": "Case 4 (Small Biz >5 ปี): มี PAYMENT ภายใน 3 เดือนหลัง default → HOLD (ไม่ FAIL)",
+      "test_scope": "RULE_ONLY",
+      "match_mode": "RULE_ONLY",
+      "activation": "ACTIVE",
+      "basis": "DERIVED_FROM_LOCKED_RULE",
+      "rule_basis": "PGS10 หน้า 7 (ง), DEC-45/Q-11",
+      "lg_no": null,
+      "evidence_ref": null,
+      "rule_ids": [
+        "PGS10-NPY-001"
+      ],
+      "config": {},
+      "input": {
+        "product": "SMALL_BIZ",
+        "claim_path": "SMALL_BIZ_GT_5Y",
+        "claim_case_no": 4,
+        "default_date": "2024-06-10",
+        "payment_history_status": "PAYMENTS_FOUND",
+        "first_payment_after_default_date": "2024-07-01",
+        "claim_submission_date": "2025-03-01"
+      },
+      "expected_rule_results": [
+        {
+          "rule_id": "PGS10-NPY-001",
+          "control_status": "HOLD",
+          "reason_codes": [
+            "CONSECUTIVE_NON_PAYMENT_NOT_MET"
+          ]
+        }
+      ],
+      "expected_case_status": null,
+      "expected_reason_codes": []
+    },
+    {
+      "test_id": "UT-NPY-003",
+      "title": "Case 2 (SMEs >5 ปี): ยื่นก่อนครบ default + 3 เดือน → HOLD NON_PAYMENT_PERIOD_NOT_ELAPSED",
+      "test_scope": "RULE_ONLY",
+      "match_mode": "RULE_ONLY",
+      "activation": "ACTIVE",
+      "basis": "DERIVED_FROM_LOCKED_RULE",
+      "rule_basis": "PGS10 หน้า 7 (ง), DEC-45",
+      "lg_no": null,
+      "evidence_ref": null,
+      "rule_ids": [
+        "PGS10-NPY-001"
+      ],
+      "config": {},
+      "input": {
+        "product": "SMART_BIZ",
+        "claim_path": "SMART_GT_5Y",
+        "claim_case_no": 2,
+        "default_date": "2024-06-10",
+        "payment_history_status": "NO_PAYMENT_VERIFIED",
+        "first_payment_after_default_date": null,
+        "claim_submission_date": "2024-09-09"
+      },
+      "expected_rule_results": [
+        {
+          "rule_id": "PGS10-NPY-001",
+          "control_status": "HOLD",
+          "reason_codes": [
+            "NON_PAYMENT_PERIOD_NOT_ELAPSED"
+          ]
+        }
+      ],
+      "expected_case_status": null,
+      "expected_reason_codes": []
+    },
+    {
+      "test_id": "UT-NPY-004",
+      "title": "ยื่นตรงวันครบกำหนดพอดี (default 2024-11-30 + 3 เดือน = 2025-02-28, clamp สิ้นเดือน) → PASS",
+      "test_scope": "RULE_ONLY",
+      "match_mode": "RULE_ONLY",
+      "activation": "ACTIVE",
+      "basis": "DERIVED_FROM_LOCKED_RULE",
+      "rule_basis": "DEC-45, PRM-028",
+      "lg_no": null,
+      "evidence_ref": null,
+      "rule_ids": [
+        "PGS10-NPY-001"
+      ],
+      "config": {},
+      "input": {
+        "product": "START_UP",
+        "claim_path": "START_UP_ALL",
+        "claim_case_no": 5,
+        "default_date": "2024-11-30",
+        "payment_history_status": "NO_PAYMENT_VERIFIED",
+        "first_payment_after_default_date": null,
+        "claim_submission_date": "2025-02-28"
+      },
+      "expected_rule_results": [
+        {
+          "rule_id": "PGS10-NPY-001",
+          "control_status": "PASS"
+        }
+      ],
+      "expected_case_status": null,
+      "expected_reason_codes": []
+    },
+    {
+      "test_id": "UT-NPY-005",
+      "title": "Case 1 (SMEs ≤5 ปี) ใช้ (ค) ไม่ใช่ (ง) → NOT_APPLICABLE",
+      "test_scope": "RULE_ONLY",
+      "match_mode": "RULE_ONLY",
+      "activation": "ACTIVE",
+      "basis": "DERIVED_FROM_LOCKED_RULE",
+      "rule_basis": "PGS10 หน้า 6 กรณี 1, DEC-45",
+      "lg_no": null,
+      "evidence_ref": null,
+      "rule_ids": [
+        "PGS10-NPY-001"
+      ],
+      "config": {},
+      "input": {
+        "product": "SMART_BIZ",
+        "claim_path": "SMART_LE_5Y",
+        "claim_case_no": 1,
+        "default_date": "2024-06-10",
+        "payment_history_status": "NO_PAYMENT_VERIFIED",
+        "first_payment_after_default_date": null,
+        "claim_submission_date": "2025-03-01"
+      },
+      "expected_rule_results": [
+        {
+          "rule_id": "PGS10-NPY-001",
+          "control_status": "NOT_APPLICABLE"
+        }
+      ],
+      "expected_case_status": null,
+      "expected_reason_codes": []
+    },
+    {
+      "test_id": "UT-NPY-006",
+      "title": "Case 3 (Small Biz ≤5 ปี) ใช้ (ค) → NOT_APPLICABLE",
+      "test_scope": "RULE_ONLY",
+      "match_mode": "RULE_ONLY",
+      "activation": "ACTIVE",
+      "basis": "DERIVED_FROM_LOCKED_RULE",
+      "rule_basis": "PGS10 หน้า 7 กรณี 3, DEC-45",
+      "lg_no": null,
+      "evidence_ref": null,
+      "rule_ids": [
+        "PGS10-NPY-001"
+      ],
+      "config": {},
+      "input": {
+        "product": "SMALL_BIZ",
+        "claim_path": "SMALL_BIZ_LE_5Y",
+        "claim_case_no": 3,
+        "default_date": "2024-06-10",
+        "payment_history_status": "NO_PAYMENT_VERIFIED",
+        "first_payment_after_default_date": null,
+        "claim_submission_date": "2025-03-01"
+      },
+      "expected_rule_results": [
+        {
+          "rule_id": "PGS10-NPY-001",
+          "control_status": "NOT_APPLICABLE"
+        }
+      ],
+      "expected_case_status": null,
+      "expected_reason_codes": []
+    },
+    {
+      "test_id": "UT-NPY-007",
+      "title": "ไม่มี default_date → NOT_TESTABLE MISSING_INPUT (REQUIRED_HARD → เคส HOLD)",
+      "test_scope": "RULE_ONLY",
+      "match_mode": "RULE_ONLY",
+      "activation": "ACTIVE",
+      "basis": "DERIVED_FROM_LOCKED_RULE",
+      "rule_basis": "DEC-45",
+      "lg_no": null,
+      "evidence_ref": null,
+      "rule_ids": [
+        "PGS10-NPY-001"
+      ],
+      "config": {},
+      "input": {
+        "product": "START_UP",
+        "claim_path": "START_UP_ALL",
+        "claim_case_no": 5,
+        "default_date": null,
+        "payment_history_status": "NO_PAYMENT_VERIFIED",
+        "first_payment_after_default_date": null,
+        "claim_submission_date": "2025-03-01"
+      },
+      "expected_rule_results": [
+        {
+          "rule_id": "PGS10-NPY-001",
+          "control_status": "NOT_TESTABLE",
+          "reason_codes": [
+            "MISSING_INPUT"
           ]
         }
       ],

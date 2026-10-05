@@ -262,6 +262,19 @@ gate(5, 'Golden tests have evidence and no invented expected result', (E, I) => 
         else st = 'PASS';
         need(exp.control_status === st && (rc ? (exp.reason_codes || [])[0] === rc : true), `CLM-001 re-evaluation gives ${st}${rc ? '/' + rc : ''}`);
       }
+      if (exp.rule_id === 'PGS10-NPY-001') {
+        const applies = [2, 4, 5].includes(inp.claim_case_no);
+        let st, rc;
+        if (!applies) st = 'NOT_APPLICABLE';
+        else if (!inp.default_date || !inp.claim_submission_date) { st = 'NOT_TESTABLE'; rc = 'MISSING_INPUT'; }
+        else {
+          const end = addMonths(inp.default_date, 3);
+          if (inp.claim_submission_date < end) { st = 'HOLD'; rc = 'NON_PAYMENT_PERIOD_NOT_ELAPSED'; }
+          else if (inp.first_payment_after_default_date && inp.first_payment_after_default_date <= end) { st = 'HOLD'; rc = 'CONSECUTIVE_NON_PAYMENT_NOT_MET'; }
+          else st = 'PASS';
+        }
+        need(exp.control_status === st && (rc ? (exp.reason_codes || [])[0] === rc : !(exp.reason_codes || []).length), `NPY-001 re-evaluation gives ${st}${rc ? '/' + rc : ''}`);
+      }
       if (exp.rule_id === 'PGS10-CLM-002' && inp.product && !exp.reason_codes?.includes('NO_RULE_FOR_PRODUCT')) {
         let tenor = null;
         if (inp.guarantee_term_years != null) tenor = { le: inp.guarantee_term_years <= 5 };

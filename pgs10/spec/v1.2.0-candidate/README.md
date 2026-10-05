@@ -1,6 +1,6 @@
 # PGS 10 Spec Candidate v1.2.0-candidate.3 — NOT FROZEN
 
-**สถานะ: READY FOR FINAL FREEZE GATE REVIEW — ยังไม่ FROZEN** (Freeze Gate 6/6 ผ่าน, ไม่มี freeze blocker; ข้อตีความ Q-08…Q-10 และรหัสใหม่ที่ Claude เสนอ เจ้าของยืนยันแล้ว; ต้องมีคำสั่งประกาศ FROZEN อย่างชัดเจนก่อนแตะ `engine.js`)
+**สถานะ: READY FOR FINAL FREEZE GATE REVIEW — ยังไม่ FROZEN** (Freeze Gate 6/6 ผ่าน, ไม่มี freeze blocker; Case 5 แก้ตามหลักเกณฑ์ฉบับจริงแล้ว (DEC-44); รออนุมัตินิยาม NPY-001 (Q-11) — ไม่ขวาง Freeze; ต้องมีคำสั่งประกาศ FROZEN อย่างชัดเจนก่อนแตะ `engine.js`)
 
 **สถานะ:** Spec Candidate เพื่อ Freeze Gate Review · **ห้ามแก้ Rule Engine (`pgs10/engine.js`) และห้ามประกาศ Freeze** จนกว่าจะผ่าน Freeze Gate
 **ที่มา:** Reconciliation r4 (DEC-01…DEC-43, ตอบ Q-01…Q-10 แล้ว) + Deployment Pack v1.1.0 + Spec ร่าง v1.0
@@ -9,18 +9,18 @@
 | ไฟล์ | เนื้อหา |
 |---|---|
 | `01_PGS10_POLICY_RULEBOOK.md` | นโยบาย (ตัวเลขอ้าง PRM-xxx ไม่ฝังในตัวกฎ) |
-| `02_PGS10_OPERATIONAL_AUDIT_RULES.md` | 32 Controls: inputs / logic / safe-hold / reason codes |
-| `03_PGS10_DATA_DICTIONARY.json` | 143 ฟิลด์, enums, conventions (วันที่ ISO+calendar, สตางค์) |
-| `04_PGS10_GOLDEN_TESTS.json` | 160 tests: ACTIVE 125, BLOCKED_PENDING_EVIDENCE 35 |
-| `05_PGS10_RULE_REGISTRY.json` | Canonical Rule IDs + legacy aliases + reason codes (80) + aggregation + safe-holds |
-| `06_PGS10_POLICY_PARAMETERS.json` | 63 พารามิเตอร์ + ตาราง transaction code ต่อ bank_id |
+| `02_PGS10_OPERATIONAL_AUDIT_RULES.md` | 33 Controls: inputs / logic / safe-hold / reason codes |
+| `03_PGS10_DATA_DICTIONARY.json` | 144 ฟิลด์, enums, conventions (วันที่ ISO+calendar, สตางค์) |
+| `04_PGS10_GOLDEN_TESTS.json` | 167 tests: ACTIVE 132, BLOCKED_PENDING_EVIDENCE 35 |
+| `05_PGS10_RULE_REGISTRY.json` | Canonical Rule IDs + legacy aliases + reason codes (82) + aggregation + safe-holds |
+| `06_PGS10_POLICY_PARAMETERS.json` | 64 พารามิเตอร์ + ตาราง transaction code ต่อ bank_id |
 | `check_freeze_gate.js` | สคริปต์ Freeze Gate 5 ข้อ (Node ≥ 18, ไม่ต้องติดตั้งแพ็กเกจ): `node check_freeze_gate.js` |
 
 ## เปลี่ยนจาก Pack v1.1.0
 1. Rule ID = Master Audit §41 (+`PGS10-TXN-001`); ID เก่า = `id@version` (มี 10 รายการที่ ID เดิมความหมายใหม่)
-2. reason_code 80 ตัว (catalogue เดียว); **ไม่มี `HOLD_*`**; 32 controls มี requirement / stage / safe-hold
+2. reason_code 82 ตัว (catalogue เดียว); **ไม่มี `HOLD_*`**; 33 controls มี requirement / stage / safe-hold
 3. เติมกลับ: Statement cut-off, Leading-zero (field-specific), Address normalization + latest address, ELIG exclusions, REVERSAL/PRINCIPAL_ADJUSTMENT, NOT_TESTABLE, calendar metadata, Decimal
-4. คำตัดสินใหม่: Start up seasoning 6 เดือน (OFFICIAL) / claim path (ข)+(จ)+(ฉ); Coverage OFFICIAL ทุก Product; 7-month exception OFFICIAL (กรณี 1 และ 3); DMD-002 derive as-of; CAP-001 REQUIRED_HARD ที่ FINAL_APPROVAL; tolerance ปิด (proposed 0.01 เฉพาะ interest/total); FAIL scope = Proven Policy Ineligibility
+4. คำตัดสินใหม่: Start up seasoning 6 เดือน (OFFICIAL) / claim path Case 5 = (ข)+(ง)+(จ)+(ฉ) (แก้ตามหลักเกณฑ์ฉบับจริงหน้า 7 — DEC-44) และเพิ่ม control NPY-001 สำหรับ (ง); Coverage OFFICIAL ทุก Product; 7-month exception OFFICIAL (กรณี 1 และ 3); DMD-002 derive as-of; CAP-001 REQUIRED_HARD ที่ FINAL_APPROVAL; tolerance ปิด (proposed 0.01 เฉพาะ interest/total); FAIL scope = Proven Policy Ineligibility
 5. Golden Tests: schema `RULE_ONLY` / `FULL_CASE` + `match_mode`; เคสจริงทั้งหมดเป็น `BLOCKED_PENDING_EVIDENCE` (ไม่มี input, ไม่มีข้อมูลที่คิดเอง)
 
 ## Freeze Blocker ที่เหลือ (ตาม Conflict Register)
@@ -40,22 +40,27 @@
 - **Q-10 / A-46** LG ต่ออายุ/ขยายและไม่มี guarantee_term ระบุ → HOLD `LG_TENOR_UNDETERMINABLE` เป็น Safe-Hold ที่ยืนยันแล้ว จนกว่าจะมี rule
 - **A-43** invariance Safe-Hold คงไว้เฉพาะ demand-waiting reference และ date arithmetic (PRM-021/028)
 - Claim window: `CLAIM_FILING_NOT_YET_OPEN` (HOLD) และ `CLAIM_FILING_WINDOW_EXPIRED` (FAIL) **อนุมัติแล้ว**; 'หมดสิทธิแต่วันที่ยังไม่ verify' ไม่มีรหัสเฉพาะและไม่มี Test (ใช้ HOLD ทั่วไปของ CLM-001)
-- รหัสที่ยัง PROPOSED_BY_CLAUDE: ไม่มี
+- รหัสที่ยัง PROPOSED_BY_CLAUDE: `CONSECUTIVE_NON_PAYMENT_NOT_MET`, `NON_PAYMENT_PERIOD_NOT_ELAPSED`
 
 หมายเหตุ: Q-09 และ Q-10 ที่ยืนยันคือ *พฤติกรรม Safe-Hold ปัจจุบัน* ไม่ใช่การกำหนด rule ใหม่ จึงยังเป็น OPEN ที่มี Safe-Hold (ไม่ขวาง Freeze)
 
-## หลักฐานที่ผมตรวจเองไม่ได้ (owner-verified)
-หลักเกณฑ์ PGS 10 ฉบับทางการ (หน้า 7 และตาราง Coverage), Statement Thai Credit (remark + พฤติกรรม ledger ของ 6619/6656/6920/6922/6931), รายงานติดตามของเคส 66-037410 — ผู้ใช้ยืนยันว่า verify จากไฟล์โครงการแล้ว (หน้า 5, 7; Statement remark/ledger; รายงานติดตาม + Statement ของ 66037410) — ผมไม่ได้ตรวจไฟล์ต้นฉบับเอง จึงบันทึกเป็น `owner-verified` (ไม่ใช่ independently verified); เติม doc/page ก่อน Production
+## ตรวจกับหลักเกณฑ์ PGS 10 ฉบับจริง (ไฟล์ `pgs_10.pdf`, ปรับปรุงครั้งที่ 5, ลงวันที่ 27 ธ.ค. 2566)
+Claude อ่านครบ 10 หน้า (หน้า 4–10 เป็นภาพสแกน — อ่านจากภาพที่เรนเดอร์ ไม่ใช้ OCR) และเทียบกับ Candidate:
+- **ตรงกัน:** Coverage 70/100 และ Start up 100/100 (หน้า 5); NPL seasoning (ก) 9 เดือน / (ข) 6 เดือน (หน้า 4, 7); Case 1–4; 7-month exception เฉพาะ Case 1 และ 3; (ค) (จ) (ฉ); วงเงิน Small Biz 200,000 / Start up 100,000; ความรับผิดเฉพาะเงินต้นไม่เกินภาระค้ำ (ข้อ 5.2) ↔ `claim_base = MIN(principal, guarantee obligation)`
+- **ไม่ตรง → แก้แล้ว (DEC-44):** Case 5 = **(ข)+(ง)+(จ)+(ฉ)** (เดิม (ข)+(จ)+(ฉ))
+- **ช่องว่างที่พบ → เพิ่ม control (DEC-45):** เงื่อนไข (ง) ไม่มี control ตรวจกับ Case ใดเลย → เพิ่ม `PGS10-NPY-001` (Case 2, 4, 5); นิยามการตรวจเป็นข้อเสนอของ Claude — **Q-11** (A-47, Safe-Hold: ไม่ผ่านเป็น HOLD ไม่ใช่ FAIL; รหัสใหม่ 2 ตัว PROPOSED_BY_CLAUDE)
+- **A-30:** ข้อ 2.5 และ 7.1(ฉ) นับจากวันออกหนังสือค้ำประกัน แต่ (ก)/(ข) ใช้ถ้อยคำ 'วันที่ บสย. ค้ำประกันสินเชื่อ' → anchor `lg_issue_date` ยังเป็น `APPROVED_OPERATIONAL` (ไม่ใช่ OFFICIAL)
+- **ยังไม่ได้ตรวจ:** ข้อ 2.4 (วันสุดท้ายยื่นคำขอค้ำ 27 ก.พ. 2568 — ไม่มี rule); เอกสาร Statement Thai Credit / รายงานติดตามของเคส 66-037410 (ไม่มีไฟล์ — ยังเป็น `owner-verified`); ไม่รู้ว่ามีหลักเกณฑ์ฉบับใหม่กว่านี้หรือไม่
 
 ## Freeze Gate (สถานะล่าสุด — รัน `node check_freeze_gate.js` เพื่อยืนยันซ้ำ)
 ```
 PGS10 1.2.0-candidate.3 — Freeze Gate  (frozen=false)
 
 [PASS] 1. Canonical IDs resolve 100%
-      32 canonical rules, 44 versioned aliases, 433 ID tokens scanned
+      33 canonical rules, 44 versioned aliases, 450 ID tokens scanned
 
 [PASS] 2. Reason codes resolve 100%
-      80 canonical reason codes, 36 aliases, 210 backticked tokens scanned
+      82 canonical reason codes, 36 aliases, 216 backticked tokens scanned
 
 [PASS] 3. No status/reason mixing
       case statuses: PASS, PASS_WITH_SUPPORT, PASS_WITH_OBSERVATION, HOLD, FAIL; retired status-like names (aliases only): 10
@@ -65,16 +70,16 @@ PGS10 1.2.0-candidate.3 — Freeze Gate  (frozen=false)
       transaction codes: 5 evidence-supported, 4 unverified
 
 [PASS] 5. Golden tests have evidence and no invented expected result
-      160 tests: ACTIVE 125, BLOCKED_PENDING_EVIDENCE 35; FULL_CASE 0; AGGREGATION_ONLY 8; blocked fixtures asserting: 0
-      numeric blocks re-verified: 7; rule/aggregation expectations re-evaluated from spec: 35
+      167 tests: ACTIVE 132, BLOCKED_PENDING_EVIDENCE 35; FULL_CASE 0; AGGREGATION_ONLY 8; blocked fixtures asserting: 0
+      numeric blocks re-verified: 7; rule/aggregation expectations re-evaluated from spec: 42
 
 [PASS] 6. Conflict Register: every unresolved item has a Safe-Hold
-      46 register items: resolved 31, unresolved with Safe-Hold 15
+      47 register items: resolved 31, unresolved with Safe-Hold 16
 
 Freeze blockers (unresolved items flagged blocks_freeze): none
 
 RESULT: all 6 checks pass, no blockers — READY FOR FINAL FREEZE GATE REVIEW (not frozen)
 ```
 
-**ข้อจำกัดที่ต้องรู้:** Gate ตรวจ *ความสอดคล้องภายในของ Spec* (ID/Reason Code/สถานะ/Safe-Hold/Golden Test) ไม่ได้ตรวจว่านโยบายถูกต้อง; แหล่งอ้างอิงที่เจ้าของระบุ (เช่น PGS10 p.5, p.7, LG 66-037410) ยังไม่ได้ตรวจกับเอกสารต้นฉบับโดย Claude; Evaluator ใน Gate ครอบคลุมเฉพาะบางส่วนของ test (35 expectation ที่คำนวณซ้ำจาก Spec).
-ทดสอบ Gate ด้วย mutation 18 แบบ (ใส่ความผิดเจตนา) — Gate จับได้ครบ 18/18
+**ข้อจำกัดที่ต้องรู้:** Gate ตรวจ *ความสอดคล้องภายในของ Spec* (ID/Reason Code/สถานะ/Safe-Hold/Golden Test) ไม่ได้ตรวจว่านโยบายถูกต้อง — ข้อไม่ตรงของ Case 5 พบจากการอ่านหลักเกณฑ์ฉบับจริง ไม่ใช่จาก Gate; Evaluator ใน Gate ครอบคลุมเฉพาะบางส่วนของ test (42 expectation ที่คำนวณซ้ำจาก Spec); Statement Thai Credit และเคส 66-037410 ยังไม่ได้ตรวจกับต้นฉบับ.
+ทดสอบ Gate ด้วย mutation 20 แบบ (ใส่ความผิดเจตนา) — Gate จับได้ครบ 20/20

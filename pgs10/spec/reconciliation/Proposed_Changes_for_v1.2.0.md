@@ -7,7 +7,7 @@
 - โครงไฟล์ = Pack v1.1.0 (5 ไฟล์) เพราะเป็นที่ ChatGPT/Claude/Backend ใช้อยู่
 - เนื้อหา = P + ส่วนที่ D เติมกลับ + ผล DEC-01…14
 - ทุกไฟล์ใส่ `ruleset_version: 1.2.0-candidate`, `frozen: false` จนผ่าน Freeze Gate
-- ใช้ Rule ID Canonical (32 รายการ) และ reason code Canonical (80 ตัว) ตามไฟล์ Reconciliation
+- ใช้ Rule ID Canonical (33 รายการ) และ reason code Canonical (82 ตัว) ตามไฟล์ Reconciliation
 
 ## 1. `01_PGS10_POLICY_RULEBOOK.md`
 
@@ -22,7 +22,7 @@
 
 ## 2. `02_PGS10_OPERATIONAL_AUDIT_RULES.md`
 
-1. เรียง Control ตาม Canonical ID (32 รายการ) พร้อมช่อง `requirement` และ `applicable_when`
+1. เรียง Control ตาม Canonical ID (33 รายการ) พร้อมช่อง `requirement` และ `applicable_when`
 2. **เติมกลับ:** STM-002 Statement Cut-off; Leading-zero (`FORMAT_VARIANCE`); Address normalization + house number no-fuzzy + latest supported address; ELIG exclusions; transaction types `REVERSAL`/`PRINCIPAL_ADJUSTMENT`; `NOT_TESTABLE`; statement-updated-after-later-payment (`later_statement_covers`)
 3. แยก TXN-001 (classification + bank code map) ออกจาก STM-001 (Last Payment)
 4. CONTRACT-001 จำกัด Thai Credit revolving-loan; `fi_id` เป็น input; FI อื่น → `CONTRACT_DATE_BASIS_UNDEFINED` (ขอยืนยันรหัส)
@@ -35,7 +35,7 @@
 
 ## 3. `03_PGS10_DATA_DICTIONARY.json`
 
-1. แทน `reason_codes` (18) ด้วย Canonical catalogue (80) + `alias_index`
+1. แทน `reason_codes` (18) ด้วย Canonical catalogue (82) + `alias_index`
 2. **เพิ่มฟิลด์:** `fi_id`, `bank_id`, `npl_date`(คง) + `npl_anchor_date`, `later_payment_date/amount`, `statement_cutoff_date`, `later_statement_covers`, `loan_purpose_business`, `loan_is_new_business`, `loan_is_hp_leasing`, `postal_sent_date`, `confirmation_visual_elements{12}`, `support_used`, `review_flag`, `control_status`, `requirement`
 3. **Transaction map** เป็นตาราง (`bank_id, code, semantic_type, effective_from, effective_to, evidence_source, approval_status, approved_by`) — ไม่ใช่ object ตาม code; 6921/6680 = `UNVERIFIED_UNTIL_SOURCE` (ถอด 6921 ออกจาก mapping ของ P)
 4. **Conventions:** วันที่ ISO CE + `calendar` (BE|CE) + `original_text`; เงิน = integer satang; ROUND_HALF_UP; percent = basis points
@@ -52,7 +52,7 @@
 |---|---|
 | status | จาก 10 ค่า → control_status 7 ค่า + review_flag + reason_code; case 5 State (+`support_used`) |
 | `runAudit` aggregation | ตาม §7 ของ Report; อ่าน `requirement` ต่อ Control |
-| `META` / Rule IDs | เป็น Canonical (32); `RST-001` (วันที่) → `RST-003`; แยก TXN/STM/CUR/VIS/PST |
+| `META` / Rule IDs | เป็น Canonical (33); `RST-001` (วันที่) → `RST-003`; แยก TXN/STM/CUR/VIS/PST |
 | `c16` | แตกเป็น CUR-001/CUR-002; tolerance ปิดเป็นค่าเริ่มต้น → NUMERIC_VARIANCE; ห้าม tolerance กับ 5 ฟิลด์ |
 | `c12` | as-of + fallback ที่พิสูจน์ได้ (Q-02) |
 | `c03` | รับ `fi_id`; Thai Credit only |

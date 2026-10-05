@@ -802,6 +802,28 @@
           "case_effect": "case HOLD"
         }
       ]
+    },
+    {
+      "rule_id": "PGS10-NPY-001",
+      "name": "Consecutive Non-payment (ง)",
+      "requirement": "REQUIRED_HARD",
+      "applicable_when": "Case 2, 4, 5 (เงื่อนไข (ง)); Case 1 และ 3 → NOT_APPLICABLE",
+      "control_status_when_ok": "PASS",
+      "support_codes": [],
+      "reason_codes": [
+        {
+          "code": "CONSECUTIVE_NON_PAYMENT_NOT_MET",
+          "control_status": "HOLD",
+          "case_effect": "case HOLD",
+          "proposed_new": true
+        },
+        {
+          "code": "NON_PAYMENT_PERIOD_NOT_ELAPSED",
+          "control_status": "HOLD",
+          "case_effect": "case HOLD",
+          "proposed_new": true
+        }
+      ]
     }
   ]
 }

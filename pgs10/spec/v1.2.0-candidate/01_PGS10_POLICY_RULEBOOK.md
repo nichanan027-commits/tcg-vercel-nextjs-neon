@@ -38,11 +38,14 @@
 |---|---|---|
 | SMEs (Smart Biz / One / Green / Plus & Top up) | (ก)+(ค)+(จ)+(ฉ) | (ก)+(ง)+(จ)+(ฉ) |
 | Small Biz | (ข)+(ค)+(จ)+(ฉ) | (ข)+(ง)+(จ)+(ฉ) |
-| **Start up** | **(ข)+(จ)+(ฉ)** — ไม่รับ (ค) (DEC-24) | (ข)+(จ)+(ฉ) |
+| **Start up** (กรณี 5 — ไม่แบ่งช่วงอายุ) | **(ข)+(ง)+(จ)+(ฉ)** — ไม่รับ (ค) (DEC-44, หลักเกณฑ์หน้า 7) | (ข)+(ง)+(จ)+(ฉ) |
 
 Case (DEC-32): **1** = SMEs ≤5 ปี · **2** = SMEs >5 ปี · **3** = Small Biz ≤5 ปี · **4** = Small Biz >5 ปี (รวม (ข)) · **5** = Start up. band ≤5/>5 ปีของ Case นับจากวันที่ยื่นเทียบวันออก LG (`PRM-054` = claim_submission_date เทียบ lg_issue_date + 5 ปี ('ขอ Claim ภายใน 5 ปีแรก') · **APPROVED_OPERATIONAL** — Q-08; ข้อมูลไม่ครบ → HOLD `LG_DATA_MISSING`)
 
-## 5. Restructure และทางออก — `PGS10-RST-001/002/003`
+## 5. เงื่อนไข (ง) ไม่ชำระหนี้ติดต่อกัน — `PGS10-NPY-001` (Case 2, 4, 5)
+- ไม่ชำระหนี้ติดต่อกัน `PRM-057` = 3 calendar_months · **OFFICIAL** นับแต่ผิดนัด; ใช้กับ Case 2, 4, 5 (Case 1 และ 3 ใช้ (ค) แทน). นิยามการตรวจ (หน้าต่างเวลา/ผลเมื่อไม่ผ่าน) เป็นข้อเสนอ — A-47/Q-11; ไม่ผ่าน = HOLD ไม่ใช่ FAIL
+
+## 5b. Restructure และทางออก — `PGS10-RST-001/002/003`
 - เส้นทาง: `NORMAL_RESTRUCTURE_PATH` | `UNCONTACTABLE_EXCEPTION_PATH` | `NOT_REQUIRED` (path ที่ไม่มี (ค))
 - `restructure_date = null` **ไม่ใช่เหตุให้ PASS**
 - **ทางออกกรณีติดต่อไม่ได้ / ตกลงไม่ได้ (OFFICIAL หน้า 7 เฉพาะ Case 1 และ 3 — DEC-20/32):** `exception_start_date = first_uncontactable_date OR first_contacted_but_restructure_failed_date`; `exception_maturity_date = add_calendar_months(start, 7)`; ต้องมี Certified Tracking Report + หนังสือบอกกล่าว/บอกเลิก ≥ 1 → PASS_WITH_SUPPORT `support_code=UNCONTACTABLE_7_MONTH_EXCEPTION`; **ไม่ขยายไป Start up (Case 5)**. (`PRM-018` = 7 months · **OFFICIAL**; `PRM-019` = true boolean · **OFFICIAL**)

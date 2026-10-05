@@ -605,6 +605,16 @@
           "note": "Chronology"
         }
       ]
+    },
+    {
+      "id": "PGS10-NPY-001",
+      "name": "Consecutive Non-payment (ง)",
+      "kind": "POLICY",
+      "requirement": "REQUIRED_HARD",
+      "applicable_when": "Case 2, 4, 5 (เงื่อนไข (ง)); Case 1 และ 3 → NOT_APPLICABLE",
+      "upstream": "PGS10 หน้า 7 (ง); M§6",
+      "id_origin": "ใหม่ในชุด Reconciliation (ไม่อยู่ใน M§41)",
+      "legacy_aliases": []
     }
   ],
   "alias_index": {

@@ -882,11 +882,11 @@
     {
       "unit": "map",
       "applies_to": "ELIG/RST/NPL/DMD/CLM",
-      "source_ref": "หลักเกณฑ์ PGS 10 หน้า 6–7 · owner-verified (ผู้ใช้ยืนยันจากไฟล์โครงการ; ไม่ได้ตรวจซ้ำใน session นี้); M§3.1, M§4",
-      "decision_ref": "DEC-24, DEC-32",
+      "source_ref": "หลักเกณฑ์ PGS 10 หน้า 6–7 · ตรวจกับต้นฉบับ PDF ใน session นี้ (DEC-44); M§3.1, M§4",
+      "decision_ref": "DEC-24, DEC-32, DEC-44",
       "config_key": "claim.path_matrix",
       "hardcode_allowed": false,
-      "notes": "Small Biz >5 ปี รวม (ข) ตามที่ยืนยัน (ต่างจาก M§6 ที่ไม่รวม)",
+      "notes": "Small Biz >5 ปี รวม (ข); Start up (Case 5) = (ข)+(ง)+(จ)+(ฉ) ตามหน้า 7 (แก้จาก (ข)+(จ)+(ฉ))",
       "safe_hold": null,
       "id": "PRM-052",
       "name": "Claim path matrix (conditions required)",
@@ -895,7 +895,7 @@
         "Case 2: SMEs >5y": "(ก)+(ง)+(จ)+(ฉ)",
         "Case 3: SMALL_BIZ ≤5y": "(ข)+(ค)+(จ)+(ฉ)",
         "Case 4: SMALL_BIZ >5y": "(ข)+(ง)+(จ)+(ฉ)",
-        "Case 5: START_UP": "(ข)+(จ)+(ฉ)"
+        "Case 5: START_UP": "(ข)+(ง)+(จ)+(ฉ)"
       },
       "source_status": "OFFICIAL"
     },
@@ -1017,6 +1017,20 @@
         "evidence_required": false
       },
       "source_status": "LOCKED"
+    },
+    {
+      "id": "PRM-057",
+      "name": "Consecutive non-payment period for condition (ง)",
+      "value": 3,
+      "unit": "calendar_months",
+      "applies_to": "NPY-001 (Case 2, 4, 5)",
+      "source_status": "OFFICIAL",
+      "source_ref": "หลักเกณฑ์ PGS 10 หน้า 7 เงื่อนไข (ง) — ตรวจกับต้นฉบับ PDF ใน session นี้",
+      "decision_ref": "DEC-45",
+      "config_key": "claim.nonpayment_months",
+      "hardcode_allowed": false,
+      "notes": "ค่า 3 เดือนเป็น OFFICIAL; วิธีตรวจ (หน้าต่างเวลา/การนับ) เป็นข้อเสนอ — A-47/Q-11",
+      "safe_hold": null
     }
   ],
   "transaction_code_map": {

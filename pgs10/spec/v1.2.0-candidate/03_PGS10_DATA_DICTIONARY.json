@@ -283,6 +283,7 @@
       "source": "DERIVED",
       "derived": true,
       "used_by": [
+        "PGS10-NPY-001",
         "PGS10-RST-001"
       ]
     },
@@ -318,6 +319,7 @@
       "source": "DERIVED",
       "derived": true,
       "used_by": [
+        "PGS10-NPY-001",
         "PGS10-RST-001"
       ]
     },
@@ -330,6 +332,7 @@
       ],
       "used_by": [
         "PGS10-CLM-001",
+        "PGS10-NPY-001",
         "PGS10-RST-001",
         "PGS10-RST-002",
         "PGS10-TIME-001"
@@ -499,6 +502,7 @@
         "PGS10-DEF-001",
         "PGS10-DEF-002",
         "PGS10-NPL-001",
+        "PGS10-NPY-001",
         "PGS10-TIME-001"
       ]
     },
@@ -678,6 +682,15 @@
       "source": "tracking report",
       "used_by": [
         "PGS10-RST-002"
+      ]
+    },
+    "first_payment_after_default_date": {
+      "meaning": "วันรับชำระจริงครั้งแรกที่ **หลัง** default_date = MIN(transaction_date WHERE type=PAYMENT AND date > default_date); null = ไม่มี",
+      "type": "date",
+      "source": "DERIVED from statement",
+      "derived": true,
+      "used_by": [
+        "PGS10-NPY-001"
       ]
     },
     "first_payment_date": {
@@ -923,6 +936,7 @@
       "derived": true,
       "used_by": [
         "PGS10-DEF-001",
+        "PGS10-NPY-001",
         "PGS10-STM-001"
       ]
     },
@@ -1067,6 +1081,7 @@
         "PGS10-CLM-002",
         "PGS10-ELIG-001",
         "PGS10-NPL-001",
+        "PGS10-NPY-001",
         "PGS10-RST-001"
       ]
     },

@@ -81,10 +81,11 @@
 | `PGS10-CLM-004` | 0 | 3 | 1 | 1 | ✅ |
 | `PGS10-CAP-001` | 0 | 2 | 0 | 1 | ✅ |
 | `PGS10-TIME-001` | 0 | 2 | 1 | 0 | ✅ |
+| `PGS10-NPY-001` | 0 | 0 | 0 | 0 | ❌ |
 
-- Rule ที่ไม่มี coverage เลยจาก P และ D: **VIS-002, TXN-001, PST-003**
-- หลังเพิ่ม T ที่เสนอ: **VIS-002, PST-003** (ยังไม่มีข้อเสนอ Test สำหรับ Rule เหล่านี้ — ต้องเพิ่มใน v1.2.0: VIS-002 ต้องมีเคสเอกสาร Critical อื่นที่ถูก Crop, PST-003 ต้องมีเคส tracking number ไม่ตรงกัน)
-- P ทดสอบ **4 จาก 32** Rule เท่านั้น (VIS-001 เป็นหลัก) และไม่มี Test ตัวเลขใด ๆ (Claim, Base, Ratio, Cap, Historical, Demand, Tolerance)
+- Rule ที่ไม่มี coverage เลยจาก P และ D: **VIS-002, TXN-001, PST-003, NPY-001**
+- หลังเพิ่ม T ที่เสนอ: **VIS-002, PST-003, NPY-001** (ยังไม่มีข้อเสนอ Test สำหรับ Rule เหล่านี้ — ต้องเพิ่มใน v1.2.0: VIS-002 ต้องมีเคสเอกสาร Critical อื่นที่ถูก Crop, PST-003 ต้องมีเคส tracking number ไม่ตรงกัน)
+- P ทดสอบ **4 จาก 33** Rule เท่านั้น (VIS-001 เป็นหลัก) และไม่มี Test ตัวเลขใด ๆ (Claim, Base, Ratio, Cap, Historical, Demand, Tolerance)
 
 ## 4. Unit cases เดิมของ D (78) เมื่อใช้ Canonical
 
@@ -138,7 +139,7 @@
 | T-14b | Demand principal derive ได้ (support_code=DERIVED_AS_OF_DEMAND) | RULE_ONLY | `PGS10-DMD-002` | PASS_WITH_SUPPORT | — | DEC-16, DEC-36 |
 | T-35 | Coverage: tenor พิสูจน์ไม่ได้ (ไม่มี guarantee_term และไม่มี expiry) | RULE_ONLY | `PGS10-CLM-002` | HOLD | LG_TENOR_UNDETERMINABLE | DEC-30 |
 | T-36 | NPL: ไม่มี lg_issue_date (anchor) → defensive HOLD | RULE_ONLY | `PGS10-NPL-001` | HOLD | NPL_ANCHOR_DATE_UNDEFINED | DEC-29 |
-| T-37 | Start up: RST-001 ไม่ใช้ ((ข)+(จ)+(ฉ) ไม่มี (ค)) | RULE_ONLY | `PGS10-RST-001` | NOT_APPLICABLE | — | DEC-24 |
+| T-37 | Start up: RST-001 ไม่ใช้ ((ข)+(ง)+(จ)+(ฉ) ไม่มี (ค) — แก้โดย DEC-44) | RULE_ONLY | `PGS10-RST-001` | NOT_APPLICABLE | — | DEC-24 |
 | T-38 | 7-month exception ครบเงื่อนไข (support_code=UNCONTACTABLE_7_MONTH_EXCEPTION) | RULE_ONLY | `PGS10-RST-002` | PASS_WITH_SUPPORT | — | DEC-20, DEC-36 |
 | T-39 | Tolerance เปิด: current_interest ต่าง 0.01 แต่ current_total ต่างจาก component อื่นด้วย | RULE_ONLY | `PGS10-CUR-002` | HOLD | CURRENT_BALANCE_MISMATCH | DEC-18 |
 | T-40 | บ้านเลขที่ต่าง / เลขภายในของ Account ต่าง ไม่ Auto-pass | RULE_ONLY | `PGS10-ID-001` | HOLD | VERIFY_REFERENCE_MAPPING | DEC-15 |
