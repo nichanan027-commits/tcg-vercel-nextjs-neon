@@ -199,14 +199,26 @@
 
   let sample = null, canImages = false, ctl = null;
   function setStatus(t, bad) { status.textContent = t || ''; status.classList.toggle('bad', !!bad); }
+  let diag = '';
+  const notice = el('div', { class: 'xnotice', hidden: true });
+  I.panel.insertBefore(notice, I.panel.firstChild);
   (async () => {
+    let lim = null, limErr = null;
     try {
       sample = window.claude && (await window.claude.use('sample'));
-      if (sample) { const lim = await sample.limits().catch(() => null); canImages = !!(lim && lim.images); }
-    } catch (e) { sample = null; }
+      if (sample) { try { lim = await sample.limits(); } catch (e) { limErr = (e && (e.code || e.message)) || 'error'; } }
+    } catch (e) { sample = null; limErr = (e && (e.code || e.message)) || 'error'; }
+    // images: usable when limits() says so; when limits() itself fails we still let the viewer try (an images_unavailable error is handled)
+    canImages = !!(lim && lim.images) || (!!sample && !lim);
+    diag = 'window.claude: ' + (window.claude ? 'มี' : 'ไม่มี') + ' · sample: ' + (sample ? 'ใช้ได้' : 'ไม่ได้') + ' · limits(): ' + (lim ? JSON.stringify(lim) : 'ไม่ได้ค่า' + (limErr ? ' (' + limErr + ')' : '')) + ' · ' + (navigator.userAgent || '').slice(0, 90);
     if (!sample || !canImages) {
-      runBtn.disabled = true; allBtn.disabled = true; consentChk.disabled = true;
-      setStatus(!sample ? 'ฟีเจอร์นี้ใช้ได้เฉพาะเมื่อเปิดหน้านี้ผ่านลิงก์ที่เผยแพร่ใน claude.ai (ต้องมีสิทธิ์เรียก Claude) — ตอนนี้ยังใช้ดูเอกสารและกรอกเองได้ตามปกติ' : 'มุมมองนี้ส่งภาพให้ AI ไม่ได้ — ใช้ดูเอกสารและกรอกเองได้ตามปกติ', false);
+      runBtn.disabled = true; allBtn.disabled = true; consentChk.disabled = true; autoChk.disabled = true;
+      const why = !sample ? 'หน้านี้เรียก Claude ไม่ได้ในมุมมองที่เปิดอยู่ (ต้องเปิดผ่านลิงก์ที่เผยแพร่ใน claude.ai ด้วยบัญชีที่มีสิทธิ์)' : 'มุมมองที่เปิดอยู่ (เวอร์ชันของแอป/เว็บ) ไม่รองรับการส่งภาพให้ AI — ปุ่ม “อ่านด้วย AI” จึงใช้ไม่ได้';
+      notice.hidden = false;
+      notice.replaceChildren(el('strong', { text: 'ปุ่ม AI ถูกปิดไว้: ' }), el('span', { text: why + '. ยังใช้ดูเอกสาร กรอกเอง และกด “ตรวจสอบ” ได้ตามปกติ' }),
+        el('p', { class: 'muted', text: 'ทางออก: ส่งไฟล์ให้ Claude อ่านในแชต แล้วนำเข้าไฟล์ JSON ที่ได้ด้วยปุ่ม “นำเข้าไฟล์” — ค่าจะเข้าฟอร์มและตรวจให้ทันที' }),
+        el('details', {}, [el('summary', { text: 'รายละเอียดทางเทคนิค (ส่งให้ผู้พัฒนาดูได้)' }), el('code', { text: diag })]));
+      setStatus('', false);
     }
   })();
 
@@ -226,7 +238,7 @@
       renderResults(f, spec, fi, out, { text: text === null ? 'unknown' : text ? 'yes' : 'no', scope: scopeSel.value, w: cap.width, h: cap.height });
       setStatus('AI อ่านเสร็จ — ตรวจเทียบกับภาพก่อนกด “ใช้ค่า” (ภาพที่ส่งขนาด ' + cap.width + '×' + cap.height + ' px; ถ้าตัวเลขเล็กมาก ให้ซูมแล้วเลือก “เฉพาะส่วนที่เห็นบนจอ”)');
     } catch (e) {
-      const m = { cancelled: 'ยกเลิกแล้ว', not_granted: 'ไม่ได้รับอนุญาตให้ใช้ Claude ในหน้านี้', rate_limited: 'เรียกบ่อยเกินไปหรือถึงขีดจำกัดการใช้งาน — ลองใหม่ภายหลัง', image_rejected: 'ภาพถูกปฏิเสธ (ชนิด/ขนาดไม่รองรับ)', invalid_json: 'AI ตอบในรูปแบบที่อ่านไม่ได้ — ลองใหม่ หรือเลือกเฉพาะส่วนที่เห็นบนจอ', refused: 'AI ไม่ตอบคำขอนี้', session_expired: 'ต้องเข้าสู่ระบบ claude.ai ใหม่' }[e && e.code] || 'เรียก AI ไม่สำเร็จ (' + ((e && e.code) || (e && e.message) || 'unknown') + ')';
+      const m = { cancelled: 'ยกเลิกแล้ว', not_granted: 'ไม่ได้รับอนุญาตให้ใช้ Claude ในหน้านี้', rate_limited: 'เรียกบ่อยเกินไปหรือถึงขีดจำกัดการใช้งาน — ลองใหม่ภายหลัง', image_rejected: 'ภาพถูกปฏิเสธ (ชนิด/ขนาดไม่รองรับ)', images_unavailable: 'มุมมองนี้ส่งภาพให้ AI ไม่ได้ (ต้องใช้แอป/เว็บเวอร์ชันที่รองรับ) — ใช้ทางออก: ให้ Claude อ่านในแชตแล้วนำเข้า JSON', invalid_json: 'AI ตอบในรูปแบบที่อ่านไม่ได้ — ลองใหม่ หรือเลือกเฉพาะส่วนที่เห็นบนจอ', refused: 'AI ไม่ตอบคำขอนี้', session_expired: 'ต้องเข้าสู่ระบบ claude.ai ใหม่' }[e && e.code] || 'เรียก AI ไม่สำเร็จ (' + ((e && e.code) || (e && e.message) || 'unknown') + ')';
       setStatus(m, e && e.code !== 'cancelled');
     } finally { runBtn.disabled = allBtn.disabled = !sample || !canImages; stopBtn.hidden = true; ctl = null; }
   });
@@ -256,7 +268,7 @@
   }
 
   // two passes so a 20+ page bundle finishes in minutes: (A) quick classification of every page, (B) full read of the pages whose type has fields
-  const POOL = 2, MAX_PAGES = 60, FATAL = ['cancelled', 'not_granted', 'rate_limited', 'session_expired', 'sampling_disabled', 'capability_disabled'];
+  const POOL = 2, MAX_PAGES = 60, FATAL = ['images_unavailable', 'cancelled', 'not_granted', 'rate_limited', 'session_expired', 'sampling_disabled', 'capability_disabled'];
   const TYPE_KEYS = Object.keys(DOC_FIELDS);
   function buildClassifyPrompt(f, p) {
     return ['จัดประเภทหน้าเอกสารภาษาไทยหนึ่งหน้า (ไฟล์ ' + f.name + ' หน้า ' + p + ') ที่อยู่ในชุดเอกสารเคสค้ำประกัน PGS 10. ภาพอาจเอียง/หมุน/สแกน.',
@@ -307,7 +319,7 @@
       setStatus(auto ? 'อ่านครบแล้ว — กำลังใส่ค่าและตรวจ…' : `อ่านครบ ${n} หน้า — ตรวจสรุปด้านล่างแล้วกด “ใช้ค่าที่มั่นใจ แล้วตรวจสอบ”`);
     } catch (e) {
       const ok = Object.keys(pages).length;
-      setStatus((e && e.code === 'cancelled' ? 'หยุดแล้ว' : 'หยุดกลางทาง (' + ((e && e.code) || (e && e.message) || 'error') + ')') + ' — ไม่มีการใส่ค่าให้อัตโนมัติ', !(e && e.code === 'cancelled'));
+      setStatus(e && e.code === 'images_unavailable' ? 'มุมมองนี้ส่งภาพให้ AI ไม่ได้ — ให้ Claude อ่านในแชตแล้วนำเข้า JSON ด้วยปุ่ม “นำเข้าไฟล์”' : (e && e.code === 'cancelled' ? 'หยุดแล้ว' : 'หยุดกลางทาง (' + ((e && e.code) || (e && e.message) || 'error') + ')') + ' — ไม่มีการใส่ค่าให้อัตโนมัติ', !(e && e.code === 'cancelled'));
       auto = false;
     } finally {
       runBtn.disabled = allBtn.disabled = !sample || !canImages; stopBtn.hidden = true; ctl = null;
@@ -330,7 +342,8 @@
   autoChk.addEventListener('change', () => store.set('pgs10.ai.auto', autoChk.checked ? '1' : '0'));
   let pendingAuto = null;
   function auto(f) {
-    if (!f || f.kind === 'other' || !sample || !canImages) return;
+    if (!f || f.kind === 'other') return;
+    if (!sample || !canImages) return; // the notice at the top of the panel already explains why
     if (!consentChk.checked) {
       pendingAuto = f;
       const go = el('button', { type: 'button', class: 'primary', text: 'ตกลง — ส่งภาพให้ AI อ่านและตรวจให้เลย' });
