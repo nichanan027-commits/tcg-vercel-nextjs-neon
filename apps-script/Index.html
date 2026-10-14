@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base target="_top">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Sarabun', sans-serif; }
+    .slide-16-9 { aspect-ratio: 16 / 9; width: 100%; max-width: 1440px; margin: auto; overflow: hidden; background: #f8fafc; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
+    .hide-scroll::-webkit-scrollbar { display: none; }
+    .tcg-header-bg { background: linear-gradient(to right, #e8f0fe, #d2e3fc); }
+
+    /* พิมพ์เฉพาะรายงานเสนอ */
+    @media print {
+      body { display: block !important; height: auto !important; width: auto !important; padding: 0 !important; background: #fff !important; }
+      body > *:not(#proposalModal) { display: none !important; }
+      #proposalModal { position: static !important; display: block !important; background: #fff !important; padding: 0 !important; backdrop-filter: none !important; }
+      #proposalModal .no-print { display: none !important; }
+      #proposalModal .modal-card { height: auto !important; max-width: none !important; border: 0 !important; box-shadow: none !important; overflow: visible !important; }
+      #proposalModal .modal-body { overflow: visible !important; }
+      #proposalTable thead { display: table-header-group; }
+      #proposalTable tr { page-break-inside: avoid; }
+      @page { size: A4 landscape; margin: 14mm; }
+    }
+  </style>
+</head>
+<body class="bg-gray-900 h-screen w-screen flex items-center justify-center p-2">
+
+  <div class="slide-16-9 flex flex-col rounded-xl border border-gray-300">
+
+    <header class="tcg-header-bg px-8 pt-4 pb-3 border-b-2 border-blue-900 shadow-sm relative">
+      <div class="flex flex-col items-center justify-center mb-2 relative">
+        <h1 class="text-3xl font-bold text-blue-900 tracking-wide">รายงานเสนอขออนุมัติ</h1>
+      </div>
+
+      <div class="flex justify-between items-end mt-1">
+        <div class="pb-1">
+          <div class="flex items-center gap-2 mb-2 bg-blue-100/50 p-2 rounded-lg border border-blue-200">
+            <span class="text-blue-900 text-base font-bold pl-1">📋 เลือกสถาบันการเงิน :</span>
+            <select id="bankSelector" onchange="filterByBank()" class="bg-white text-blue-900 text-base font-bold px-3 py-1.5 rounded shadow-sm border border-blue-300 outline-none cursor-pointer hover:bg-blue-50 transition">
+              <option>กำลังโหลดฐานข้อมูล...</option>
+            </select>
+            <button onclick="openProposal()" class="ml-2 bg-orange-500 hover:bg-orange-600 text-white text-base font-bold px-4 py-1.5 rounded shadow-sm transition">📄 สร้างรายงานเสนอ</button>
+          </div>
+          <p class="text-base text-blue-700 font-semibold pl-1">หน้า 1/1 (Interactive Dashboard)</p>
+        </div>
+
+        <div class="text-right text-blue-900 font-semibold text-lg">
+          <p class="mb-1">จำนวนเสนออนุมัติ <span id="topTotalCases" class="text-orange-500 font-bold text-2xl mx-1">0</span> ราย</p>
+          <p class="mb-1">จำนวนเงินค่าประกันชดเชย <span id="portText" class="text-orange-500 font-bold text-2xl mx-1">0.00</span> บาท</p>
+          <p class="text-gray-600 text-base mt-2 font-medium">ติดต่อได้ <span id="contactYes" class="text-blue-800 font-bold">0</span> ราย &nbsp;|&nbsp; ติดต่อไม่ได้ <span id="contactNo" class="text-red-600 font-bold">0</span> ราย</p>
+        </div>
+      </div>
+    </header>
+
+    <div class="grid grid-cols-3 gap-4 px-6 py-3 bg-white border-b shadow-sm">
+      <div class="bg-green-50 px-4 py-2 rounded border-l-4 border-green-500 flex justify-between items-center">
+        <h3 class="text-green-800 text-sm font-bold">🟢 ผ่านเกณฑ์ (Auto-Approve)</h3>
+        <p class="text-2xl font-black text-green-600" id="countGreen">0</p>
+      </div>
+      <div class="bg-orange-50 px-4 py-2 rounded border-l-4 border-orange-500 flex justify-between items-center">
+        <h3 class="text-orange-800 text-sm font-bold">🟡 ดำเนินคดี (Litigation)</h3>
+        <p class="text-2xl font-black text-orange-600" id="countOrange">0</p>
+      </div>
+      <div class="bg-red-50 px-4 py-2 rounded border-l-4 border-red-500 flex justify-between items-center">
+        <h3 class="text-red-800 text-sm font-bold">🔴 มีประเด็น (Grey Area)</h3>
+        <p class="text-2xl font-black text-red-600" id="countRed">0</p>
+      </div>
+    </div>
+
+    <div class="flex-1 overflow-auto hide-scroll p-4 bg-gray-50">
+      <table class="w-full text-left shadow-sm rounded-lg overflow-hidden border-collapse bg-white">
+        <thead class="bg-orange-400 text-white text-sm uppercase font-bold text-center sticky top-0 z-10 shadow-sm">
+          <tr>
+            <th class="p-2 border border-orange-300 w-12">ลำดับที่</th>
+            <th class="p-2 border border-orange-300 text-left w-48">โครงการ</th>
+            <th class="p-2 border border-orange-300">จ่ายครั้งที่</th>
+            <th class="p-2 border border-orange-300 w-36">ประเภทการค้ำประกัน</th>
+            <th class="p-2 border border-orange-300">เงื่อนไข</th>
+            <th class="p-2 border border-orange-300">สัดส่วน</th>
+            <th class="p-2 border border-orange-300 text-right">จำนวนเงิน</th>
+            <th class="p-2 border border-orange-300 text-right">คงเหลือจ่ายได้</th>
+            <th class="p-2 border border-orange-300 w-28">สถานะการติดต่อ</th>
+            <th class="p-2 border border-orange-300 w-24">สถานะกิจการ</th>
+            <th class="p-2 border border-orange-300 w-28">เครื่องมือ</th>
+          </tr>
+        </thead>
+        <tbody id="tableBody" class="divide-y divide-gray-200">
+          <tr><td colspan="11" class="text-center py-10 text-gray-500 text-lg">กำลังประมวลผลข้อมูล...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Pop-up ประเด็นพิจารณา -->
+  <div id="smartModal" class="fixed inset-0 bg-gray-900/85 hidden items-center justify-center z-50 backdrop-blur-sm p-4">
+    <div class="bg-white rounded-xl shadow-2xl w-full max-w-6xl h-[85vh] flex flex-col overflow-hidden border-t-8 border-orange-500">
+      <div class="bg-gray-50 px-6 py-4 border-b flex justify-between items-center shrink-0">
+        <div>
+          <span class="text-sm font-bold text-orange-600 bg-orange-100 px-3 py-1 rounded-full">⭐ บันทึกการพิจารณาข้อกฎหมายและหลักฐาน</span>
+          <h2 id="modalSmeName" class="text-2xl font-bold text-gray-800 mt-2">ชื่อผู้ประกอบการ</h2>
+        </div>
+        <button onclick="closeSmartModal()" class="text-gray-400 hover:text-red-500 text-4xl font-bold">&times;</button>
+      </div>
+
+      <div class="flex-1 flex overflow-hidden">
+        <div class="w-1/2 p-6 overflow-y-auto border-r bg-white space-y-5">
+          <div class="bg-red-50 border border-red-200 rounded-xl p-5">
+            <h4 class="font-bold text-red-700 text-base pb-2 border-b border-red-200/50">⚠️ ประเด็นที่ตรวจพบ</h4>
+            <p id="modalIssueText" class="text-gray-800 mt-3 text-base whitespace-pre-wrap">-</p>
+          </div>
+          <div class="bg-green-50 border border-green-200 rounded-xl p-5">
+            <h4 class="font-bold text-green-700 text-base pb-2 border-b border-green-200/50">✅ การปลดล็อก</h4>
+            <p id="modalUnlockText" class="text-gray-800 mt-3 text-base whitespace-pre-wrap">-</p>
+          </div>
+        </div>
+
+        <div class="w-1/2 bg-slate-100 p-4 flex flex-col">
+          <div class="flex justify-between items-center mb-2 px-2">
+            <h4 class="font-bold text-slate-700 text-base">📄 เอกสารหลักฐาน</h4>
+          </div>
+          <div class="flex-1 w-full bg-white border border-gray-300 rounded-lg flex items-center justify-center overflow-hidden relative">
+            <div id="noDocText" class="text-gray-400 font-medium text-lg text-center">ไม่มีเอกสารแนบในระบบ</div>
+            <iframe id="modalDocPreview" class="w-full h-full absolute inset-0 hidden" src="" frameborder="0" allow="autoplay"></iframe>
+          </div>
+        </div>
+      </div>
+      <div class="bg-gray-100 px-6 py-3 flex justify-end shrink-0">
+        <button onclick="closeSmartModal()" class="bg-gray-700 hover:bg-gray-800 text-white text-base font-semibold px-6 py-2 rounded-lg">ปิดหน้าต่าง</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- รายงานเสนอจ่ายค่าประกันชดเชย (รูปแบบเดียวกับวาระพิจารณาจ่ายในรายงานการประชุม) -->
+  <div id="proposalModal" class="fixed inset-0 bg-gray-900/85 hidden items-center justify-center z-50 backdrop-blur-sm p-4">
+    <div class="modal-card bg-white rounded-xl shadow-2xl w-full max-w-6xl h-[90vh] flex flex-col overflow-hidden border-t-8 border-blue-900">
+      <div class="no-print bg-gray-50 px-6 py-3 border-b flex flex-wrap justify-between items-center gap-3 shrink-0">
+        <div class="flex items-center gap-2">
+          <span class="text-blue-900 font-bold">📄 รายงานเสนอจ่ายค่าประกันชดเชย — รอบประชุม :</span>
+          <select id="roundSelector" onchange="loadProposal(this.value)" class="bg-white text-blue-900 font-bold px-3 py-1.5 rounded shadow-sm border border-blue-300 outline-none cursor-pointer"></select>
+        </div>
+        <div class="flex items-center gap-2">
+          <span id="docResult" class="text-sm text-green-700 font-semibold"></span>
+          <button id="docBtn" onclick="createDoc()" class="bg-blue-700 hover:bg-blue-800 text-white font-semibold px-4 py-1.5 rounded-lg">สร้าง Google Docs</button>
+          <button onclick="window.print()" class="bg-orange-500 hover:bg-orange-600 text-white font-semibold px-4 py-1.5 rounded-lg">พิมพ์ / บันทึก PDF</button>
+          <button onclick="closeProposal()" class="text-gray-400 hover:text-red-500 text-3xl font-bold leading-none px-2">&times;</button>
+        </div>
+      </div>
+      <div class="modal-body flex-1 overflow-auto p-8 bg-white text-gray-900">
+        <div id="proposalBody" class="text-lg text-gray-500">กำลังโหลด...</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    window.allCasesData = [];
+    window.proposalRound = '';
+
+    // ===== ตัวช่วย =====
+    function esc(s) {
+      return String(s == null ? '' : s).replace(/[&<>"']/g, function (ch) {
+        return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch];
+      });
+    }
+    function money(n) {
+      return Number(n || 0).toLocaleString('th-TH', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+    function safeUrl(u) {
+      return /^https?:\/\//i.test(String(u || '').trim()) ? String(u).trim() : '';
+    }
+    function showError(err) {
+      const msg = (err && err.message) ? err.message : String(err);
+      document.getElementById('tableBody').innerHTML =
+        '<tr><td colspan="11" class="text-center py-10 text-red-600 text-lg">โหลดข้อมูลไม่สำเร็จ: ' + esc(msg) + '</td></tr>';
+    }
+
+    // ===== แดชบอร์ด =====
+    window.onload = function () {
+      google.script.run.withSuccessHandler(initializeData).withFailureHandler(showError).getBoardData();
+      document.getElementById('tableBody').addEventListener('click', onTableClick);
+    };
+
+    function initializeData(data) {
+      if (!data) { showError('ไม่ได้รับข้อมูลจากเซิร์ฟเวอร์'); return; }
+      window.allCasesData = data.cases;
+
+      const selector = document.getElementById('bankSelector');
+      selector.innerHTML = '';
+      data.banks.forEach(function (bank) {
+        const option = document.createElement('option');
+        option.value = bank.code;
+        option.textContent = bank.name && bank.name !== bank.code ? bank.code + ' — ' + bank.name : bank.code;
+        selector.appendChild(option);
+      });
+
+      if (data.banks.length > 0) filterByBank();
+      else document.getElementById('tableBody').innerHTML =
+        '<tr><td colspan="11" class="text-center py-10 text-gray-500 text-lg">ไม่พบข้อมูล</td></tr>';
+    }
+
+    function filterByBank() {
+      const selectedBank = document.getElementById('bankSelector').value;
+      renderTable(window.allCasesData.filter(function (c) { return c.bank === selectedBank; }));
+    }
+
+    function renderTable(dataCases) {
+      let html = '';
+      let r = 0, o = 0, g = 0, contactYesCount = 0, contactNoCount = 0, totalAmount = 0;
+
+      dataCases.forEach(function (c) {
+        totalAmount += c.amount;
+
+        if (c.status === 'RED') r++;
+        else if (c.status === 'ORANGE') o++;
+        else g++;
+
+        if (c.contact.includes('ติดต่อได้') && !c.contact.includes('ติดต่อไม่ได้')) contactYesCount++;
+        else if (c.contact.includes('ติดต่อไม่ได้') || c.contact.includes('ไม่รับสาย') || c.contact.includes('ไม่มีสัญญาณ')) contactNoCount++;
+
+        let buttons;
+        if (c.status === 'RED') {
+          buttons = '<button data-act="issue" data-gi="' + c.globalIndex + '" class="bg-orange-500 hover:bg-orange-600 text-white font-bold px-3 py-1.5 rounded shadow-sm text-[13px] w-full transition">⭐ ประเด็น</button>';
+        } else if (safeUrl(c.link)) {
+          buttons = '<button data-act="doc" data-gi="' + c.globalIndex + '" class="bg-blue-100 hover:bg-blue-200 text-blue-700 font-bold px-3 py-1.5 rounded text-[13px] w-full border border-blue-200 transition">📄 เอกสาร</button>';
+        } else {
+          buttons = '<span class="text-gray-400 text-sm">- ปกติ -</span>';
+        }
+
+        html += '<tr class="hover:bg-orange-50 border-b border-gray-200 text-gray-800">' +
+          '<td class="p-2 text-center font-bold border-r border-gray-200 text-[14px]">' + esc(c.id) + '</td>' +
+          '<td class="p-2 font-bold border-r border-gray-200 text-[15px]">' + esc(c.name) + '</td>' +
+          '<td class="p-2 text-center border-r border-gray-200 text-[14px]">' + esc(c.payRound) + '</td>' +
+          '<td class="p-2 text-center border-r border-gray-200 leading-tight text-[14px]">' + esc(c.guaranteeType) + '</td>' +
+          '<td class="p-2 text-center font-semibold border-r border-gray-200 text-[14px]">' + esc(c.condition) + '</td>' +
+          '<td class="p-2 text-center border-r border-gray-200 text-[14px]">' + esc(c.ratio) + '</td>' +
+          '<td class="p-2 text-right font-mono font-bold text-gray-900 border-r border-gray-200 text-[15px]">' + money(c.amount) + '</td>' +
+          '<td class="p-2 text-right font-mono text-gray-600 border-r border-gray-200 text-[14px]">' + money(c.remain) + '</td>' +
+          '<td class="p-2 text-center leading-tight border-r border-gray-200 text-[13px] text-gray-600">' + esc(c.contact) + '</td>' +
+          '<td class="p-2 text-center leading-tight border-r border-gray-200 text-[13px] text-gray-600">' + esc(c.businessStatus) + '</td>' +
+          '<td class="p-2 text-center">' + buttons + '</td>' +
+          '</tr>';
+      });
+
+      document.getElementById('tableBody').innerHTML = html ||
+        '<tr><td colspan="11" class="text-center py-10 text-gray-500 text-lg">ไม่พบข้อมูล</td></tr>';
+
+      document.getElementById('countRed').innerText = r;
+      document.getElementById('countOrange').innerText = o;
+      document.getElementById('countGreen').innerText = g;
+      document.getElementById('contactYes').innerText = contactYesCount;
+      document.getElementById('contactNo').innerText = contactNoCount;
+      document.getElementById('topTotalCases').innerText = dataCases.length;
+      document.getElementById('portText').innerText = money(totalAmount);
+    }
+
+    function findCase(globalIndex) {
+      return window.allCasesData.find(function (item) { return item.globalIndex === globalIndex; });
+    }
+
+    function onTableClick(e) {
+      const btn = e.target.closest('button[data-act]');
+      if (!btn) return;
+      const c = findCase(Number(btn.dataset.gi));
+      if (!c) return;
+      if (btn.dataset.act === 'issue') openSmartModal(c);
+      else if (btn.dataset.act === 'doc') window.open(safeUrl(c.link), '_blank', 'noopener');
+    }
+
+    // ===== Pop-up ประเด็น =====
+    function formatDriveLinkForEmbed(url) {
+      if (url.includes('drive.google.com') && url.includes('/view')) return url.replace(/\/view.*$/, '/preview');
+      return url;
+    }
+
+    function openSmartModal(c) {
+      document.getElementById('modalSmeName').innerText = c.name;
+      document.getElementById('modalIssueText').innerText = c.issueTitle || 'ไม่มีระบุ';
+      document.getElementById('modalUnlockText').innerText = c.issueUnlock || 'ไม่มีระบุ';
+
+      const previewIframe = document.getElementById('modalDocPreview');
+      const noDocText = document.getElementById('noDocText');
+      const link = safeUrl(c.link);
+
+      if (link) {
+        noDocText.classList.add('hidden');
+        previewIframe.classList.remove('hidden');
+        previewIframe.src = formatDriveLinkForEmbed(link);
+      } else {
+        noDocText.classList.remove('hidden');
+        previewIframe.classList.add('hidden');
+        previewIframe.src = '';
+      }
+      document.getElementById('smartModal').classList.replace('hidden', 'flex');
+    }
+
+    function closeSmartModal() {
+      document.getElementById('smartModal').classList.replace('flex', 'hidden');
+      document.getElementById('modalDocPreview').src = '';
+    }
+
+    // ===== รายงานเสนอจ่ายค่าประกันชดเชย =====
+    function openProposal() {
+      document.getElementById('proposalModal').classList.replace('hidden', 'flex');
+      loadProposal('');
+    }
+
+    function closeProposal() {
+      document.getElementById('proposalModal').classList.replace('flex', 'hidden');
+    }
+
+    function loadProposal(round) {
+      document.getElementById('docResult').innerHTML = '';
+      document.getElementById('proposalBody').innerHTML = '<div class="text-lg text-gray-500">กำลังโหลด...</div>';
+      google.script.run
+        .withSuccessHandler(renderProposal)
+        .withFailureHandler(function (err) {
+          document.getElementById('proposalBody').innerHTML =
+            '<div class="text-lg text-red-600">โหลดรายงานไม่สำเร็จ: ' + esc(err && err.message ? err.message : err) + '</div>';
+        })
+        .getProposal(round);
+    }
+
+    function renderProposal(p) {
+      window.proposalRound = p.round;
+
+      const sel = document.getElementById('roundSelector');
+      sel.innerHTML = '';
+      p.rounds.forEach(function (r) {
+        const o = document.createElement('option');
+        o.value = r; o.textContent = r; o.selected = (r === p.round);
+        sel.appendChild(o);
+      });
+
+      if (!p.count) {
+        document.getElementById('proposalBody').innerHTML = '<div class="text-lg text-gray-500">ไม่พบรายการเสนอในรอบนี้</div>';
+        return;
+      }
+
+      let rows = '';
+      p.rows.forEach(function (r) {
+        rows += '<tr>' +
+          '<td class="border border-gray-400 px-2 py-1 text-center align-top">' + r.no + '</td>' +
+          '<td class="border border-gray-400 px-2 py-1 align-top">' + esc(r.name) + '</td>' +
+          '<td class="border border-gray-400 px-2 py-1 align-top">' + esc(r.type) + '</td>' +
+          '<td class="border border-gray-400 px-2 py-1 text-right align-top font-mono">' + money(r.limit) + '</td>' +
+          '<td class="border border-gray-400 px-2 py-1 text-right align-top font-mono">' + money(r.amount) + '</td>' +
+          '<td class="border border-gray-400 px-2 py-1 align-top text-sm">' + (esc(r.note) || '-') + '</td>' +
+          '</tr>';
+      });
+
+      let issues = '';
+      if (p.issues.length) {
+        issues = '<h3 class="font-bold mt-8 mb-2">รายที่มีประเด็นพิจารณาเพิ่มเติม</h3>';
+        p.issues.forEach(function (it) {
+          issues += '<div class="mb-4"><p class="font-semibold">ลำดับที่ ' + it.no + ' ' + esc(it.name) + '</p>' +
+            '<p class="whitespace-pre-wrap"><b>ประเด็น:</b> ' + (esc(it.title) || '-') + '</p>' +
+            '<p class="whitespace-pre-wrap"><b>การปลดล็อก:</b> ' + (esc(it.unlock) || '-') + '</p></div>';
+        });
+        issues += '<p class="text-sm text-gray-700">ทั้งนี้ รายที่มีประเด็นพิจารณาเพิ่มเติมอยู่ในกรอบแนววิธีปฏิบัติที่นำเสนอต่อคณะกรรมการจ่ายค่าประกันชดเชย' +
+          esc(p.policyReference) + '</p>';
+      }
+
+      document.getElementById('proposalBody').innerHTML =
+        '<h2 class="text-xl font-bold text-center mb-4">รายงานเสนอจ่ายค่าประกันชดเชย ' + esc(p.round) + '</h2>' +
+        '<p class="font-semibold mb-1">ระเบียบวาระ ' + esc(p.heading) + '</p>' +
+        '<p class="text-right text-sm mb-1">หน่วย : บาท</p>' +
+        '<table id="proposalTable" class="w-full border-collapse text-base">' +
+          '<thead class="bg-orange-200 font-bold text-center"><tr>' +
+            '<th class="border border-gray-400 px-2 py-1 w-14">ลำดับ</th>' +
+            '<th class="border border-gray-400 px-2 py-1">ชื่อโครงการ</th>' +
+            '<th class="border border-gray-400 px-2 py-1">ประเภท</th>' +
+            '<th class="border border-gray-400 px-2 py-1">วงเงินค้ำประกัน<br>(ล่าสุด)</th>' +
+            '<th class="border border-gray-400 px-2 py-1">ขออนุมัติจ่าย<br>ค่าประกันชดเชย</th>' +
+            '<th class="border border-gray-400 px-2 py-1">หมายเหตุ</th>' +
+          '</tr></thead><tbody>' + rows + '</tbody>' +
+          '<tfoot><tr class="font-bold bg-gray-100">' +
+            '<td class="border border-gray-400 px-2 py-1"></td>' +
+            '<td class="border border-gray-400 px-2 py-1" colspan="3">รวม ' + p.count + ' ราย</td>' +
+            '<td class="border border-gray-400 px-2 py-1 text-right font-mono">' + money(p.total) + '</td>' +
+            '<td class="border border-gray-400 px-2 py-1"></td>' +
+          '</tr></tfoot></table>' + issues;
+    }
+
+    function createDoc() {
+      const btn = document.getElementById('docBtn');
+      const out = document.getElementById('docResult');
+      btn.disabled = true; btn.classList.add('opacity-60');
+      out.innerHTML = 'กำลังสร้างเอกสาร...';
+      google.script.run
+        .withSuccessHandler(function (res) {
+          btn.disabled = false; btn.classList.remove('opacity-60');
+          out.innerHTML = '✅ สร้างแล้ว: <a class="underline" target="_blank" rel="noopener" href="' + esc(safeUrl(res.url)) + '">' + esc(res.name) + '</a>';
+        })
+        .withFailureHandler(function (err) {
+          btn.disabled = false; btn.classList.remove('opacity-60');
+          out.innerHTML = '<span class="text-red-600">สร้างเอกสารไม่สำเร็จ: ' + esc(err && err.message ? err.message : err) + '</span>';
+        })
+        .createProposalDoc(window.proposalRound);
+    }
+  </script>
+</body>
+</html>
