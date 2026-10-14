@@ -623,7 +623,7 @@
 
     function togglePresentFullscreen() {
       if (document.fullscreenElement) document.exitFullscreen();
-      else if (document.getElementById('presentModal').requestFullscreen) document.getElementById('presentModal').requestFullscreen();
+      else if (document.getElementById('presentModal').requestFullscreen) document.getElementById('presentModal').requestFullscreen().catch(function () {}); // บางเบราว์เซอร์ปฏิเสธ ใช้โหมดปกติต่อได้
     }
 
     function closePresent() {
