@@ -10,6 +10,49 @@
     .hide-scroll::-webkit-scrollbar { display: none; }
     .tcg-header-bg { background: linear-gradient(to right, #e8f0fe, #d2e3fc); }
 
+    /* โหมดนำเสนอ (ใช้หน่วย cqw ให้สัดส่วนคงที่ทุกขนาดจอ ไม่พึ่ง Tailwind) */
+    #presentModal { position: fixed; inset: 0; background: #0b1220; z-index: 60; display: none; flex-direction: column; }
+    #presentModal.on { display: flex; }
+    .pbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 8px 16px; color: #cbd5e1; font-size: 14px; flex-wrap: wrap; }
+    .pbar button, .pbar select { background: #1e293b; color: #e2e8f0; border: 1px solid #334155; border-radius: 8px; padding: 6px 12px; font-family: inherit; font-size: 14px; cursor: pointer; }
+    .pbar button:hover { background: #334155; }
+    .pprogress { height: 3px; background: #1e293b; }
+    .pprogress > div { height: 100%; background: #fb923c; width: 0; transition: width .2s; }
+    .pstage { flex: 1; display: flex; align-items: center; justify-content: center; min-height: 0; padding: 12px; }
+    .pslide { aspect-ratio: 16 / 9; width: min(100%, calc((100vh - 96px) * 16 / 9)); container-type: inline-size; background: #f8fafc; border-radius: 12px; overflow: hidden; display: flex; flex-direction: column; font-family: 'Sarabun', sans-serif; color: #1e293b; box-shadow: 0 10px 40px rgba(0,0,0,.5); }
+    .ptop { background: linear-gradient(to right, #e8f0fe, #d2e3fc); border-bottom: .25cqw solid #1e3a8a; padding: 1.4cqw 3cqw; display: flex; justify-content: space-between; align-items: center; }
+    .ptop h1 { font-size: 2.6cqw; font-weight: 700; color: #1e3a8a; margin: 0; }
+    .ptop .sub { font-size: 1.6cqw; color: #1d4ed8; font-weight: 600; margin-top: .2cqw; }
+    .ptop .pg { font-size: 1.4cqw; color: #475569; }
+    .pbody { flex: 1; padding: 1.8cqw 3cqw; overflow: hidden; min-height: 0; display: flex; flex-direction: column; gap: 1.2cqw; }
+    .pt { width: 100%; border-collapse: collapse; background: #fff; }
+    .pt th { background: #fb923c; color: #fff; font-size: 1.2cqw; line-height: 1.2; padding: .6cqw .7cqw; border: 1px solid #fdba74; }
+    .pt td { font-size: 1.3cqw; line-height: 1.3; padding: .5cqw .7cqw; border-bottom: 1px solid #e5e7eb; vertical-align: middle; }
+    .pt td.nw { white-space: nowrap; }
+    .pt td.c, .pt th.c { text-align: center; } .pt td.r, .pt th.r { text-align: right; font-variant-numeric: tabular-nums; }
+    .pt tfoot td { font-weight: 700; background: #f1f5f9; }
+    .pcover { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; gap: 1.6cqw; background: linear-gradient(135deg, #e8f0fe, #d2e3fc); padding: 4cqw; }
+    .pcover h1 { font-size: 4.4cqw; font-weight: 700; color: #1e3a8a; margin: 0; }
+    .pcover .round { font-size: 2.6cqw; color: #1d4ed8; font-weight: 600; }
+    .pcover .big { font-size: 2.4cqw; color: #1e3a8a; font-weight: 600; } .pcover .big b { color: #f97316; font-size: 3.6cqw; margin: 0 .5cqw; }
+    .pcover .meta { font-size: 1.7cqw; color: #475569; }
+    .pkpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.2cqw; }
+    .pkpi { background: #fff; border-left: .5cqw solid #94a3b8; border-radius: .6cqw; padding: 1cqw 1.4cqw; box-shadow: 0 1px 3px rgba(0,0,0,.08); }
+    .pkpi .l { font-size: 1.3cqw; color: #475569; font-weight: 600; } .pkpi .v { font-size: 2.8cqw; font-weight: 800; color: #1e293b; }
+    .pkpi.g { border-color: #22c55e; } .pkpi.g .v { color: #16a34a; } .pkpi.o { border-color: #f97316; } .pkpi.o .v { color: #ea580c; } .pkpi.r { border-color: #ef4444; } .pkpi.r .v { color: #dc2626; }
+    .pbar-cell { background: #e2e8f0; border-radius: .4cqw; height: 1.2cqw; width: 100%; } .pbar-cell > div { background: #fb923c; height: 100%; border-radius: .4cqw; }
+    .pcols { flex: 1; display: grid; grid-template-columns: 1fr 1fr; gap: 1.6cqw; min-height: 0; }
+    .pcol { display: flex; flex-direction: column; gap: 1.2cqw; min-height: 0; }
+    .pbox { border-radius: .8cqw; padding: 1.2cqw 1.6cqw; overflow: auto; font-size: 1.45cqw; line-height: 1.5; white-space: pre-wrap; }
+    .pbox h4 { margin: 0 0 .6cqw; font-size: 1.5cqw; font-weight: 700; }
+    .pbox.red { background: #fef2f2; border: 1px solid #fecaca; flex: 1; } .pbox.red h4 { color: #b91c1c; }
+    .pbox.grn { background: #f0fdf4; border: 1px solid #bbf7d0; flex: 1; } .pbox.grn h4 { color: #15803d; }
+    .pdoc { flex: 1; border: 1px solid #cbd5e1; border-radius: .8cqw; background: #fff; width: 100%; min-height: 0; }
+    .pnodoc { flex: 1; display: flex; align-items: center; justify-content: center; border: 1px dashed #cbd5e1; border-radius: .8cqw; color: #94a3b8; font-size: 1.6cqw; }
+    .pnote { font-size: 1.5cqw; color: #334155; } .pnote b { color: #1e3a8a; }
+    .pclose { flex: 1; display: flex; flex-direction: column; justify-content: center; gap: 1.6cqw; font-size: 2cqw; line-height: 1.6; }
+    .pclose .ask { background: #fff; border-left: .6cqw solid #f97316; padding: 1.6cqw 2cqw; border-radius: .8cqw; box-shadow: 0 1px 4px rgba(0,0,0,.08); }
+
     /* พิมพ์เฉพาะรายงานเสนอ */
     @media print {
       body { display: block !important; height: auto !important; width: auto !important; padding: 0 !important; background: #fff !important; }
@@ -41,6 +84,7 @@
               <option>กำลังโหลดฐานข้อมูล...</option>
             </select>
             <button onclick="openProposal()" class="ml-2 bg-orange-500 hover:bg-orange-600 text-white text-base font-bold px-4 py-1.5 rounded shadow-sm transition">📄 สร้างรายงานเสนอ</button>
+            <button onclick="openPresent()" class="bg-blue-800 hover:bg-blue-900 text-white text-base font-bold px-4 py-1.5 rounded shadow-sm transition">🎬 โหมดนำเสนอ</button>
           </div>
           <p class="text-base text-blue-700 font-semibold pl-1">หน้า 1/1 (Interactive Dashboard)</p>
         </div>
@@ -152,8 +196,30 @@
     </div>
   </div>
 
+  <!-- โหมดนำเสนอในที่ประชุม -->
+  <div id="presentModal">
+    <div class="pbar">
+      <div style="display:flex;align-items:center;gap:8px;">
+        <span>🎬 รอบประชุม :</span>
+        <select id="presentRound" onchange="changePresentRound(this.value)"></select>
+        <span id="presentCount"></span>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;">
+        <button onclick="prevSlide()">◀ ก่อนหน้า</button>
+        <span id="presentPos" style="min-width:64px;text-align:center;"></span>
+        <button onclick="nextSlide()">ถัดไป ▶</button>
+        <button onclick="togglePresentFullscreen()">⛶ เต็มจอ (F)</button>
+        <button onclick="closePresent()">✕ ปิด (Esc)</button>
+      </div>
+    </div>
+    <div class="pprogress"><div id="presentProgress"></div></div>
+    <div class="pstage"><div id="presentSlide" class="pslide"></div></div>
+  </div>
+
   <script>
     window.allCasesData = [];
+    window.allRounds = [];
+    window.bankNames = {};
     window.proposalRound = '';
 
     // ===== ตัวช่วย =====
@@ -183,10 +249,12 @@
     function initializeData(data) {
       if (!data) { showError('ไม่ได้รับข้อมูลจากเซิร์ฟเวอร์'); return; }
       window.allCasesData = data.cases;
+      window.allRounds = data.rounds || [];
 
       const selector = document.getElementById('bankSelector');
       selector.innerHTML = '';
       data.banks.forEach(function (bank) {
+        window.bankNames[bank.code] = bank.name || bank.code;
         const option = document.createElement('option');
         option.value = bank.code;
         option.textContent = bank.name && bank.name !== bank.code ? bank.code + ' — ' + bank.name : bank.code;
@@ -214,8 +282,9 @@
         else if (c.status === 'ORANGE') o++;
         else g++;
 
-        if (c.contact.includes('ติดต่อได้') && !c.contact.includes('ติดต่อไม่ได้')) contactYesCount++;
-        else if (c.contact.includes('ติดต่อไม่ได้') || c.contact.includes('ไม่รับสาย') || c.contact.includes('ไม่มีสัญญาณ')) contactNoCount++;
+        const kind = contactKind(c);
+        if (kind === 'yes') contactYesCount++;
+        else if (kind === 'no') contactNoCount++;
 
         let buttons;
         if (c.status === 'RED') {
@@ -251,6 +320,12 @@
       document.getElementById('contactNo').innerText = contactNoCount;
       document.getElementById('topTotalCases').innerText = dataCases.length;
       document.getElementById('portText').innerText = money(totalAmount);
+    }
+
+    function contactKind(c) {
+      if (c.contact.includes('ติดต่อได้') && !c.contact.includes('ติดต่อไม่ได้')) return 'yes';
+      if (c.contact.includes('ติดต่อไม่ได้') || c.contact.includes('ไม่รับสาย') || c.contact.includes('ไม่มีสัญญาณ')) return 'no';
+      return '';
     }
 
     function findCase(globalIndex) {
@@ -396,6 +471,176 @@
           out.innerHTML = '<span class="text-red-600">สร้างเอกสารไม่สำเร็จ: ' + esc(err && err.message ? err.message : err) + '</span>';
         })
         .createProposalDoc(window.proposalRound);
+    }
+
+    // ===== โหมดนำเสนอในที่ประชุม =====
+    const PRESENT_ROWS = 6; // จำนวนแถวต่อสไลด์ตารางรายธนาคาร
+    window.deck = [];
+    window.deckIndex = 0;
+    window.deckRound = '';
+
+    // สไลด์แต่ละหน้าคือฟังก์ชัน (เลขหน้า, จำนวนหน้า) => HTML เพื่อให้ใส่เลขหน้าตอนแสดงผล
+    function slideFrame(round, sub, bodyHtml) {
+      return function (i, n) {
+        return '<div class="ptop"><div><h1>รายงานเสนอขออนุมัติจ่ายค่าประกันชดเชย' + (round ? ' ' + esc(round) : '') + '</h1>' +
+          '<div class="sub">' + esc(sub) + '</div></div><div class="pg">หน้า ' + i + '/' + n + '</div></div>' +
+          '<div class="pbody">' + bodyHtml + '</div>';
+      };
+    }
+
+    function buildDeck(round) {
+      const items = window.allCasesData
+        .filter(function (c) { return !round || c.round === round; })
+        .map(function (c, i) { return Object.assign({}, c, { no: i + 1 }); }); // ลำดับเดียวกับรายงานเสนอ
+
+      if (!items.length) {
+        return [slideFrame(round, 'ไม่พบรายการ', '<div class="pnote">ไม่พบรายการเสนอในรอบนี้</div>')];
+      }
+
+      const total = items.reduce(function (s, c) { return s + c.amount; }, 0);
+      const groups = [], byBank = {};
+      items.forEach(function (c) {
+        if (!byBank[c.bank]) {
+          byBank[c.bank] = { code: c.bank, name: window.bankNames[c.bank] || c.bank, items: [], amount: 0, yes: 0, no: 0, issues: 0 };
+          groups.push(byBank[c.bank]);
+        }
+        const g = byBank[c.bank];
+        g.items.push(c); g.amount += c.amount;
+        const k = contactKind(c);
+        if (k === 'yes') g.yes++; else if (k === 'no') g.no++;
+        if (c.status === 'RED') g.issues++;
+      });
+      const issues = items.filter(function (c) { return c.status === 'RED'; });
+      const yes = groups.reduce(function (s, g) { return s + g.yes; }, 0);
+      const no = groups.reduce(function (s, g) { return s + g.no; }, 0);
+      const deck = [];
+
+      // 1) หน้าปก
+      deck.push(function () {
+        return '<div class="pcover"><h1>รายงานเสนอขออนุมัติ<br>จ่ายค่าประกันชดเชย</h1>' +
+          (round ? '<div class="round">' + esc(round) + '</div>' : '') +
+          '<div class="big">จำนวน<b>' + items.length + '</b>ราย &nbsp; รวม<b>' + money(total) + '</b>บาท</div>' +
+          '<div class="meta">จาก ' + groups.length + ' สถาบันการเงิน &nbsp;|&nbsp; ติดต่อได้ ' + yes + ' ราย &nbsp;|&nbsp; ติดต่อไม่ได้ ' + no +
+          ' ราย &nbsp;|&nbsp; มีประเด็นพิจารณา ' + issues.length + ' ราย</div></div>';
+      });
+
+      // 2) สรุปรายธนาคาร
+      let sumRows = '';
+      groups.forEach(function (g) {
+        sumRows += '<tr><td>' + esc(g.name) + '</td><td class="c">' + g.items.length + '</td><td class="r">' + money(g.amount) + '</td>' +
+          '<td style="width:18%"><div class="pbar-cell"><div style="width:' + (total ? Math.max(2, g.amount / total * 100) : 0).toFixed(1) + '%"></div></div></td>' +
+          '<td class="c">' + g.yes + '</td><td class="c">' + g.no + '</td><td class="c">' + (g.issues || '-') + '</td></tr>';
+      });
+      const kpis = '<div class="pkpis">' +
+        '<div class="pkpi"><div class="l">จำนวนเสนออนุมัติ</div><div class="v">' + items.length + ' ราย</div></div>' +
+        '<div class="pkpi o"><div class="l">ค่าประกันชดเชยรวม (บาท)</div><div class="v">' + money(total) + '</div></div>' +
+        '<div class="pkpi g"><div class="l">ผ่านเกณฑ์ (Auto-Approve)</div><div class="v">' + (items.length - issues.length) + '</div></div>' +
+        '<div class="pkpi r"><div class="l">มีประเด็น (Grey Area)</div><div class="v">' + issues.length + '</div></div></div>';
+      deck.push(slideFrame(round, 'ภาพรวมรายสถาบันการเงิน', kpis +
+        '<table class="pt"><thead><tr><th style="text-align:left">สถาบันการเงิน</th><th class="c">จำนวน (ราย)</th><th class="r">ค่าประกันชดเชย (บาท)</th><th></th>' +
+        '<th class="c">ติดต่อได้</th><th class="c">ติดต่อไม่ได้</th><th class="c">มีประเด็น</th></tr></thead><tbody>' + sumRows + '</tbody>' +
+        '<tfoot><tr><td>รวม</td><td class="c">' + items.length + '</td><td class="r">' + money(total) + '</td><td></td><td class="c">' + yes +
+        '</td><td class="c">' + no + '</td><td class="c">' + issues.length + '</td></tr></tfoot></table>'));
+
+      // 3) ตารางรายธนาคาร แบ่งหน้าละ PRESENT_ROWS แถว
+      groups.forEach(function (g) {
+        const pages = Math.ceil(g.items.length / PRESENT_ROWS);
+        for (let p = 0; p < pages; p++) {
+          let rows = '';
+          g.items.slice(p * PRESENT_ROWS, (p + 1) * PRESENT_ROWS).forEach(function (c) {
+            const k = contactKind(c);
+            const dot = k === 'yes' ? '🟢 ' : k === 'no' ? '🔴 ' : '';
+            rows += '<tr><td class="c"><b>' + c.no + '</b></td><td><b>' + esc(c.name) + '</b></td><td>' + esc(c.guaranteeType) + '</td>' +
+              '<td class="c nw">' + esc(c.condition) + '</td><td class="c nw">' + esc(c.ratio) + '</td><td class="c nw">' + esc(c.payRound) + '</td>' +
+              '<td class="r nw"><b>' + money(c.amount) + '</b></td><td>' + dot + esc(c.contact) + '</td><td class="c">' + esc(c.businessStatus) + '</td>' +
+              '<td class="c">' + (c.status === 'RED' ? '⭐' : '') + '</td></tr>';
+          });
+          deck.push(slideFrame(round, g.name + (pages > 1 ? ' (' + (p + 1) + '/' + pages + ')' : ''),
+            '<table class="pt"><thead><tr><th class="c">ลำดับ</th><th style="text-align:left">โครงการ</th><th>ประเภทการค้ำประกัน</th><th>เงื่อนไข</th>' +
+            '<th>สัดส่วน</th><th>ฉบับที่</th><th class="r">จำนวนเงิน</th><th>สถานะการติดต่อ</th><th>สถานะกิจการ</th><th></th></tr></thead>' +
+            '<tbody>' + rows + '</tbody></table>' +
+            '<div class="pnote">รวม ' + esc(g.name) + ' <b>' + g.items.length + ' ราย</b> จำนวน <b>' + money(g.amount) + ' บาท</b></div>'));
+        }
+      });
+
+      // 4) รายที่มีประเด็น แยกหน้าละราย พร้อมเอกสารหลักฐาน
+      issues.forEach(function (c) {
+        const link = safeUrl(c.link);
+        const doc = link
+          ? '<iframe class="pdoc" src="' + esc(formatDriveLinkForEmbed(link)) + '" allow="autoplay"></iframe>'
+          : '<div class="pnodoc">ไม่มีเอกสารแนบในระบบ</div>';
+        deck.push(slideFrame(round, 'ลำดับที่ ' + c.no + ' ' + c.name,
+          '<div class="pnote"><b>' + esc(window.bankNames[c.bank] || c.bank) + '</b> &nbsp;|&nbsp; ' + esc(c.guaranteeType) +
+          ' &nbsp;|&nbsp; ขออนุมัติจ่าย <b>' + money(c.amount) + ' บาท</b></div>' +
+          '<div class="pcols"><div class="pcol">' +
+            '<div class="pbox red"><h4>⚠️ ประเด็นที่ตรวจพบ</h4>' + (esc(c.issueTitle) || 'ไม่มีระบุ') + '</div>' +
+            '<div class="pbox grn"><h4>✅ การปลดล็อก</h4>' + (esc(c.issueUnlock) || 'ไม่มีระบุ') + '</div>' +
+          '</div><div class="pcol">' + doc + '</div></div>'));
+      });
+
+      // 5) สรุปขอมติ
+      deck.push(slideFrame(round, 'สรุปที่เสนอต่อที่ประชุม',
+        '<div class="pclose"><div class="ask">ขอเสนอที่ประชุมพิจารณาอนุมัติจ่ายค่าประกันชดเชย ลำดับที่ 1 ถึงลำดับที่ ' + items.length +
+        ' จำนวน <b>' + items.length + ' ราย</b> รวมค่าประกันชดเชย <b>' + money(total) + ' บาท</b></div>' +
+        (issues.length
+          ? '<div>มีรายที่มีประเด็นพิจารณาเพิ่มเติม <b>' + issues.length + ' ราย</b> (ลำดับที่ ' +
+            issues.map(function (c) { return c.no; }).join(', ') + ') ซึ่งได้นำเสนอประเด็นและการปลดล็อกแล้ว</div>'
+          : '<div>ไม่มีรายที่มีประเด็นพิจารณาเพิ่มเติม</div>') + '</div>'));
+
+      return deck;
+    }
+
+    function openPresent() {
+      const sel = document.getElementById('presentRound');
+      sel.innerHTML = '';
+      window.allRounds.forEach(function (r) {
+        const o = document.createElement('option');
+        o.value = r; o.textContent = r; sel.appendChild(o);
+      });
+      sel.style.display = window.allRounds.length ? '' : 'none';
+      document.getElementById('presentModal').classList.add('on');
+      document.addEventListener('keydown', onPresentKey);
+      changePresentRound(window.allRounds[0] || '');
+    }
+
+    function changePresentRound(round) {
+      window.deckRound = round;
+      window.deck = buildDeck(round);
+      document.getElementById('presentCount').textContent = '(' + window.deck.length + ' หน้า)';
+      showSlide(0);
+    }
+
+    function showSlide(i) {
+      window.deckIndex = Math.max(0, Math.min(window.deck.length - 1, i));
+      const n = window.deck.length, k = window.deckIndex + 1;
+      document.getElementById('presentSlide').innerHTML = window.deck[window.deckIndex](k, n);
+      document.getElementById('presentPos').textContent = k + ' / ' + n;
+      document.getElementById('presentProgress').style.width = (k / n * 100) + '%';
+    }
+
+    function nextSlide() { showSlide(window.deckIndex + 1); }
+    function prevSlide() { showSlide(window.deckIndex - 1); }
+
+    function togglePresentFullscreen() {
+      if (document.fullscreenElement) document.exitFullscreen();
+      else if (document.getElementById('presentModal').requestFullscreen) document.getElementById('presentModal').requestFullscreen();
+    }
+
+    function closePresent() {
+      document.removeEventListener('keydown', onPresentKey);
+      if (document.fullscreenElement) document.exitFullscreen();
+      document.getElementById('presentModal').classList.remove('on');
+      document.getElementById('presentSlide').innerHTML = ''; // หยุดโหลด iframe เอกสาร
+    }
+
+    function onPresentKey(e) {
+      if (e.target && e.target.tagName === 'SELECT') return;
+      if (['ArrowRight', 'PageDown', ' ', 'Enter'].includes(e.key)) { e.preventDefault(); nextSlide(); }
+      else if (['ArrowLeft', 'PageUp', 'Backspace'].includes(e.key)) { e.preventDefault(); prevSlide(); }
+      else if (e.key === 'Home') { e.preventDefault(); showSlide(0); }
+      else if (e.key === 'End') { e.preventDefault(); showSlide(window.deck.length - 1); }
+      else if (e.key === 'f' || e.key === 'F') togglePresentFullscreen();
+      else if (e.key === 'Escape') closePresent();
     }
   </script>
 </body>
