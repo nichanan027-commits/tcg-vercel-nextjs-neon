@@ -193,7 +193,12 @@ export default function Deck({ meeting, initial }: { meeting: Meeting; initial: 
             <div className="pbox grn"><h4>✅ การปลดล็อก</h4>{c.unlock || 'ไม่มีระบุ'}</div>
           </div>
           <div className="pcol">
-            {link ? <iframe className="pdoc" src={embedUrl(link)} title="เอกสารหลักฐาน" referrerPolicy="no-referrer" /> : <div className="pnodoc">ไม่มีเอกสารแนบในระบบ</div>}
+            {link ? (
+              <>
+                <iframe className="pdoc" src={embedUrl(link)} title="เอกสารหลักฐาน" referrerPolicy="no-referrer" />
+                <a className="plink" href={link} target="_blank" rel="noopener noreferrer">เปิดเอกสารในแท็บใหม่ ↗</a>
+              </>
+            ) : <div className="pnodoc">ไม่มีเอกสารแนบในระบบ</div>}
           </div>
         </div>
         <div className="pdecide">

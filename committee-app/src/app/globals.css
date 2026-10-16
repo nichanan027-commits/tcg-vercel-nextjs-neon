@@ -158,6 +158,7 @@ textarea.field { width: 100%; min-height: 90px; font-family: ui-monospace, monos
 .pbox.red { background: #fef2f2; border: 1px solid #fecaca; flex: 1; } .pbox.red h4 { color: #b91c1c; }
 .pbox.grn { background: #f0fdf4; border: 1px solid #bbf7d0; flex: 1; } .pbox.grn h4 { color: #15803d; }
 .pdoc { flex: 1; border: 1px solid #cbd5e1; border-radius: .8cqw; background: #fff; width: 100%; min-height: 0; }
+.plink { font-size: 1.4cqw; color: var(--blue); }
 .pnodoc { flex: 1; display: flex; align-items: center; justify-content: center; border: 1px dashed #cbd5e1; border-radius: .8cqw; color: #94a3b8; font-size: 1.6cqw; }
 .pnote { font-size: 1.5cqw; color: #334155; } .pnote b { color: var(--navy); }
 .pclose { flex: 1; display: flex; flex-direction: column; justify-content: center; gap: 1.6cqw; font-size: 2cqw; line-height: 1.6; }

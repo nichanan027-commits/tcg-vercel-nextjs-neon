@@ -147,7 +147,12 @@ export default function Dashboard({ meeting, initial }: { meeting: Meeting; init
               <div>
                 <h4 style={{ margin: '0 0 6px' }}>📄 เอกสารหลักฐาน</h4>
                 {safeUrl(issueFor.evidenceUrl)
-                  ? <iframe className="docframe" src={embedUrl(safeUrl(issueFor.evidenceUrl))} title="เอกสารหลักฐาน" referrerPolicy="no-referrer" />
+                  ? (
+                    <>
+                      <iframe className="docframe" src={embedUrl(safeUrl(issueFor.evidenceUrl))} title="เอกสารหลักฐาน" referrerPolicy="no-referrer" />
+                      <p style={{ margin: '6px 0 0' }}><a href={safeUrl(issueFor.evidenceUrl)} target="_blank" rel="noopener noreferrer">เปิดเอกสารในแท็บใหม่ ↗</a></p>
+                    </>
+                  )
                   : <p className="sub">ไม่มีเอกสารแนบในระบบ</p>}
               </div>
             </div>
