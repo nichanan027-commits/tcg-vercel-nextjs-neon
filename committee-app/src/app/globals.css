@@ -80,6 +80,8 @@ table.grid tbody tr:hover { background: #fff7ed; }
 .kpi.bad { border-left-color: #ef4444; } .kpi.bad .v { color: var(--red); }
 .toolbar { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin: 4px 0 12px; }
 select.field, input.field, textarea.field { background: #fff; border: 1px solid #93a3c4; border-radius: 8px; padding: 6px 10px; }
+select.field, input.field { max-width: 100%; }
+.head > div { min-width: 0; }
 input.note { width: 100%; min-width: 170px; padding: 4px 8px; border: 1px solid transparent; border-radius: 6px; background: transparent; }
 input.note:hover, input.note:focus { border-color: #93a3c4; background: #fff; }
 input.note.edited { background: #fffbeb; }
